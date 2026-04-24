@@ -44,7 +44,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const AuthHeader(
                       title: 'Connexion',
-                      subtitle: 'Content de vous revoir ! Connectez-vous pour continuer.',
+                      subtitle:
+                          'Content de vous revoir ! Connectez-vous pour continuer.',
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(

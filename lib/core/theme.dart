@@ -35,14 +35,19 @@ class AppColors extends ThemeExtension<AppColors> {
   }
 
   @override
-  ThemeExtension<AppColors> lerp(
-    ThemeExtension<AppColors>? other,
-    double t,
-  ) {
+  ThemeExtension<AppColors> lerp(ThemeExtension<AppColors>? other, double t) {
     if (other is! AppColors) return this;
     return AppColors(
-      brandPrimaryGhost: Color.lerp(brandPrimaryGhost, other.brandPrimaryGhost, t)!,
-      brandPrimaryGlow: Color.lerp(brandPrimaryGlow, other.brandPrimaryGlow, t)!,
+      brandPrimaryGhost: Color.lerp(
+        brandPrimaryGhost,
+        other.brandPrimaryGhost,
+        t,
+      )!,
+      brandPrimaryGlow: Color.lerp(
+        brandPrimaryGlow,
+        other.brandPrimaryGlow,
+        t,
+      )!,
       bgSurface: Color.lerp(bgSurface, other.bgSurface, t)!,
       bgElevated: Color.lerp(bgElevated, other.bgElevated, t)!,
       bgBorder: Color.lerp(bgBorder, other.bgBorder, t)!,
@@ -72,7 +77,7 @@ class BourgoTheme {
       extensions: [
         const AppColors(
           brandPrimaryGhost: Color(0x15AAFF00), // 8% opacity
-          brandPrimaryGlow: Color(0x40AAFF00),  // 25% opacity
+          brandPrimaryGlow: Color(0x40AAFF00), // 25% opacity
           bgSurface: Color(0xFF111111),
           bgElevated: Color(0xFF1A1A1A),
           bgBorder: Color(0xFF242424),

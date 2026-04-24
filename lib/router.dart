@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/new_password/new_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:bourgo_arena_mobile/presentation/onboarding/onboarding_screen.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,22 +11,13 @@ import 'package:go_router/go_router.dart';
 final router = GoRouter(
   initialLocation: '/',
   routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) => const OnboardingScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      builder: (context, state) => const LoginScreen(),
-    ),
+    GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
+    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
     ),
-    GoRoute(
-      path: '/otp',
-      builder: (context, state) => const OtpScreen(),
-    ),
+    GoRoute(path: '/otp', builder: (context, state) => const OtpScreen()),
     GoRoute(
       path: '/forgot-password',
       builder: (context, state) => const ForgotPasswordScreen(),
@@ -34,5 +26,6 @@ final router = GoRouter(
       path: '/new-password',
       builder: (context, state) => const NewPasswordScreen(),
     ),
+    GoRoute(path: '/home', builder: (context, state) => const MainLayout()),
   ],
 );

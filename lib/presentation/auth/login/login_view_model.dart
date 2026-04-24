@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// ViewModel for the Login screen.
 class LoginViewModel extends ChangeNotifier {
@@ -17,10 +18,11 @@ class LoginViewModel extends ChangeNotifier {
   void login(BuildContext context) {
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
-      // Simulate API call
       Future.delayed(const Duration(seconds: 2), () {
         setLoading(false);
-        // Navigate to OTP or Home
+        if (context.mounted) {
+          context.go('/home');
+        }
       });
     }
   }

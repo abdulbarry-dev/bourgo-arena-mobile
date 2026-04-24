@@ -43,7 +43,8 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                   children: [
                     const AuthHeader(
                       title: 'Nouveau mot de passe',
-                      subtitle: 'Créez un nouveau mot de passe sécurisé pour votre compte.',
+                      subtitle:
+                          'Créez un nouveau mot de passe sécurisé pour votre compte.',
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(

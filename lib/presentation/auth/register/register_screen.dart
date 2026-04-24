@@ -44,7 +44,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     const AuthHeader(
                       title: 'Inscription',
-                      subtitle: 'Rejoignez le QG du Sport à Djerba et commencez votre aventure.',
+                      subtitle:
+                          'Rejoignez le QG du Sport à Djerba et commencez votre aventure.',
                     ),
                     const SizedBox(height: 32),
                     AuthTextField(

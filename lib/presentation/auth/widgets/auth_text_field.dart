@@ -48,7 +48,12 @@ class AuthTextField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: leadingIcon != null
-                ? Icon(leadingIcon, color: theme.colorScheme.onSurface.withAlpha((0.35 * 255).round()))
+                ? Icon(
+                    leadingIcon,
+                    color: theme.colorScheme.onSurface.withAlpha(
+                      (0.35 * 255).round(),
+                    ),
+                  )
                 : null,
             filled: true,
             fillColor: appColors.bgElevated,
@@ -62,11 +67,17 @@ class AuthTextField extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.5),
+              borderSide: BorderSide(
+                color: theme.colorScheme.primary,
+                width: 1.5,
+              ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: theme.colorScheme.error, width: 1.5),
+              borderSide: BorderSide(
+                color: theme.colorScheme.error,
+                width: 1.5,
+              ),
             ),
           ),
         ),

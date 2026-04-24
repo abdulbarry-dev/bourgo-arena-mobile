@@ -43,10 +43,11 @@ class _OtpScreenState extends State<OtpScreen> {
                 children: [
                   const AuthHeader(
                     title: 'Vérification',
-                    subtitle: 'Entrez le code de vérification envoyé à votre numéro.',
+                    subtitle:
+                        'Entrez le code de vérification envoyé à votre numéro.',
                   ),
                   const SizedBox(height: 48),
-                  
+
                   // OTP Input Boxes
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -76,7 +77,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // Real input hidden or using a specialized package
                   // For now, I'll add a simple TextField below for demonstration
                   const SizedBox(height: 24),
@@ -85,7 +86,10 @@ class _OtpScreenState extends State<OtpScreen> {
                     keyboardType: TextInputType.number,
                     maxLength: 4,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white, letterSpacing: 8),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      letterSpacing: 8,
+                    ),
                     decoration: InputDecoration(
                       hintText: 'CODE OTP',
                       counterText: '',
@@ -97,7 +101,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
                   ElevatedButton(
                     onPressed: _viewModel.isLoading
@@ -114,7 +118,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           )
                         : const Text('VALIDER'),
                   ),
-                  
+
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

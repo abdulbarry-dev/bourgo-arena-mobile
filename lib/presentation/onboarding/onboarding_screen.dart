@@ -11,7 +11,7 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       body: Stack(
         children: [
@@ -28,7 +28,7 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
           ),
-          
+
           // Content
           SafeArea(
             child: Padding(
@@ -37,12 +37,12 @@ class OnboardingScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Spacer(flex: 3),
-                  
+
                   // Brand Logotype
                   _BrandLogotype(),
-                  
+
                   const SizedBox(height: 12),
-                  
+
                   // Tagline
                   Text(
                     AppConstants.tagline.toUpperCase(),
@@ -52,15 +52,15 @@ class OnboardingScreen extends StatelessWidget {
                       letterSpacing: 2.0,
                     ),
                   ),
-                  
+
                   const Spacer(flex: 5),
-                  
+
                   // Action Button
                   ElevatedButton(
                     onPressed: () => context.push('/login'),
                     child: const Text('COMMENCER'),
                   ),
-                  
+
                   const SizedBox(height: 32),
                 ],
               ),
@@ -76,15 +76,13 @@ class _BrandLogotype extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'BOURGO',
-          style: theme.textTheme.displayLarge?.copyWith(
-            color: Colors.white,
-          ),
+          style: theme.textTheme.displayLarge?.copyWith(color: Colors.white),
         ),
         Text(
           'ARENA',

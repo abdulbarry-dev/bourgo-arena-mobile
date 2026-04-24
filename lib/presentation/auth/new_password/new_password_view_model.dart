@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 class NewPasswordViewModel extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;

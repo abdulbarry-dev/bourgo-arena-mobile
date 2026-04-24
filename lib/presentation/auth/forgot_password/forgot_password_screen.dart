@@ -44,7 +44,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   children: [
                     const AuthHeader(
                       title: 'Mot de passe oublié',
-                      subtitle: 'Ne vous inquiétez pas ! Entrez votre e-mail ou numéro pour recevoir un code.',
+                      subtitle:
+                          'Ne vous inquiétez pas ! Entrez votre e-mail ou numéro pour recevoir un code.',
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(
