@@ -1,4 +1,7 @@
+import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -15,9 +18,9 @@ class _MainLayoutState extends State<MainLayout> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const Center(child: Text('Activités')),
-    const Center(child: Text('Planning')),
-    const Center(child: Text('Profil')),
+    const ActivitiesScreen(),
+    const PlanningScreen(),
+    const ProfileScreen(),
   ];
 
   @override

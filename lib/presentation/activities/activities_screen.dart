@@ -1,0 +1,182 @@
+import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
+import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+/// Screen displaying all activities and user reservations.
+class ActivitiesScreen extends StatefulWidget {
+  const ActivitiesScreen({super.key});
+
+  @override
+  State<ActivitiesScreen> createState() => _ActivitiesScreenState();
+}
+
+class _ActivitiesScreenState extends State<ActivitiesScreen>
+    with SingleTickerProviderStateMixin {
+  late final ActivitiesViewModel _viewModel;
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = ActivitiesViewModel(dataService: DataService());
+    _tabController = TabController(length: 2, vsync: this);
+    _viewModel.loadData();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _viewModel.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: theme.colorScheme.surface,
+            title: Row(
+              children: [
+                Text(
+                  'BOURGO',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'ARENA',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
+                  ),
+                ),
+              ],
+            ),
+            bottom: TabBar(
+              controller: _tabController,
+              indicatorColor: theme.colorScheme.primary,
+              indicatorSize: TabBarIndicatorSize.tab,
+              labelColor: theme.colorScheme.primary,
+              unselectedLabelColor: Colors.white70,
+              labelStyle: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+              tabs: const [
+                Tab(text: 'EXPLORER'),
+                Tab(text: 'MES RÉSERVATIONS'),
+              ],
+            ),
+          ),
+          body: _viewModel.isLoading
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: theme.colorScheme.primary,
+                  ),
+                )
+              : _viewModel.error != null
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(_viewModel.error!),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _viewModel.loadData,
+                        child: const Text('RÉESSAYER'),
+                      ),
+                    ],
+                  ),
+                )
+              : TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _ActivitiesTab(viewModel: _viewModel),
+                    _ReservationsTab(viewModel: _viewModel),
+                  ],
+                ),
+        );
+      },
+    );
+  }
+}
+
+class _ActivitiesTab extends StatelessWidget {
+  final ActivitiesViewModel viewModel;
+
+  const _ActivitiesTab({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: viewModel.activities.length,
+      itemBuilder: (context, index) {
+        final activity = viewModel.activities[index];
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: ActivityCard(
+            title: activity.title,
+            imageUrl: activity.imageUrl,
+            icon: _getIcon(activity.icon),
+            onTap: () => context.push('/booking', extra: activity),
+          ),
+        );
+      },
+    );
+  }
+
+  // Helper to map string icon name to Material Symbols
+  IconData _getIcon(String name) {
+    switch (name) {
+      case 'sports_soccer':
+        return Icons.sports_soccer;
+      case 'sports_tennis':
+        return Icons.sports_tennis;
+      case 'sports_basketball':
+        return Icons.sports_basketball;
+      case 'fitness_center':
+        return Icons.fitness_center;
+      default:
+        return Icons.sports;
+    }
+  }
+}
+
+class _ReservationsTab extends StatelessWidget {
+  final ActivitiesViewModel viewModel;
+
+  const _ReservationsTab({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    if (viewModel.reservations.isEmpty) {
+      return const Center(
+        child: Text(
+          'Aucune réservation trouvée.',
+          style: TextStyle(color: Colors.white70),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: viewModel.reservations.length,
+      itemBuilder: (context, index) {
+        return ReservationCard(reservation: viewModel.reservations[index]);
+      },
+    );
+  }
+}

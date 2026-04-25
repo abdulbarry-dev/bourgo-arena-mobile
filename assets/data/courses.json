@@ -1,0 +1,50 @@
+[
+  {
+    "id": "course-1",
+    "title": "CrossFit Pro",
+    "instructor": "Coach Sami",
+    "start_time": "18:00",
+    "end_time": "19:00",
+    "day_of_week": 1,
+    "category": "Fitness",
+    "capacity": 15,
+    "enrolled": 12,
+    "icon": "fitness_center"
+  },
+  {
+    "id": "course-2",
+    "title": "Yoga Flow",
+    "instructor": "Ines",
+    "start_time": "09:00",
+    "end_time": "10:15",
+    "day_of_week": 2,
+    "category": "Wellness",
+    "capacity": 10,
+    "enrolled": 10,
+    "icon": "self_improvement"
+  },
+  {
+    "id": "course-3",
+    "title": "Football Academy",
+    "instructor": "Coach Mourad",
+    "start_time": "16:30",
+    "end_time": "18:00",
+    "day_of_week": 3,
+    "category": "Academy",
+    "capacity": 22,
+    "enrolled": 18,
+    "icon": "sports_soccer"
+  },
+  {
+    "id": "course-4",
+    "title": "Zumba Night",
+    "instructor": "Olfa",
+    "start_time": "19:00",
+    "end_time": "20:00",
+    "day_of_week": 1,
+    "category": "Fitness",
+    "capacity": 20,
+    "enrolled": 15,
+    "icon": "music_note"
+  }
+]

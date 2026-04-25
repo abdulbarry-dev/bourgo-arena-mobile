@@ -1,0 +1,165 @@
+import 'package:bourgo_arena_mobile/data/models/reservation.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+/// A card displaying a user's reservation details.
+class ReservationCard extends StatelessWidget {
+  /// The reservation to display.
+  final Reservation reservation;
+
+  /// Creates a new [ReservationCard] instance.
+  const ReservationCard({super.key, required this.reservation});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withAlpha(20)),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                _StatusBadge(status: reservation.status),
+                const Spacer(),
+                Text(
+                  reservation.id,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: Colors.white.withAlpha(100),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Colors.white10),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        reservation.activityTitle,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(
+                            Symbols.calendar_month,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            reservation.date,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.white70,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          const Icon(
+                            Symbols.schedule,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            reservation.time,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  '${reservation.price} ${reservation.paymentStatus == "paid" ? "TND" : "TND (À payer)"}',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String status;
+
+  const _StatusBadge({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    Color color;
+    String label;
+    IconData icon;
+
+    switch (status.toLowerCase()) {
+      case 'confirmed':
+        color = const Color(0xFFAAFF00);
+        label = 'CONFIRMÉ';
+        icon = Symbols.check_circle;
+        break;
+      case 'pending':
+        color = const Color(0xFFFF9500);
+        label = 'EN ATTENTE';
+        icon = Symbols.schedule;
+        break;
+      case 'cancelled':
+        color = const Color(0xFFFF3B30);
+        label = 'ANNULÉ';
+        icon = Symbols.cancel;
+        break;
+      default:
+        color = Colors.grey;
+        label = status.toUpperCase();
+        icon = Symbols.info;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withAlpha(30),
+        borderRadius: BorderRadius.circular(full),
+        border: Border.all(color: color.withAlpha(100)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+const double full = 9999;

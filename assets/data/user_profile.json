@@ -1,0 +1,10 @@
+{
+  "id": "user-123",
+  "name": "Abdelbari Bourgo",
+  "email": "abdelbari@bourgoarena.tn",
+  "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2574&auto=format&fit=crop",
+  "loyalty_points": 1250,
+  "subscription_level": "PREMIUM",
+  "subscription_expiry": "2026-12-31",
+  "total_check_ins": 42
+}
