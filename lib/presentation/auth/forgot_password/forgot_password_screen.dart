@@ -2,7 +2,6 @@ import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_pas
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// The forgot password screen for Bourgo Arena.
@@ -60,11 +59,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ElevatedButton(
                       onPressed: _viewModel.isLoading
                           ? null
-                          : () {
-                              _viewModel.sendCode(context);
-                              // For now, manual navigation for demo
-                              context.push('/otp');
-                            },
+                          : () => _viewModel.sendCode(context),
                       child: _viewModel.isLoading
                           ? const SizedBox(
                               height: 20,

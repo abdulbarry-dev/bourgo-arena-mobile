@@ -45,6 +45,23 @@ class _FoodScreenState extends State<FoodScreen> {
                 _buildMenuList(theme),
             ],
           ),
+          floatingActionButton: _viewModel.cart.isNotEmpty
+              ? FloatingActionButton.extended(
+                  onPressed: () {
+                    // Logic for checkout or cart summary
+                    _showCartSummary(context);
+                  },
+                  label: Text(
+                    'PANIER (${_viewModel.cart.length}) • ${_viewModel.cartTotal.toStringAsFixed(1)} TND',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  icon: const Icon(Symbols.shopping_cart, color: Colors.black),
+                  backgroundColor: theme.colorScheme.primary,
+                )
+              : null,
         );
       },
     );
@@ -206,7 +223,17 @@ class _FoodScreenState extends State<FoodScreen> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _viewModel.addToCart(item);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${item.name} ajouté au panier'),
+                        duration: const Duration(seconds: 1),
+                        backgroundColor: theme.colorScheme.primary,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
                   icon: Icon(
                     Symbols.add_circle,
                     color: theme.colorScheme.primary,
@@ -217,6 +244,92 @@ class _FoodScreenState extends State<FoodScreen> {
           );
         }, childCount: _viewModel.items.length),
       ),
+    );
+  }
+
+  void _showCartSummary(BuildContext context) {
+    final theme = Theme.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return ListenableBuilder(
+          listenable: _viewModel,
+          builder: (context, _) {
+            return Container(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'VOTRE PANIER',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontFamily: 'BlackHanSans',
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(color: Colors.white10),
+                  const SizedBox(height: 16),
+                  ..._viewModel.cart.map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(item.name),
+                          Text(
+                            '${item.price.toStringAsFixed(1)} TND',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(color: Colors.white10),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'TOTAL',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        '${_viewModel.cartTotal.toStringAsFixed(1)} TND',
+                        style: TextStyle(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _viewModel.clearCart();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Commande envoyée avec succès !'),
+                        ),
+                      );
+                    },
+                    child: const Text('COMMANDER'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

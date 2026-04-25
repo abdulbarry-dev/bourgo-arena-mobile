@@ -8,6 +8,9 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// The main layout of the application with bottom navigation.
 class MainLayout extends StatefulWidget {
+  /// Controller to change the active tab from child screens.
+  static final ValueNotifier<int> tabController = ValueNotifier<int>(0);
+
   const MainLayout({super.key});
 
   @override
@@ -26,6 +29,25 @@ class _MainLayoutState extends State<MainLayout> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _currentIndex = MainLayout.tabController.value;
+    MainLayout.tabController.addListener(_handleTabChange);
+  }
+
+  @override
+  void dispose() {
+    MainLayout.tabController.removeListener(_handleTabChange);
+    super.dispose();
+  }
+
+  void _handleTabChange() {
+    if (mounted) {
+      setState(() => _currentIndex = MainLayout.tabController.value);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
@@ -39,7 +61,7 @@ class _MainLayoutState extends State<MainLayout> {
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: (index) => MainLayout.tabController.value = index,
           type: BottomNavigationBarType.fixed,
           backgroundColor: theme.colorScheme.surface,
           selectedItemColor: theme.colorScheme.primary,

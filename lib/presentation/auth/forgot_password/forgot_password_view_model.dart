@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// ViewModel for the Forgot Password screen.
 class ForgotPasswordViewModel extends ChangeNotifier {
@@ -18,8 +19,10 @@ class ForgotPasswordViewModel extends ChangeNotifier {
       setLoading(true);
       // Simulate API call
       Future.delayed(const Duration(seconds: 2), () {
-        setLoading(false);
-        // Navigate to OTP
+        if (context.mounted) {
+          setLoading(false);
+          context.push('/otp', extra: identifierController.text);
+        }
       });
     }
   }

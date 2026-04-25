@@ -9,9 +9,13 @@ class FoodViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   String _selectedCategory = 'Tous';
+  final List<FoodItem> _cart = [];
 
   FoodViewModel({required DataService dataService})
     : _dataService = dataService;
+
+  List<FoodItem> get cart => List.unmodifiable(_cart);
+  double get cartTotal => _cart.fold(0, (sum, item) => sum + item.price);
 
   List<FoodItem> get items {
     if (_selectedCategory == 'Tous') return _items;
@@ -47,6 +51,16 @@ class FoodViewModel extends ChangeNotifier {
 
   void setCategory(String category) {
     _selectedCategory = category;
+    notifyListeners();
+  }
+
+  void addToCart(FoodItem item) {
+    _cart.add(item);
+    notifyListeners();
+  }
+
+  void clearCart() {
+    _cart.clear();
     notifyListeners();
   }
 }

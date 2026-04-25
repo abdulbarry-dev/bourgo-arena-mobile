@@ -1,8 +1,11 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/ticker_strip.dart';
+import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// The home screen of Bourgo Arena.
@@ -46,8 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Symbols.search)),
-          IconButton(onPressed: () {}, icon: const Icon(Symbols.notifications)),
+          IconButton(
+            onPressed: () => MainLayout.tabController.value = 1,
+            icon: const Icon(Symbols.search),
+          ),
+          IconButton(
+            onPressed: () => context.push('/notifications'),
+            icon: const Icon(Symbols.notifications),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -106,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () => MainLayout.tabController.value = 1,
                     child: Text(
                       'VOIR TOUT',
                       style: TextStyle(
@@ -127,21 +136,67 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 24),
-                children: const [
+                children: [
                   ActivityCard(
                     title: 'Football',
                     imageUrl:
                         'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500',
+                    onTap: () => context.push(
+                      '/booking',
+                      extra: Activity(
+                        id: 'foot-1',
+                        title: 'Football 5vs5',
+                        imageUrl:
+                            'https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500',
+                        price: 100.0,
+                        currency: 'TND',
+                        category: 'Football',
+                        icon: 'sports_soccer',
+                        description: 'Terrain synthétique de haute qualité.',
+                        features: ['Douches', 'Parking', 'Éclairage'],
+                      ),
+                    ),
                   ),
                   ActivityCard(
                     title: 'Padel',
                     imageUrl:
                         'https://images.unsplash.com/photo-1626245917164-214273c248fa?q=80&w=500',
+                    onTap: () => context.push(
+                      '/booking',
+                      extra: Activity(
+                        id: 'padel-1',
+                        title: 'Padel Court',
+                        imageUrl:
+                            'https://images.unsplash.com/photo-1626245917164-214273c248fa?q=80&w=500',
+                        price: 60.0,
+                        currency: 'TND',
+                        category: 'Padel',
+                        icon: 'sports_tennis',
+                        description: 'Court panoramique avec éclairage LED.',
+                        features: ['Raquettes fournies', 'Vitre panoramique'],
+                      ),
+                    ),
                   ),
                   ActivityCard(
                     title: 'Fitness',
                     imageUrl:
                         'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=500',
+                    onTap: () => context.push(
+                      '/booking',
+                      extra: Activity(
+                        id: 'fitness-1',
+                        title: 'Salle de Fitness',
+                        imageUrl:
+                            'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=500',
+                        price: 20.0,
+                        currency: 'TND',
+                        category: 'Fitness',
+                        icon: 'fitness_center',
+                        description:
+                            'Accès complet aux machines et poids libres.',
+                        features: ['Climatisation', 'Coach disponible'],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -170,42 +225,56 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 24),
               itemCount: 3,
               itemBuilder: (context, index) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 4,
-                        height: 40,
-                        color: theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'TOURNOI FLASH',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.bold,
+                final titles = [
+                  'TOURNOI FLASH',
+                  'COURS COLLECTIF',
+                  'MATCH AMICAL',
+                ];
+                final subtitles = [
+                  'Football 5vs5 • 18:00',
+                  'CrossFit • 19:30',
+                  'Padel Mixed • 21:00',
+                ];
+
+                return GestureDetector(
+                  onTap: () => MainLayout.tabController.value = 2,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 4,
+                          height: 40,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              titles[index],
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          Text(
-                            'Football 5vs5 • 18:00',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              subtitles[index],
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Symbols.chevron_right, size: 20),
-                    ],
+                          ],
+                        ),
+                        const Spacer(),
+                        const Icon(Symbols.chevron_right, size: 20),
+                      ],
+                    ),
                   ),
                 );
               },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// ViewModel for the Registration screen.
 class RegisterViewModel extends ChangeNotifier {
@@ -21,8 +22,10 @@ class RegisterViewModel extends ChangeNotifier {
       setLoading(true);
       // Simulate API call
       Future.delayed(const Duration(seconds: 2), () {
-        setLoading(false);
-        // Navigate to OTP
+        if (context.mounted) {
+          setLoading(false);
+          context.push('/otp', extra: emailController.text);
+        }
       });
     }
   }
