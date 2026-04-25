@@ -1,0 +1,52 @@
+import 'package:bourgo_arena_mobile/data/models/food_item.dart';
+import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:flutter/material.dart';
+
+/// ViewModel managing the food menu state.
+class FoodViewModel extends ChangeNotifier {
+  final DataService _dataService;
+  List<FoodItem> _items = [];
+  bool _isLoading = false;
+  String? _error;
+  String _selectedCategory = 'Tous';
+
+  FoodViewModel({required DataService dataService})
+    : _dataService = dataService;
+
+  List<FoodItem> get items {
+    if (_selectedCategory == 'Tous') return _items;
+    return _items.where((i) => i.category == _selectedCategory).toList();
+  }
+
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+  String get selectedCategory => _selectedCategory;
+
+  List<String> get categories => [
+    'Tous',
+    'Healthy',
+    'Boissons',
+    'Plats',
+    'Snacks',
+  ];
+
+  Future<void> loadMenu() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _items = await _dataService.getFoodMenu();
+      _isLoading = false;
+    } catch (e) {
+      _error = 'Erreur lors du chargement du menu';
+      _isLoading = false;
+    }
+    notifyListeners();
+  }
+
+  void setCategory(String category) {
+    _selectedCategory = category;
+    notifyListeners();
+  }
+}

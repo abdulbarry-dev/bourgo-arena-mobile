@@ -24,7 +24,13 @@ final router = GoRouter(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
     ),
-    GoRoute(path: '/otp', builder: (context, state) => const OtpScreen()),
+    GoRoute(
+      path: '/otp',
+      builder: (context, state) {
+        final destination = state.extra as String?;
+        return OtpScreen(destination: destination);
+      },
+    ),
     GoRoute(
       path: '/forgot-password',
       builder: (context, state) => const ForgotPasswordScreen(),
