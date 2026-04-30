@@ -1,6 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/food/food_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_screen.dart';
@@ -25,7 +24,6 @@ class _MainLayoutState extends State<MainLayout> {
     const HomeScreen(),
     const ActivitiesScreen(),
     const PlanningScreen(),
-    const FoodScreen(),
     const ProfileScreen(),
   ];
 
@@ -84,10 +82,6 @@ class _MainLayoutState extends State<MainLayout> {
             BottomNavigationBarItem(
               icon: Icon(Symbols.calendar_month),
               label: AppConstants.navPlanning,
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Symbols.restaurant),
-              label: AppConstants.navFood,
             ),
             BottomNavigationBarItem(
               icon: Icon(Symbols.person),

@@ -23,7 +23,6 @@ class AppConstants {
   static const String navHome = 'ACCUEIL';
   static const String navActivities = 'ACTIVITÉS';
   static const String navPlanning = 'PLANNING';
-  static const String navFood = 'FOOD';
   static const String navProfile = 'PROFIL';
 
   // Home
@@ -152,18 +151,4 @@ class AppConstants {
   static const String bookingSportDefault = 'Sport';
   static const String bookingLocationValue = 'Bourgo Arena, Djerba';
   static const String bookingTodayAt = 'Aujourd\'hui à 18:30';
-
-  // Food
-  static const String foodTitle = 'FOOD CORNER';
-  static const String foodCart = 'PANIER';
-  static const String foodYourCart = 'VOTRE PANIER';
-  static const String foodOrderSuccess = 'Commande envoyée avec succès !';
-  static const String foodAddedToCart = 'ajouté au panier';
-  static const String foodOrder = 'COMMANDER';
-  static const String foodCategoryAll = 'Tous';
-  static const String foodCategoryHealthy = 'Healthy';
-  static const String foodCategoryDrinks = 'Boissons';
-  static const String foodCategoryDishes = 'Plats';
-  static const String foodCategorySnacks = 'Snacks';
-  static const String foodLoadError = 'Erreur lors du chargement du menu';
 }

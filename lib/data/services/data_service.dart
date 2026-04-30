@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
-import 'package:bourgo_arena_mobile/data/models/food_item.dart';
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation.dart';
 import 'package:bourgo_arena_mobile/data/models/time_slot.dart';
@@ -66,14 +65,5 @@ class DataService {
     );
     final List<dynamic> data = json.decode(response);
     return data.map((json) => NotificationModel.fromJson(json)).toList();
-  }
-
-  /// Fetches the list of food and drink items.
-  Future<List<FoodItem>> getFoodMenu() async {
-    final String response = await rootBundle.loadString(
-      'assets/data/food_menu.json',
-    );
-    final List<dynamic> data = json.decode(response);
-    return data.map((json) => FoodItem.fromJson(json)).toList();
   }
 }
