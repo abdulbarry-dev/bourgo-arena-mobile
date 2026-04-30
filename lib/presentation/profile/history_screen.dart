@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
@@ -36,13 +37,13 @@ class _HistoryScreenState extends State<HistoryScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HISTORIQUE & CHECK-IN'),
+        title: const Text(AppConstants.profileHistoryTitle),
         backgroundColor: theme.colorScheme.surface,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
-            Tab(text: 'CHECK-IN'),
-            Tab(text: 'HISTORIQUE'),
+            Tab(text: AppConstants.profileTabCheckin),
+            Tab(text: AppConstants.profileTabHistory),
           ],
         ),
       ),
@@ -66,7 +67,7 @@ class _CheckInTab extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text(
-          'PRÉSENTEZ VOTRE QR CODE',
+          AppConstants.profileQrSubtitle,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.5,
@@ -105,7 +106,7 @@ class _CheckInTab extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'BOURGO-SCAN-123',
+                AppConstants.profileQrPlaceholder,
                 style: TextStyle(
                   color: Colors.black54,
                   fontFamily: 'monospace',
@@ -119,7 +120,7 @@ class _CheckInTab extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 48),
           child: Text(
-            'Scannez ce code à l\'entrée pour valider votre présence.',
+            AppConstants.profileQrScanInstruction,
             textAlign: TextAlign.center,
             style: TextStyle(color: Colors.white54, fontSize: 14),
           ),
@@ -145,7 +146,7 @@ class _HistoryTab extends StatelessWidget {
 
         final reservations = viewModel.reservations;
         if (reservations.isEmpty) {
-          return const Center(child: Text('Aucune réservation passée.'));
+          return const Center(child: Text(AppConstants.profileNoHistory));
         }
 
         return ListView.builder(

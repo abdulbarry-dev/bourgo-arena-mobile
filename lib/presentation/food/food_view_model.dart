@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/food_item.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +9,7 @@ class FoodViewModel extends ChangeNotifier {
   List<FoodItem> _items = [];
   bool _isLoading = false;
   String? _error;
-  String _selectedCategory = 'Tous';
+  String _selectedCategory = AppConstants.foodCategoryAll;
   final List<FoodItem> _cart = [];
 
   FoodViewModel({required DataService dataService})
@@ -18,7 +19,7 @@ class FoodViewModel extends ChangeNotifier {
   double get cartTotal => _cart.fold(0, (sum, item) => sum + item.price);
 
   List<FoodItem> get items {
-    if (_selectedCategory == 'Tous') return _items;
+    if (_selectedCategory == AppConstants.foodCategoryAll) return _items;
     return _items.where((i) => i.category == _selectedCategory).toList();
   }
 
@@ -27,11 +28,11 @@ class FoodViewModel extends ChangeNotifier {
   String get selectedCategory => _selectedCategory;
 
   List<String> get categories => [
-    'Tous',
-    'Healthy',
-    'Boissons',
-    'Plats',
-    'Snacks',
+    AppConstants.foodCategoryAll,
+    AppConstants.foodCategoryHealthy,
+    AppConstants.foodCategoryDrinks,
+    AppConstants.foodCategoryDishes,
+    AppConstants.foodCategorySnacks,
   ];
 
   Future<void> loadMenu() async {
@@ -43,7 +44,7 @@ class FoodViewModel extends ChangeNotifier {
       _items = await _dataService.getFoodMenu();
       _isLoading = false;
     } catch (e) {
-      _error = 'Erreur lors du chargement du menu';
+      _error = AppConstants.foodLoadError;
       _isLoading = false;
     }
     notifyListeners();

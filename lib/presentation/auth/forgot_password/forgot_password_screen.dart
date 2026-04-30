@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -42,18 +43,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const AuthHeader(
-                      title: 'Mot de passe oublié',
-                      subtitle:
-                          'Ne vous inquiétez pas ! Entrez votre e-mail ou numéro pour recevoir un code.',
+                      title: AppConstants.authForgotPasswordTitle,
+                      subtitle: AppConstants.authForgotPasswordSubtitle,
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(
-                      label: 'E-mail ou Téléphone',
-                      hint: 'Entrez votre identifiant',
+                      label: AppConstants.authIdentifierLabel,
+                      hint: AppConstants.authEmailHint,
                       leadingIcon: Symbols.mail,
                       controller: _viewModel.identifierController,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Champ requis' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppConstants.commonRequiredField
+                          : null,
                     ),
                     const SizedBox(height: 48),
                     ElevatedButton(
@@ -69,7 +70,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 color: Colors.black,
                               ),
                             )
-                          : const Text('ENVOYER LE CODE'),
+                          : const Text(AppConstants.authSendCode),
                     ),
                   ],
                 ),

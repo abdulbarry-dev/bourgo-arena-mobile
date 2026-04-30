@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -76,9 +77,8 @@ class NoResultsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const EmptyStateScreen(
-      title: 'AUCUN RÉSULTAT',
-      subtitle:
-          'Nous n\'avons rien trouvé pour votre recherche. Essayez d\'autres filtres.',
+      title: AppConstants.commonNoResults,
+      subtitle: AppConstants.commonNoResultsSubtitle,
       icon: Symbols.search_off,
     );
   }

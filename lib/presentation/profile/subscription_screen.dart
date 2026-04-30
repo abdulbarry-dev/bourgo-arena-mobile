@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('MON ABONNEMENT'),
+            title: const Text(AppConstants.profileSubscriptionTitle),
             backgroundColor: theme.colorScheme.surface,
           ),
           body: SingleChildScrollView(
@@ -42,7 +43,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 _ActivePlanCard(profile: profile),
                 const SizedBox(height: 32),
                 const Text(
-                  'AVANTAGES',
+                  AppConstants.profileAdvantages,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -51,17 +52,17 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _BenefitItem(text: 'Accès illimité à la salle de sport'),
-                _BenefitItem(text: 'Réservation prioritaire des terrains'),
-                _BenefitItem(text: '1 invité gratuit par mois'),
-                _BenefitItem(text: '-10% au Pro Shop'),
+                _BenefitItem(text: AppConstants.profileBenefit1),
+                _BenefitItem(text: AppConstants.profileBenefit2),
+                _BenefitItem(text: AppConstants.profileBenefit3),
+                _BenefitItem(text: AppConstants.profileBenefit4),
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
                   ),
-                  child: const Text('GÉRER L\'ABONNEMENT'),
+                  child: const Text(AppConstants.profileManageSubscription),
                 ),
               ],
             ),
@@ -104,7 +105,7 @@ class _ActivePlanCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                profile?.subscriptionLevel ?? 'PLAN',
+                profile?.subscriptionLevel ?? AppConstants.profilePlanLabel,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontFamily: 'BlackHanSans',
                   color: theme.colorScheme.primary,
@@ -115,7 +116,7 @@ class _ActivePlanCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           const Text(
-            'PROCHAINE FACTURATION',
+            AppConstants.profileNextBilling,
             style: TextStyle(
               color: Colors.white54,
               fontSize: 10,
@@ -137,7 +138,7 @@ class _ActivePlanCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Utilisation mensuelle',
+                AppConstants.profileMonthlyUsage,
                 style: TextStyle(color: Colors.white54, fontSize: 12),
               ),
               Text(

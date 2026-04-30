@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/food/food_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
@@ -72,22 +73,25 @@ class _MainLayoutState extends State<MainLayout> {
           ),
           unselectedLabelStyle: const TextStyle(fontSize: 10),
           items: const [
-            BottomNavigationBarItem(icon: Icon(Symbols.home), label: 'ACCUEIL'),
+            BottomNavigationBarItem(
+              icon: Icon(Symbols.home),
+              label: AppConstants.navHome,
+            ),
             BottomNavigationBarItem(
               icon: Icon(Symbols.sports_soccer),
-              label: 'ACTIVITÉS',
+              label: AppConstants.navActivities,
             ),
             BottomNavigationBarItem(
               icon: Icon(Symbols.calendar_month),
-              label: 'PLANNING',
+              label: AppConstants.navPlanning,
             ),
             BottomNavigationBarItem(
               icon: Icon(Symbols.restaurant),
-              label: 'FOOD',
+              label: AppConstants.navFood,
             ),
             BottomNavigationBarItem(
               icon: Icon(Symbols.person),
-              label: 'PROFIL',
+              label: AppConstants.navProfile,
             ),
           ],
         ),

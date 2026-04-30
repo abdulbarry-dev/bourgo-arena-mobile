@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -32,7 +33,7 @@ class OfflineScreen extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               Text(
-                'MODE HORS-LIGNE',
+                AppConstants.commonOfflineTitle,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontFamily: 'BlackHanSans',
                   letterSpacing: 2,
@@ -40,7 +41,7 @@ class OfflineScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Oups ! Il semble que vous soyez déconnecté. Vérifiez votre connexion internet pour continuer.',
+                AppConstants.commonOfflineSubtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white54,
@@ -54,13 +55,13 @@ class OfflineScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
                 ),
-                child: const Text('RÉESSAYER'),
+                child: const Text(AppConstants.commonRetry),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {},
                 child: Text(
-                  'ACCÉDER AUX RÉSERVATIONS HORS-LIGNE',
+                  AppConstants.commonOfflineAccess,
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,

@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -45,7 +46,7 @@ class BookingSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               Text(
-                'RÉSERVATION CONFIRMÉE !',
+                AppConstants.bookingConfirmed,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontFamily: 'BlackHanSans',
@@ -54,21 +55,21 @@ class BookingSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                'Votre terrain de ${activity?.title ?? 'Sport'} a été réservé avec succès.',
+                '${AppConstants.bookingSuccessMessagePrefix}${activity?.title ?? AppConstants.bookingSportDefault}${AppConstants.bookingSuccessMessageSuffix}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: Colors.white70, fontSize: 16),
               ),
               const SizedBox(height: 48),
               _DetailItem(
                 icon: Symbols.calendar_month,
-                label: 'DATE & HEURE',
-                value: 'Aujourd\'hui à 18:30',
+                label: AppConstants.bookingDateLabel,
+                value: AppConstants.bookingTodayAt,
               ),
               const SizedBox(height: 16),
               _DetailItem(
                 icon: Symbols.location_on,
-                label: 'LIEU',
-                value: 'Bourgo Arena, Djerba',
+                label: AppConstants.bookingLocationLabel,
+                value: AppConstants.bookingLocationValue,
               ),
               const Spacer(),
               ElevatedButton(
@@ -76,13 +77,13 @@ class BookingSuccessScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
                 ),
-                child: const Text('RETOUR À L\'ACCUEIL'),
+                child: const Text(AppConstants.bookingReturnHome),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {}, // Navigate to reservation details
                 child: Text(
-                  'VOIR LE TICKET',
+                  AppConstants.bookingViewTicket,
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,

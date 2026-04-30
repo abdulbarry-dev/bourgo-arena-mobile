@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -43,48 +44,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const AuthHeader(
-                      title: 'Inscription',
-                      subtitle:
-                          'Rejoignez le QG du Sport à Djerba et commencez votre aventure.',
+                      title: AppConstants.authRegisterTitle,
+                      subtitle: AppConstants.authRegisterSubtitle,
                     ),
                     const SizedBox(height: 32),
                     AuthTextField(
-                      label: 'Nom complet',
-                      hint: 'Entrez votre nom',
+                      label: AppConstants.authFullNameLabel,
+                      hint: AppConstants.authFullNameHint,
                       leadingIcon: Symbols.person,
                       controller: _viewModel.nameController,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Champ requis' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppConstants.commonRequiredField
+                          : null,
                     ),
                     const SizedBox(height: 20),
                     AuthTextField(
-                      label: 'E-mail',
-                      hint: 'Entrez votre e-mail',
+                      label: AppConstants.authEmailLabel,
+                      hint: AppConstants.authEmailLabelHint,
                       leadingIcon: Symbols.mail,
                       keyboardType: TextInputType.emailAddress,
                       controller: _viewModel.emailController,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Champ requis' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppConstants.commonRequiredField
+                          : null,
                     ),
                     const SizedBox(height: 20),
                     AuthTextField(
-                      label: 'Téléphone',
-                      hint: 'Entrez votre numéro',
+                      label: AppConstants.authPhoneLabel,
+                      hint: AppConstants.authPhoneHint,
                       leadingIcon: Symbols.call,
                       keyboardType: TextInputType.phone,
                       controller: _viewModel.phoneController,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Champ requis' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppConstants.commonRequiredField
+                          : null,
                     ),
                     const SizedBox(height: 20),
                     AuthTextField(
-                      label: 'Mot de passe',
-                      hint: 'Créez un mot de passe',
+                      label: AppConstants.authPasswordLabel,
+                      hint: AppConstants.authPasswordCreateHint,
                       leadingIcon: Symbols.lock,
                       isPassword: true,
                       controller: _viewModel.passwordController,
-                      validator: (value) =>
-                          (value?.length ?? 0) < 6 ? 'Min 6 caractères' : null,
+                      validator: (value) => (value?.length ?? 0) < 6
+                          ? AppConstants.authPasswordMinLength
+                          : null,
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton(
@@ -100,14 +104,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: Colors.black,
                               ),
                             )
-                          : const Text('S\'INSCRIRE'),
+                          : const Text(AppConstants.authRegister),
                     ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Déjà un compte ? ',
+                          AppConstants.authHaveAccount,
                           style: TextStyle(
                             color: Colors.white.withAlpha((0.65 * 255).round()),
                             fontSize: 14,
@@ -116,7 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         TextButton(
                           onPressed: () => context.pop(),
                           child: Text(
-                            'Se connecter',
+                            AppConstants.authLogin,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,

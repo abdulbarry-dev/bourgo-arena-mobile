@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'REJOINS',
+                        AppConstants.homeHeroPart1,
                         style: theme.textTheme.displayMedium?.copyWith(
                           color: Colors.white,
                           fontFamily: 'BlackHanSans',
@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text(
-                        'L\'ARENE',
+                        AppConstants.homeHeroPart2,
                         style: theme.textTheme.displayMedium?.copyWith(
                           color: theme.colorScheme.primary,
                           fontFamily: 'BlackHanSans',
@@ -104,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // Ticker Strip
                 TickerStrip(
-                  text: 'RESERVE TA SESSION • FOOTBALL • PADEL • FITNESS • ',
+                  text: AppConstants.homeTicker,
                   backgroundColor: theme.colorScheme.primary,
                   textColor: Colors.black,
                 ),
@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'NOS ACTIVITÉS',
+                        AppConstants.homeActivitiesTitle,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontFamily: 'BlackHanSans',
                           letterSpacing: 1,
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextButton(
                         onPressed: () => MainLayout.tabController.value = 1,
                         child: Text(
-                          'VOIR TOUT',
+                          AppConstants.homeSeeAll,
                           style: TextStyle(
                             color: theme.colorScheme.primary,
                             fontSize: 12,
@@ -152,10 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       return ActivityCard(
                         title: activity.title,
                         imageUrl: activity.imageUrl,
-                        onTap: () => context.push(
-                          '/booking',
-                          extra: activity,
-                        ),
+                        onTap: () => context.push('/booking', extra: activity),
                       );
                     },
                   ),
@@ -167,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    'AUJOURD\'HUI',
+                    AppConstants.homeTodayTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontFamily: 'BlackHanSans',
                       letterSpacing: 1,
@@ -181,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
-                      'Aucun cours prévu aujourd\'hui.',
+                      AppConstants.homeNoCourses,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white54,
                       ),

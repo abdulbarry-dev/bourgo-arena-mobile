@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 class HomeViewModel extends ChangeNotifier {
   final DataService _dataService;
 
-  HomeViewModel({required DataService dataService}) : _dataService = dataService;
+  HomeViewModel({required DataService dataService})
+    : _dataService = dataService;
 
   int _currentIndex = 0;
   int get currentIndex => _currentIndex;

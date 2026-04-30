@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final profile = _viewModel.profile;
         if (profile == null) {
           return const Scaffold(
-            body: Center(child: Text('Erreur de chargement')),
+            body: Center(child: Text(AppConstants.commonLoadingError)),
           );
         }
 
@@ -157,13 +158,13 @@ class _StatsRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _StatItem(
-            label: 'POINTS',
+            label: AppConstants.profilePoints,
             value: profile.loyaltyPoints.toString(),
             icon: Symbols.stars,
           ),
           Container(width: 1, height: 40, color: Colors.white10),
           _StatItem(
-            label: 'CHECK-INS',
+            label: AppConstants.profileCheckins,
             value: profile.totalCheckIns.toString(),
             icon: Symbols.qr_code_scanner,
           ),
@@ -226,23 +227,27 @@ class _ProfileMenu extends StatelessWidget {
       children: [
         _MenuItem(
           icon: Symbols.card_membership,
-          label: 'Mon Abonnement',
+          label: AppConstants.profileMySubscription,
           onTap: onTapAbonnement,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.history,
-          label: 'Check-in & Historique',
+          label: AppConstants.profileHistory,
           onTap: onTapHistorique,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.notifications,
-          label: 'Notifications',
+          label: AppConstants.profileNotifications,
           onTap: onTapNotifications,
         ),
         const SizedBox(height: 12),
-        _MenuItem(icon: Symbols.settings, label: 'Paramètres', onTap: () {}),
+        _MenuItem(
+          icon: Symbols.settings,
+          label: AppConstants.profileSettings,
+          onTap: () {},
+        ),
       ],
     );
   }
@@ -293,7 +298,7 @@ class _LogoutButton extends StatelessWidget {
     return TextButton(
       onPressed: () => context.go('/login'),
       child: const Text(
-        'SE DÉCONNECTER',
+        AppConstants.profileLogout,
         style: TextStyle(
           color: Colors.redAccent,
           fontWeight: FontWeight.bold,

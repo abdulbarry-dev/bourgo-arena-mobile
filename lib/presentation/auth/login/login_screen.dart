@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -43,28 +44,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const AuthHeader(
-                      title: 'Connexion',
-                      subtitle:
-                          'Content de vous revoir ! Connectez-vous pour continuer.',
+                      title: AppConstants.authLoginTitle,
+                      subtitle: AppConstants.authLoginSubtitle,
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(
-                      label: 'E-mail ou Téléphone',
-                      hint: 'Entrez votre identifiant',
+                      label: AppConstants.authIdentifierLabel,
+                      hint: AppConstants.authEmailHint,
                       leadingIcon: Symbols.person,
                       controller: _viewModel.identifierController,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Champ requis' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppConstants.commonRequiredField
+                          : null,
                     ),
                     const SizedBox(height: 24),
                     AuthTextField(
-                      label: 'Mot de passe',
-                      hint: 'Entrez votre mot de passe',
+                      label: AppConstants.authPasswordLabel,
+                      hint: AppConstants.authPasswordHint,
                       leadingIcon: Symbols.lock,
                       isPassword: true,
                       controller: _viewModel.passwordController,
-                      validator: (value) =>
-                          value?.isEmpty ?? true ? 'Champ requis' : null,
+                      validator: (value) => value?.isEmpty ?? true
+                          ? AppConstants.commonRequiredField
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     Align(
@@ -72,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextButton(
                         onPressed: () => context.push('/forgot-password'),
                         child: Text(
-                          'Mot de passe oublié ?',
+                          AppConstants.authForgotPassword,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontSize: 12,
@@ -94,14 +96,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.black,
                               ),
                             )
-                          : const Text('SE CONNECTER'),
+                          : const Text(AppConstants.authLogin),
                     ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Pas encore de compte ? ',
+                          AppConstants.authNoAccount,
                           style: TextStyle(
                             color: Colors.white.withAlpha((0.65 * 255).round()),
                             fontSize: 14,
@@ -110,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: () => context.push('/register'),
                           child: Text(
-                            'S\'inscrire',
+                            AppConstants.authRegister,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,

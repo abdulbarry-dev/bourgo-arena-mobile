@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
@@ -46,7 +47,7 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
         return Scaffold(
           appBar: AppBar(
             backgroundColor: theme.colorScheme.surface,
-            title: const Text('RÉSERVATION'),
+            title: const Text(AppConstants.bookingTitle),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {

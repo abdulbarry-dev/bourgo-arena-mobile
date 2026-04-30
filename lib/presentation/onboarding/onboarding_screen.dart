@@ -58,7 +58,7 @@ class OnboardingScreen extends StatelessWidget {
                   // Action Button
                   ElevatedButton(
                     onPressed: () => context.push('/login'),
-                    child: const Text('COMMENCER'),
+                    child: const Text(AppConstants.commonStart),
                   ),
 
                   const SizedBox(height: 32),
@@ -81,11 +81,11 @@ class _BrandLogotype extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'BOURGO',
+          AppConstants.commonAppNamePart1,
           style: theme.textTheme.displayLarge?.copyWith(color: Colors.white),
         ),
         Text(
-          'ARENA',
+          AppConstants.commonAppNamePart2,
           style: theme.textTheme.displayLarge?.copyWith(
             color: theme.colorScheme.primary,
           ),

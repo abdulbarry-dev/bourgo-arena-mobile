@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,10 +21,10 @@ class PaymentStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _SectionTitle(title: 'RÉSUMÉ'),
+                _SectionTitle(title: AppConstants.bookingSummaryTitle),
                 _SummaryCard(viewModel: viewModel),
                 const SizedBox(height: 32),
-                const _SectionTitle(title: 'PAIEMENT'),
+                _SectionTitle(title: AppConstants.bookingPaymentTitle),
                 _PaymentMethodSelector(viewModel: viewModel),
               ],
             ),
@@ -134,20 +135,22 @@ class _SummaryCard extends StatelessWidget {
           ),
           _SummaryRow(
             icon: Symbols.calendar_month,
-            label: 'Date',
+            label: AppConstants.bookingDate,
             value: DateFormat('dd MMMM yyyy').format(viewModel.selectedDate),
           ),
           const SizedBox(height: 12),
           _SummaryRow(
             icon: Symbols.schedule,
-            label: 'Horaire',
+            label: AppConstants.bookingTime,
             value: viewModel.selectedSlot?.time ?? '',
           ),
           const SizedBox(height: 12),
           _SummaryRow(
             icon: Symbols.hourglass_bottom,
-            label: 'Durée',
-            value: activity?.id == 'padel-1' ? '90 min' : '60 min',
+            label: AppConstants.bookingDuration,
+            value: activity?.id == 'padel-1'
+                ? AppConstants.bookingDurationPadel
+                : AppConstants.bookingDurationStandard,
           ),
         ],
       ),
@@ -212,14 +215,14 @@ class _PaymentMethodSelector extends StatelessWidget {
       children: [
         _PaymentOption(
           icon: Symbols.credit_card,
-          label: 'Carte Bancaire',
+          label: AppConstants.bookingMethodCard,
           isSelected: viewModel.paymentMethod == 'Credit Card',
           onTap: () => viewModel.setPaymentMethod('Credit Card'),
         ),
         const SizedBox(height: 12),
         _PaymentOption(
           icon: Symbols.account_balance_wallet,
-          label: 'Solde Bourgo Pay',
+          label: AppConstants.bookingMethodWallet,
           isSelected: viewModel.paymentMethod == 'Bourgo Pay',
           onTap: () => viewModel.setPaymentMethod('Bourgo Pay'),
         ),
@@ -307,7 +310,7 @@ class _BottomPayButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 56),
           ),
-          child: Text('PAYER — $price TND'),
+          child: Text('${AppConstants.bookingPay} — $price TND'),
         ),
       ),
     );

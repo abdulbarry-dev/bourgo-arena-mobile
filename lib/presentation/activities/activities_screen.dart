@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
@@ -46,7 +47,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
             title: Row(
               children: [
                 Text(
-                  'BOURGO',
+                  AppConstants.commonAppNamePart1,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,
@@ -54,7 +55,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  'ARENA',
+                  AppConstants.commonAppNamePart2,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -75,8 +76,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 letterSpacing: 1.2,
               ),
               tabs: const [
-                Tab(text: 'EXPLORER'),
-                Tab(text: 'MES RÉSERVATIONS'),
+                Tab(text: AppConstants.activitiesExplorer),
+                Tab(text: AppConstants.activitiesMyReservations),
               ],
             ),
           ),
@@ -95,7 +96,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _viewModel.loadData,
-                        child: const Text('RÉESSAYER'),
+                        child: const Text(AppConstants.activitiesRetry),
                       ),
                     ],
                   ),
@@ -165,7 +166,7 @@ class _ReservationsTab extends StatelessWidget {
     if (viewModel.reservations.isEmpty) {
       return const Center(
         child: Text(
-          'Aucune réservation trouvée.',
+          AppConstants.activitiesNoReservations,
           style: TextStyle(color: Colors.white70),
         ),
       );

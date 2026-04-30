@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -20,7 +21,7 @@ class SelectTimeStep extends StatelessWidget {
               : _TimeGrid(viewModel: viewModel),
         ),
         _BottomActionBar(
-          label: 'CONFIRMER',
+          label: AppConstants.bookingConfirm,
           onPressed: viewModel.selectedSlot != null ? viewModel.nextStep : null,
           price: viewModel.selectedActivity?.price ?? 0,
         ),
@@ -106,9 +107,7 @@ class _TimeGrid extends StatelessWidget {
     final theme = Theme.of(context);
 
     if (viewModel.availableSlots.isEmpty) {
-      return const Center(
-        child: Text('Aucun créneau disponible pour cette date.'),
-      );
+      return const Center(child: Text(AppConstants.bookingNoSlots));
     }
 
     return GridView.builder(
@@ -191,7 +190,7 @@ class _BottomActionBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'TOTAL',
+                  AppConstants.bookingTotal,
                   style: TextStyle(color: Colors.white54, fontSize: 10),
                 ),
                 Text(

@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/presentation/food/food_view_model.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class _FoodScreenState extends State<FoodScreen> {
                     _showCartSummary(context);
                   },
                   label: Text(
-                    'PANIER (${_viewModel.cart.length}) • ${_viewModel.cartTotal.toStringAsFixed(1)} TND',
+                    '${AppConstants.foodCart} (${_viewModel.cart.length}) • ${_viewModel.cartTotal.toStringAsFixed(1)} TND',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
@@ -74,7 +75,7 @@ class _FoodScreenState extends State<FoodScreen> {
       backgroundColor: theme.colorScheme.surface,
       flexibleSpace: FlexibleSpaceBar(
         title: Text(
-          'FOOD CORNER',
+          AppConstants.foodTitle,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontFamily: 'BlackHanSans',
             letterSpacing: 2,
@@ -227,7 +228,9 @@ class _FoodScreenState extends State<FoodScreen> {
                     _viewModel.addToCart(item);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('${item.name} ajouté au panier'),
+                        content: Text(
+                          '${item.name} ${AppConstants.foodAddedToCart}',
+                        ),
                         duration: const Duration(seconds: 1),
                         backgroundColor: theme.colorScheme.primary,
                         behavior: SnackBarBehavior.floating,
@@ -267,7 +270,7 @@ class _FoodScreenState extends State<FoodScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    'VOTRE PANIER',
+                    AppConstants.foodYourCart,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontFamily: 'BlackHanSans',
                       letterSpacing: 1,
@@ -298,7 +301,7 @@ class _FoodScreenState extends State<FoodScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'TOTAL',
+                        AppConstants.bookingTotal,
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
@@ -318,11 +321,11 @@ class _FoodScreenState extends State<FoodScreen> {
                       _viewModel.clearCart();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Commande envoyée avec succès !'),
+                          content: Text(AppConstants.foodOrderSuccess),
                         ),
                       );
                     },
-                    child: const Text('COMMANDER'),
+                    child: const Text(AppConstants.foodOrder),
                   ),
                 ],
               ),
