@@ -54,6 +54,7 @@ class _TickerStripState extends State<TickerStrip>
       height: widget.height,
       color: widget.backgroundColor,
       child: ListView.builder(
+        itemCount: 100, // Provide a finite count to avoid infinite scroll crash
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
         physics: const NeverScrollableScrollPhysics(),

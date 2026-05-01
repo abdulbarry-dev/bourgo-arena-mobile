@@ -30,14 +30,18 @@ class CourseCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      course.title.toUpperCase(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    Flexible(
+                      child: Text(
+                        course.title.toUpperCase(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(width: 8),
                     _CategoryBadge(category: course.category),
                   ],
                 ),
@@ -46,11 +50,15 @@ class CourseCard extends StatelessWidget {
                   children: [
                     const Icon(Symbols.person, size: 14, color: Colors.white54),
                     const SizedBox(width: 4),
-                    Text(
-                      course.instructor,
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 13,
+                    Flexible(
+                      child: Text(
+                        course.instructor,
+                        style: const TextStyle(
+                          color: Colors.white54,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -59,13 +67,10 @@ class CourseCard extends StatelessWidget {
                     Text(
                       '${course.enrolled}/${course.capacity}',
                       style: TextStyle(
-                        color: course.isFull
-                            ? Colors.redAccent
-                            : Colors.white54,
+                        color: course.isFull ? Colors.redAccent : Colors.white54,
                         fontSize: 13,
-                        fontWeight: course.isFull
-                            ? FontWeight.bold
-                            : FontWeight.normal,
+                        fontWeight:
+                            course.isFull ? FontWeight.bold : FontWeight.normal,
                       ),
                     ),
                   ],
