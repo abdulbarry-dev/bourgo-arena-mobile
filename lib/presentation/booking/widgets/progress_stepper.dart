@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -18,21 +18,21 @@ class ProgressStepper extends StatelessWidget {
         children: [
           _StepCircle(
             icon: Symbols.sports_soccer,
-            label: AppConstants.bookingStepSport,
+            label: AppLocalizations.of(context)!.bookingStepSport,
             isActive: currentStep >= 0,
             isCompleted: currentStep > 0,
           ),
           _StepLine(isCompleted: currentStep > 0),
           _StepCircle(
             icon: Symbols.schedule,
-            label: AppConstants.bookingStepTime,
+            label: AppLocalizations.of(context)!.bookingStepTime,
             isActive: currentStep >= 1,
             isCompleted: currentStep > 1,
           ),
           _StepLine(isCompleted: currentStep > 1),
           _StepCircle(
             icon: Symbols.payment,
-            label: AppConstants.bookingStepPayment,
+            label: AppLocalizations.of(context)!.bookingStepPayment,
             isActive: currentStep >= 2,
             isCompleted: false,
           ),

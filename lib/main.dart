@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/theme.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/router.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +19,8 @@ class BourgoArenaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: BourgoTheme.darkTheme,
       routerConfig: router,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -32,7 +33,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text(AppConstants.profileSubscriptionTitle),
+            title: Text(AppLocalizations.of(context)!.profileSubscriptionTitle),
             backgroundColor: theme.colorScheme.surface,
           ),
           body: SingleChildScrollView(
@@ -42,8 +43,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               children: [
                 _ActivePlanCard(profile: profile),
                 const SizedBox(height: 32),
-                const Text(
-                  AppConstants.profileAdvantages,
+                Text(
+                  AppLocalizations.of(context)!.profileAdvantages,
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -52,17 +53,27 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _BenefitItem(text: AppConstants.profileBenefit1),
-                _BenefitItem(text: AppConstants.profileBenefit2),
-                _BenefitItem(text: AppConstants.profileBenefit3),
-                _BenefitItem(text: AppConstants.profileBenefit4),
+                _BenefitItem(
+                  text: AppLocalizations.of(context)!.profileBenefit1,
+                ),
+                _BenefitItem(
+                  text: AppLocalizations.of(context)!.profileBenefit2,
+                ),
+                _BenefitItem(
+                  text: AppLocalizations.of(context)!.profileBenefit3,
+                ),
+                _BenefitItem(
+                  text: AppLocalizations.of(context)!.profileBenefit4,
+                ),
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
                   ),
-                  child: const Text(AppConstants.profileManageSubscription),
+                  child: Text(
+                    AppLocalizations.of(context)!.profileManageSubscription,
+                  ),
                 ),
               ],
             ),
@@ -105,7 +116,8 @@ class _ActivePlanCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                profile?.subscriptionLevel ?? AppConstants.profilePlanLabel,
+                profile?.subscriptionLevel ??
+                    AppLocalizations.of(context)!.profilePlanLabel,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontFamily: AppConstants.displayFontFamily,
                   color: theme.colorScheme.primary,
@@ -115,9 +127,9 @@ class _ActivePlanCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          const Text(
-            AppConstants.profileNextBilling,
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context)!.profileNextBilling,
+            style: const TextStyle(
               color: Colors.white54,
               fontSize: 10,
               letterSpacing: 1,
@@ -134,14 +146,14 @@ class _ActivePlanCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
           ),
           const SizedBox(height: 8),
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                AppConstants.profileMonthlyUsage,
-                style: TextStyle(color: Colors.white54, fontSize: 12),
+                AppLocalizations.of(context)!.profileMonthlyUsage,
+                style: const TextStyle(color: Colors.white54, fontSize: 12),
               ),
-              Text(
+              const Text(
                 '70%',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
               ),

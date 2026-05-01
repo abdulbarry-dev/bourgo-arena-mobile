@@ -1,5 +1,5 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -88,7 +88,7 @@ class ReservationCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${reservation.price} ${reservation.paymentStatus == "paid" ? AppConstants.bookingCurrency : AppConstants.bookingToPay}',
+                  '${reservation.price} ${reservation.paymentStatus == "paid" ? AppLocalizations.of(context)!.bookingCurrency : AppLocalizations.of(context)!.bookingToPay}',
                   style: theme.textTheme.titleSmall?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -117,17 +117,17 @@ class _StatusBadge extends StatelessWidget {
     switch (status.toLowerCase()) {
       case 'confirmed':
         color = const Color(0xFFAAFF00);
-        label = AppConstants.activitiesStatusConfirmed;
+        label = AppLocalizations.of(context)!.activitiesStatusConfirmed;
         icon = Symbols.check_circle;
         break;
       case 'pending':
         color = const Color(0xFFFF9500);
-        label = AppConstants.activitiesStatusPending;
+        label = AppLocalizations.of(context)!.activitiesStatusPending;
         icon = Symbols.schedule;
         break;
       case 'cancelled':
         color = const Color(0xFFFF3B30);
-        label = AppConstants.activitiesStatusCancelled;
+        label = AppLocalizations.of(context)!.activitiesStatusCancelled;
         icon = Symbols.cancel;
         break;
       default:

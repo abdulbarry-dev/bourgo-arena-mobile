@@ -1,5 +1,5 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
@@ -47,7 +47,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
             title: Row(
               children: [
                 Text(
-                  AppConstants.commonAppNamePart1,
+                  AppLocalizations.of(context)!.commonAppNamePart1,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2,
@@ -55,7 +55,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  AppConstants.commonAppNamePart2,
+                  AppLocalizations.of(context)!.commonAppNamePart2,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -75,9 +75,11 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
               ),
-              tabs: const [
-                Tab(text: AppConstants.activitiesExplorer),
-                Tab(text: AppConstants.activitiesMyReservations),
+              tabs: [
+                Tab(text: AppLocalizations.of(context)!.activitiesExplorer),
+                Tab(
+                  text: AppLocalizations.of(context)!.activitiesMyReservations,
+                ),
               ],
             ),
           ),
@@ -92,11 +94,17 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_viewModel.error ?? ''),
+                      Text(
+                        _viewModel.error == 'loading_failed'
+                            ? AppLocalizations.of(context)!.commonLoadingFailed
+                            : _viewModel.error ?? '',
+                      ),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _viewModel.loadData,
-                        child: const Text(AppConstants.activitiesRetry),
+                        child: Text(
+                          AppLocalizations.of(context)!.activitiesRetry,
+                        ),
                       ),
                     ],
                   ),
@@ -164,10 +172,10 @@ class _ReservationsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (viewModel.reservations.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          AppConstants.activitiesNoReservations,
-          style: TextStyle(color: Colors.white70),
+          AppLocalizations.of(context)!.activitiesNoReservations,
+          style: const TextStyle(color: Colors.white70),
         ),
       );
     }

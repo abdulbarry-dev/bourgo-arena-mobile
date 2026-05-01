@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/ticker_strip.dart';
@@ -51,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: Text(
-              AppConstants.appName.toUpperCase(),
+              AppLocalizations.of(context)!.appName.toUpperCase(),
               style: const TextStyle(
                 fontFamily: AppConstants.displayFontFamily,
                 fontSize: 20,
@@ -83,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        AppConstants.homeHeroPart1,
+                        AppLocalizations.of(context)!.homeHeroPart1,
                         style: theme.textTheme.displayMedium?.copyWith(
                           color: Colors.white,
                           fontFamily: AppConstants.displayFontFamily,
@@ -91,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Text(
-                        AppConstants.homeHeroPart2,
+                        AppLocalizations.of(context)!.homeHeroPart2,
                         style: theme.textTheme.displayMedium?.copyWith(
                           color: theme.colorScheme.primary,
                           fontFamily: AppConstants.displayFontFamily,
@@ -104,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // Ticker Strip
                 TickerStrip(
-                  text: AppConstants.homeTicker,
+                  text: AppLocalizations.of(context)!.homeTicker,
                   backgroundColor: theme.colorScheme.primary,
                   textColor: Colors.black,
                 ),
@@ -118,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        AppConstants.homeActivitiesTitle,
+                        AppLocalizations.of(context)!.homeActivitiesTitle,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontFamily: AppConstants.displayFontFamily,
                           letterSpacing: 1,
@@ -127,7 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       TextButton(
                         onPressed: () => MainLayout.tabController.value = 1,
                         child: Text(
-                          AppConstants.homeSeeAll,
+                          AppLocalizations.of(context)!.homeSeeAll,
                           style: TextStyle(
                             color: theme.colorScheme.primary,
                             fontSize: 12,
@@ -164,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: Text(
-                    AppConstants.homeTodayTitle,
+                    AppLocalizations.of(context)!.homeTodayTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontFamily: AppConstants.displayFontFamily,
                       letterSpacing: 1,
@@ -178,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Text(
-                      AppConstants.homeNoCourses,
+                      AppLocalizations.of(context)!.homeNoCourses,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: Colors.white54,
                       ),

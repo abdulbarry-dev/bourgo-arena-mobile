@@ -1,5 +1,5 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/core/theme.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -45,7 +45,7 @@ class OnboardingScreen extends StatelessWidget {
 
                   // Tagline
                   Text(
-                    AppConstants.tagline.toUpperCase(),
+                    AppLocalizations.of(context)!.tagline.toUpperCase(),
                     style: theme.textTheme.labelLarge?.copyWith(
                       color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w700,
@@ -58,7 +58,7 @@ class OnboardingScreen extends StatelessWidget {
                   // Action Button
                   ElevatedButton(
                     onPressed: () => context.push('/login'),
-                    child: const Text(AppConstants.commonStart),
+                    child: Text(AppLocalizations.of(context)!.commonStart),
                   ),
 
                   const SizedBox(height: 32),
@@ -81,11 +81,11 @@ class _BrandLogotype extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          AppConstants.commonAppNamePart1,
+          AppLocalizations.of(context)!.commonAppNamePart1,
           style: theme.textTheme.displayLarge?.copyWith(color: Colors.white),
         ),
         Text(
-          AppConstants.commonAppNamePart2,
+          AppLocalizations.of(context)!.commonAppNamePart2,
           style: theme.textTheme.displayLarge?.copyWith(
             color: theme.colorScheme.primary,
           ),

@@ -41,6 +41,8 @@ dependencies:
   intl: ^0.20.2
   build_runner: ^2.14.0
   mocktail: ^1.0.5
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +61,7 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

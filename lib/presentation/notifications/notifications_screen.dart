@@ -1,6 +1,6 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -42,13 +42,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppConstants.notificationsTitle),
+        title: Text(AppLocalizations.of(context)!.notificationsTitle),
         backgroundColor: theme.colorScheme.surface,
         actions: [
           TextButton(
             onPressed: () {},
             child: Text(
-              AppConstants.notificationsMarkAllRead,
+              AppLocalizations.of(context)!.notificationsMarkAllRead,
               style: TextStyle(color: theme.colorScheme.primary, fontSize: 12),
             ),
           ),
@@ -78,9 +78,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         children: [
           Icon(Symbols.notifications_off, size: 64, color: Colors.white12),
           const SizedBox(height: 16),
-          const Text(
-            AppConstants.notificationsEmpty,
-            style: TextStyle(color: Colors.white54),
+          Text(
+            AppLocalizations.of(context)!.notificationsEmpty,
+            style: const TextStyle(color: Colors.white54),
           ),
         ],
       ),
@@ -167,6 +167,7 @@ class _NotificationItem extends StatelessWidget {
                 Text(
                   DateFormat(
                     'dd MMM, HH:mm',
+                    Localizations.localeOf(context).toString(),
                   ).format(DateTime.parse(notification.timestamp)),
                   style: const TextStyle(color: Colors.white38, fontSize: 11),
                 ),

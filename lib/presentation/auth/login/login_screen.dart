@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -43,29 +43,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const AuthHeader(
-                      title: AppConstants.authLoginTitle,
-                      subtitle: AppConstants.authLoginSubtitle,
+                    AuthHeader(
+                      title: AppLocalizations.of(context)!.authLoginTitle,
+                      subtitle: AppLocalizations.of(context)!.authLoginSubtitle,
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(
-                      label: AppConstants.authIdentifierLabel,
-                      hint: AppConstants.authEmailHint,
+                      label: AppLocalizations.of(context)!.authIdentifierLabel,
+                      hint: AppLocalizations.of(context)!.authEmailHint,
                       leadingIcon: Symbols.person,
                       controller: _viewModel.identifierController,
                       validator: (value) => value?.isEmpty ?? true
-                          ? AppConstants.commonRequiredField
+                          ? AppLocalizations.of(context)!.commonRequiredField
                           : null,
                     ),
                     const SizedBox(height: 24),
                     AuthTextField(
-                      label: AppConstants.authPasswordLabel,
-                      hint: AppConstants.authPasswordHint,
+                      label: AppLocalizations.of(context)!.authPasswordLabel,
+                      hint: AppLocalizations.of(context)!.authPasswordHint,
                       leadingIcon: Symbols.lock,
                       isPassword: true,
                       controller: _viewModel.passwordController,
                       validator: (value) => value?.isEmpty ?? true
-                          ? AppConstants.commonRequiredField
+                          ? AppLocalizations.of(context)!.commonRequiredField
                           : null,
                     ),
                     const SizedBox(height: 12),
@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextButton(
                         onPressed: () => context.push('/forgot-password'),
                         child: Text(
-                          AppConstants.authForgotPassword,
+                          AppLocalizations.of(context)!.authForgotPassword,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.primary,
                             fontSize: 12,
@@ -96,14 +96,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.black,
                               ),
                             )
-                          : const Text(AppConstants.authLogin),
+                          : Text(AppLocalizations.of(context)!.authLogin),
                     ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          AppConstants.authNoAccount,
+                          AppLocalizations.of(context)!.authNoAccount,
                           style: TextStyle(
                             color: Colors.white.withAlpha((0.65 * 255).round()),
                             fontSize: 14,
@@ -112,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(
                           onPressed: () => context.push('/register'),
                           child: Text(
-                            AppConstants.authRegister,
+                            AppLocalizations.of(context)!.authRegister,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,

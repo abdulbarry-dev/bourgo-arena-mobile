@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/new_password/new_password_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -42,31 +42,39 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const AuthHeader(
-                      title: AppConstants.authNewPasswordTitle,
-                      subtitle: AppConstants.authNewPasswordSubtitle,
+                    AuthHeader(
+                      title: AppLocalizations.of(context)!.authNewPasswordTitle,
+                      subtitle: AppLocalizations.of(
+                        context,
+                      )!.authNewPasswordSubtitle,
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(
-                      label: AppConstants.authNewPasswordLabel,
-                      hint: AppConstants.authNewPasswordHint,
+                      label: AppLocalizations.of(context)!.authNewPasswordLabel,
+                      hint: AppLocalizations.of(context)!.authNewPasswordHint,
                       leadingIcon: Symbols.lock,
                       isPassword: true,
                       controller: _viewModel.passwordController,
                       validator: (value) => (value?.length ?? 0) < 6
-                          ? AppConstants.authPasswordMinLength
+                          ? AppLocalizations.of(context)!.authPasswordMinLength
                           : null,
                     ),
                     const SizedBox(height: 24),
                     AuthTextField(
-                      label: AppConstants.authConfirmPasswordLabel,
-                      hint: AppConstants.authConfirmPasswordHint,
+                      label: AppLocalizations.of(
+                        context,
+                      )!.authConfirmPasswordLabel,
+                      hint: AppLocalizations.of(
+                        context,
+                      )!.authConfirmPasswordHint,
                       leadingIcon: Symbols.lock,
                       isPassword: true,
                       controller: _viewModel.confirmPasswordController,
                       validator: (value) {
                         if (value != _viewModel.passwordController.text) {
-                          return AppConstants.authPasswordsDoNotMatch;
+                          return AppLocalizations.of(
+                            context,
+                          )!.authPasswordsDoNotMatch;
                         }
                         return null;
                       },
@@ -85,7 +93,7 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
                                 color: Colors.black,
                               ),
                             )
-                          : const Text(AppConstants.authReset),
+                          : Text(AppLocalizations.of(context)!.authReset),
                     ),
                   ],
                 ),

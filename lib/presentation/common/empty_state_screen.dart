@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -79,9 +79,9 @@ class NoResultsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const EmptyStateScreen(
-      title: AppConstants.commonNoResults,
-      subtitle: AppConstants.commonNoResultsSubtitle,
+    return EmptyStateScreen(
+      title: AppLocalizations.of(context)!.commonNoResults,
+      subtitle: AppLocalizations.of(context)!.commonNoResultsSubtitle,
       icon: Symbols.search_off,
     );
   }

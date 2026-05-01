@@ -1,5 +1,7 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/data/models/user_profile.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -35,8 +37,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         final profile = _viewModel.profile;
         if (profile == null) {
-          return const Scaffold(
-            body: Center(child: Text(AppConstants.commonLoadingError)),
+          return Scaffold(
+            body: Center(
+              child: Text(AppLocalizations.of(context)!.commonLoadingError),
+            ),
           );
         }
 
@@ -70,7 +74,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, dynamic profile) {
+  Widget _buildAppBar(BuildContext context, UserProfile profile) {
     final theme = Theme.of(context);
 
     return SliverAppBar(
@@ -139,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _StatsRow extends StatelessWidget {
-  final dynamic profile;
+  final UserProfile profile;
 
   const _StatsRow({required this.profile});
 
@@ -158,13 +162,13 @@ class _StatsRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _StatItem(
-            label: AppConstants.profilePoints,
+            label: AppLocalizations.of(context)!.profilePoints,
             value: profile.loyaltyPoints.toString(),
             icon: Symbols.stars,
           ),
           Container(width: 1, height: 40, color: Colors.white10),
           _StatItem(
-            label: AppConstants.profileCheckins,
+            label: AppLocalizations.of(context)!.profileCheckins,
             value: profile.totalCheckIns.toString(),
             icon: Symbols.qr_code_scanner,
           ),
@@ -227,25 +231,25 @@ class _ProfileMenu extends StatelessWidget {
       children: [
         _MenuItem(
           icon: Symbols.card_membership,
-          label: AppConstants.profileMySubscription,
+          label: AppLocalizations.of(context)!.profileMySubscription,
           onTap: onTapAbonnement,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.history,
-          label: AppConstants.profileHistory,
+          label: AppLocalizations.of(context)!.profileHistory,
           onTap: onTapHistorique,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.notifications,
-          label: AppConstants.profileNotifications,
+          label: AppLocalizations.of(context)!.profileNotifications,
           onTap: onTapNotifications,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.settings,
-          label: AppConstants.profileSettings,
+          label: AppLocalizations.of(context)!.profileSettings,
           onTap: () {},
         ),
       ],
@@ -297,9 +301,9 @@ class _LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton(
       onPressed: () => context.go('/login'),
-      child: const Text(
-        AppConstants.profileLogout,
-        style: TextStyle(
+      child: Text(
+        AppLocalizations.of(context)!.profileLogout,
+        style: const TextStyle(
           color: Colors.redAccent,
           fontWeight: FontWeight.bold,
           letterSpacing: 1,

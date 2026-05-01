@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -42,18 +42,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const AuthHeader(
-                      title: AppConstants.authForgotPasswordTitle,
-                      subtitle: AppConstants.authForgotPasswordSubtitle,
+                    AuthHeader(
+                      title: AppLocalizations.of(
+                        context,
+                      )!.authForgotPasswordTitle,
+                      subtitle: AppLocalizations.of(
+                        context,
+                      )!.authForgotPasswordSubtitle,
                     ),
                     const SizedBox(height: 48),
                     AuthTextField(
-                      label: AppConstants.authIdentifierLabel,
-                      hint: AppConstants.authEmailHint,
+                      label: AppLocalizations.of(context)!.authIdentifierLabel,
+                      hint: AppLocalizations.of(context)!.authEmailHint,
                       leadingIcon: Symbols.mail,
                       controller: _viewModel.identifierController,
                       validator: (value) => value?.isEmpty ?? true
-                          ? AppConstants.commonRequiredField
+                          ? AppLocalizations.of(context)!.commonRequiredField
                           : null,
                     ),
                     const SizedBox(height: 48),
@@ -70,7 +74,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 color: Colors.black,
                               ),
                             )
-                          : const Text(AppConstants.authSendCode),
+                          : Text(AppLocalizations.of(context)!.authSendCode),
                     ),
                   ],
                 ),

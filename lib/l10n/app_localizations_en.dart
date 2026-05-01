@@ -1,0 +1,438 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get appName => 'Bourgo Arena';
+
+  @override
+  String get tagline => 'The Sport HQ in Djerba';
+
+  @override
+  String get commonRetry => 'RETRY';
+
+  @override
+  String get commonLoadingError => 'Loading Error';
+
+  @override
+  String get commonNoResults => 'NO RESULTS';
+
+  @override
+  String get commonNoResultsSubtitle =>
+      'We couldn\'t find anything for your search. Try other filters.';
+
+  @override
+  String get commonOfflineTitle => 'OFFLINE MODE';
+
+  @override
+  String get commonOfflineSubtitle =>
+      'Oops! It seems you are disconnected. Check your internet connection to continue.';
+
+  @override
+  String get commonOfflineAccess => 'ACCESS OFFLINE RESERVATIONS';
+
+  @override
+  String get commonRequiredField => 'Required field';
+
+  @override
+  String get commonStart => 'START';
+
+  @override
+  String get commonAppNamePart1 => 'BOURGO';
+
+  @override
+  String get commonAppNamePart2 => 'ARENA';
+
+  @override
+  String get commonLoadingFailed => 'Failed to load data. Please try again.';
+
+  @override
+  String get navHome => 'HOME';
+
+  @override
+  String get navActivities => 'ACTIVITIES';
+
+  @override
+  String get navPlanning => 'PLANNING';
+
+  @override
+  String get navProfile => 'PROFILE';
+
+  @override
+  String get homeHeroPart1 => 'JOIN';
+
+  @override
+  String get homeHeroPart2 => 'THE ARENA';
+
+  @override
+  String get homeTicker =>
+      'RESERVE YOUR SESSION • FOOTBALL • PADEL • FITNESS • ';
+
+  @override
+  String get homeNoCourses => 'No courses scheduled for today.';
+
+  @override
+  String get homeActivitiesTitle => 'OUR ACTIVITIES';
+
+  @override
+  String get homeSeeAll => 'SEE ALL';
+
+  @override
+  String get homeTodayTitle => 'TODAY';
+
+  @override
+  String get activitiesExplorer => 'EXPLORE';
+
+  @override
+  String get activitiesMyReservations => 'MY RESERVATIONS';
+
+  @override
+  String get activitiesNoReservations => 'No reservations found.';
+
+  @override
+  String get activitiesRetry => 'RETRY';
+
+  @override
+  String get activitiesStatusConfirmed => 'CONFIRMED';
+
+  @override
+  String get activitiesStatusPending => 'PENDING';
+
+  @override
+  String get activitiesStatusCancelled => 'CANCELLED';
+
+  @override
+  String get authLogin => 'LOG IN';
+
+  @override
+  String get authRegister => 'SIGN UP';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authNoAccount => 'Don\'t have an account? ';
+
+  @override
+  String get authHaveAccount => 'Already have an account? ';
+
+  @override
+  String get authEmailHint => 'Enter your identifier';
+
+  @override
+  String get authPasswordHint => 'Enter your password';
+
+  @override
+  String get authIdentifierLabel => 'Email or Phone';
+
+  @override
+  String get authPasswordLabel => 'Password';
+
+  @override
+  String get authLoginTitle => 'Login';
+
+  @override
+  String get authLoginSubtitle => 'Welcome back! Log in to continue.';
+
+  @override
+  String get authRegisterTitle => 'Registration';
+
+  @override
+  String get authRegisterSubtitle =>
+      'Join the Sport HQ in Djerba and start your adventure.';
+
+  @override
+  String get authFullNameLabel => 'Full Name';
+
+  @override
+  String get authFullNameHint => 'Enter your name';
+
+  @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authEmailLabelHint => 'Enter your email';
+
+  @override
+  String get authPhoneLabel => 'Phone';
+
+  @override
+  String get authPhoneHint => 'Enter your number';
+
+  @override
+  String get authPasswordCreateHint => 'Create a password';
+
+  @override
+  String get authPasswordMinLength => 'Min 6 characters';
+
+  @override
+  String get authForgotPasswordTitle => 'Forgot Password';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Don\'t worry! Enter your email or number to receive a code.';
+
+  @override
+  String get authVerificationTitle => 'VERIFICATION';
+
+  @override
+  String get authOtpSubtitlePrefix => 'Enter the 4-digit code sent to ';
+
+  @override
+  String get authOtpSubtitleDefault => 'your number';
+
+  @override
+  String get authOtpResendPrefix => 'Resend code in ';
+
+  @override
+  String get authNewPasswordTitle => 'New Password';
+
+  @override
+  String get authNewPasswordSubtitle =>
+      'Create a new secure password for your account.';
+
+  @override
+  String get authNewPasswordLabel => 'New Password';
+
+  @override
+  String get authNewPasswordHint => 'Enter new password';
+
+  @override
+  String get authConfirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get authConfirmPasswordHint => 'Repeat the password';
+
+  @override
+  String get authPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get authSendCode => 'SEND CODE';
+
+  @override
+  String get authVerify => 'VERIFY';
+
+  @override
+  String get authReset => 'RESET';
+
+  @override
+  String get profilePoints => 'POINTS';
+
+  @override
+  String get profileCheckins => 'CHECK-INS';
+
+  @override
+  String get profileMySubscription => 'My Subscription';
+
+  @override
+  String get profileHistory => 'Check-in & History';
+
+  @override
+  String get profileNotifications => 'Notifications';
+
+  @override
+  String get profileSettings => 'Settings';
+
+  @override
+  String get profileLogout => 'LOG OUT';
+
+  @override
+  String get profileSubscriptionTitle => 'MY SUBSCRIPTION';
+
+  @override
+  String get profileManageSubscription => 'MANAGE SUBSCRIPTION';
+
+  @override
+  String get profileAdvantages => 'ADVANTAGES';
+
+  @override
+  String get profileNextBilling => 'NEXT BILLING';
+
+  @override
+  String get profileMonthlyUsage => 'Monthly usage';
+
+  @override
+  String get profilePlanLabel => 'PLAN';
+
+  @override
+  String get profileBenefit1 => 'Unlimited gym access';
+
+  @override
+  String get profileBenefit2 => 'Priority court reservation';
+
+  @override
+  String get profileBenefit3 => '1 free guest per month';
+
+  @override
+  String get profileBenefit4 => '-10% at the Pro Shop';
+
+  @override
+  String get profileHistoryTitle => 'HISTORY & CHECK-IN';
+
+  @override
+  String get profileTabCheckin => 'CHECK-IN';
+
+  @override
+  String get profileTabHistory => 'HISTORY';
+
+  @override
+  String get profileQrSubtitle => 'PRESENT YOUR QR CODE';
+
+  @override
+  String get profileQrPlaceholder => 'BOURGO-SCAN-123';
+
+  @override
+  String get profileQrScanInstruction =>
+      'Scan this code at the entrance to validate your presence.';
+
+  @override
+  String get profileNoHistory => 'No past reservations.';
+
+  @override
+  String get planningTitle => 'CLASS SCHEDULE';
+
+  @override
+  String get planningFilterTitle => 'FILTER BY CATEGORY';
+
+  @override
+  String get planningNoCourses => 'No classes scheduled for this day.';
+
+  @override
+  String get bookingTitle => 'RESERVATION';
+
+  @override
+  String get bookingSuccess => 'RESERVATION SUCCESSFUL!';
+
+  @override
+  String get bookingConfirmed => 'RESERVATION CONFIRMED!';
+
+  @override
+  String get bookingReturnHome => 'RETURN TO HOME';
+
+  @override
+  String get bookingViewTicket => 'VIEW TICKET';
+
+  @override
+  String get bookingNoSlots => 'No slots available for this date.';
+
+  @override
+  String get bookingPay => 'PAY';
+
+  @override
+  String get bookingDateLabel => 'DATE & TIME';
+
+  @override
+  String get bookingLocationLabel => 'LOCATION';
+
+  @override
+  String get bookingSummaryTitle => 'SUMMARY';
+
+  @override
+  String get bookingPaymentTitle => 'PAYMENT';
+
+  @override
+  String get bookingDate => 'Date';
+
+  @override
+  String get bookingTime => 'Time';
+
+  @override
+  String get bookingDuration => 'Duration';
+
+  @override
+  String get bookingDurationPadel => '90 min';
+
+  @override
+  String get bookingDurationStandard => '60 min';
+
+  @override
+  String get bookingMethodCard => 'Credit Card';
+
+  @override
+  String get bookingMethodWallet => 'Bourgo Pay Balance';
+
+  @override
+  String get bookingTotal => 'TOTAL';
+
+  @override
+  String get bookingConfirm => 'CONFIRM';
+
+  @override
+  String get bookingCurrency => 'TND';
+
+  @override
+  String get bookingToPay => 'TND (To pay)';
+
+  @override
+  String get bookingSuccessMessagePrefix => 'Your ';
+
+  @override
+  String get bookingSuccessMessageSuffix =>
+      ' court has been reserved successfully.';
+
+  @override
+  String get bookingSportDefault => 'Sport';
+
+  @override
+  String get bookingLocationValue => 'Bourgo Arena, Djerba';
+
+  @override
+  String get bookingTodayAt => 'Today at 18:30';
+
+  @override
+  String get commonMon => 'MON';
+
+  @override
+  String get commonTue => 'TUE';
+
+  @override
+  String get commonWed => 'WED';
+
+  @override
+  String get commonThu => 'THU';
+
+  @override
+  String get commonFri => 'FRI';
+
+  @override
+  String get commonSat => 'SAT';
+
+  @override
+  String get commonSun => 'SUN';
+
+  @override
+  String get notificationsTitle => 'NOTIFICATIONS';
+
+  @override
+  String get notificationsMarkAllRead => 'MARK ALL READ';
+
+  @override
+  String get notificationsEmpty => 'No notifications for now.';
+
+  @override
+  String get planningCategoryAll => 'All';
+
+  @override
+  String get planningCategoryFitness => 'Fitness';
+
+  @override
+  String get planningCategoryAcademy => 'Academy';
+
+  @override
+  String get planningCategoryWellness => 'Wellness';
+
+  @override
+  String get bookingStepSport => 'SPORT';
+
+  @override
+  String get bookingStepTime => 'TIME';
+
+  @override
+  String get bookingStepPayment => 'PAYMENT';
+}

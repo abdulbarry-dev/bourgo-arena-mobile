@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +31,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text(AppConstants.planningTitle),
+            title: Text(AppLocalizations.of(context)!.planningTitle),
             backgroundColor: theme.colorScheme.surface,
             actions: [
               IconButton(
@@ -63,6 +64,21 @@ class _PlanningScreenState extends State<PlanningScreen> {
       AppConstants.planningCategoryWellness,
     ];
 
+    final Map<String, String> categoryLabels = {
+      AppConstants.planningCategoryAll: AppLocalizations.of(
+        context,
+      )!.planningCategoryAll,
+      AppConstants.planningCategoryFitness: AppLocalizations.of(
+        context,
+      )!.planningCategoryFitness,
+      AppConstants.planningCategoryAcademy: AppLocalizations.of(
+        context,
+      )!.planningCategoryAcademy,
+      AppConstants.planningCategoryWellness: AppLocalizations.of(
+        context,
+      )!.planningCategoryWellness,
+    };
+
     showModalBottomSheet(
       context: context,
       backgroundColor: theme.colorScheme.surface,
@@ -72,14 +88,17 @@ class _PlanningScreenState extends State<PlanningScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                AppConstants.planningFilterTitle,
-                style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
+              Text(
+                AppLocalizations.of(context)!.planningFilterTitle,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1,
+                ),
               ),
               const SizedBox(height: 16),
               ...categories.map(
                 (cat) => ListTile(
-                  title: Text(cat),
+                  title: Text(categoryLabels[cat] ?? cat),
                   onTap: () {
                     _viewModel.selectCategory(cat);
                     Navigator.pop(context);
@@ -106,13 +125,13 @@ class _DaySelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final days = [
-      AppConstants.commonMon,
-      AppConstants.commonTue,
-      AppConstants.commonWed,
-      AppConstants.commonThu,
-      AppConstants.commonFri,
-      AppConstants.commonSat,
-      AppConstants.commonSun,
+      AppLocalizations.of(context)!.commonMon,
+      AppLocalizations.of(context)!.commonTue,
+      AppLocalizations.of(context)!.commonWed,
+      AppLocalizations.of(context)!.commonThu,
+      AppLocalizations.of(context)!.commonFri,
+      AppLocalizations.of(context)!.commonSat,
+      AppLocalizations.of(context)!.commonSun,
     ];
 
     return Container(
@@ -169,7 +188,9 @@ class _CourseList extends StatelessWidget {
     final courses = viewModel.courses;
 
     if (courses.isEmpty) {
-      return const Center(child: Text(AppConstants.planningNoCourses));
+      return Center(
+        child: Text(AppLocalizations.of(context)!.planningNoCourses),
+      );
     }
 
     return ListView.builder(
