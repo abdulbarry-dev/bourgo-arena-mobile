@@ -107,7 +107,7 @@ class _ActivePlanCard extends StatelessWidget {
               Text(
                 profile?.subscriptionLevel ?? AppConstants.profilePlanLabel,
                 style: theme.textTheme.headlineMedium?.copyWith(
-                  fontFamily: 'BlackHanSans',
+                  fontFamily: AppConstants.displayFontFamily,
                   color: theme.colorScheme.primary,
                 ),
               ),

@@ -35,7 +35,7 @@ class OfflineScreen extends StatelessWidget {
               Text(
                 AppConstants.commonOfflineTitle,
                 style: theme.textTheme.headlineSmall?.copyWith(
-                  fontFamily: 'BlackHanSans',
+                  fontFamily: AppConstants.displayFontFamily,
                   letterSpacing: 2,
                 ),
               ),

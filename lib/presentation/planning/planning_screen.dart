@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.dart';
@@ -29,7 +30,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('PLANNING DES COURS'),
+            title: const Text(AppConstants.planningTitle),
             backgroundColor: theme.colorScheme.surface,
             actions: [
               IconButton(
@@ -55,7 +56,12 @@ class _PlanningScreenState extends State<PlanningScreen> {
 
   void _showCategoryFilter(BuildContext context) {
     final theme = Theme.of(context);
-    final categories = ['Tous', 'Fitness', 'Academy', 'Wellness'];
+    final categories = [
+      AppConstants.planningCategoryAll,
+      AppConstants.planningCategoryFitness,
+      AppConstants.planningCategoryAcademy,
+      AppConstants.planningCategoryWellness,
+    ];
 
     showModalBottomSheet(
       context: context,
@@ -67,7 +73,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'FILTRER PAR CATÉGORIE',
+                AppConstants.planningFilterTitle,
                 style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1),
               ),
               const SizedBox(height: 16),
@@ -99,7 +105,15 @@ class _DaySelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final days = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
+    final days = [
+      AppConstants.commonMon,
+      AppConstants.commonTue,
+      AppConstants.commonWed,
+      AppConstants.commonThu,
+      AppConstants.commonFri,
+      AppConstants.commonSat,
+      AppConstants.commonSun,
+    ];
 
     return Container(
       height: 80,
@@ -155,7 +169,7 @@ class _CourseList extends StatelessWidget {
     final courses = viewModel.courses;
 
     if (courses.isEmpty) {
-      return const Center(child: Text('Aucun cours prévu pour ce jour.'));
+      return const Center(child: Text(AppConstants.planningNoCourses));
     }
 
     return ListView.builder(

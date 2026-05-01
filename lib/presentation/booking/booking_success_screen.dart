@@ -49,7 +49,7 @@ class BookingSuccessScreen extends StatelessWidget {
                 AppConstants.bookingConfirmed,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineSmall?.copyWith(
-                  fontFamily: 'BlackHanSans',
+                  fontFamily: AppConstants.displayFontFamily,
                   letterSpacing: 1.5,
                 ),
               ),

@@ -92,7 +92,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_viewModel.error!),
+                      Text(_viewModel.error ?? ''),
                       const SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: _viewModel.loadData,

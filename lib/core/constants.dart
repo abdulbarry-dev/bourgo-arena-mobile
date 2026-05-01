@@ -2,6 +2,7 @@
 class AppConstants {
   static const String appName = 'Bourgo Arena';
   static const String tagline = 'Le QG du Sport à Djerba';
+  static const String displayFontFamily = 'BlackHanSans';
 
   // Common
   static const String commonRetry = 'RÉESSAYER';
@@ -18,6 +19,8 @@ class AppConstants {
   static const String commonStart = 'COMMENCER';
   static const String commonAppNamePart1 = 'BOURGO';
   static const String commonAppNamePart2 = 'ARENA';
+  static const String commonLoadingFailed =
+      'Échec du chargement des données. Veuillez réessayer.';
 
   // Navigation
   static const String navHome = 'ACCUEIL';
@@ -151,4 +154,34 @@ class AppConstants {
   static const String bookingSportDefault = 'Sport';
   static const String bookingLocationValue = 'Bourgo Arena, Djerba';
   static const String bookingTodayAt = 'Aujourd\'hui à 18:30';
+
+  // Days of week
+  static const String commonMon = 'LUN';
+  static const String commonTue = 'MAR';
+  static const String commonWed = 'MER';
+  static const String commonThu = 'JEU';
+  static const String commonFri = 'VEN';
+  static const String commonSat = 'SAM';
+  static const String commonSun = 'DIM';
+
+  // Notifications
+  static const String notificationsTitle = 'NOTIFICATIONS';
+  static const String notificationsMarkAllRead = 'TOUT LIRE';
+  static const String notificationsEmpty =
+      'Aucune notification pour le moment.';
+
+  // Planning Categories
+  static const String planningCategoryAll = 'Tous';
+  static const String planningCategoryFitness = 'Fitness';
+  static const String planningCategoryAcademy = 'Academy';
+  static const String planningCategoryWellness = 'Wellness';
+
+  // Booking Steps
+  static const String bookingStepSport = 'SPORT';
+  static const String bookingStepTime = 'HORAIRE';
+  static const String bookingStepPayment = 'PAIEMENT';
+
+  // Payment Method IDs (Logical)
+  static const String paymentMethodCardId = 'Credit Card';
+  static const String paymentMethodWalletId = 'Bourgo Pay';
 }

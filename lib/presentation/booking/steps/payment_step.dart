@@ -216,15 +216,19 @@ class _PaymentMethodSelector extends StatelessWidget {
         _PaymentOption(
           icon: Symbols.credit_card,
           label: AppConstants.bookingMethodCard,
-          isSelected: viewModel.paymentMethod == 'Credit Card',
-          onTap: () => viewModel.setPaymentMethod('Credit Card'),
+          isSelected:
+              viewModel.paymentMethod == AppConstants.paymentMethodCardId,
+          onTap: () =>
+              viewModel.setPaymentMethod(AppConstants.paymentMethodCardId),
         ),
         const SizedBox(height: 12),
         _PaymentOption(
           icon: Symbols.account_balance_wallet,
           label: AppConstants.bookingMethodWallet,
-          isSelected: viewModel.paymentMethod == 'Bourgo Pay',
-          onTap: () => viewModel.setPaymentMethod('Bourgo Pay'),
+          isSelected:
+              viewModel.paymentMethod == AppConstants.paymentMethodWalletId,
+          onTap: () =>
+              viewModel.setPaymentMethod(AppConstants.paymentMethodWalletId),
         ),
       ],
     );

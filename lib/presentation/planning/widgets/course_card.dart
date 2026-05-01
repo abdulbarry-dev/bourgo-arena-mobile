@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -139,11 +140,11 @@ class _CategoryBadge extends StatelessWidget {
 
   Color _getCategoryColor(String cat, ThemeData theme) {
     switch (cat) {
-      case 'Fitness':
+      case AppConstants.planningCategoryFitness:
         return theme.colorScheme.primary;
-      case 'Academy':
+      case AppConstants.planningCategoryAcademy:
         return Colors.orangeAccent;
-      case 'Wellness':
+      case AppConstants.planningCategoryWellness:
         return Colors.lightBlueAccent;
       default:
         return Colors.white54;

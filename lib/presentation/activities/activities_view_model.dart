@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation.dart';
@@ -42,7 +43,7 @@ class ActivitiesViewModel extends ChangeNotifier {
       _activities = results[0] as List<Activity>;
       _reservations = results[1] as List<Reservation>;
     } catch (e) {
-      _error = 'Échec du chargement des données. Veuillez réessayer.';
+      _error = AppConstants.commonLoadingFailed;
     } finally {
       _isLoading = false;
       notifyListeners();

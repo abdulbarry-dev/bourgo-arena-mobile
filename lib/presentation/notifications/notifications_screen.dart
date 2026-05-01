@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:flutter/material.dart';
@@ -41,13 +42,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NOTIFICATIONS'),
+        title: const Text(AppConstants.notificationsTitle),
         backgroundColor: theme.colorScheme.surface,
         actions: [
           TextButton(
             onPressed: () {},
             child: Text(
-              'TOUT LIRE',
+              AppConstants.notificationsMarkAllRead,
               style: TextStyle(color: theme.colorScheme.primary, fontSize: 12),
             ),
           ),
@@ -55,14 +56,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _notifications == null || _notifications!.isEmpty
+          : (_notifications?.isEmpty ?? true)
           ? _buildEmptyState()
           : ListView.separated(
               padding: const EdgeInsets.all(24),
-              itemCount: _notifications!.length,
+              itemCount: _notifications?.length ?? 0,
               separatorBuilder: (context, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
-                return _NotificationItem(notification: _notifications![index]);
+                final notification = _notifications?[index];
+                if (notification == null) return const SizedBox.shrink();
+                return _NotificationItem(notification: notification);
               },
             ),
     );
@@ -76,7 +79,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           Icon(Symbols.notifications_off, size: 64, color: Colors.white12),
           const SizedBox(height: 16),
           const Text(
-            'Aucune notification pour le moment.',
+            AppConstants.notificationsEmpty,
             style: TextStyle(color: Colors.white54),
           ),
         ],

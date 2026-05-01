@@ -23,6 +23,7 @@ class _HistoryScreenState extends State<HistoryScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _viewModel = ActivitiesViewModel(dataService: DataService());
+    _viewModel.loadData();
   }
 
   @override

@@ -38,19 +38,15 @@ class AppColors extends ThemeExtension<AppColors> {
   ThemeExtension<AppColors> lerp(ThemeExtension<AppColors>? other, double t) {
     if (other is! AppColors) return this;
     return AppColors(
-      brandPrimaryGhost: Color.lerp(
-        brandPrimaryGhost,
-        other.brandPrimaryGhost,
-        t,
-      )!,
-      brandPrimaryGlow: Color.lerp(
-        brandPrimaryGlow,
-        other.brandPrimaryGlow,
-        t,
-      )!,
-      bgSurface: Color.lerp(bgSurface, other.bgSurface, t)!,
-      bgElevated: Color.lerp(bgElevated, other.bgElevated, t)!,
-      bgBorder: Color.lerp(bgBorder, other.bgBorder, t)!,
+      brandPrimaryGhost:
+          Color.lerp(brandPrimaryGhost, other.brandPrimaryGhost, t) ??
+          brandPrimaryGhost,
+      brandPrimaryGlow:
+          Color.lerp(brandPrimaryGlow, other.brandPrimaryGlow, t) ??
+          brandPrimaryGlow,
+      bgSurface: Color.lerp(bgSurface, other.bgSurface, t) ?? bgSurface,
+      bgElevated: Color.lerp(bgElevated, other.bgElevated, t) ?? bgElevated,
+      bgBorder: Color.lerp(bgBorder, other.bgBorder, t) ?? bgBorder,
     );
   }
 }

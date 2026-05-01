@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text(
               AppConstants.appName.toUpperCase(),
               style: const TextStyle(
-                fontFamily: 'BlackHanSans',
+                fontFamily: AppConstants.displayFontFamily,
                 fontSize: 20,
                 letterSpacing: 1.5,
               ),
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         AppConstants.homeHeroPart1,
                         style: theme.textTheme.displayMedium?.copyWith(
                           color: Colors.white,
-                          fontFamily: 'BlackHanSans',
+                          fontFamily: AppConstants.displayFontFamily,
                           height: 0.9,
                         ),
                       ),
@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         AppConstants.homeHeroPart2,
                         style: theme.textTheme.displayMedium?.copyWith(
                           color: theme.colorScheme.primary,
-                          fontFamily: 'BlackHanSans',
+                          fontFamily: AppConstants.displayFontFamily,
                           height: 0.9,
                         ),
                       ),
@@ -120,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         AppConstants.homeActivitiesTitle,
                         style: theme.textTheme.titleMedium?.copyWith(
-                          fontFamily: 'BlackHanSans',
+                          fontFamily: AppConstants.displayFontFamily,
                           letterSpacing: 1,
                         ),
                       ),
@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                     AppConstants.homeTodayTitle,
                     style: theme.textTheme.titleMedium?.copyWith(
-                      fontFamily: 'BlackHanSans',
+                      fontFamily: AppConstants.displayFontFamily,
                       letterSpacing: 1,
                     ),
                   ),

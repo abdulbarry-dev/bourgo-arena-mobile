@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/data/models/time_slot.dart';
@@ -11,7 +12,7 @@ class BookingViewModel extends ChangeNotifier {
   Activity? _selectedActivity;
   DateTime _selectedDate = DateTime.now();
   TimeSlot? _selectedSlot;
-  String _paymentMethod = 'Credit Card';
+  String _paymentMethod = AppConstants.paymentMethodCardId;
 
   List<Activity> _activities = [];
   List<TimeSlot> _availableSlots = [];
@@ -91,7 +92,10 @@ class BookingViewModel extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     // In a real app, we'd pass the date too.
-    _availableSlots = await _dataService.getTimeSlots(_selectedActivity!.id);
+    final activity = _selectedActivity;
+    if (activity != null) {
+      _availableSlots = await _dataService.getTimeSlots(activity.id);
+    }
     _isLoading = false;
     notifyListeners();
   }

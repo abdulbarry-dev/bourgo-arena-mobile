@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:flutter/material.dart';
 
 /// A custom marquee/ticker strip widget.
@@ -67,7 +68,8 @@ class _TickerStripState extends State<TickerStrip>
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
                   letterSpacing: 1.2,
-                  fontFamily: 'BlackHanSans', // Use the display font
+                  fontFamily:
+                      AppConstants.displayFontFamily, // Use the display font
                 ),
               ),
             ),

@@ -106,7 +106,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   profile.name.toUpperCase(),
                   style: theme.textTheme.headlineSmall?.copyWith(
-                    fontFamily: 'BlackHanSans',
+                    fontFamily: AppConstants.displayFontFamily,
                     letterSpacing: 1,
                   ),
                 ),
