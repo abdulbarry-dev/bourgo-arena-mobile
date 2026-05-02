@@ -55,7 +55,10 @@ class _MainLayoutState extends State<MainLayout> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(
-            top: BorderSide(color: Colors.white.withAlpha(20), width: 1),
+            top: BorderSide(
+              color: theme.colorScheme.outline.withValues(alpha: 0.3),
+              width: 1,
+            ),
           ),
         ),
         child: BottomNavigationBar(
@@ -64,7 +67,9 @@ class _MainLayoutState extends State<MainLayout> {
           type: BottomNavigationBarType.fixed,
           backgroundColor: theme.colorScheme.surface,
           selectedItemColor: theme.colorScheme.primary,
-          unselectedItemColor: Colors.white.withAlpha(100),
+          unselectedItemColor: theme.colorScheme.onSurfaceVariant.withValues(
+            alpha: 0.6,
+          ),
           selectedLabelStyle: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,

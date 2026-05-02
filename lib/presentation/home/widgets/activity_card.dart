@@ -38,7 +38,7 @@ class ActivityCard extends StatelessWidget {
               BlendMode.darken,
             ),
           ),
-          border: Border.all(color: Colors.white.withAlpha(20)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
         ),
         child: Stack(
           children: [

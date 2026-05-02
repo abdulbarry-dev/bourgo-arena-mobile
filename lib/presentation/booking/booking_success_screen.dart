@@ -58,7 +58,10 @@ class BookingSuccessScreen extends StatelessWidget {
               Text(
                 '${AppLocalizations.of(context)!.bookingSuccessMessagePrefix}${activity?.title ?? AppLocalizations.of(context)!.bookingSportDefault}${AppLocalizations.of(context)!.bookingSuccessMessageSuffix}',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 48),
               _DetailItem(
@@ -121,7 +124,9 @@ class _DetailItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         children: [
@@ -132,7 +137,10 @@ class _DetailItem extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(color: Colors.white54, fontSize: 10),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 10,
+                ),
               ),
               Text(
                 value,

@@ -106,9 +106,11 @@ class SettingsScreen extends StatelessWidget {
                   _SettingsTile(
                     icon: Symbols.info,
                     title: l10n.settingsAppVersion,
-                    trailing: const Text(
+                    trailing: Text(
                       '1.0.0 (1)',
-                      style: TextStyle(color: Colors.white54),
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     showArrow: false,
                   ),
@@ -304,16 +306,17 @@ class _SettingsTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final Widget? trailingWidget = trailing;
 
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.04),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, size: 20, color: Colors.white70),
+        child: Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
       ),
       title: Text(
         title,
@@ -325,7 +328,11 @@ class _SettingsTile extends StatelessWidget {
           ?trailingWidget,
           if (showArrow) ...[
             const SizedBox(width: 8),
-            const Icon(Symbols.chevron_right, size: 20, color: Colors.white24),
+            Icon(
+              Symbols.chevron_right,
+              size: 20,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+            ),
           ],
         ],
       ),
@@ -355,10 +362,10 @@ class _SettingsSwitchTile extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.04),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(icon, size: 20, color: Colors.white70),
+        child: Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
       ),
       title: Text(
         title,

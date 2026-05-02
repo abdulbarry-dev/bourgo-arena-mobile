@@ -76,11 +76,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Symbols.notifications_off, size: 64, color: Colors.white12),
+          Icon(
+            Symbols.notifications_off,
+            size: 64,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+          ),
           const SizedBox(height: 16),
           Text(
             AppLocalizations.of(context)!.notificationsEmpty,
-            style: const TextStyle(color: Colors.white54),
+            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
           ),
         ],
       ),
@@ -107,8 +111,8 @@ class _NotificationItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: notification.isRead
-              ? Colors.white10
-              : theme.colorScheme.primary.withAlpha(50),
+              ? theme.colorScheme.outline
+              : theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -119,14 +123,14 @@ class _NotificationItem extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: notification.isRead
-                  ? Colors.white10
-                  : theme.colorScheme.primary.withAlpha(20),
+                  ? theme.colorScheme.onSurface.withValues(alpha: 0.05)
+                  : theme.colorScheme.primary.withValues(alpha: 0.15),
             ),
             child: Icon(
               iconData,
               size: 20,
               color: notification.isRead
-                  ? Colors.white38
+                  ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)
                   : theme.colorScheme.primary,
             ),
           ),
@@ -161,7 +165,10 @@ class _NotificationItem extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   notification.message,
-                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -169,7 +176,12 @@ class _NotificationItem extends StatelessWidget {
                     'dd MMM, HH:mm',
                     Localizations.localeOf(context).toString(),
                   ).format(DateTime.parse(notification.timestamp)),
-                  style: const TextStyle(color: Colors.white38, fontSize: 11),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.6,
+                    ),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),

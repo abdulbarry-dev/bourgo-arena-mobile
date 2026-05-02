@@ -159,7 +159,9 @@ class _StatsRow extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -169,7 +171,7 @@ class _StatsRow extends StatelessWidget {
             value: profile.loyaltyPoints.toString(),
             icon: Symbols.stars,
           ),
-          Container(width: 1, height: 40, color: Colors.white10),
+          Container(width: 1, height: 40, color: theme.colorScheme.outline),
           _StatItem(
             label: AppLocalizations.of(context)!.profileCheckins,
             value: profile.totalCheckIns.toString(),
@@ -206,8 +208,8 @@ class _StatItem extends StatelessWidget {
         ),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white54,
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
             fontSize: 10,
             letterSpacing: 1,
           ),
@@ -284,7 +286,9 @@ class _MenuItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.white10),
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
+          ),
         ),
         child: Icon(icon, color: theme.colorScheme.primary, size: 20),
       ),
@@ -292,10 +296,15 @@ class _MenuItem extends StatelessWidget {
         label,
         style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
       ),
-      trailing: const Icon(Icons.chevron_right, color: Colors.white24),
+      trailing: Icon(
+        Icons.chevron_right,
+        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: Colors.white10),
+        side: BorderSide(
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+        ),
       ),
     );
   }

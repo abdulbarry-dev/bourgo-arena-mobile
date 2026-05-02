@@ -139,7 +139,11 @@ class _DaySelector extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        border: const Border(bottom: BorderSide(color: Colors.white10)),
+        border: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
+          ),
+        ),
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
@@ -164,7 +168,9 @@ class _DaySelector extends StatelessWidget {
                 child: Text(
                   days[index],
                   style: TextStyle(
-                    color: isSelected ? Colors.black : Colors.white54,
+                    color: isSelected
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSurfaceVariant,
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),
