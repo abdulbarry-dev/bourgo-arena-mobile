@@ -97,6 +97,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get activitiesNoReservations => 'Aucune réservation trouvée.';
 
   @override
+  String get activitiesNoReservationsSubtitle =>
+      'Prêt à jouer ? Réservez votre première session dès maintenant et rejoignez l\'arène !';
+
+  @override
+  String get activitiesNoReservationsCTA => 'RÉSERVER UNE SESSION';
+
+  @override
   String get activitiesRetry => 'RÉESSAYER';
 
   @override
@@ -298,6 +305,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileNoHistory => 'Aucune réservation passée.';
 
   @override
+  String get profileNoHistorySubtitle =>
+      'Vos activités et sessions passées apparaîtront ici une fois terminées.';
+
+  @override
   String get planningTitle => 'PLANNING DES COURS';
 
   @override
@@ -305,6 +316,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get planningNoCourses => 'Aucun cours prévu pour ce jour.';
+
+  @override
+  String get planningNoCoursesSubtitle =>
+      'Essayez de sélectionner un autre jour de la semaine ou une catégorie différente pour trouver des sessions disponibles.';
 
   @override
   String get bookingTitle => 'RÉSERVATION';
@@ -416,6 +431,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get notificationsEmpty => 'Aucune notification pour le moment.';
+
+  @override
+  String get notificationsEmptySubtitle =>
+      'Nous vous préviendrons ici lorsque vous aurez une nouvelle réservation ou une offre spéciale.';
 
   @override
   String get planningCategoryAll => 'Tous';

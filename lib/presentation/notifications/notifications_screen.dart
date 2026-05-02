@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -72,23 +73,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   Widget _buildEmptyState() {
-    final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Symbols.notifications_off,
-            size: 64,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            AppLocalizations.of(context)!.notificationsEmpty,
-            style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-          ),
-        ],
-      ),
+    return EmptyState(
+      title: AppLocalizations.of(context)!.notificationsEmpty,
+      message: AppLocalizations.of(context)!.notificationsEmptySubtitle,
+      icon: Symbols.notifications_off,
     );
   }
 }

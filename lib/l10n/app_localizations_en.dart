@@ -96,6 +96,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activitiesNoReservations => 'No reservations found.';
 
   @override
+  String get activitiesNoReservationsSubtitle =>
+      'Ready to play? Book your first session now and join the arena!';
+
+  @override
+  String get activitiesNoReservationsCTA => 'BOOK A SESSION';
+
+  @override
   String get activitiesRetry => 'RETRY';
 
   @override
@@ -295,6 +302,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileNoHistory => 'No past reservations.';
 
   @override
+  String get profileNoHistorySubtitle =>
+      'Your past activities and sessions will appear here once you complete them.';
+
+  @override
   String get planningTitle => 'CLASS SCHEDULE';
 
   @override
@@ -302,6 +313,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planningNoCourses => 'No classes scheduled for this day.';
+
+  @override
+  String get planningNoCoursesSubtitle =>
+      'Try selecting another day of the week or a different category to find available sessions.';
 
   @override
   String get bookingTitle => 'RESERVATION';
@@ -414,6 +429,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get notificationsEmpty => 'No notifications for now.';
+
+  @override
+  String get notificationsEmptySubtitle =>
+      'We\'ll let you know here when you have a new reservation or a special offer.';
 
   @override
   String get planningCategoryAll => 'All';

@@ -32,6 +32,8 @@
   "activitiesExplorer": "DÉCOUVRIR LE SPORT",
   "activitiesMyReservations": "MES RÉSERVATIONS",
   "activitiesNoReservations": "Aucune réservation trouvée.",
+  "activitiesNoReservationsSubtitle": "Prêt à jouer ? Réservez votre première session dès maintenant et rejoignez l'arène !",
+  "activitiesNoReservationsCTA": "RÉSERVER UNE SESSION",
   "activitiesRetry": "RÉESSAYER",
   "activitiesStatusConfirmed": "CONFIRMÉ",
   "activitiesStatusPending": "EN ATTENTE",
@@ -100,10 +102,12 @@
   "profileQrPlaceholder": "BOURGO-SCAN-123",
   "profileQrScanInstruction": "Scannez ce code à l'entrée pour valider votre présence.",
   "profileNoHistory": "Aucune réservation passée.",
+  "profileNoHistorySubtitle": "Vos activités et sessions passées apparaîtront ici une fois terminées.",
   
   "planningTitle": "PLANNING DES COURS",
   "planningFilterTitle": "FILTRER PAR CATÉGORIE",
   "planningNoCourses": "Aucun cours prévu pour ce jour.",
+  "planningNoCoursesSubtitle": "Essayez de sélectionner un autre jour de la semaine ou une catégorie différente pour trouver des sessions disponibles.",
   
   "bookingTitle": "RÉSERVATION",
   "bookingSuccess": "RÉSERVATION RÉUSSIE !",
@@ -144,6 +148,7 @@
   "notificationsTitle": "NOTIFICATIONS",
   "notificationsMarkAllRead": "TOUT LIRE",
   "notificationsEmpty": "Aucune notification pour le moment.",
+  "notificationsEmptySubtitle": "Nous vous préviendrons ici lorsque vous aurez une nouvelle réservation ou une offre spéciale.",
   
   "planningCategoryAll": "Tous",
   "planningCategoryFitness": "Fitness",

@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -147,8 +148,10 @@ class _HistoryTab extends StatelessWidget {
 
         final reservations = viewModel.reservations;
         if (reservations.isEmpty) {
-          return Center(
-            child: Text(AppLocalizations.of(context)!.profileNoHistory),
+          return EmptyState(
+            title: AppLocalizations.of(context)!.profileNoHistory,
+            message: AppLocalizations.of(context)!.profileNoHistorySubtitle,
+            icon: Symbols.history,
           );
         }
 

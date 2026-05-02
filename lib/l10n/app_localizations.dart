@@ -266,6 +266,18 @@ abstract class AppLocalizations {
   /// **'Aucune réservation trouvée.'**
   String get activitiesNoReservations;
 
+  /// No description provided for @activitiesNoReservationsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prêt à jouer ? Réservez votre première session dès maintenant et rejoignez l\'arène !'**
+  String get activitiesNoReservationsSubtitle;
+
+  /// No description provided for @activitiesNoReservationsCTA.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉSERVER UNE SESSION'**
+  String get activitiesNoReservationsCTA;
+
   /// No description provided for @activitiesRetry.
   ///
   /// In fr, this message translates to:
@@ -656,6 +668,12 @@ abstract class AppLocalizations {
   /// **'Aucune réservation passée.'**
   String get profileNoHistory;
 
+  /// No description provided for @profileNoHistorySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos activités et sessions passées apparaîtront ici une fois terminées.'**
+  String get profileNoHistorySubtitle;
+
   /// No description provided for @planningTitle.
   ///
   /// In fr, this message translates to:
@@ -673,6 +691,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucun cours prévu pour ce jour.'**
   String get planningNoCourses;
+
+  /// No description provided for @planningNoCoursesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Essayez de sélectionner un autre jour de la semaine ou une catégorie différente pour trouver des sessions disponibles.'**
+  String get planningNoCoursesSubtitle;
 
   /// No description provided for @bookingTitle.
   ///
@@ -895,6 +919,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucune notification pour le moment.'**
   String get notificationsEmpty;
+
+  /// No description provided for @notificationsEmptySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous vous préviendrons ici lorsque vous aurez une nouvelle réservation ou une offre spéciale.'**
+  String get notificationsEmptySubtitle;
 
   /// No description provided for @planningCategoryAll.
   ///

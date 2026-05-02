@@ -32,6 +32,8 @@
   "activitiesExplorer": "BROWSE SPORTS",
   "activitiesMyReservations": "MY RESERVATIONS",
   "activitiesNoReservations": "No reservations found.",
+  "activitiesNoReservationsSubtitle": "Ready to play? Book your first session now and join the arena!",
+  "activitiesNoReservationsCTA": "BOOK A SESSION",
   "activitiesRetry": "RETRY",
   "activitiesStatusConfirmed": "CONFIRMED",
   "activitiesStatusPending": "PENDING",
@@ -101,10 +103,12 @@
   "profileQrPlaceholder": "BOURGO-SCAN-123",
   "profileQrScanInstruction": "Scan this code at the entrance to validate your presence.",
   "profileNoHistory": "No past reservations.",
+  "profileNoHistorySubtitle": "Your past activities and sessions will appear here once you complete them.",
   
   "planningTitle": "CLASS SCHEDULE",
   "planningFilterTitle": "FILTER BY CATEGORY",
   "planningNoCourses": "No classes scheduled for this day.",
+  "planningNoCoursesSubtitle": "Try selecting another day of the week or a different category to find available sessions.",
   
   "bookingTitle": "RESERVATION",
   "bookingSuccess": "RESERVATION SUCCESSFUL!",
@@ -145,6 +149,7 @@
   "notificationsTitle": "NOTIFICATIONS",
   "notificationsMarkAllRead": "MARK ALL READ",
   "notificationsEmpty": "No notifications for now.",
+  "notificationsEmptySubtitle": "We'll let you know here when you have a new reservation or a special offer.",
   
   "planningCategoryAll": "All",
   "planningCategoryFitness": "Fitness",

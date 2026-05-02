@@ -3,7 +3,9 @@ import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// The course planning/schedule screen.
 class PlanningScreen extends StatefulWidget {
@@ -194,8 +196,10 @@ class _CourseList extends StatelessWidget {
     final courses = viewModel.courses;
 
     if (courses.isEmpty) {
-      return Center(
-        child: Text(AppLocalizations.of(context)!.planningNoCourses),
+      return EmptyState(
+        title: AppLocalizations.of(context)!.planningNoCourses,
+        message: AppLocalizations.of(context)!.planningNoCoursesSubtitle,
+        icon: Symbols.calendar_today,
       );
     }
 

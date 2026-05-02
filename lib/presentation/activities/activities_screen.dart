@@ -2,9 +2,12 @@ import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
+import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen displaying all activities and user reservations.
 class ActivitiesScreen extends StatefulWidget {
@@ -172,11 +175,12 @@ class _ReservationsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (viewModel.reservations.isEmpty) {
-      return Center(
-        child: Text(
-          AppLocalizations.of(context)!.activitiesNoReservations,
-          style: const TextStyle(color: Colors.white70),
-        ),
+      return EmptyState(
+        title: AppLocalizations.of(context)!.activitiesNoReservations,
+        message: AppLocalizations.of(context)!.activitiesNoReservationsSubtitle,
+        icon: Symbols.calendar_add_on,
+        actionLabel: AppLocalizations.of(context)!.activitiesNoReservationsCTA,
+        onAction: () => MainLayout.tabController.value = 0, // Go to Explorer tab
       );
     }
 
