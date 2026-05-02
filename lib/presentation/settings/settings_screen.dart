@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/settings_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// A professional settings screen for application configuration.
@@ -34,16 +35,12 @@ class SettingsScreen extends StatelessWidget {
                   _SettingsTile(
                     icon: Symbols.person,
                     title: l10n.settingsEditProfile,
-                    onTap: () {
-                      // Navigate to profile edit
-                    },
+                    onTap: () => context.push('/edit-profile'),
                   ),
                   _SettingsTile(
                     icon: Symbols.lock,
                     title: l10n.settingsChangePassword,
-                    onTap: () {
-                      // Navigate to change password
-                    },
+                    onTap: () => context.push('/change-password'),
                   ),
                 ],
               ),

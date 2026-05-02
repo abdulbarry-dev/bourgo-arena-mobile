@@ -75,6 +75,7 @@ class AuthService extends ChangeNotifier {
     id: 'dev_user_1',
     name: 'Dev Tester',
     email: 'test@testor.com',
+    phone: '+216 20 000 000',
     avatarUrl: 'https://i.pravatar.cc/150?u=dev_user_1',
     loyaltyPoints: 1250,
     subscriptionLevel: 'Premium',

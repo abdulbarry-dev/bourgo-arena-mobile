@@ -66,4 +66,17 @@ class DataService {
     final List<dynamic> data = json.decode(response);
     return data.map((json) => NotificationModel.fromJson(json)).toList();
   }
+
+  /// Updates the user's profile (Mock).
+  Future<void> updateProfile(UserProfile profile) async {
+    await Future.delayed(const Duration(seconds: 1));
+  }
+
+  /// Updates the user's password (Mock).
+  Future<void> updatePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    await Future.delayed(const Duration(seconds: 1));
+  }
 }

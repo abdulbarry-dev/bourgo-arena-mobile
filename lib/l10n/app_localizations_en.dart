@@ -499,4 +499,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsCancel => 'CANCEL';
+
+  @override
+  String get profileEditTitle => 'EDIT PROFILE';
+
+  @override
+  String get profileSave => 'SAVE CHANGES';
+
+  @override
+  String get profileUpdateSuccess => 'Profile updated successfully!';
+
+  @override
+  String get passwordChangeTitle => 'CHANGE PASSWORD';
+
+  @override
+  String get passwordCurrentLabel => 'Current Password';
+
+  @override
+  String get passwordCurrentHint => 'Enter current password';
+
+  @override
+  String get passwordUpdateSuccess => 'Password updated successfully!';
 }

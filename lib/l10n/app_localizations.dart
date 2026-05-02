@@ -1063,6 +1063,48 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'ANNULER'**
   String get settingsCancel;
+
+  /// No description provided for @profileEditTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'MODIFIER LE PROFIL'**
+  String get profileEditTitle;
+
+  /// No description provided for @profileSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'ENREGISTRER'**
+  String get profileSave;
+
+  /// No description provided for @profileUpdateSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil mis à jour avec succès !'**
+  String get profileUpdateSuccess;
+
+  /// No description provided for @passwordChangeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'CHANGER LE MOT DE PASSE'**
+  String get passwordChangeTitle;
+
+  /// No description provided for @passwordCurrentLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe actuel'**
+  String get passwordCurrentLabel;
+
+  /// No description provided for @passwordCurrentHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez votre mot de passe actuel'**
+  String get passwordCurrentHint;
+
+  /// No description provided for @passwordUpdateSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe mis à jour avec succès !'**
+  String get passwordUpdateSuccess;
 }
 
 class _AppLocalizationsDelegate

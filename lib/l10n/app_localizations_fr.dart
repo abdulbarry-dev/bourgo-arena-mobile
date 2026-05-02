@@ -501,4 +501,25 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get settingsCancel => 'ANNULER';
+
+  @override
+  String get profileEditTitle => 'MODIFIER LE PROFIL';
+
+  @override
+  String get profileSave => 'ENREGISTRER';
+
+  @override
+  String get profileUpdateSuccess => 'Profil mis à jour avec succès !';
+
+  @override
+  String get passwordChangeTitle => 'CHANGER LE MOT DE PASSE';
+
+  @override
+  String get passwordCurrentLabel => 'Mot de passe actuel';
+
+  @override
+  String get passwordCurrentHint => 'Entrez votre mot de passe actuel';
+
+  @override
+  String get passwordUpdateSuccess => 'Mot de passe mis à jour avec succès !';
 }

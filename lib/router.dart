@@ -11,6 +11,8 @@ import 'package:bourgo_arena_mobile/presentation/common/offline_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/onboarding/onboarding_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/change_password_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
@@ -99,6 +101,14 @@ GoRouter createRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => SettingsScreen(viewModel: settingsViewModel),
+    ),
+    GoRoute(
+      path: '/edit-profile',
+      builder: (context, state) => const EditProfileScreen(),
+    ),
+    GoRoute(
+      path: '/change-password',
+      builder: (context, state) => const ChangePasswordScreen(),
     ),
     GoRoute(
       path: '/offline',

@@ -175,5 +175,12 @@
   "settingsConfirmDeleteTitle": "Delete Account?",
   "settingsConfirmDeleteMessage": "This action cannot be undone. All your data will be permanently removed.",
   "settingsDelete": "DELETE",
-  "settingsCancel": "CANCEL"
+  "settingsCancel": "CANCEL",
+  "profileEditTitle": "EDIT PROFILE",
+  "profileSave": "SAVE CHANGES",
+  "profileUpdateSuccess": "Profile updated successfully!",
+  "passwordChangeTitle": "CHANGE PASSWORD",
+  "passwordCurrentLabel": "Current Password",
+  "passwordCurrentHint": "Enter current password",
+  "passwordUpdateSuccess": "Password updated successfully!"
 }

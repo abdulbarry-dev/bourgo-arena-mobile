@@ -10,6 +10,7 @@ UserProfile _$UserProfileFromJson(Map<String, dynamic> json) => UserProfile(
   id: json['id'] as String,
   name: json['name'] as String,
   email: json['email'] as String,
+  phone: json['phone'] as String,
   avatarUrl: json['avatar_url'] as String,
   loyaltyPoints: (json['loyalty_points'] as num).toInt(),
   subscriptionLevel: json['subscription_level'] as String,
@@ -26,5 +27,6 @@ Map<String, dynamic> _$UserProfileToJson(UserProfile instance) =>
       'loyalty_points': instance.loyaltyPoints,
       'subscription_level': instance.subscriptionLevel,
       'subscription_expiry': instance.subscriptionExpiry,
+      'phone': instance.phone,
       'total_check_ins': instance.totalCheckIns,
     };

@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/data/models/user_profile.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
 /// ViewModel for the Profile screen.
 class ProfileViewModel extends ChangeNotifier {
@@ -28,8 +29,8 @@ class ProfileViewModel extends ChangeNotifier {
 
     try {
       _profile = await _dataService.getUserProfile();
-    } catch (e) {
-      // Handle error
+    } catch (e, stackTrace) {
+      developer.log('Error loading profile', error: e, stackTrace: stackTrace);
     } finally {
       _isLoading = false;
       notifyListeners();

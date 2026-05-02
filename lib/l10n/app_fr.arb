@@ -174,5 +174,12 @@
   "settingsConfirmDeleteTitle": "Supprimer le compte ?",
   "settingsConfirmDeleteMessage": "Cette action est irréversible. Toutes vos données seront définitivement supprimées.",
   "settingsDelete": "SUPPRIMER",
-  "settingsCancel": "ANNULER"
+  "settingsCancel": "ANNULER",
+  "profileEditTitle": "MODIFIER LE PROFIL",
+  "profileSave": "ENREGISTRER",
+  "profileUpdateSuccess": "Profil mis à jour avec succès !",
+  "passwordChangeTitle": "CHANGER LE MOT DE PASSE",
+  "passwordCurrentLabel": "Mot de passe actuel",
+  "passwordCurrentHint": "Entrez votre mot de passe actuel",
+  "passwordUpdateSuccess": "Mot de passe mis à jour avec succès !"
 }
