@@ -144,8 +144,6 @@ class SettingsScreen extends StatelessWidget {
         return l10n.settingsThemeLight;
       case ThemeMode.dark:
         return l10n.settingsThemeDark;
-      default:
-        return l10n.settingsThemeSystem;
     }
   }
 
@@ -257,7 +255,7 @@ class _SettingsSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
 
-  const _SettingsSection({Key? key, required this.title, required this.children}) : super(key: key);
+  const _SettingsSection({required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
@@ -289,16 +287,17 @@ class _SettingsTile extends StatelessWidget {
   final VoidCallback? onTap;
   final bool showArrow;
   const _SettingsTile({
-    Key? key,
     required this.icon,
     required this.title,
     this.trailing,
     this.onTap,
     this.showArrow = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
+    final Widget? trailingWidget = trailing;
+
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
@@ -315,7 +314,7 @@ class _SettingsTile extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (trailing != null) trailing,
+          if (trailingWidget != null) trailingWidget,
           if (showArrow) ...[
             const SizedBox(width: 8),
             const Icon(Symbols.chevron_right, size: 20, color: Colors.white24),
@@ -333,7 +332,7 @@ class _SettingsSwitchTile extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const _SettingsSwitchTile({Key? key, required this.icon, required this.title, required this.value, required this.onChanged}) : super(key: key);
+  const _SettingsSwitchTile({required this.icon, required this.title, required this.value, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -365,7 +364,7 @@ class _ThemeOption extends StatelessWidget {
   final ThemeMode mode;
   final String label;
   final SettingsViewModel viewModel;
-  const _ThemeOption({Key? key, required this.mode, required this.label, required this.viewModel}) : super(key: key);
+  const _ThemeOption({required this.mode, required this.label, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
