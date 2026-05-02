@@ -20,7 +20,9 @@ class ReservationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withAlpha(20)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+        ),
       ),
       child: Column(
         children: [
@@ -33,13 +35,18 @@ class ReservationCard extends StatelessWidget {
                 Text(
                   reservation.id,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: Colors.white.withAlpha(100),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.5,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Colors.white10),
+          Divider(
+            height: 1,
+            color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -57,29 +64,29 @@ class ReservationCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          const Icon(
+                          Icon(
                             Symbols.calendar_month,
                             size: 16,
-                            color: Colors.white70,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             reservation.date,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white70,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(width: 16),
-                          const Icon(
+                          Icon(
                             Symbols.schedule,
                             size: 16,
-                            color: Colors.white70,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             reservation.time,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white70,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                         ],
