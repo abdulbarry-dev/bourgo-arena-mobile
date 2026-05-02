@@ -436,4 +436,68 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get bookingStepPayment => 'PAIEMENT';
+
+  @override
+  String get settingsTitle => 'PARAMÈTRES';
+
+  @override
+  String get settingsSectionAccount => 'COMPTE';
+
+  @override
+  String get settingsSectionPreferences => 'PRÉFÉRENCES';
+
+  @override
+  String get settingsSectionLegal => 'LÉGAL';
+
+  @override
+  String get settingsSectionAbout => 'À PROPOS';
+
+  @override
+  String get settingsEditProfile => 'Modifier le profil';
+
+  @override
+  String get settingsChangePassword => 'Changer le mot de passe';
+
+  @override
+  String get settingsLanguage => 'Langue';
+
+  @override
+  String get settingsTheme => 'Thème';
+
+  @override
+  String get settingsThemeSystem => 'Défaut Système';
+
+  @override
+  String get settingsThemeLight => 'Mode Clair';
+
+  @override
+  String get settingsThemeDark => 'Mode Sombre';
+
+  @override
+  String get settingsPushNotifications => 'Notifications Push';
+
+  @override
+  String get settingsTerms => 'Conditions d\'utilisation';
+
+  @override
+  String get settingsPrivacy => 'Politique de confidentialité';
+
+  @override
+  String get settingsAppVersion => 'Version de l\'application';
+
+  @override
+  String get settingsDeleteAccount => 'Supprimer le compte';
+
+  @override
+  String get settingsConfirmDeleteTitle => 'Supprimer le compte ?';
+
+  @override
+  String get settingsConfirmDeleteMessage =>
+      'Cette action est irréversible. Toutes vos données seront définitivement supprimées.';
+
+  @override
+  String get settingsDelete => 'SUPPRIMER';
+
+  @override
+  String get settingsCancel => 'ANNULER';
 }

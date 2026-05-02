@@ -937,6 +937,132 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'PAIEMENT'**
   String get bookingStepPayment;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PARAMÈTRES'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsSectionAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'COMPTE'**
+  String get settingsSectionAccount;
+
+  /// No description provided for @settingsSectionPreferences.
+  ///
+  /// In fr, this message translates to:
+  /// **'PRÉFÉRENCES'**
+  String get settingsSectionPreferences;
+
+  /// No description provided for @settingsSectionLegal.
+  ///
+  /// In fr, this message translates to:
+  /// **'LÉGAL'**
+  String get settingsSectionLegal;
+
+  /// No description provided for @settingsSectionAbout.
+  ///
+  /// In fr, this message translates to:
+  /// **'À PROPOS'**
+  String get settingsSectionAbout;
+
+  /// No description provided for @settingsEditProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier le profil'**
+  String get settingsEditProfile;
+
+  /// No description provided for @settingsChangePassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer le mot de passe'**
+  String get settingsChangePassword;
+
+  /// No description provided for @settingsLanguage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langue'**
+  String get settingsLanguage;
+
+  /// No description provided for @settingsTheme.
+  ///
+  /// In fr, this message translates to:
+  /// **'Thème'**
+  String get settingsTheme;
+
+  /// No description provided for @settingsThemeSystem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Défaut Système'**
+  String get settingsThemeSystem;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode Clair'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode Sombre'**
+  String get settingsThemeDark;
+
+  /// No description provided for @settingsPushNotifications.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications Push'**
+  String get settingsPushNotifications;
+
+  /// No description provided for @settingsTerms.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conditions d\'utilisation'**
+  String get settingsTerms;
+
+  /// No description provided for @settingsPrivacy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Politique de confidentialité'**
+  String get settingsPrivacy;
+
+  /// No description provided for @settingsAppVersion.
+  ///
+  /// In fr, this message translates to:
+  /// **'Version de l\'application'**
+  String get settingsAppVersion;
+
+  /// No description provided for @settingsDeleteAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte'**
+  String get settingsDeleteAccount;
+
+  /// No description provided for @settingsConfirmDeleteTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte ?'**
+  String get settingsConfirmDeleteTitle;
+
+  /// No description provided for @settingsConfirmDeleteMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette action est irréversible. Toutes vos données seront définitivement supprimées.'**
+  String get settingsConfirmDeleteMessage;
+
+  /// No description provided for @settingsDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'SUPPRIMER'**
+  String get settingsDelete;
+
+  /// No description provided for @settingsCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'ANNULER'**
+  String get settingsCancel;
 }
 
 class _AppLocalizationsDelegate

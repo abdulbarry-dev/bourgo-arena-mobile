@@ -151,5 +151,27 @@
   
   "bookingStepSport": "SPORT",
   "bookingStepTime": "TIME",
-  "bookingStepPayment": "PAYMENT"
+  "bookingStepPayment": "PAYMENT",
+
+  "settingsTitle": "SETTINGS",
+  "settingsSectionAccount": "ACCOUNT",
+  "settingsSectionPreferences": "PREFERENCES",
+  "settingsSectionLegal": "LEGAL",
+  "settingsSectionAbout": "ABOUT",
+  "settingsEditProfile": "Edit Profile",
+  "settingsChangePassword": "Change Password",
+  "settingsLanguage": "Language",
+  "settingsTheme": "Theme",
+  "settingsThemeSystem": "System Default",
+  "settingsThemeLight": "Light Mode",
+  "settingsThemeDark": "Dark Mode",
+  "settingsPushNotifications": "Push Notifications",
+  "settingsTerms": "Terms of Service",
+  "settingsPrivacy": "Privacy Policy",
+  "settingsAppVersion": "App Version",
+  "settingsDeleteAccount": "Delete Account",
+  "settingsConfirmDeleteTitle": "Delete Account?",
+  "settingsConfirmDeleteMessage": "This action cannot be undone. All your data will be permanently removed.",
+  "settingsDelete": "DELETE",
+  "settingsCancel": "CANCEL"
 }

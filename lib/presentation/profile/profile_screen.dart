@@ -60,6 +60,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTapHistorique: () => context.push('/history'),
                         onTapNotifications: () =>
                             context.push('/notifications'),
+                        onTapSettings: () => context.push('/settings'),
                       ),
                       const SizedBox(height: 32),
                       _LogoutButton(),
@@ -218,11 +219,13 @@ class _ProfileMenu extends StatelessWidget {
   final VoidCallback onTapAbonnement;
   final VoidCallback onTapHistorique;
   final VoidCallback onTapNotifications;
+  final VoidCallback onTapSettings;
 
   const _ProfileMenu({
     required this.onTapAbonnement,
     required this.onTapHistorique,
     required this.onTapNotifications,
+    required this.onTapSettings,
   });
 
   @override
@@ -250,7 +253,7 @@ class _ProfileMenu extends StatelessWidget {
         _MenuItem(
           icon: Symbols.settings,
           label: AppLocalizations.of(context)!.profileSettings,
-          onTap: () {},
+          onTap: onTapSettings,
         ),
       ],
     );

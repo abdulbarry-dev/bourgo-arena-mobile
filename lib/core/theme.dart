@@ -57,6 +57,44 @@ class BourgoTheme {
   static const Color primaryNeonDim = Color(0xFF88CC00);
   static const Color bgBase = Color(0xFF0A0A0A);
 
+  static ThemeData get lightTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primaryNeon,
+        brightness: Brightness.light,
+        primary: const Color(0xFF669900), // Darker neon for readability on white
+        onPrimary: Colors.white,
+      ),
+      textTheme: _textTheme,
+      extensions: [
+        const AppColors(
+          brandPrimaryGhost: Color(0x15AAFF00),
+          brandPrimaryGlow: Color(0x40AAFF00),
+          bgSurface: Colors.white,
+          bgElevated: Color(0xFFF5F5F5),
+          bgBorder: Color(0xFFE0E0E0),
+        ),
+      ],
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF669900),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ),
+    );
+  }
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

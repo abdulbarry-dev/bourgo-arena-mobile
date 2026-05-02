@@ -435,4 +435,68 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingStepPayment => 'PAYMENT';
+
+  @override
+  String get settingsTitle => 'SETTINGS';
+
+  @override
+  String get settingsSectionAccount => 'ACCOUNT';
+
+  @override
+  String get settingsSectionPreferences => 'PREFERENCES';
+
+  @override
+  String get settingsSectionLegal => 'LEGAL';
+
+  @override
+  String get settingsSectionAbout => 'ABOUT';
+
+  @override
+  String get settingsEditProfile => 'Edit Profile';
+
+  @override
+  String get settingsChangePassword => 'Change Password';
+
+  @override
+  String get settingsLanguage => 'Language';
+
+  @override
+  String get settingsTheme => 'Theme';
+
+  @override
+  String get settingsThemeSystem => 'System Default';
+
+  @override
+  String get settingsThemeLight => 'Light Mode';
+
+  @override
+  String get settingsThemeDark => 'Dark Mode';
+
+  @override
+  String get settingsPushNotifications => 'Push Notifications';
+
+  @override
+  String get settingsTerms => 'Terms of Service';
+
+  @override
+  String get settingsPrivacy => 'Privacy Policy';
+
+  @override
+  String get settingsAppVersion => 'App Version';
+
+  @override
+  String get settingsDeleteAccount => 'Delete Account';
+
+  @override
+  String get settingsConfirmDeleteTitle => 'Delete Account?';
+
+  @override
+  String get settingsConfirmDeleteMessage =>
+      'This action cannot be undone. All your data will be permanently removed.';
+
+  @override
+  String get settingsDelete => 'DELETE';
+
+  @override
+  String get settingsCancel => 'CANCEL';
 }

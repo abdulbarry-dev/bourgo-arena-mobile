@@ -151,5 +151,27 @@
   
   "bookingStepSport": "SPORT",
   "bookingStepTime": "HORAIRE",
-  "bookingStepPayment": "PAIEMENT"
+  "bookingStepPayment": "PAIEMENT",
+
+  "settingsTitle": "PARAMÈTRES",
+  "settingsSectionAccount": "COMPTE",
+  "settingsSectionPreferences": "PRÉFÉRENCES",
+  "settingsSectionLegal": "LÉGAL",
+  "settingsSectionAbout": "À PROPOS",
+  "settingsEditProfile": "Modifier le profil",
+  "settingsChangePassword": "Changer le mot de passe",
+  "settingsLanguage": "Langue",
+  "settingsTheme": "Thème",
+  "settingsThemeSystem": "Défaut Système",
+  "settingsThemeLight": "Mode Clair",
+  "settingsThemeDark": "Mode Sombre",
+  "settingsPushNotifications": "Notifications Push",
+  "settingsTerms": "Conditions d'utilisation",
+  "settingsPrivacy": "Politique de confidentialité",
+  "settingsAppVersion": "Version de l'application",
+  "settingsDeleteAccount": "Supprimer le compte",
+  "settingsConfirmDeleteTitle": "Supprimer le compte ?",
+  "settingsConfirmDeleteMessage": "Cette action est irréversible. Toutes vos données seront définitivement supprimées.",
+  "settingsDelete": "SUPPRIMER",
+  "settingsCancel": "ANNULER"
 }
