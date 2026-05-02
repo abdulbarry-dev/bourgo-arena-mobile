@@ -4,6 +4,8 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/ticker_strip.dart';
+import 'package:bourgo_arena_mobile/presentation/home/widgets/today_course_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -164,76 +166,55 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Aujourd'hui Section
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    AppLocalizations.of(context)!.homeTodayTitle,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontFamily: AppConstants.displayFontFamily,
-                      letterSpacing: 1,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        AppLocalizations.of(context)!.homeTodayTitle,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontFamily: AppConstants.displayFontFamily,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => MainLayout.tabController.value = 2,
+                        child: Text(
+                          AppLocalizations.of(context)!.homeSeeAll,
+                          style: TextStyle(
+                            color: theme.colorScheme.primary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
                 if (_viewModel.todayCourses.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(
-                      AppLocalizations.of(context)!.homeNoCourses,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white54,
-                      ),
+                    child: EmptyState(
+                      title: AppLocalizations.of(context)!.homeNoCourses,
+                      message: AppLocalizations.of(
+                        context,
+                      )!.planningNoCoursesSubtitle,
+                      icon: Symbols.calendar_today,
                     ),
                   )
                 else
-                  ListView.builder(
+                  ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     itemCount: _viewModel.todayCourses.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
-                      final course = _viewModel.todayCourses[index];
-
-                      return GestureDetector(
+                      return TodayCourseCard(
+                        course: _viewModel.todayCourses[index],
                         onTap: () => MainLayout.tabController.value = 2,
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 4,
-                                height: 40,
-                                color: theme.colorScheme.primary,
-                              ),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    course.category.toUpperCase(),
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: theme.colorScheme.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${course.title} • ${course.startTime}',
-                                    style: theme.textTheme.titleSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const Spacer(),
-                              const Icon(Symbols.chevron_right, size: 20),
-                            ],
-                          ),
-                        ),
                       );
                     },
                   ),
