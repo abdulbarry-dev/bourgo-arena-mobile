@@ -30,7 +30,7 @@ class _TickerStripState extends State<TickerStrip>
     super.initState();
     _scrollController = ScrollController();
     _animationController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 10))
+        AnimationController(vsync: this, duration: const Duration(seconds: 120))
           ..addListener(() {
             if (_scrollController.hasClients) {
               final maxScroll = _scrollController.position.maxScrollExtent;
@@ -53,29 +53,44 @@ class _TickerStripState extends State<TickerStrip>
     return Container(
       height: widget.height,
       color: widget.backgroundColor,
-      child: ListView.builder(
-        itemCount: 100, // Provide a finite count to avoid infinite scroll crash
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (context, index) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                widget.text.toUpperCase(),
-                style: TextStyle(
-                  color: widget.textColor,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                  letterSpacing: 1.2,
-                  fontFamily:
-                      AppConstants.displayFontFamily, // Use the display font
+      child: ShaderMask(
+        shaderCallback: (Rect bounds) {
+          return const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Colors.transparent,
+              Colors.black,
+              Colors.black,
+              Colors.transparent,
+            ],
+            stops: [0.0, 0.05, 0.95, 1.0],
+          ).createShader(bounds);
+        },
+        blendMode: BlendMode.dstIn,
+        child: ListView.builder(
+          itemCount: 30, // Balanced count for a long strip
+          controller: _scrollController,
+          scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  widget.text.toUpperCase(),
+                  style: TextStyle(
+                    color: widget.textColor,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15, // Slightly larger
+                    letterSpacing: 3.0, // More spacing for premium look
+                    fontFamily: AppConstants.displayFontFamily,
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
