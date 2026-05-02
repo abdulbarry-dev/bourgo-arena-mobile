@@ -62,13 +62,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navPlanning => 'PLANNING';
 
   @override
-  String get navProfile => 'PROFILE';
+  String get navProfile => 'ACCOUNT';
 
   @override
-  String get homeHeroPart1 => 'JOIN';
+  String get homeHeroPart1 => 'JOIN THE';
 
   @override
-  String get homeHeroPart2 => 'THE ARENA';
+  String get homeHeroPart2 => 'ARENA';
 
   @override
   String get homeTicker =>
@@ -87,7 +87,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeTodayTitle => 'TODAY';
 
   @override
-  String get activitiesExplorer => 'EXPLORE';
+  String get activitiesExplorer => 'BROWSE SPORTS';
 
   @override
   String get activitiesMyReservations => 'MY RESERVATIONS';
@@ -222,16 +222,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authReset => 'RESET';
 
   @override
-  String get profilePoints => 'POINTS';
+  String get profilePoints => 'BOURGO POINTS';
 
   @override
-  String get profileCheckins => 'CHECK-INS';
+  String get profileCheckins => 'VISITS';
 
   @override
-  String get profileMySubscription => 'My Subscription';
+  String get profileMySubscription => 'Membership Plan';
 
   @override
-  String get profileHistory => 'Check-in & History';
+  String get profileHistory => 'Access & History';
 
   @override
   String get profileNotifications => 'Notifications';
@@ -240,16 +240,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileSettings => 'Settings';
 
   @override
-  String get profileLogout => 'LOG OUT';
+  String get profileLogout => 'SIGN OUT';
 
   @override
-  String get profileSubscriptionTitle => 'MY SUBSCRIPTION';
+  String get profileSubscriptionTitle => 'MY PLAN';
 
   @override
-  String get profileManageSubscription => 'MANAGE SUBSCRIPTION';
+  String get profileManageSubscription => 'MANAGE PLAN';
 
   @override
-  String get profileAdvantages => 'ADVANTAGES';
+  String get profileAdvantages => 'PRIVILEGES';
 
   @override
   String get profileNextBilling => 'NEXT BILLING';
@@ -340,7 +340,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingDate => 'Date';
 
   @override
-  String get bookingTime => 'Time';
+  String get bookingTime => 'Time Slot';
 
   @override
   String get bookingDuration => 'Duration';
@@ -349,7 +349,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingDurationPadel => '90 min';
 
   @override
-  String get bookingDurationStandard => '60 min';
+  String get bookingDurationStandard => '60 minutes';
 
   @override
   String get bookingMethodCard => 'Credit Card';
@@ -458,10 +458,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsChangePassword => 'Change Password';
 
   @override
-  String get settingsLanguage => 'Language';
+  String get settingsLanguage => 'App Language';
 
   @override
-  String get settingsTheme => 'Theme';
+  String get settingsTheme => 'Display Mode';
 
   @override
   String get settingsThemeSystem => 'System Default';
@@ -482,7 +482,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPrivacy => 'Privacy Policy';
 
   @override
-  String get settingsAppVersion => 'App Version';
+  String get settingsAppVersion => 'Version';
 
   @override
   String get settingsDeleteAccount => 'Delete Account';

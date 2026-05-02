@@ -155,38 +155,26 @@ class SettingsScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(
+            RadioListTile<String>(
               title: const Text('English'),
-              leading: Radio<String>(
-                value: 'en',
-                groupValue: viewModel.locale.languageCode,
-                onChanged: (val) {
-                  if (val != null) {
-                    viewModel.updateLocale(Locale(val));
-                    Navigator.pop(context);
-                  }
-                },
-              ),
-              onTap: () {
-                viewModel.updateLocale(const Locale('en'));
-                Navigator.pop(context);
+              value: 'en',
+              groupValue: viewModel.locale.languageCode,
+              onChanged: (val) {
+                if (val != null) {
+                  viewModel.updateLocale(Locale(val));
+                  Navigator.pop(context);
+                }
               },
             ),
-            ListTile(
+            RadioListTile<String>(
               title: const Text('Français'),
-              leading: Radio<String>(
-                value: 'fr',
-                groupValue: viewModel.locale.languageCode,
-                onChanged: (val) {
-                  if (val != null) {
-                    viewModel.updateLocale(Locale(val));
-                    Navigator.pop(context);
-                  }
-                },
-              ),
-              onTap: () {
-                viewModel.updateLocale(const Locale('fr'));
-                Navigator.pop(context);
+              value: 'fr',
+              groupValue: viewModel.locale.languageCode,
+              onChanged: (val) {
+                if (val != null) {
+                  viewModel.updateLocale(Locale(val));
+                  Navigator.pop(context);
+                }
               },
             ),
           ],
@@ -203,20 +191,38 @@ class SettingsScreen extends StatelessWidget {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _ThemeOption(
-              mode: ThemeMode.system,
-              label: l10n.settingsThemeSystem,
-              viewModel: viewModel,
+            RadioListTile<ThemeMode>(
+              title: Text(l10n.settingsThemeSystem),
+              value: ThemeMode.system,
+              groupValue: viewModel.themeMode,
+              onChanged: (val) {
+                if (val != null) {
+                  viewModel.updateThemeMode(val);
+                  Navigator.pop(context);
+                }
+              },
             ),
-            _ThemeOption(
-              mode: ThemeMode.light,
-              label: l10n.settingsThemeLight,
-              viewModel: viewModel,
+            RadioListTile<ThemeMode>(
+              title: Text(l10n.settingsThemeLight),
+              value: ThemeMode.light,
+              groupValue: viewModel.themeMode,
+              onChanged: (val) {
+                if (val != null) {
+                  viewModel.updateThemeMode(val);
+                  Navigator.pop(context);
+                }
+              },
             ),
-            _ThemeOption(
-              mode: ThemeMode.dark,
-              label: l10n.settingsThemeDark,
-              viewModel: viewModel,
+            RadioListTile<ThemeMode>(
+              title: Text(l10n.settingsThemeDark),
+              value: ThemeMode.dark,
+              groupValue: viewModel.themeMode,
+              onChanged: (val) {
+                if (val != null) {
+                  viewModel.updateThemeMode(val);
+                  Navigator.pop(context);
+                }
+              },
             ),
           ],
         ),
@@ -269,7 +275,9 @@ class _SettingsSection extends StatelessWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.primary.withAlpha(180),
+              color: Theme.of(
+                context,
+              ).colorScheme.primary.withValues(alpha: 0.7),
               letterSpacing: 1.2,
             ),
           ),
@@ -302,7 +310,7 @@ class _SettingsTile extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withAlpha(10),
+          color: Colors.white.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, size: 20, color: Colors.white70),
@@ -314,7 +322,7 @@ class _SettingsTile extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (trailingWidget != null) trailingWidget,
+          ?trailingWidget,
           if (showArrow) ...[
             const SizedBox(width: 8),
             const Icon(Symbols.chevron_right, size: 20, color: Colors.white24),
@@ -332,7 +340,12 @@ class _SettingsSwitchTile extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const _SettingsSwitchTile({required this.icon, required this.title, required this.value, required this.onChanged});
+  const _SettingsSwitchTile({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -342,7 +355,7 @@ class _SettingsSwitchTile extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withAlpha(10),
+          color: Colors.white.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, size: 20, color: Colors.white70),
@@ -356,34 +369,6 @@ class _SettingsSwitchTile extends StatelessWidget {
         onChanged: onChanged,
         activeTrackColor: theme.colorScheme.primary,
       ),
-    );
-  }
-}
-
-class _ThemeOption extends StatelessWidget {
-  final ThemeMode mode;
-  final String label;
-  final SettingsViewModel viewModel;
-  const _ThemeOption({required this.mode, required this.label, required this.viewModel});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(label),
-      leading: Radio<ThemeMode>(
-        value: mode,
-        groupValue: viewModel.themeMode,
-        onChanged: (val) {
-          if (val != null) {
-            viewModel.updateThemeMode(val);
-            Navigator.pop(context);
-          }
-        },
-      ),
-      onTap: () {
-        viewModel.updateThemeMode(mode);
-        Navigator.pop(context);
-      },
     );
   }
 }

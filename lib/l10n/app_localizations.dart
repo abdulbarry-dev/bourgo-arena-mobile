@@ -203,25 +203,25 @@ abstract class AppLocalizations {
   /// No description provided for @navProfile.
   ///
   /// In fr, this message translates to:
-  /// **'PROFIL'**
+  /// **'COMPTE'**
   String get navProfile;
 
   /// No description provided for @homeHeroPart1.
   ///
   /// In fr, this message translates to:
-  /// **'REJOINS'**
+  /// **'REJOIGNEZ'**
   String get homeHeroPart1;
 
   /// No description provided for @homeHeroPart2.
   ///
   /// In fr, this message translates to:
-  /// **'L\'ARENE'**
+  /// **'L\'ARÈNE'**
   String get homeHeroPart2;
 
   /// No description provided for @homeTicker.
   ///
   /// In fr, this message translates to:
-  /// **'RESERVE TA SESSION • FOOTBALL • PADEL • FITNESS • '**
+  /// **'RÉSERVEZ VOTRE SESSION • FOOTBALL • PADEL • FITNESS • '**
   String get homeTicker;
 
   /// No description provided for @homeNoCourses.
@@ -251,7 +251,7 @@ abstract class AppLocalizations {
   /// No description provided for @activitiesExplorer.
   ///
   /// In fr, this message translates to:
-  /// **'EXPLORER'**
+  /// **'DÉCOUVRIR LE SPORT'**
   String get activitiesExplorer;
 
   /// No description provided for @activitiesMyReservations.
@@ -515,25 +515,25 @@ abstract class AppLocalizations {
   /// No description provided for @profilePoints.
   ///
   /// In fr, this message translates to:
-  /// **'POINTS'**
+  /// **'POINTS BOURGO'**
   String get profilePoints;
 
   /// No description provided for @profileCheckins.
   ///
   /// In fr, this message translates to:
-  /// **'CHECK-INS'**
+  /// **'VISITES'**
   String get profileCheckins;
 
   /// No description provided for @profileMySubscription.
   ///
   /// In fr, this message translates to:
-  /// **'Mon Abonnement'**
+  /// **'Mon Adhésion'**
   String get profileMySubscription;
 
   /// No description provided for @profileHistory.
   ///
   /// In fr, this message translates to:
-  /// **'Check-in & Historique'**
+  /// **'Accès & Historique'**
   String get profileHistory;
 
   /// No description provided for @profileNotifications.
@@ -551,25 +551,25 @@ abstract class AppLocalizations {
   /// No description provided for @profileLogout.
   ///
   /// In fr, this message translates to:
-  /// **'SE DÉCONNECTER'**
+  /// **'DÉCONNEXION'**
   String get profileLogout;
 
   /// No description provided for @profileSubscriptionTitle.
   ///
   /// In fr, this message translates to:
-  /// **'MON ABONNEMENT'**
+  /// **'MON ADHÉSION'**
   String get profileSubscriptionTitle;
 
   /// No description provided for @profileManageSubscription.
   ///
   /// In fr, this message translates to:
-  /// **'GÉRER L\'ABONNEMENT'**
+  /// **'GÉRER MON OFFRE'**
   String get profileManageSubscription;
 
   /// No description provided for @profileAdvantages.
   ///
   /// In fr, this message translates to:
-  /// **'AVANTAGES'**
+  /// **'MES PRIVILÈGES'**
   String get profileAdvantages;
 
   /// No description provided for @profileNextBilling.
@@ -749,7 +749,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingTime.
   ///
   /// In fr, this message translates to:
-  /// **'Horaire'**
+  /// **'Créneau'**
   String get bookingTime;
 
   /// No description provided for @bookingDuration.
@@ -767,7 +767,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookingDurationStandard.
   ///
   /// In fr, this message translates to:
-  /// **'60 min'**
+  /// **'60 minutes'**
   String get bookingDurationStandard;
 
   /// No description provided for @bookingMethodCard.
@@ -983,13 +983,13 @@ abstract class AppLocalizations {
   /// No description provided for @settingsLanguage.
   ///
   /// In fr, this message translates to:
-  /// **'Langue'**
+  /// **'Langue de l\'app'**
   String get settingsLanguage;
 
   /// No description provided for @settingsTheme.
   ///
   /// In fr, this message translates to:
-  /// **'Thème'**
+  /// **'Mode d\'affichage'**
   String get settingsTheme;
 
   /// No description provided for @settingsThemeSystem.
@@ -1031,7 +1031,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsAppVersion.
   ///
   /// In fr, this message translates to:
-  /// **'Version de l\'application'**
+  /// **'Version'**
   String get settingsAppVersion;
 
   /// No description provided for @settingsDeleteAccount.

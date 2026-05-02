@@ -64,7 +64,9 @@ class BourgoTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryNeon,
         brightness: Brightness.light,
-        primary: const Color(0xFF669900), // Darker neon for readability on white
+        primary: const Color(
+          0xFF669900,
+        ), // Darker neon for readability on white
         onPrimary: Colors.white,
       ),
       textTheme: _textTheme,

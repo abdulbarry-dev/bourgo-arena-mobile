@@ -15,7 +15,7 @@ class SettingsService {
   ThemeMode getThemeMode() {
     final String? themeValue = _prefs.getString(_themeKey);
     if (themeValue == null) return ThemeMode.system;
-    
+
     return ThemeMode.values.firstWhere(
       (e) => e.name == themeValue,
       orElse: () => ThemeMode.system,

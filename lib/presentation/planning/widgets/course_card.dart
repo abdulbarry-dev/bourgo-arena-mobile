@@ -67,10 +67,13 @@ class CourseCard extends StatelessWidget {
                     Text(
                       '${course.enrolled}/${course.capacity}',
                       style: TextStyle(
-                        color: course.isFull ? Colors.redAccent : Colors.white54,
+                        color: course.isFull
+                            ? Colors.redAccent
+                            : Colors.white54,
                         fontSize: 13,
-                        fontWeight:
-                            course.isFull ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: course.isFull
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                     ),
                   ],

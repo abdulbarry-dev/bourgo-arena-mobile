@@ -94,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: theme.colorScheme.primary.withAlpha(20),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
                 ),
               ),
             ),
@@ -105,7 +105,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: NetworkImage(profile.avatarUrl),
-                  backgroundColor: theme.colorScheme.primary.withAlpha(50),
+                  backgroundColor: theme.colorScheme.primary.withValues(
+                    alpha: 0.2,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Text(

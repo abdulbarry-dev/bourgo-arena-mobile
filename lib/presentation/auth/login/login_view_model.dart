@@ -1,8 +1,9 @@
+import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 /// ViewModel for the Login screen.
 class LoginViewModel extends ChangeNotifier {
+  final AuthService _authService;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController identifierController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -10,20 +11,31 @@ class LoginViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  LoginViewModel(this._authService);
+
   void setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  void login(BuildContext context) {
+  Future<void> login(BuildContext context) async {
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
-      Future.delayed(const Duration(seconds: 2), () {
-        setLoading(false);
-        if (context.mounted) {
-          context.go('/home');
-        }
-      });
+
+      // TODO: Replace with real API call in production
+      final success = await _authService.login(
+        identifierController.text,
+        passwordController.text,
+      );
+
+      setLoading(false);
+
+      if (!success && context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Invalid credentials')));
+      }
+      // Note: GoRouter redirect in router.dart will handle navigation on success
     }
   }
 

@@ -63,16 +63,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navPlanning => 'PLANNING';
 
   @override
-  String get navProfile => 'PROFIL';
+  String get navProfile => 'COMPTE';
 
   @override
-  String get homeHeroPart1 => 'REJOINS';
+  String get homeHeroPart1 => 'REJOIGNEZ';
 
   @override
-  String get homeHeroPart2 => 'L\'ARENE';
+  String get homeHeroPart2 => 'L\'ARÈNE';
 
   @override
-  String get homeTicker => 'RESERVE TA SESSION • FOOTBALL • PADEL • FITNESS • ';
+  String get homeTicker =>
+      'RÉSERVEZ VOTRE SESSION • FOOTBALL • PADEL • FITNESS • ';
 
   @override
   String get homeNoCourses => 'Aucun cours prévu aujourd\'hui.';
@@ -87,7 +88,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeTodayTitle => 'AUJOURD\'HUI';
 
   @override
-  String get activitiesExplorer => 'EXPLORER';
+  String get activitiesExplorer => 'DÉCOUVRIR LE SPORT';
 
   @override
   String get activitiesMyReservations => 'MES RÉSERVATIONS';
@@ -224,16 +225,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authReset => 'RÉINITIALISER';
 
   @override
-  String get profilePoints => 'POINTS';
+  String get profilePoints => 'POINTS BOURGO';
 
   @override
-  String get profileCheckins => 'CHECK-INS';
+  String get profileCheckins => 'VISITES';
 
   @override
-  String get profileMySubscription => 'Mon Abonnement';
+  String get profileMySubscription => 'Mon Adhésion';
 
   @override
-  String get profileHistory => 'Check-in & Historique';
+  String get profileHistory => 'Accès & Historique';
 
   @override
   String get profileNotifications => 'Notifications';
@@ -242,16 +243,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileSettings => 'Paramètres';
 
   @override
-  String get profileLogout => 'SE DÉCONNECTER';
+  String get profileLogout => 'DÉCONNEXION';
 
   @override
-  String get profileSubscriptionTitle => 'MON ABONNEMENT';
+  String get profileSubscriptionTitle => 'MON ADHÉSION';
 
   @override
-  String get profileManageSubscription => 'GÉRER L\'ABONNEMENT';
+  String get profileManageSubscription => 'GÉRER MON OFFRE';
 
   @override
-  String get profileAdvantages => 'AVANTAGES';
+  String get profileAdvantages => 'MES PRIVILÈGES';
 
   @override
   String get profileNextBilling => 'PROCHAINE FACTURATION';
@@ -342,7 +343,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bookingDate => 'Date';
 
   @override
-  String get bookingTime => 'Horaire';
+  String get bookingTime => 'Créneau';
 
   @override
   String get bookingDuration => 'Durée';
@@ -351,7 +352,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bookingDurationPadel => '90 min';
 
   @override
-  String get bookingDurationStandard => '60 min';
+  String get bookingDurationStandard => '60 minutes';
 
   @override
   String get bookingMethodCard => 'Carte Bancaire';
@@ -459,10 +460,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsChangePassword => 'Changer le mot de passe';
 
   @override
-  String get settingsLanguage => 'Langue';
+  String get settingsLanguage => 'Langue de l\'app';
 
   @override
-  String get settingsTheme => 'Thème';
+  String get settingsTheme => 'Mode d\'affichage';
 
   @override
   String get settingsThemeSystem => 'Défaut Système';
@@ -483,7 +484,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsPrivacy => 'Politique de confidentialité';
 
   @override
-  String get settingsAppVersion => 'Version de l\'application';
+  String get settingsAppVersion => 'Version';
 
   @override
   String get settingsDeleteAccount => 'Supprimer le compte';

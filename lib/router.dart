@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
@@ -17,71 +18,91 @@ import 'package:bourgo_arena_mobile/presentation/settings/settings_view_model.da
 import 'package:go_router/go_router.dart';
 
 /// App routing configuration using GoRouter.
-GoRouter createRouter(SettingsViewModel settingsViewModel) => GoRouter(
-      initialLocation: '/',
-      routes: [
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const OnboardingScreen(),
-        ),
-        GoRoute(
-          path: '/login',
-          builder: (context, state) => const LoginScreen(),
-        ),
-        GoRoute(
-          path: '/register',
-          builder: (context, state) => const RegisterScreen(),
-        ),
-        GoRoute(
-          path: '/otp',
-          builder: (context, state) {
-            final destination = state.extra as String?;
-            return OtpScreen(destination: destination);
-          },
-        ),
-        GoRoute(
-          path: '/forgot-password',
-          builder: (context, state) => const ForgotPasswordScreen(),
-        ),
-        GoRoute(
-          path: '/new-password',
-          builder: (context, state) => const NewPasswordScreen(),
-        ),
-        GoRoute(path: '/home', builder: (context, state) => const MainLayout()),
-        GoRoute(
-          path: '/booking',
-          builder: (context, state) {
-            final activity = state.extra as Activity?;
-            return BookingFlowScreen(initialActivity: activity);
-          },
-        ),
-        GoRoute(
-          path: '/booking-success',
-          builder: (context, state) {
-            final activity = state.extra as Activity?;
-            return BookingSuccessScreen(activity: activity);
-          },
-        ),
-        GoRoute(
-          path: '/subscription',
-          builder: (context, state) => const SubscriptionScreen(),
-        ),
-        GoRoute(
-          path: '/history',
-          builder: (context, state) => const HistoryScreen(),
-        ),
-        GoRoute(
-          path: '/notifications',
-          builder: (context, state) => const NotificationsScreen(),
-        ),
-        GoRoute(
-          path: '/settings',
-          builder: (context, state) =>
-              SettingsScreen(viewModel: settingsViewModel),
-        ),
-        GoRoute(
-          path: '/offline',
-          builder: (context, state) => const OfflineScreen(),
-        ),
-      ],
-    );
+GoRouter createRouter(
+  SettingsViewModel settingsViewModel,
+  AuthService authService,
+) => GoRouter(
+  initialLocation: '/',
+  refreshListenable: authService,
+  redirect: (context, state) {
+    final bool isAuthenticated = authService.isAuthenticated;
+    final bool isAuthRoute =
+        state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register' ||
+        state.matchedLocation == '/otp' ||
+        state.matchedLocation == '/forgot-password' ||
+        state.matchedLocation == '/new-password' ||
+        state.matchedLocation == '/';
+
+    if (!isAuthenticated) {
+      return isAuthRoute ? null : '/login';
+    }
+
+    if (isAuthRoute) {
+      return '/home';
+    }
+
+    return null;
+  },
+  routes: [
+    GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => LoginScreen(authService: authService),
+    ),
+    GoRoute(
+      path: '/register',
+      builder: (context, state) => const RegisterScreen(),
+    ),
+    GoRoute(
+      path: '/otp',
+      builder: (context, state) {
+        final destination = state.extra as String?;
+        return OtpScreen(destination: destination);
+      },
+    ),
+    GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/new-password',
+      builder: (context, state) => const NewPasswordScreen(),
+    ),
+    GoRoute(path: '/home', builder: (context, state) => const MainLayout()),
+    GoRoute(
+      path: '/booking',
+      builder: (context, state) {
+        final activity = state.extra as Activity?;
+        return BookingFlowScreen(initialActivity: activity);
+      },
+    ),
+    GoRoute(
+      path: '/booking-success',
+      builder: (context, state) {
+        final activity = state.extra as Activity?;
+        return BookingSuccessScreen(activity: activity);
+      },
+    ),
+    GoRoute(
+      path: '/subscription',
+      builder: (context, state) => const SubscriptionScreen(),
+    ),
+    GoRoute(
+      path: '/history',
+      builder: (context, state) => const HistoryScreen(),
+    ),
+    GoRoute(
+      path: '/notifications',
+      builder: (context, state) => const NotificationsScreen(),
+    ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => SettingsScreen(viewModel: settingsViewModel),
+    ),
+    GoRoute(
+      path: '/offline',
+      builder: (context, state) => const OfflineScreen(),
+    ),
+  ],
+);

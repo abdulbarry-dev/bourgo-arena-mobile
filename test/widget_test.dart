@@ -6,19 +6,27 @@ import 'package:mocktail/mocktail.dart';
 
 class MockSettingsViewModel extends Mock implements SettingsViewModel {}
 
+class MockAuthService extends Mock implements AuthService {}
+
 void main() {
   late MockSettingsViewModel mockSettingsViewModel;
+  late MockAuthService mockAuthService;
 
   setUp(() {
     mockSettingsViewModel = MockSettingsViewModel();
+    mockAuthService = MockAuthService();
     when(() => mockSettingsViewModel.themeMode).thenReturn(ThemeMode.dark);
     when(() => mockSettingsViewModel.locale).thenReturn(const Locale('fr'));
+    when(() => mockAuthService.isAuthenticated).thenReturn(false);
   });
 
   testWidgets('Onboarding screen smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(
-      BourgoArenaApp(settingsViewModel: mockSettingsViewModel),
+      BourgoArenaApp(
+        settingsViewModel: mockSettingsViewModel,
+        authService: mockAuthService,
+      ),
     );
 
     // Verify that the onboarding screen displays the brand text.
