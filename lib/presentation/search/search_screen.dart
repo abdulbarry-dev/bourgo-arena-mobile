@@ -17,18 +17,23 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  late final SearchViewModel _viewModel;
+  SearchViewModel? _viewModel;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
 
   @override
-  void initState() {
-    super.initState();
-    _viewModel = SearchViewModel(
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _viewModel ??= SearchViewModel(
       activityService: locator<ActivityService>(),
       dataService: locator<DataService>(),
       l10n: AppLocalizations.of(context)!,
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
     
     // Auto-focus the search bar
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -40,7 +45,7 @@ class _SearchScreenState extends State<SearchScreen> {
   void dispose() {
     _searchController.dispose();
     _focusNode.dispose();
-    _viewModel.dispose();
+    _viewModel?.dispose();
     super.dispose();
   }
 
@@ -48,8 +53,10 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    if (_viewModel == null) return const SizedBox.shrink();
+
     return ListenableBuilder(
-      listenable: _viewModel,
+      listenable: _viewModel!,
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
@@ -59,7 +66,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: TextField(
                 controller: _searchController,
                 focusNode: _focusNode,
-                onChanged: _viewModel.search,
+                onChanged: _viewModel!.search,
                 decoration: InputDecoration(
                   hintText: 'Search activities, courses, settings...',
                   border: InputBorder.none,
@@ -76,14 +83,14 @@ class _SearchScreenState extends State<SearchScreen> {
                   icon: const Icon(Symbols.close),
                   onPressed: () {
                     _searchController.clear();
-                    _viewModel.clearSearch();
+                    _viewModel!.clearSearch();
                   },
                 ),
             ],
           ),
           body: Column(
             children: [
-              if (_viewModel.isSearching)
+              if (_viewModel!.isSearching)
                 const LinearProgressIndicator()
               else
                 const Divider(height: 1),
@@ -99,19 +106,19 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   Widget _buildContent(BuildContext context) {
-    if (_viewModel.query.isEmpty) {
+    if (_viewModel == null || _viewModel!.query.isEmpty) {
       return _RecentSearchesPlaceholder();
     }
 
-    if (!_viewModel.isSearching && _viewModel.results.isEmpty) {
-      return _NoResultsPlaceholder(query: _viewModel.query);
+    if (!_viewModel!.isSearching && _viewModel!.results.isEmpty) {
+      return _NoResultsPlaceholder(query: _viewModel!.query);
     }
 
     return ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
-      itemCount: _viewModel.results.length,
+      itemCount: _viewModel!.results.length,
       itemBuilder: (context, index) {
-        final result = _viewModel.results[index];
+        final result = _viewModel!.results[index];
         return _SearchResultTile(result: result);
       },
     );
