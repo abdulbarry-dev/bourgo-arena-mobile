@@ -629,13 +629,13 @@ abstract class AppLocalizations {
   /// No description provided for @profileHistoryTitle.
   ///
   /// In fr, this message translates to:
-  /// **'HISTORIQUE & CHECK-IN'**
+  /// **'ACCÈS & HISTORIQUE'**
   String get profileHistoryTitle;
 
   /// No description provided for @profileTabCheckin.
   ///
   /// In fr, this message translates to:
-  /// **'CHECK-IN'**
+  /// **'ACCÈS'**
   String get profileTabCheckin;
 
   /// No description provided for @profileTabHistory.
@@ -661,6 +661,54 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Scannez ce code à l\'entrée pour valider votre présence.'**
   String get profileQrScanInstruction;
+
+  /// No description provided for @profileAccessMethods.
+  ///
+  /// In fr, this message translates to:
+  /// **'MÉTHODES D\'ACCÈS'**
+  String get profileAccessMethods;
+
+  /// No description provided for @profileAccessPin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code PIN'**
+  String get profileAccessPin;
+
+  /// No description provided for @profileAccessFingerprint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Empreinte digitale'**
+  String get profileAccessFingerprint;
+
+  /// No description provided for @profileAccessNfc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte NFC'**
+  String get profileAccessNfc;
+
+  /// No description provided for @profileStatusConfigured.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configuré'**
+  String get profileStatusConfigured;
+
+  /// No description provided for @profileStatusNotConfigured.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non configuré'**
+  String get profileStatusNotConfigured;
+
+  /// No description provided for @profileCheckinHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'HISTORIQUE D\'ACCÈS'**
+  String get profileCheckinHistory;
+
+  /// No description provided for @profileCheckinEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrée enregistrée'**
+  String get profileCheckinEntry;
 
   /// No description provided for @profileNoHistory.
   ///

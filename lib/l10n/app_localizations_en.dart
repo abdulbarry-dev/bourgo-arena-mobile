@@ -280,10 +280,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileBenefit4 => '-10% at the Pro Shop';
 
   @override
-  String get profileHistoryTitle => 'HISTORY & CHECK-IN';
+  String get profileHistoryTitle => 'ACCESS & HISTORY';
 
   @override
-  String get profileTabCheckin => 'CHECK-IN';
+  String get profileTabCheckin => 'ACCESS';
 
   @override
   String get profileTabHistory => 'HISTORY';
@@ -297,6 +297,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profileQrScanInstruction =>
       'Scan this code at the entrance to validate your presence.';
+
+  @override
+  String get profileAccessMethods => 'ACCESS METHODS';
+
+  @override
+  String get profileAccessPin => 'Security PIN';
+
+  @override
+  String get profileAccessFingerprint => 'Fingerprint';
+
+  @override
+  String get profileAccessNfc => 'NFC Card';
+
+  @override
+  String get profileStatusConfigured => 'Configured';
+
+  @override
+  String get profileStatusNotConfigured => 'Not set';
+
+  @override
+  String get profileCheckinHistory => 'CHECK-IN HISTORY';
+
+  @override
+  String get profileCheckinEntry => 'Entry recorded';
 
   @override
   String get profileNoHistory => 'No past reservations.';
