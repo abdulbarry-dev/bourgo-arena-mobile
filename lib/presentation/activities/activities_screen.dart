@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activities_view_model.dart';
@@ -26,7 +27,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   @override
   void initState() {
     super.initState();
-    _viewModel = ActivitiesViewModel(dataService: DataService());
+    _viewModel = ActivitiesViewModel(dataService: locator<DataService>());
     _tabController = TabController(length: 2, vsync: this);
     _viewModel.loadData();
   }

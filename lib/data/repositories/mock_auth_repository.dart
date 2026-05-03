@@ -15,14 +15,15 @@ class MockAuthRepository implements AuthRepository {
 
     _currentUser = const User(
       id: 'mock-user-123',
-      name: 'Mock User',
-      email: 'mock@test.com',
-      phone: '+216 00 000 000',
-      avatarUrl: 'https://i.pravatar.cc/150?u=mock',
-      loyaltyPoints: 100,
-      subscriptionLevel: 'Basic',
-      subscriptionExpiry: '2026-01-01',
-      totalCheckIns: 5,
+      name: 'ABDULBARRY BOURGO',
+      email: 'test@testor.com',
+      phone: '+216 20 000 000',
+      avatarUrl:
+          'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2574&auto=format&fit=crop',
+      loyaltyPoints: 1250,
+      subscriptionLevel: 'PREMIUM',
+      subscriptionExpiry: '2026-12-31',
+      totalCheckIns: 42,
     );
 
     _authStateController.add(_currentUser);

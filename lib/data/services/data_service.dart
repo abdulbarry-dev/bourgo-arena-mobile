@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/data/models/activity.dart';
+import 'package:bourgo_arena_mobile/data/models/activity_model.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation.dart';
@@ -20,7 +20,7 @@ abstract class DataService {
   }
 
   /// Loads the list of available activities.
-  Future<List<Activity>> getActivities();
+  Future<List<ActivityModel>> getActivities();
 
   /// Loads the list of user reservations.
   Future<List<Reservation>> getReservations();

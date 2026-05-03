@@ -31,7 +31,7 @@ class BookingViewModel extends ChangeNotifier {
       _loadActivities();
     }
   }
-  
+
   int get currentStep => _currentStep;
   Activity? get selectedActivity => _selectedActivity;
   DateTime get selectedDate => _selectedDate;
@@ -97,7 +97,7 @@ class BookingViewModel extends ChangeNotifier {
     if (activity != null) {
       // TODO: Add getTimeSlots to ActivityService
       // For now, we'll return empty or mock
-      _availableSlots = []; 
+      _availableSlots = [];
     }
     _isLoading = false;
     notifyListeners();

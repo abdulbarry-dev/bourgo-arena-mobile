@@ -25,8 +25,7 @@ GoRouter createRouter(
   SettingsViewModel settingsViewModel,
   AuthService authService,
   ActivityService activityService,
-) =>
-    GoRouter(
+) => GoRouter(
   initialLocation: '/',
   refreshListenable: authService,
   redirect: (context, state) {

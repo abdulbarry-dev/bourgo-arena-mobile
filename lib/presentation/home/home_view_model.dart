@@ -1,14 +1,19 @@
-import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Home screen.
 class HomeViewModel extends ChangeNotifier {
+  final ActivityService _activityService;
   final DataService _dataService;
 
-  HomeViewModel({required DataService dataService})
-    : _dataService = dataService;
+  HomeViewModel({
+    required ActivityService activityService,
+    required DataService dataService,
+  }) : _activityService = activityService,
+       _dataService = dataService;
 
   int _currentIndex = 0;
   int get currentIndex => _currentIndex;
@@ -33,9 +38,11 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final allActivities = await _dataService.getActivities();
-      _activities = allActivities;
+      // Load activities via ActivityService (Domain Entities)
+      await _activityService.fetchActivities();
+      _activities = _activityService.activities;
 
+      // Load courses via DataService (for now)
       final allCourses = await _dataService.getCourses();
       final today = DateTime.now().weekday;
       _todayCourses = allCourses.where((c) => c.dayOfWeek == today).toList();

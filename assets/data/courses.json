@@ -46,5 +46,65 @@
     "capacity": 20,
     "enrolled": 15,
     "icon": "music_note"
+  },
+  {
+    "id": "course-5",
+    "title": "Sunday Morning Run",
+    "instructor": "Coach Adam",
+    "start_time": "07:30",
+    "end_time": "08:30",
+    "day_of_week": 7,
+    "category": "Fitness",
+    "capacity": 30,
+    "enrolled": 12,
+    "icon": "directions_run"
+  },
+  {
+    "id": "course-6",
+    "title": "Sunday Padel Tournament",
+    "instructor": "Coach Aziz",
+    "start_time": "10:00",
+    "end_time": "13:00",
+    "day_of_week": 7,
+    "category": "Competition",
+    "capacity": 16,
+    "enrolled": 14,
+    "icon": "emoji_events"
+  },
+  {
+    "id": "course-7",
+    "title": "Advanced Pilates",
+    "instructor": "Lina",
+    "start_time": "17:00",
+    "end_time": "18:00",
+    "day_of_week": 4,
+    "category": "Wellness",
+    "capacity": 12,
+    "enrolled": 8,
+    "icon": "accessibility_new"
+  },
+  {
+    "id": "course-8",
+    "title": "Boxing HIIT",
+    "instructor": "Coach Slim",
+    "start_time": "19:30",
+    "end_time": "20:30",
+    "day_of_week": 5,
+    "category": "Fitness",
+    "capacity": 15,
+    "enrolled": 10,
+    "icon": "sports_mma"
+  },
+  {
+    "id": "course-9",
+    "title": "Family Football",
+    "instructor": "Coach Mourad",
+    "start_time": "15:00",
+    "end_time": "17:00",
+    "day_of_week": 6,
+    "category": "Fun",
+    "capacity": 20,
+    "enrolled": 15,
+    "icon": "groups"
   }
 ]

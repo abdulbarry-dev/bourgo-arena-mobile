@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:bourgo_arena_mobile/data/models/activity.dart';
+import 'package:bourgo_arena_mobile/data/models/activity_model.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation.dart';
@@ -14,14 +14,14 @@ class MockDataService implements DataService {
   static const Duration _latency = Duration(milliseconds: 800);
 
   @override
-  Future<List<Activity>> getActivities() async {
+  Future<List<ActivityModel>> getActivities() async {
     await Future.delayed(_latency);
     try {
       final String response = await rootBundle.loadString(
         'assets/data/activities.json',
       );
       final List<dynamic> data = json.decode(response);
-      return data.map((json) => Activity.fromJson(json)).toList();
+      return data.map((json) => ActivityModel.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Failed to load activities: $e');
     }

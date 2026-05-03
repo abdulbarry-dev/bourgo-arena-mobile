@@ -10,6 +10,8 @@ import 'package:bourgo_arena_mobile/data/repositories/mock_reservation_repositor
 import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/services/reservation_service.dart';
+import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/data/services/mock_data_service.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
@@ -30,26 +32,38 @@ Future<void> initLocator({
   bool useMockData = AppConfig.useMockData,
   bool useMockServer = AppConfig.useMockServer,
 }) async {
+  // Data Services
+  locator.registerLazySingleton<DataService>(() => MockDataService());
+
   // Repositories
   if (useMockData && !useMockServer) {
     locator.registerLazySingleton<AuthRepository>(() => MockAuthRepository());
-    locator.registerLazySingleton<ActivityRepository>(() => MockActivityRepository());
-    locator.registerLazySingleton<ReservationRepository>(() => MockReservationRepository());
+    locator.registerLazySingleton<ActivityRepository>(
+      () => MockActivityRepository(dataService: locator<DataService>()),
+    );
+    locator.registerLazySingleton<ReservationRepository>(
+      () => MockReservationRepository(),
+    );
   } else {
     final mockServer = MockServer();
     if (useMockServer) {
       MockServerSetup.configure(mockServer);
     }
 
-    final httpClient = useMockServer ? MockHttpClient(mockServer) : http.Client();
-    final apiClient = ApiClient(
-      baseUrl: AppConfig.baseUrl,
-      client: httpClient,
-    );
+    final httpClient = useMockServer
+        ? MockHttpClient(mockServer)
+        : http.Client();
+    final apiClient = ApiClient(baseUrl: AppConfig.baseUrl, client: httpClient);
 
-    locator.registerLazySingleton<AuthRepository>(() => ApiAuthRepository(apiClient));
-    locator.registerLazySingleton<ActivityRepository>(() => ApiActivityRepository(apiClient));
-    locator.registerLazySingleton<ReservationRepository>(() => ApiReservationRepository(apiClient));
+    locator.registerLazySingleton<AuthRepository>(
+      () => ApiAuthRepository(apiClient),
+    );
+    locator.registerLazySingleton<ActivityRepository>(
+      () => ApiActivityRepository(apiClient),
+    );
+    locator.registerLazySingleton<ReservationRepository>(
+      () => ApiReservationRepository(apiClient),
+    );
   }
 
   // Use Cases
