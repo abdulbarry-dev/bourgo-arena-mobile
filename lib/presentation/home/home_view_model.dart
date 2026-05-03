@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
 /// ViewModel for the Home screen.
 class HomeViewModel extends ChangeNotifier {
@@ -46,8 +47,10 @@ class HomeViewModel extends ChangeNotifier {
       final allCourses = await _dataService.getCourses();
       final today = DateTime.now().weekday;
       _todayCourses = allCourses.where((c) => c.dayOfWeek == today).toList();
-    } catch (e) {
-      // In a real app, handle error
+      
+      developer.log('Home Data Loaded: ${_activities.length} activities, ${_todayCourses.length} courses for day $today');
+    } catch (e, stack) {
+      developer.log('Error loading home data: $e', error: e, stackTrace: stack);
     } finally {
       _isLoading = false;
       notifyListeners();

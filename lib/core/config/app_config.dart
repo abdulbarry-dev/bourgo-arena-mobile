@@ -17,7 +17,7 @@ class AppConfig {
   /// Whether to use the mock server interceptor.
   static const bool useMockServer = bool.fromEnvironment(
     'USE_MOCK_SERVER',
-    defaultValue: true,
+    defaultValue: false,
   );
 
   /// The timeout duration for API requests in milliseconds.

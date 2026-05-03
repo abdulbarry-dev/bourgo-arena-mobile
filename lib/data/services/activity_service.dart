@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
 /// Service for managing activities and related business logic.
 class ActivityService extends ChangeNotifier {
@@ -22,6 +23,9 @@ class ActivityService extends ChangeNotifier {
     notifyListeners();
     try {
       _activities = await _activityRepository.getActivities();
+      developer.log('ActivityService: Fetched ${_activities.length} activities');
+    } catch (e, stack) {
+      developer.log('ActivityService: Error fetching activities: $e', error: e, stackTrace: stack);
     } finally {
       _isLoading = false;
       notifyListeners();
