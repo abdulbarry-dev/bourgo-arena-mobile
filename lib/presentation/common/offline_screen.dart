@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -33,15 +34,15 @@ class OfflineScreen extends StatelessWidget {
               ),
               const SizedBox(height: 48),
               Text(
-                AppConstants.commonOfflineTitle,
+                AppLocalizations.of(context)!.commonOfflineTitle,
                 style: theme.textTheme.headlineSmall?.copyWith(
-                  fontFamily: 'BlackHanSans',
+                  fontFamily: AppConstants.displayFontFamily,
                   letterSpacing: 2,
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                AppConstants.commonOfflineSubtitle,
+              Text(
+                AppLocalizations.of(context)!.commonOfflineSubtitle,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white54,
@@ -55,13 +56,13 @@ class OfflineScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
                 ),
-                child: const Text(AppConstants.commonRetry),
+                child: Text(AppLocalizations.of(context)!.commonRetry),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {},
                 child: Text(
-                  AppConstants.commonOfflineAccess,
+                  AppLocalizations.of(context)!.commonOfflineAccess,
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,

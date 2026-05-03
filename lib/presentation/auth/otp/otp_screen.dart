@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,9 +68,9 @@ class _OtpScreenState extends State<OtpScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               AuthHeader(
-                title: AppConstants.authVerificationTitle,
+                title: AppLocalizations.of(context)!.authVerificationTitle,
                 subtitle:
-                    '${AppConstants.authOtpSubtitlePrefix}${widget.destination ?? AppConstants.authOtpSubtitleDefault}.',
+                    '${AppLocalizations.of(context)!.authOtpSubtitlePrefix}${widget.destination ?? AppLocalizations.of(context)!.authOtpSubtitleDefault}.',
               ),
               const SizedBox(height: 48),
               Row(
@@ -82,7 +82,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: Column(
                   children: [
                     Text(
-                      '${AppConstants.authOtpResendPrefix}${_timerCount}s',
+                      '${AppLocalizations.of(context)!.authOtpResendPrefix}${_timerCount}s',
                       style: const TextStyle(color: Colors.white38),
                     ),
                     if (_timerCount == 0)
@@ -92,7 +92,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           _startTimer();
                         },
                         child: Text(
-                          AppConstants.authSendCode,
+                          AppLocalizations.of(context)!.authSendCode,
                           style: TextStyle(
                             color: theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -105,7 +105,7 @@ class _OtpScreenState extends State<OtpScreen> {
               const Spacer(),
               ElevatedButton(
                 onPressed: () => context.go('/'),
-                child: const Text(AppConstants.authVerify),
+                child: Text(AppLocalizations.of(context)!.authVerify),
               ),
             ],
           ),

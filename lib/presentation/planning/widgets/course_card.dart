@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -17,7 +18,9 @@ class CourseCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         children: [
@@ -29,38 +32,54 @@ class CourseCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      course.title.toUpperCase(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                    Flexible(
+                      child: Text(
+                        course.title.toUpperCase(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
-                    const Spacer(),
+                    const SizedBox(width: 8),
                     _CategoryBadge(category: course.category),
                   ],
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    const Icon(Symbols.person, size: 14, color: Colors.white54),
+                    Icon(
+                      Symbols.person,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 4),
-                    Text(
-                      course.instructor,
-                      style: const TextStyle(
-                        color: Colors.white54,
-                        fontSize: 13,
+                    Flexible(
+                      child: Text(
+                        course.instructor,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                     const SizedBox(width: 16),
-                    const Icon(Symbols.groups, size: 14, color: Colors.white54),
+                    Icon(
+                      Symbols.groups,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${course.enrolled}/${course.capacity}',
                       style: TextStyle(
                         color: course.isFull
                             ? Colors.redAccent
-                            : Colors.white54,
+                            : theme.colorScheme.onSurfaceVariant,
                         fontSize: 13,
                         fontWeight: course.isFull
                             ? FontWeight.bold
@@ -88,6 +107,7 @@ class _TimeColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       children: [
         Text(
@@ -97,12 +117,15 @@ class _TimeColumn extends StatelessWidget {
         Container(
           width: 2,
           height: 12,
-          color: Colors.white10,
+          color: theme.colorScheme.outline,
           margin: const EdgeInsets.symmetric(vertical: 2),
         ),
         Text(
           endTime,
-          style: const TextStyle(color: Colors.white54, fontSize: 12),
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontSize: 12,
+          ),
         ),
       ],
     );
@@ -139,14 +162,14 @@ class _CategoryBadge extends StatelessWidget {
 
   Color _getCategoryColor(String cat, ThemeData theme) {
     switch (cat) {
-      case 'Fitness':
+      case AppConstants.planningCategoryFitness:
         return theme.colorScheme.primary;
-      case 'Academy':
+      case AppConstants.planningCategoryAcademy:
         return Colors.orangeAccent;
-      case 'Wellness':
+      case AppConstants.planningCategoryWellness:
         return Colors.lightBlueAccent;
       default:
-        return Colors.white54;
+        return theme.colorScheme.onSurfaceVariant;
     }
   }
 }
@@ -166,18 +189,20 @@ class _ActionButton extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: isFull
-            ? Colors.white12
-            : theme.colorScheme.primary.withAlpha(20),
+            ? theme.colorScheme.onSurface.withValues(alpha: 0.1)
+            : theme.colorScheme.primary.withValues(alpha: 0.15),
         border: Border.all(
           color: isFull
-              ? Colors.white12
-              : theme.colorScheme.primary.withAlpha(50),
+              ? theme.colorScheme.outline
+              : theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Icon(
         isFull ? Symbols.lock : Symbols.add,
         size: 20,
-        color: isFull ? Colors.white24 : theme.colorScheme.primary,
+        color: isFull
+            ? theme.colorScheme.onSurfaceVariant
+            : theme.colorScheme.primary,
       ),
     );
   }

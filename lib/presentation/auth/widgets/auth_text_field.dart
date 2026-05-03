@@ -25,7 +25,8 @@ class AuthTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
+    final appColors = theme.extension<AppColors>();
+    if (appColors == null) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -46,30 +47,33 @@ class BookingSuccessScreen extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               Text(
-                AppConstants.bookingConfirmed,
+                AppLocalizations.of(context)!.bookingConfirmed,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.headlineSmall?.copyWith(
-                  fontFamily: 'BlackHanSans',
+                  fontFamily: AppConstants.displayFontFamily,
                   letterSpacing: 1.5,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                '${AppConstants.bookingSuccessMessagePrefix}${activity?.title ?? AppConstants.bookingSportDefault}${AppConstants.bookingSuccessMessageSuffix}',
+                '${AppLocalizations.of(context)!.bookingSuccessMessagePrefix}${activity?.title ?? AppLocalizations.of(context)!.bookingSportDefault}${AppLocalizations.of(context)!.bookingSuccessMessageSuffix}',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, fontSize: 16),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 16,
+                ),
               ),
               const SizedBox(height: 48),
               _DetailItem(
                 icon: Symbols.calendar_month,
-                label: AppConstants.bookingDateLabel,
-                value: AppConstants.bookingTodayAt,
+                label: AppLocalizations.of(context)!.bookingDateLabel,
+                value: AppLocalizations.of(context)!.bookingTodayAt,
               ),
               const SizedBox(height: 16),
               _DetailItem(
                 icon: Symbols.location_on,
-                label: AppConstants.bookingLocationLabel,
-                value: AppConstants.bookingLocationValue,
+                label: AppLocalizations.of(context)!.bookingLocationLabel,
+                value: AppLocalizations.of(context)!.bookingLocationValue,
               ),
               const Spacer(),
               ElevatedButton(
@@ -77,13 +81,13 @@ class BookingSuccessScreen extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),
                 ),
-                child: const Text(AppConstants.bookingReturnHome),
+                child: Text(AppLocalizations.of(context)!.bookingReturnHome),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {}, // Navigate to reservation details
                 child: Text(
-                  AppConstants.bookingViewTicket,
+                  AppLocalizations.of(context)!.bookingViewTicket,
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -120,7 +124,9 @@ class _DetailItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         children: [
@@ -131,7 +137,10 @@ class _DetailItem extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(color: Colors.white54, fontSize: 10),
+                style: TextStyle(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontSize: 10,
+                ),
               ),
               Text(
                 value,

@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ class PlanningViewModel extends ChangeNotifier {
   List<Course> _filteredCourses = [];
   bool _isLoading = false;
   int _selectedDay = 1; // Monday by default
-  String _selectedCategory = 'Tous';
+  String _selectedCategory = AppConstants.planningCategoryAll;
 
   /// List of courses filtered by the selected day and category.
   List<Course> get courses => _filteredCourses;
@@ -64,7 +65,8 @@ class PlanningViewModel extends ChangeNotifier {
     _filteredCourses = _allCourses.where((course) {
       final matchesDay = course.dayOfWeek == _selectedDay;
       final matchesCategory =
-          _selectedCategory == 'Tous' || course.category == _selectedCategory;
+          _selectedCategory == AppConstants.planningCategoryAll ||
+          course.category == _selectedCategory;
       return matchesDay && matchesCategory;
     }).toList();
   }

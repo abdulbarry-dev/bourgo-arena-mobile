@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -21,10 +22,14 @@ class PaymentStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SectionTitle(title: AppConstants.bookingSummaryTitle),
+                _SectionTitle(
+                  title: AppLocalizations.of(context)!.bookingSummaryTitle,
+                ),
                 _SummaryCard(viewModel: viewModel),
                 const SizedBox(height: 32),
-                _SectionTitle(title: AppConstants.bookingPaymentTitle),
+                _SectionTitle(
+                  title: AppLocalizations.of(context)!.bookingPaymentTitle,
+                ),
                 _PaymentMethodSelector(viewModel: viewModel),
               ],
             ),
@@ -135,22 +140,25 @@ class _SummaryCard extends StatelessWidget {
           ),
           _SummaryRow(
             icon: Symbols.calendar_month,
-            label: AppConstants.bookingDate,
-            value: DateFormat('dd MMMM yyyy').format(viewModel.selectedDate),
+            label: AppLocalizations.of(context)!.bookingDate,
+            value: DateFormat(
+              'dd MMMM yyyy',
+              Localizations.localeOf(context).toString(),
+            ).format(viewModel.selectedDate),
           ),
           const SizedBox(height: 12),
           _SummaryRow(
             icon: Symbols.schedule,
-            label: AppConstants.bookingTime,
+            label: AppLocalizations.of(context)!.bookingTime,
             value: viewModel.selectedSlot?.time ?? '',
           ),
           const SizedBox(height: 12),
           _SummaryRow(
             icon: Symbols.hourglass_bottom,
-            label: AppConstants.bookingDuration,
+            label: AppLocalizations.of(context)!.bookingDuration,
             value: activity?.id == 'padel-1'
-                ? AppConstants.bookingDurationPadel
-                : AppConstants.bookingDurationStandard,
+                ? AppLocalizations.of(context)!.bookingDurationPadel
+                : AppLocalizations.of(context)!.bookingDurationStandard,
           ),
         ],
       ),
@@ -215,16 +223,20 @@ class _PaymentMethodSelector extends StatelessWidget {
       children: [
         _PaymentOption(
           icon: Symbols.credit_card,
-          label: AppConstants.bookingMethodCard,
-          isSelected: viewModel.paymentMethod == 'Credit Card',
-          onTap: () => viewModel.setPaymentMethod('Credit Card'),
+          label: AppLocalizations.of(context)!.bookingMethodCard,
+          isSelected:
+              viewModel.paymentMethod == AppConstants.paymentMethodCardId,
+          onTap: () =>
+              viewModel.setPaymentMethod(AppConstants.paymentMethodCardId),
         ),
         const SizedBox(height: 12),
         _PaymentOption(
           icon: Symbols.account_balance_wallet,
-          label: AppConstants.bookingMethodWallet,
-          isSelected: viewModel.paymentMethod == 'Bourgo Pay',
-          onTap: () => viewModel.setPaymentMethod('Bourgo Pay'),
+          label: AppLocalizations.of(context)!.bookingMethodWallet,
+          isSelected:
+              viewModel.paymentMethod == AppConstants.paymentMethodWalletId,
+          onTap: () =>
+              viewModel.setPaymentMethod(AppConstants.paymentMethodWalletId),
         ),
       ],
     );
@@ -310,7 +322,9 @@ class _BottomPayButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 56),
           ),
-          child: Text('${AppConstants.bookingPay} — $price TND'),
+          child: Text(
+            '${AppLocalizations.of(context)!.bookingPay} — $price ${AppLocalizations.of(context)!.bookingCurrency}',
+          ),
         ),
       ),
     );

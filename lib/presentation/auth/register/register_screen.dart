@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -43,51 +43,55 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const AuthHeader(
-                      title: AppConstants.authRegisterTitle,
-                      subtitle: AppConstants.authRegisterSubtitle,
+                    AuthHeader(
+                      title: AppLocalizations.of(context)!.authRegisterTitle,
+                      subtitle: AppLocalizations.of(
+                        context,
+                      )!.authRegisterSubtitle,
                     ),
                     const SizedBox(height: 32),
                     AuthTextField(
-                      label: AppConstants.authFullNameLabel,
-                      hint: AppConstants.authFullNameHint,
+                      label: AppLocalizations.of(context)!.authFullNameLabel,
+                      hint: AppLocalizations.of(context)!.authFullNameHint,
                       leadingIcon: Symbols.person,
                       controller: _viewModel.nameController,
                       validator: (value) => value?.isEmpty ?? true
-                          ? AppConstants.commonRequiredField
+                          ? AppLocalizations.of(context)!.commonRequiredField
                           : null,
                     ),
                     const SizedBox(height: 20),
                     AuthTextField(
-                      label: AppConstants.authEmailLabel,
-                      hint: AppConstants.authEmailLabelHint,
+                      label: AppLocalizations.of(context)!.authEmailLabel,
+                      hint: AppLocalizations.of(context)!.authEmailLabelHint,
                       leadingIcon: Symbols.mail,
                       keyboardType: TextInputType.emailAddress,
                       controller: _viewModel.emailController,
                       validator: (value) => value?.isEmpty ?? true
-                          ? AppConstants.commonRequiredField
+                          ? AppLocalizations.of(context)!.commonRequiredField
                           : null,
                     ),
                     const SizedBox(height: 20),
                     AuthTextField(
-                      label: AppConstants.authPhoneLabel,
-                      hint: AppConstants.authPhoneHint,
+                      label: AppLocalizations.of(context)!.authPhoneLabel,
+                      hint: AppLocalizations.of(context)!.authPhoneHint,
                       leadingIcon: Symbols.call,
                       keyboardType: TextInputType.phone,
                       controller: _viewModel.phoneController,
                       validator: (value) => value?.isEmpty ?? true
-                          ? AppConstants.commonRequiredField
+                          ? AppLocalizations.of(context)!.commonRequiredField
                           : null,
                     ),
                     const SizedBox(height: 20),
                     AuthTextField(
-                      label: AppConstants.authPasswordLabel,
-                      hint: AppConstants.authPasswordCreateHint,
+                      label: AppLocalizations.of(context)!.authPasswordLabel,
+                      hint: AppLocalizations.of(
+                        context,
+                      )!.authPasswordCreateHint,
                       leadingIcon: Symbols.lock,
                       isPassword: true,
                       controller: _viewModel.passwordController,
                       validator: (value) => (value?.length ?? 0) < 6
-                          ? AppConstants.authPasswordMinLength
+                          ? AppLocalizations.of(context)!.authPasswordMinLength
                           : null,
                     ),
                     const SizedBox(height: 32),
@@ -104,14 +108,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 color: Colors.black,
                               ),
                             )
-                          : const Text(AppConstants.authRegister),
+                          : Text(AppLocalizations.of(context)!.authRegister),
                     ),
                     const SizedBox(height: 24),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          AppConstants.authHaveAccount,
+                          AppLocalizations.of(context)!.authHaveAccount,
                           style: TextStyle(
                             color: Colors.white.withAlpha((0.65 * 255).round()),
                             fontSize: 14,
@@ -120,7 +124,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         TextButton(
                           onPressed: () => context.pop(),
                           child: Text(
-                            AppConstants.authLogin,
+                            AppLocalizations.of(context)!.authLogin,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.primary,
                               fontWeight: FontWeight.bold,

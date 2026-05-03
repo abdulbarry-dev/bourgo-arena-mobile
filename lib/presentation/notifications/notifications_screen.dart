@@ -1,5 +1,7 @@
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -41,13 +43,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NOTIFICATIONS'),
+        title: Text(AppLocalizations.of(context)!.notificationsTitle),
         backgroundColor: theme.colorScheme.surface,
         actions: [
           TextButton(
             onPressed: () {},
             child: Text(
-              'TOUT LIRE',
+              AppLocalizations.of(context)!.notificationsMarkAllRead,
               style: TextStyle(color: theme.colorScheme.primary, fontSize: 12),
             ),
           ),
@@ -55,32 +57,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _notifications == null || _notifications!.isEmpty
+          : (_notifications?.isEmpty ?? true)
           ? _buildEmptyState()
           : ListView.separated(
               padding: const EdgeInsets.all(24),
-              itemCount: _notifications!.length,
+              itemCount: _notifications?.length ?? 0,
               separatorBuilder: (context, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
-                return _NotificationItem(notification: _notifications![index]);
+                final notification = _notifications?[index];
+                if (notification == null) return const SizedBox.shrink();
+                return _NotificationItem(notification: notification);
               },
             ),
     );
   }
 
   Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Symbols.notifications_off, size: 64, color: Colors.white12),
-          const SizedBox(height: 16),
-          const Text(
-            'Aucune notification pour le moment.',
-            style: TextStyle(color: Colors.white54),
-          ),
-        ],
-      ),
+    return EmptyState(
+      title: AppLocalizations.of(context)!.notificationsEmpty,
+      message: AppLocalizations.of(context)!.notificationsEmptySubtitle,
+      icon: Symbols.notifications_off,
     );
   }
 }
@@ -104,8 +100,8 @@ class _NotificationItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: notification.isRead
-              ? Colors.white10
-              : theme.colorScheme.primary.withAlpha(50),
+              ? theme.colorScheme.outline
+              : theme.colorScheme.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -116,14 +112,14 @@ class _NotificationItem extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: notification.isRead
-                  ? Colors.white10
-                  : theme.colorScheme.primary.withAlpha(20),
+                  ? theme.colorScheme.onSurface.withValues(alpha: 0.05)
+                  : theme.colorScheme.primary.withValues(alpha: 0.15),
             ),
             child: Icon(
               iconData,
               size: 20,
               color: notification.isRead
-                  ? Colors.white38
+                  ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)
                   : theme.colorScheme.primary,
             ),
           ),
@@ -158,14 +154,23 @@ class _NotificationItem extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   notification.message,
-                  style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 13,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   DateFormat(
                     'dd MMM, HH:mm',
+                    Localizations.localeOf(context).toString(),
                   ).format(DateTime.parse(notification.timestamp)),
-                  style: const TextStyle(color: Colors.white38, fontSize: 11),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.6,
+                    ),
+                    fontSize: 11,
+                  ),
                 ),
               ],
             ),

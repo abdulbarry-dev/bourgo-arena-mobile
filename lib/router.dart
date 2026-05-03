@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
@@ -10,16 +11,47 @@ import 'package:bourgo_arena_mobile/presentation/common/offline_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/onboarding/onboarding_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/change_password_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/settings/settings_view_model.dart';
 import 'package:go_router/go_router.dart';
 
 /// App routing configuration using GoRouter.
-final router = GoRouter(
+GoRouter createRouter(
+  SettingsViewModel settingsViewModel,
+  AuthService authService,
+) => GoRouter(
   initialLocation: '/',
+  refreshListenable: authService,
+  redirect: (context, state) {
+    final bool isAuthenticated = authService.isAuthenticated;
+    final bool isAuthRoute =
+        state.matchedLocation == '/login' ||
+        state.matchedLocation == '/register' ||
+        state.matchedLocation == '/otp' ||
+        state.matchedLocation == '/forgot-password' ||
+        state.matchedLocation == '/new-password' ||
+        state.matchedLocation == '/';
+
+    if (!isAuthenticated) {
+      return isAuthRoute ? null : '/login';
+    }
+
+    if (isAuthRoute) {
+      return '/home';
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
-    GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => LoginScreen(authService: authService),
+    ),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
@@ -65,6 +97,18 @@ final router = GoRouter(
     GoRoute(
       path: '/notifications',
       builder: (context, state) => const NotificationsScreen(),
+    ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => SettingsScreen(viewModel: settingsViewModel),
+    ),
+    GoRoute(
+      path: '/edit-profile',
+      builder: (context, state) => const EditProfileScreen(),
+    ),
+    GoRoute(
+      path: '/change-password',
+      builder: (context, state) => const ChangePasswordScreen(),
     ),
     GoRoute(
       path: '/offline',

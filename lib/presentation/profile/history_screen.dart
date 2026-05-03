@@ -1,7 +1,8 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -23,6 +24,7 @@ class _HistoryScreenState extends State<HistoryScreen>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _viewModel = ActivitiesViewModel(dataService: DataService());
+    _viewModel.loadData();
   }
 
   @override
@@ -37,13 +39,13 @@ class _HistoryScreenState extends State<HistoryScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppConstants.profileHistoryTitle),
+        title: Text(AppLocalizations.of(context)!.profileHistoryTitle),
         backgroundColor: theme.colorScheme.surface,
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
-            Tab(text: AppConstants.profileTabCheckin),
-            Tab(text: AppConstants.profileTabHistory),
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.profileTabCheckin),
+            Tab(text: AppLocalizations.of(context)!.profileTabHistory),
           ],
         ),
       ),
@@ -66,8 +68,8 @@ class _CheckInTab extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Text(
-          AppConstants.profileQrSubtitle,
+        Text(
+          AppLocalizations.of(context)!.profileQrSubtitle,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.5,
@@ -105,8 +107,8 @@ class _CheckInTab extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                AppConstants.profileQrPlaceholder,
+              Text(
+                AppLocalizations.of(context)!.profileQrPlaceholder,
                 style: TextStyle(
                   color: Colors.black54,
                   fontFamily: 'monospace',
@@ -117,12 +119,12 @@ class _CheckInTab extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 48),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 48),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 48),
           child: Text(
-            AppConstants.profileQrScanInstruction,
+            AppLocalizations.of(context)!.profileQrScanInstruction,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white54, fontSize: 14),
+            style: const TextStyle(color: Colors.white54, fontSize: 14),
           ),
         ),
       ],
@@ -146,7 +148,11 @@ class _HistoryTab extends StatelessWidget {
 
         final reservations = viewModel.reservations;
         if (reservations.isEmpty) {
-          return const Center(child: Text(AppConstants.profileNoHistory));
+          return EmptyState(
+            title: AppLocalizations.of(context)!.profileNoHistory,
+            message: AppLocalizations.of(context)!.profileNoHistorySubtitle,
+            icon: Symbols.history,
+          );
         }
 
         return ListView.builder(

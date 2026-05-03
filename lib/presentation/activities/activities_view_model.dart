@@ -42,7 +42,7 @@ class ActivitiesViewModel extends ChangeNotifier {
       _activities = results[0] as List<Activity>;
       _reservations = results[1] as List<Reservation>;
     } catch (e) {
-      _error = 'Échec du chargement des données. Veuillez réessayer.';
+      _error = 'loading_failed';
     } finally {
       _isLoading = false;
       notifyListeners();

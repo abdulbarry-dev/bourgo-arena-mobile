@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -21,7 +21,7 @@ class SelectTimeStep extends StatelessWidget {
               : _TimeGrid(viewModel: viewModel),
         ),
         _BottomActionBar(
-          label: AppConstants.bookingConfirm,
+          label: AppLocalizations.of(context)!.bookingConfirm,
           onPressed: viewModel.selectedSlot != null ? viewModel.nextStep : null,
           price: viewModel.selectedActivity?.price ?? 0,
         ),
@@ -71,7 +71,10 @@ class _DatePicker extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    DateFormat('EEE').format(date).toUpperCase(),
+                    DateFormat(
+                      'EEE',
+                      Localizations.localeOf(context).toString(),
+                    ).format(date).toUpperCase(),
                     style: TextStyle(
                       color: isSelected ? Colors.black : Colors.white70,
                       fontSize: 10,
@@ -107,7 +110,7 @@ class _TimeGrid extends StatelessWidget {
     final theme = Theme.of(context);
 
     if (viewModel.availableSlots.isEmpty) {
-      return const Center(child: Text(AppConstants.bookingNoSlots));
+      return Center(child: Text(AppLocalizations.of(context)!.bookingNoSlots));
     }
 
     return GridView.builder(
@@ -189,12 +192,12 @@ class _BottomActionBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  AppConstants.bookingTotal,
+                Text(
+                  AppLocalizations.of(context)!.bookingTotal,
                   style: TextStyle(color: Colors.white54, fontSize: 10),
                 ),
                 Text(
-                  '$price TND',
+                  '$price ${AppLocalizations.of(context)!.bookingCurrency}',
                   style: TextStyle(
                     color: theme.colorScheme.primary,
                     fontSize: 20,

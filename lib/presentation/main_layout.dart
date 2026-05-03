@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
@@ -55,7 +55,10 @@ class _MainLayoutState extends State<MainLayout> {
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           border: Border(
-            top: BorderSide(color: Colors.white.withAlpha(20), width: 1),
+            top: BorderSide(
+              color: theme.colorScheme.outline.withValues(alpha: 0.3),
+              width: 1,
+            ),
           ),
         ),
         child: BottomNavigationBar(
@@ -64,28 +67,30 @@ class _MainLayoutState extends State<MainLayout> {
           type: BottomNavigationBarType.fixed,
           backgroundColor: theme.colorScheme.surface,
           selectedItemColor: theme.colorScheme.primary,
-          unselectedItemColor: Colors.white.withAlpha(100),
+          unselectedItemColor: theme.colorScheme.onSurfaceVariant.withValues(
+            alpha: 0.6,
+          ),
           selectedLabelStyle: const TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),
           unselectedLabelStyle: const TextStyle(fontSize: 10),
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Symbols.home),
-              label: AppConstants.navHome,
+              icon: const Icon(Symbols.home),
+              label: AppLocalizations.of(context)!.navHome,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Symbols.sports_soccer),
-              label: AppConstants.navActivities,
+              icon: const Icon(Symbols.sports_soccer),
+              label: AppLocalizations.of(context)!.navActivities,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Symbols.calendar_month),
-              label: AppConstants.navPlanning,
+              icon: const Icon(Symbols.calendar_month),
+              label: AppLocalizations.of(context)!.navPlanning,
             ),
             BottomNavigationBarItem(
-              icon: Icon(Symbols.person),
-              label: AppConstants.navProfile,
+              icon: const Icon(Symbols.person),
+              label: AppLocalizations.of(context)!.navProfile,
             ),
           ],
         ),
