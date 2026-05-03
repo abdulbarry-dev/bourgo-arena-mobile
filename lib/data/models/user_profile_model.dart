@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_profile_model.g.dart';
@@ -27,36 +26,6 @@ class UserProfileModel {
     required this.subscriptionExpiry,
     required this.totalCheckIns,
   });
-
-  /// Converts this model to a pure domain entity.
-  User toEntity() {
-    return User(
-      id: id,
-      name: name,
-      email: email,
-      phone: phone,
-      avatarUrl: avatarUrl,
-      loyaltyPoints: loyaltyPoints,
-      subscriptionLevel: subscriptionLevel,
-      subscriptionExpiry: subscriptionExpiry,
-      totalCheckIns: totalCheckIns,
-    );
-  }
-
-  /// Creates a model from a domain entity.
-  factory UserProfileModel.fromEntity(User user) {
-    return UserProfileModel(
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      avatarUrl: user.avatarUrl,
-      loyaltyPoints: user.loyaltyPoints,
-      subscriptionLevel: user.subscriptionLevel,
-      subscriptionExpiry: user.subscriptionExpiry,
-      totalCheckIns: user.totalCheckIns,
-    );
-  }
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) =>
       _$UserProfileModelFromJson(json);

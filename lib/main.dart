@@ -1,9 +1,10 @@
-import 'package:bourgo_arena_mobile/core/di.dart';
-import 'package:bourgo_arena_mobile/core/theme.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/services/settings_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/settings/settings_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,7 +14,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Dependencies
-  DI.init(useMockData: true, useMockServer: true);
+  await initLocator();
 
   final prefs = await SharedPreferences.getInstance();
   final settingsService = SettingsService(prefs);
@@ -22,7 +23,7 @@ Future<void> main() async {
   runApp(
     BourgoArenaApp(
       settingsViewModel: settingsViewModel,
-      authService: DI.authService,
+      authService: locator<AuthService>(),
     ),
   );
 }
@@ -52,7 +53,7 @@ class _BourgoArenaAppState extends State<BourgoArenaApp> {
     _router = createRouter(
       widget.settingsViewModel,
       widget.authService,
-      DI.activityService,
+      locator<ActivityService>(),
     );
   }
 

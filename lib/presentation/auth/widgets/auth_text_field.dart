@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/theme.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 
 /// A custom themed text field for authentication screens.

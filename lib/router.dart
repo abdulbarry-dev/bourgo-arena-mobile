@@ -17,7 +17,7 @@ import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_screen.dar
 import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/settings/settings_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:go_router/go_router.dart';
 
 /// App routing configuration using GoRouter.

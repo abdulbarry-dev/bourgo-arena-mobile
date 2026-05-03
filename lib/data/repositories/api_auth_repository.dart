@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -25,7 +26,7 @@ class ApiAuthRepository implements AuthRepository {
     // Fetch user profile after login
     final userResponse = await _apiClient.get('/user/profile');
     final userModel = UserProfileModel.fromJson(userResponse);
-    final user = userModel.toEntity();
+    final user = UserMapper.toEntity(userModel);
 
     _authStateController.add(user);
     return user;

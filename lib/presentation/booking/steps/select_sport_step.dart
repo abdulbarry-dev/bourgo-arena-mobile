@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
 import 'package:flutter/material.dart';
 

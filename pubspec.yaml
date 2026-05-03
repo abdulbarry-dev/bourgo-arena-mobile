@@ -46,6 +46,7 @@ dependencies:
   shared_preferences: ^2.5.5
   flutter_api_mock_server: ^0.0.1
   http: ^1.6.0
+  get_it: ^9.2.1
 
 dev_dependencies:
   flutter_test:

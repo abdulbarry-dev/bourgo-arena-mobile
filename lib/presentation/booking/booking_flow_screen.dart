@@ -1,7 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/payment_step.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/select_sport_step.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/select_time_step.dart';

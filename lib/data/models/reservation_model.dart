@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'reservation_model.g.dart';
@@ -29,38 +28,6 @@ class ReservationModel {
     required this.paymentStatus,
     required this.qrCode,
   });
-
-  /// Converts this model to a pure domain entity.
-  Reservation toEntity() {
-    return Reservation(
-      id: id,
-      activityId: activityId,
-      activityTitle: activityTitle,
-      date: date,
-      time: time,
-      duration: duration,
-      price: price,
-      status: status,
-      paymentStatus: paymentStatus,
-      qrCode: qrCode,
-    );
-  }
-
-  /// Creates a model from a domain entity.
-  factory ReservationModel.fromEntity(Reservation entity) {
-    return ReservationModel(
-      id: entity.id,
-      activityId: entity.activityId,
-      activityTitle: entity.activityTitle,
-      date: entity.date,
-      time: entity.time,
-      duration: entity.duration,
-      price: entity.price,
-      status: entity.status,
-      paymentStatus: entity.paymentStatus,
-      qrCode: entity.qrCode,
-    );
-  }
 
   factory ReservationModel.fromJson(Map<String, dynamic> json) =>
       _$ReservationModelFromJson(json);
