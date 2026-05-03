@@ -87,12 +87,12 @@ class SettingsScreen extends StatelessWidget {
                   _SettingsTile(
                     icon: Symbols.description,
                     title: l10n.settingsTerms,
-                    onTap: () {},
+                    onTap: () => context.push('/terms'),
                   ),
                   _SettingsTile(
                     icon: Symbols.policy,
                     title: l10n.settingsPrivacy,
-                    onTap: () {},
+                    onTap: () => context.push('/privacy'),
                   ),
                 ],
               ),
