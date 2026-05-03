@@ -1,5 +1,6 @@
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
-import 'package:bourgo_arena_mobile/data/models/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/new_password/new_password_screen.dart';
@@ -23,7 +24,9 @@ import 'package:go_router/go_router.dart';
 GoRouter createRouter(
   SettingsViewModel settingsViewModel,
   AuthService authService,
-) => GoRouter(
+  ActivityService activityService,
+) =>
+    GoRouter(
   initialLocation: '/',
   refreshListenable: authService,
   redirect: (context, state) {
@@ -76,7 +79,10 @@ GoRouter createRouter(
       path: '/booking',
       builder: (context, state) {
         final activity = state.extra as Activity?;
-        return BookingFlowScreen(initialActivity: activity);
+        return BookingFlowScreen(
+          initialActivity: activity,
+          activityService: activityService,
+        );
       },
     ),
     GoRoute(

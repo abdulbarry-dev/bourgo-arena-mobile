@@ -22,18 +22,19 @@ class LoginViewModel extends ChangeNotifier {
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
 
-      // TODO: Replace with real API call in production
-      final success = await _authService.login(
-        identifierController.text,
-        passwordController.text,
-      );
-
-      setLoading(false);
-
-      if (!success && context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Invalid credentials')));
+      try {
+        await _authService.login(
+          identifierController.text,
+          passwordController.text,
+        );
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
+        }
+      } finally {
+        setLoading(false);
       }
       // Note: GoRouter redirect in router.dart will handle navigation on success
     }

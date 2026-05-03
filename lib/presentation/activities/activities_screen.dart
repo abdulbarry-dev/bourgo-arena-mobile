@@ -170,7 +170,8 @@ class _ReservationsTab extends StatelessWidget {
         message: AppLocalizations.of(context)!.activitiesNoReservationsSubtitle,
         icon: Symbols.calendar_add_on,
         actionLabel: AppLocalizations.of(context)!.activitiesNoReservationsCTA,
-        onAction: () => MainLayout.tabController.value = 0, // Go to Explorer tab
+        onAction: () =>
+            MainLayout.tabController.value = 0, // Go to Explorer tab
       );
     }
 

@@ -198,6 +198,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_api_mock_server:
+    dependency: "direct main"
+    description:
+      name: flutter_api_mock_server
+      sha256: "38c79c53b88bc15d2c27baa07fc4f903f8184ffba9ffa1c84bc42ab0a6871b21"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -262,7 +270,7 @@ packages:
     source: hosted
     version: "1.0.3"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
