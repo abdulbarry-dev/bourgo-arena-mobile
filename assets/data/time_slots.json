@@ -1,4 +1,25 @@
 {
+  "foot-1": [
+    {"time": "08:00", "available": true},
+    {"time": "09:00", "available": true},
+    {"time": "10:00", "available": true},
+    {"time": "11:00", "available": true},
+    {"time": "14:00", "available": true},
+    {"time": "15:00", "available": true},
+    {"time": "16:00", "available": true},
+    {"time": "17:00", "available": true},
+    {"time": "18:00", "available": true},
+    {"time": "19:00", "available": true},
+    {"time": "20:00", "available": true}
+  ],
+  "foot-2": [
+    {"time": "08:00", "available": true},
+    {"time": "10:00", "available": true},
+    {"time": "14:00", "available": true},
+    {"time": "16:00", "available": true},
+    {"time": "18:00", "available": true},
+    {"time": "20:00", "available": true}
+  ],
   "foot-5": [
     {"time": "08:00", "available": true},
     {"time": "09:00", "available": true},
@@ -25,15 +46,33 @@
     {"time": "20:00", "available": true},
     {"time": "21:30", "available": true}
   ],
-  "basket-1": [
-    {"time": "09:00", "available": true},
-    {"time": "10:30", "available": true},
-    {"time": "12:00", "available": false},
-    {"time": "13:30", "available": true},
-    {"time": "15:00", "available": true},
-    {"time": "16:30", "available": false},
+  "padel-2": [
+    {"time": "08:00", "available": true},
+    {"time": "09:30", "available": true},
+    {"time": "11:00", "available": true},
+    {"time": "12:30", "available": true},
+    {"time": "14:00", "available": true},
+    {"time": "15:30", "available": true},
+    {"time": "17:00", "available": true},
+    {"time": "18:30", "available": true},
+    {"time": "20:00", "available": true}
+  ],
+  "padel-3": [
+    {"time": "08:00", "available": true},
+    {"time": "10:00", "available": true},
+    {"time": "14:00", "available": true},
+    {"time": "16:00", "available": true},
     {"time": "18:00", "available": true},
-    {"time": "19:30", "available": true},
-    {"time": "21:00", "available": true}
+    {"time": "20:00", "available": true}
+  ],
+  "gym-1": [
+    {"time": "06:00", "available": true},
+    {"time": "08:00", "available": true},
+    {"time": "10:00", "available": true},
+    {"time": "12:00", "available": true},
+    {"time": "14:00", "available": true},
+    {"time": "16:00", "available": true},
+    {"time": "18:00", "available": true},
+    {"time": "20:00", "available": true}
   ]
 }

@@ -77,9 +77,29 @@ class MockDataService implements DataService {
         final List<dynamic> slots = data[activityId];
         return slots.map((json) => TimeSlot.fromJson(json)).toList();
       }
-      return [];
+      // If activity not found in JSON, return generic slots
+      return [
+        const TimeSlot(time: '09:00', available: true),
+        const TimeSlot(time: '10:30', available: true),
+        const TimeSlot(time: '12:00', available: true),
+        const TimeSlot(time: '15:00', available: true),
+        const TimeSlot(time: '16:30', available: true),
+        const TimeSlot(time: '18:00', available: true),
+        const TimeSlot(time: '19:30', available: true),
+        const TimeSlot(time: '21:00', available: true),
+      ];
     } catch (e) {
-      throw Exception('Failed to load time slots: $e');
+      // Fallback data if JSON loading fails or activity not found
+      return [
+        const TimeSlot(time: '09:00', available: true),
+        const TimeSlot(time: '10:00', available: true),
+        const TimeSlot(time: '11:00', available: false),
+        const TimeSlot(time: '14:00', available: true),
+        const TimeSlot(time: '15:00', available: true),
+        const TimeSlot(time: '16:00', available: true),
+        const TimeSlot(time: '17:00', available: true),
+        const TimeSlot(time: '18:00', available: true),
+      ];
     }
   }
 
