@@ -16,6 +16,7 @@ import 'package:bourgo_arena_mobile/presentation/profile/change_password_screen.
 import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/search/search_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/privacy_policy_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_screen.dart';
@@ -116,6 +117,10 @@ GoRouter createRouter(
     GoRoute(
       path: '/change-password',
       builder: (context, state) => const ChangePasswordScreen(),
+    ),
+    GoRoute(
+      path: '/search',
+      builder: (context, state) => const SearchScreen(),
     ),
     GoRoute(
       path: '/terms',

@@ -23,7 +23,31 @@ class MockDataService implements DataService {
       final List<dynamic> data = json.decode(response);
       return data.map((json) => ActivityModel.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Failed to load activities: $e');
+      // Fallback data if JSON loading fails
+      return [
+        const ActivityModel(
+          id: 'foot-1',
+          title: 'Football 5x5',
+          category: 'Outdoor',
+          price: 80.0,
+          currency: 'TND',
+          imageUrl: 'https://images.unsplash.com/photo-1544441892-794166f42a7b?q=80&w=800&auto=format&fit=crop',
+          icon: 'sports_soccer',
+          description: 'Premium synthetic turf for the best football experience.',
+          features: ['Floodlights', 'Changing rooms'],
+        ),
+        const ActivityModel(
+          id: 'padel-1',
+          title: 'Padel Court',
+          category: 'Racket',
+          price: 120.0,
+          currency: 'TND',
+          imageUrl: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=800&auto=format&fit=crop',
+          icon: 'sports_tennis',
+          description: 'High-quality panoramic padel courts.',
+          features: ['Pro equipment', 'Scoreboard'],
+        ),
+      ];
     }
   }
 
@@ -83,7 +107,33 @@ class MockDataService implements DataService {
       final List<dynamic> data = json.decode(response);
       return data.map((json) => Course.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Failed to load courses: $e');
+      // Fallback data if JSON loading fails
+      return [
+        Course(
+          id: 'course-f1',
+          title: 'CrossFit Pro',
+          instructor: 'Coach Sami',
+          startTime: '18:00',
+          endTime: '19:00',
+          dayOfWeek: DateTime.now().weekday,
+          category: 'Fitness',
+          capacity: 15,
+          enrolled: 12,
+          icon: 'fitness_center',
+        ),
+        Course(
+          id: 'course-f2',
+          title: 'Yoga Flow',
+          instructor: 'Ines',
+          startTime: '09:00',
+          endTime: '10:15',
+          dayOfWeek: DateTime.now().weekday,
+          category: 'Wellness',
+          capacity: 10,
+          enrolled: 10,
+          icon: 'self_improvement',
+        ),
+      ];
     }
   }
 

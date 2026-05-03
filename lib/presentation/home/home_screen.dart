@@ -69,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: [
               IconButton(
-                onPressed: () => MainLayout.tabController.value = 1,
+                onPressed: () => context.push('/search'),
                 icon: const Icon(Symbols.search),
               ),
               IconButton(
