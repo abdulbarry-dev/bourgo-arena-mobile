@@ -118,10 +118,7 @@ GoRouter createRouter(
       path: '/change-password',
       builder: (context, state) => const ChangePasswordScreen(),
     ),
-    GoRoute(
-      path: '/search',
-      builder: (context, state) => const SearchScreen(),
-    ),
+    GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
     GoRoute(
       path: '/terms',
       builder: (context, state) => const TermsOfServiceScreen(),

@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Types of search results available in the application.
-enum SearchResultType {
-  activity,
-  course,
-  setting,
-  navigation,
-}
+enum SearchResultType { activity, course, setting, navigation }
 
 /// A unified entity representing a search result from any source.
 class SearchResult {

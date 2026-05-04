@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:developer' as developer;
@@ -23,9 +24,15 @@ class ActivityService extends ChangeNotifier {
     notifyListeners();
     try {
       _activities = await _activityRepository.getActivities();
-      developer.log('ActivityService: Fetched ${_activities.length} activities');
+      developer.log(
+        'ActivityService: Fetched ${_activities.length} activities',
+      );
     } catch (e, stack) {
-      developer.log('ActivityService: Error fetching activities: $e', error: e, stackTrace: stack);
+      developer.log(
+        'ActivityService: Error fetching activities: $e',
+        error: e,
+        stackTrace: stack,
+      );
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -35,5 +42,10 @@ class ActivityService extends ChangeNotifier {
   /// Retrieves an activity by its [id].
   Future<Activity> getActivity(String id) {
     return _activityRepository.getActivityById(id);
+  }
+
+  /// Retrieves available time slots for a given [activityId].
+  Future<List<TimeSlot>> getTimeSlots(String activityId) {
+    return _activityRepository.getTimeSlots(activityId);
   }
 }

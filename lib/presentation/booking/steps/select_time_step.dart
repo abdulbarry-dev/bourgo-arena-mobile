@@ -64,7 +64,7 @@ class _DatePicker extends StatelessWidget {
                 border: Border.all(
                   color: isSelected
                       ? theme.colorScheme.primary
-                      : Colors.white12,
+                      : theme.colorScheme.outline.withValues(alpha: 0.12),
                 ),
               ),
               child: Column(
@@ -76,7 +76,11 @@ class _DatePicker extends StatelessWidget {
                       Localizations.localeOf(context).toString(),
                     ).format(date).toUpperCase(),
                     style: TextStyle(
-                      color: isSelected ? Colors.black : Colors.white70,
+                      color: isSelected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.7,
+                            ),
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -85,7 +89,9 @@ class _DatePicker extends StatelessWidget {
                   Text(
                     date.day.toString(),
                     style: TextStyle(
-                      color: isSelected ? Colors.black : Colors.white,
+                      color: isSelected
+                          ? theme.colorScheme.onPrimary
+                          : theme.colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -138,7 +144,7 @@ class _TimeGrid extends StatelessWidget {
                 color: isSelected
                     ? theme.colorScheme.primary
                     : slot.available
-                    ? Colors.white12
+                    ? theme.colorScheme.outline.withValues(alpha: 0.12)
                     : Colors.transparent,
               ),
             ),
@@ -147,8 +153,10 @@ class _TimeGrid extends StatelessWidget {
                 slot.time,
                 style: TextStyle(
                   color: slot.available
-                      ? (isSelected ? theme.colorScheme.primary : Colors.white)
-                      : Colors.white24,
+                      ? (isSelected
+                            ? theme.colorScheme.primary
+                            : theme.colorScheme.onSurface)
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.24),
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   decoration: slot.available
                       ? null
@@ -182,29 +190,40 @@ class _BottomActionBar extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        border: const Border(top: BorderSide(color: Colors.white10)),
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          ),
+        ),
       ),
       child: SafeArea(
         top: false,
         child: Row(
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.bookingTotal,
-                  style: TextStyle(color: Colors.white54, fontSize: 10),
-                ),
-                Text(
-                  '$price ${AppLocalizations.of(context)!.bookingCurrency}',
-                  style: TextStyle(
-                    color: theme.colorScheme.primary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            Flexible(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    AppLocalizations.of(context)!.bookingTotal,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontSize: 10,
+                    ),
                   ),
-                ),
-              ],
+                  Text(
+                    '$price ${AppLocalizations.of(context)!.bookingCurrency}',
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
             const SizedBox(width: 24),
             Expanded(

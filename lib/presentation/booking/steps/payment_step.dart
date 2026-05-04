@@ -54,15 +54,16 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.5,
-          color: Colors.white54,
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
         ),
       ),
     );
@@ -124,8 +125,8 @@ class _SummaryCard extends StatelessWidget {
                     ),
                     Text(
                       activity?.category ?? '',
-                      style: const TextStyle(
-                        color: Colors.white54,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 12,
                       ),
                     ),
@@ -134,9 +135,11 @@ class _SummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            child: Divider(color: Colors.white10),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Divider(
+              color: theme.colorScheme.outline.withValues(alpha: 0.1),
+            ),
           ),
           _SummaryRow(
             icon: Symbols.calendar_month,
@@ -196,16 +199,27 @@ class _SummaryRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.white54),
+        Icon(
+          icon,
+          size: 16,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(color: Colors.white54, fontSize: 14),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 14,
+          ),
         ),
-        const Spacer(),
-        Text(
-          value,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );
@@ -268,21 +282,27 @@ class _PaymentOption extends StatelessWidget {
           color: theme.colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : Colors.white12,
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.colorScheme.outline.withValues(alpha: 0.12),
           ),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected ? theme.colorScheme.primary : Colors.white54,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
             ),
             const SizedBox(width: 16),
             Text(
               label,
               style: TextStyle(
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.white : Colors.white70,
+                color: isSelected
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurfaceVariant,
               ),
             ),
             const Spacer(),
@@ -313,7 +333,11 @@ class _BottomPayButton extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        border: const Border(top: BorderSide(color: Colors.white10)),
+        border: Border(
+          top: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          ),
+        ),
       ),
       child: SafeArea(
         top: false,

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 import 'package:bourgo_arena_mobile/data/models/activity_model.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
@@ -31,9 +32,11 @@ class MockDataService implements DataService {
           category: 'Outdoor',
           price: 80.0,
           currency: 'TND',
-          imageUrl: 'https://images.unsplash.com/photo-1544441892-794166f42a7b?q=80&w=800&auto=format&fit=crop',
+          imageUrl:
+              'https://images.unsplash.com/photo-1544441892-794166f42a7b?q=80&w=800&auto=format&fit=crop',
           icon: 'sports_soccer',
-          description: 'Premium synthetic turf for the best football experience.',
+          description:
+              'Premium synthetic turf for the best football experience.',
           features: ['Floodlights', 'Changing rooms'],
         ),
         const ActivityModel(
@@ -42,7 +45,8 @@ class MockDataService implements DataService {
           category: 'Racket',
           price: 120.0,
           currency: 'TND',
-          imageUrl: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=800&auto=format&fit=crop',
+          imageUrl:
+              'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=800&auto=format&fit=crop',
           icon: 'sports_tennis',
           description: 'High-quality panoramic padel courts.',
           features: ['Pro equipment', 'Scoreboard'],
@@ -77,6 +81,9 @@ class MockDataService implements DataService {
         final List<dynamic> slots = data[activityId];
         return slots.map((json) => TimeSlot.fromJson(json)).toList();
       }
+      developer.log(
+        'MockDataService: Activity $activityId not found in time_slots.json, returning generic slots',
+      );
       // If activity not found in JSON, return generic slots
       return [
         const TimeSlot(time: '09:00', available: true),
@@ -89,6 +96,9 @@ class MockDataService implements DataService {
         const TimeSlot(time: '21:00', available: true),
       ];
     } catch (e) {
+      developer.log(
+        'MockDataService: Error loading time slots for $activityId: $e',
+      );
       // Fallback data if JSON loading fails or activity not found
       return [
         const TimeSlot(time: '09:00', available: true),

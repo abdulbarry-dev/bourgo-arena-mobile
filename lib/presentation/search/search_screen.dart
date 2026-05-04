@@ -34,7 +34,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Auto-focus the search bar
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
@@ -94,10 +94,8 @@ class _SearchScreenState extends State<SearchScreen> {
                 const LinearProgressIndicator()
               else
                 const Divider(height: 1),
-                
-              Expanded(
-                child: _buildContent(context),
-              ),
+
+              Expanded(child: _buildContent(context)),
             ],
           ),
         );
@@ -141,11 +139,7 @@ class _SearchResultTile extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
         ),
-        child: Icon(
-          result.icon,
-          size: 20,
-          color: theme.colorScheme.primary,
-        ),
+        child: Icon(result.icon, size: 20, color: theme.colorScheme.primary),
       ),
       title: Text(
         result.title,
@@ -226,10 +220,7 @@ class _NoResultsPlaceholder extends StatelessWidget {
             color: theme.colorScheme.error.withAlpha(50),
           ),
           const SizedBox(height: 16),
-          Text(
-            'No results for "$query"',
-            style: theme.textTheme.titleMedium,
-          ),
+          Text('No results for "$query"', style: theme.textTheme.titleMedium),
           const SizedBox(height: 8),
           Text(
             'Try different keywords or check spelling.',

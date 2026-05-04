@@ -46,33 +46,43 @@ class SearchViewModel extends ChangeNotifier {
       // 1. Search Activities
       final activities = _activityService.activities;
       final activityMatches = activities.where(
-        (a) => a.title.toLowerCase().contains(query.toLowerCase()) ||
-               a.category.toLowerCase().contains(query.toLowerCase()),
+        (a) =>
+            a.title.toLowerCase().contains(query.toLowerCase()) ||
+            a.category.toLowerCase().contains(query.toLowerCase()),
       );
-      
-      allResults.addAll(activityMatches.map((a) => SearchResult(
-        title: a.title,
-        subtitle: a.category,
-        type: SearchResultType.activity,
-        icon: Symbols.sports_soccer,
-        route: '/booking',
-        extra: a,
-      )));
+
+      allResults.addAll(
+        activityMatches.map(
+          (a) => SearchResult(
+            title: a.title,
+            subtitle: a.category,
+            type: SearchResultType.activity,
+            icon: Symbols.sports_soccer,
+            route: '/booking',
+            extra: a,
+          ),
+        ),
+      );
 
       // 2. Search Courses
       final courses = await _dataService.getCourses();
       final courseMatches = courses.where(
-        (c) => c.title.toLowerCase().contains(query.toLowerCase()) ||
-               c.instructor.toLowerCase().contains(query.toLowerCase()),
+        (c) =>
+            c.title.toLowerCase().contains(query.toLowerCase()) ||
+            c.instructor.toLowerCase().contains(query.toLowerCase()),
       );
-      
-      allResults.addAll(courseMatches.map((c) => SearchResult(
-        title: c.title,
-        subtitle: '${c.instructor} • ${c.startTime}',
-        type: SearchResultType.course,
-        icon: Symbols.calendar_month,
-        route: '/planning',
-      )));
+
+      allResults.addAll(
+        courseMatches.map(
+          (c) => SearchResult(
+            title: c.title,
+            subtitle: '${c.instructor} • ${c.startTime}',
+            type: SearchResultType.course,
+            icon: Symbols.calendar_month,
+            route: '/planning',
+          ),
+        ),
+      );
 
       // 3. Search Settings & Navigation
       final settingsResults = _searchSettings(query);
@@ -133,10 +143,13 @@ class SearchViewModel extends ChangeNotifier {
       ),
     ];
 
-    return settings.where(
-      (s) => s.title.toLowerCase().contains(query.toLowerCase()) ||
-             s.subtitle.toLowerCase().contains(query.toLowerCase()),
-    ).toList();
+    return settings
+        .where(
+          (s) =>
+              s.title.toLowerCase().contains(query.toLowerCase()) ||
+              s.subtitle.toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
   }
 
   void clearSearch() {

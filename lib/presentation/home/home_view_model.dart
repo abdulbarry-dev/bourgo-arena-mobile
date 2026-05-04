@@ -54,8 +54,10 @@ class HomeViewModel extends ChangeNotifier {
       final allCourses = await _dataService.getCourses();
       final today = DateTime.now().weekday;
       _todayCourses = allCourses.where((c) => c.dayOfWeek == today).toList();
-      
-      developer.log('Home Data Loaded: ${activities.length} activities, ${_todayCourses.length} courses for day $today');
+
+      developer.log(
+        'Home Data Loaded: ${activities.length} activities, ${_todayCourses.length} courses for day $today',
+      );
     } catch (e, stack) {
       developer.log('Error loading home data: $e', error: e, stackTrace: stack);
     } finally {

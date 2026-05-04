@@ -11,10 +11,7 @@ class TermsOfServiceScreen extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settingsTerms),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(l10n.settingsTerms), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
