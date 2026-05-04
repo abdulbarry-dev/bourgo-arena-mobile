@@ -185,8 +185,8 @@ class MockDataService implements DataService {
   Future<void> updateProfile(UserProfile profile) async {
     await Future.delayed(const Duration(seconds: 1));
     // Simulate potential server error
-    if (profile.name.isEmpty) {
-      throw Exception('Name cannot be empty');
+    if (profile.firstName.isEmpty || profile.lastName.isEmpty) {
+      throw Exception('First and last name cannot be empty');
     }
   }
 

@@ -196,5 +196,21 @@
   "passwordChangeTitle": "CHANGE PASSWORD",
   "passwordCurrentLabel": "Current Password",
   "passwordCurrentHint": "Enter current password",
-  "passwordUpdateSuccess": "Password updated successfully!"
+  "passwordUpdateSuccess": "Password updated successfully!",
+  "authFirstNameLabel": "First Name",
+  "authFirstNameHint": "Enter your first name",
+  "authLastNameLabel": "Last Name",
+  "authLastNameHint": "Enter your last name",
+  "authBirthDateLabel": "Birth Date",
+  "authBirthDateHint": "Select your birth date",
+  "profileFamilyAccount": "Family Account",
+  "profileEnableFamilyAccount": "Enable Family Account",
+  "profileFamilyAccountDescription": "Manage your children's profiles and activities.",
+  "profileAddChild": "Add Child",
+  "profileNoChildren": "No children profiles added.",
+  "profileChildName": "Child Name",
+  "profileChildBirthDate": "Child Birth Date",
+  "profileVerifyFamilyTitle": "Verify Family Account",
+  "profileVerifyFamilySubtitle": "To enable family account, we need to verify your identity. Enter the code sent to your {identifier}.",
+  "profileFamilyEnabled": "Family account enabled successfully!"
 }

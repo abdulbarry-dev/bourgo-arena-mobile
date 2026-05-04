@@ -564,5 +564,56 @@ class AppLocalizationsFr extends AppLocalizations {
   String get passwordCurrentHint => 'Entrez votre mot de passe actuel';
 
   @override
-  String get passwordUpdateSuccess => 'Mot de passe mis à jour avec succès !';
+  String get passwordUpdateSuccess => 'Mot de passe mis à jour avec succès!';
+
+  @override
+  String get authFirstNameLabel => 'Prénom';
+
+  @override
+  String get authFirstNameHint => 'Entrez votre prénom';
+
+  @override
+  String get authLastNameLabel => 'Nom';
+
+  @override
+  String get authLastNameHint => 'Entrez votre nom';
+
+  @override
+  String get authBirthDateLabel => 'Date de naissance';
+
+  @override
+  String get authBirthDateHint => 'Sélectionnez votre date de naissance';
+
+  @override
+  String get profileFamilyAccount => 'Compte Famille';
+
+  @override
+  String get profileEnableFamilyAccount => 'Activer le compte famille';
+
+  @override
+  String get profileFamilyAccountDescription =>
+      'Gérez les profils et activités de vos enfants.';
+
+  @override
+  String get profileAddChild => 'Ajouter un enfant';
+
+  @override
+  String get profileNoChildren => 'Aucun profil d\'enfant ajouté.';
+
+  @override
+  String get profileChildName => 'Nom de l\'enfant';
+
+  @override
+  String get profileChildBirthDate => 'Date de naissance de l\'enfant';
+
+  @override
+  String get profileVerifyFamilyTitle => 'Vérifier le compte famille';
+
+  @override
+  String profileVerifyFamilySubtitle(Object identifier) {
+    return 'Pour activer le compte famille, nous devons vérifier votre identité. Entrez le code envoyé à votre $identifier.';
+  }
+
+  @override
+  String get profileFamilyEnabled => 'Compte famille activé avec succès !';
 }

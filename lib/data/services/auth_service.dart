@@ -57,6 +57,32 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Sends an OTP to the given [identifier].
+  Future<void> sendOtp(String identifier) async {
+    _setLoading(true);
+    try {
+      await _authRepository.sendOtp(identifier);
+    } catch (e) {
+      developer.log('Send OTP failed', error: e);
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  /// Verifies the [otp] for the given [identifier].
+  Future<bool> verifyOtp(String identifier, String otp) async {
+    _setLoading(true);
+    try {
+      return await _authRepository.verifyOtp(identifier, otp);
+    } catch (e) {
+      developer.log('Verify OTP failed', error: e);
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();

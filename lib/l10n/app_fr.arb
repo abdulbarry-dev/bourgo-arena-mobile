@@ -194,5 +194,21 @@
   "passwordChangeTitle": "CHANGER LE MOT DE PASSE",
   "passwordCurrentLabel": "Mot de passe actuel",
   "passwordCurrentHint": "Entrez votre mot de passe actuel",
-  "passwordUpdateSuccess": "Mot de passe mis à jour avec succès !"
+  "passwordUpdateSuccess": "Mot de passe mis à jour avec succès!",
+  "authFirstNameLabel": "Prénom",
+  "authFirstNameHint": "Entrez votre prénom",
+  "authLastNameLabel": "Nom",
+  "authLastNameHint": "Entrez votre nom",
+  "authBirthDateLabel": "Date de naissance",
+  "authBirthDateHint": "Sélectionnez votre date de naissance",
+  "profileFamilyAccount": "Compte Famille",
+  "profileEnableFamilyAccount": "Activer le compte famille",
+  "profileFamilyAccountDescription": "Gérez les profils et activités de vos enfants.",
+  "profileAddChild": "Ajouter un enfant",
+  "profileNoChildren": "Aucun profil d'enfant ajouté.",
+  "profileChildName": "Nom de l'enfant",
+  "profileChildBirthDate": "Date de naissance de l'enfant",
+  "profileVerifyFamilyTitle": "Vérifier le compte famille",
+  "profileVerifyFamilySubtitle": "Pour activer le compte famille, nous devons vérifier votre identité. Entrez le code envoyé à votre {identifier}.",
+  "profileFamilyEnabled": "Compte famille activé avec succès !"
 }

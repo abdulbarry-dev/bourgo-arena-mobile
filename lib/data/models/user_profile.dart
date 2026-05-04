@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_profile.g.dart';
@@ -8,8 +9,11 @@ class UserProfile {
   /// User's unique ID.
   final String id;
 
-  /// Full name.
-  final String name;
+  /// First name.
+  final String firstName;
+
+  /// Last name.
+  final String lastName;
 
   /// Email address.
   final String email;
@@ -32,10 +36,20 @@ class UserProfile {
   /// Total number of check-ins.
   final int totalCheckIns;
 
+  /// Birth date.
+  final DateTime? birthDate;
+
+  /// Whether this is a parent account.
+  final bool isParentAccount;
+
+  /// List of children models.
+  final List<ChildProfileModel> children;
+
   /// Creates a new [UserProfile] instance.
   const UserProfile({
     required this.id,
-    required this.name,
+    required this.firstName,
+    required this.lastName,
     required this.email,
     required this.phone,
     required this.avatarUrl,
@@ -43,11 +57,15 @@ class UserProfile {
     required this.subscriptionLevel,
     required this.subscriptionExpiry,
     required this.totalCheckIns,
+    this.birthDate,
+    this.isParentAccount = false,
+    this.children = const [],
   });
 
   /// Creates a copy of this [UserProfile] but with the given fields replaced.
   UserProfile copyWith({
-    String? name,
+    String? firstName,
+    String? lastName,
     String? email,
     String? phone,
     String? avatarUrl,
@@ -55,10 +73,14 @@ class UserProfile {
     String? subscriptionLevel,
     String? subscriptionExpiry,
     int? totalCheckIns,
+    DateTime? birthDate,
+    bool? isParentAccount,
+    List<ChildProfileModel>? children,
   }) {
     return UserProfile(
       id: id,
-      name: name ?? this.name,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
       email: email ?? this.email,
       phone: phone ?? this.phone,
       avatarUrl: avatarUrl ?? this.avatarUrl,
@@ -66,6 +88,9 @@ class UserProfile {
       subscriptionLevel: subscriptionLevel ?? this.subscriptionLevel,
       subscriptionExpiry: subscriptionExpiry ?? this.subscriptionExpiry,
       totalCheckIns: totalCheckIns ?? this.totalCheckIns,
+      birthDate: birthDate ?? this.birthDate,
+      isParentAccount: isParentAccount ?? this.isParentAccount,
+      children: children ?? this.children,
     );
   }
 

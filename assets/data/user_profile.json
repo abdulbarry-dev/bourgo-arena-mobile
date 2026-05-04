@@ -1,11 +1,15 @@
 {
-  "id": "user-123",
-  "name": "ABDULBARRY BOURGO",
-  "email": "test@testor.com",
+  "id": "mock-user-123",
+  "first_name": "ABDULBARRY",
+  "last_name": "BOURGO",
+  "email": "abdulbarry.dev@gmail.com",
+  "phone": "+216 20 000 000",
   "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2574&auto=format&fit=crop",
   "loyalty_points": 1250,
   "subscription_level": "PREMIUM",
   "subscription_expiry": "2026-12-31",
-  "phone": "+216 20 000 000",
-  "total_check_ins": 42
+  "total_check_ins": 42,
+  "birth_date": "1995-05-15T00:00:00Z",
+  "is_parent_account": false,
+  "children": []
 }

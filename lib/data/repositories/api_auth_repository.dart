@@ -40,6 +40,44 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    required String password,
+    bool isFamilyAccount = false,
+  }) async {
+    await _apiClient.post('/auth/register', {
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'phone': phone,
+      'password': password,
+      'is_family_account': isFamilyAccount,
+    });
+  }
+
+  @override
+  Future<void> sendOtp(String identifier) async {
+    await _apiClient.post('/auth/send-otp', {'identifier': identifier});
+  }
+
+  @override
+  Future<bool> verifyOtp(String identifier, String otp) async {
+    final response = await _apiClient.post('/auth/verify-otp', {
+      'identifier': identifier,
+      'otp': otp,
+    });
+    return response['success'] == true;
+  }
+
+  @override
+  Future<void> requestFamilyAccountOtp() async {
+    await _apiClient.post('/auth/request-family-otp', {});
+  }
+
+  @override
   Future<String?> getToken() async {
     // In a real app, this might come from secure storage
     return null;

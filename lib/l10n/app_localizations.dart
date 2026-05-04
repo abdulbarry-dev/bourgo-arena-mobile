@@ -1181,8 +1181,104 @@ abstract class AppLocalizations {
   /// No description provided for @passwordUpdateSuccess.
   ///
   /// In fr, this message translates to:
-  /// **'Mot de passe mis à jour avec succès !'**
+  /// **'Mot de passe mis à jour avec succès!'**
   String get passwordUpdateSuccess;
+
+  /// No description provided for @authFirstNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prénom'**
+  String get authFirstNameLabel;
+
+  /// No description provided for @authFirstNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez votre prénom'**
+  String get authFirstNameHint;
+
+  /// No description provided for @authLastNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom'**
+  String get authLastNameLabel;
+
+  /// No description provided for @authLastNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez votre nom'**
+  String get authLastNameHint;
+
+  /// No description provided for @authBirthDateLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de naissance'**
+  String get authBirthDateLabel;
+
+  /// No description provided for @authBirthDateHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez votre date de naissance'**
+  String get authBirthDateHint;
+
+  /// No description provided for @profileFamilyAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte Famille'**
+  String get profileFamilyAccount;
+
+  /// No description provided for @profileEnableFamilyAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer le compte famille'**
+  String get profileEnableFamilyAccount;
+
+  /// No description provided for @profileFamilyAccountDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérez les profils et activités de vos enfants.'**
+  String get profileFamilyAccountDescription;
+
+  /// No description provided for @profileAddChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un enfant'**
+  String get profileAddChild;
+
+  /// No description provided for @profileNoChildren.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun profil d\'enfant ajouté.'**
+  String get profileNoChildren;
+
+  /// No description provided for @profileChildName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de l\'enfant'**
+  String get profileChildName;
+
+  /// No description provided for @profileChildBirthDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de naissance de l\'enfant'**
+  String get profileChildBirthDate;
+
+  /// No description provided for @profileVerifyFamilyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier le compte famille'**
+  String get profileVerifyFamilyTitle;
+
+  /// No description provided for @profileVerifyFamilySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour activer le compte famille, nous devons vérifier votre identité. Entrez le code envoyé à votre {identifier}.'**
+  String profileVerifyFamilySubtitle(Object identifier);
+
+  /// No description provided for @profileFamilyEnabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte famille activé avec succès !'**
+  String get profileFamilyEnabled;
 }
 
 class _AppLocalizationsDelegate

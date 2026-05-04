@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 
@@ -15,7 +16,8 @@ class MockAuthRepository implements AuthRepository {
 
     _currentUser = const User(
       id: 'mock-user-123',
-      name: 'ABDULBARRY BOURGO',
+      firstName: 'ABDULBARRY',
+      lastName: 'BOURGO',
       email: 'test@testor.com',
       phone: '+216 20 000 000',
       avatarUrl:
@@ -24,10 +26,45 @@ class MockAuthRepository implements AuthRepository {
       subscriptionLevel: 'PREMIUM',
       subscriptionExpiry: '2026-12-31',
       totalCheckIns: 42,
+      isParentAccount: false,
     );
 
     _authStateController.add(_currentUser);
     return _currentUser!;
+  }
+
+  @override
+  Future<void> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String phone,
+    required String password,
+    bool isFamilyAccount = false,
+  }) async {
+    await Future.delayed(const Duration(seconds: 1));
+    developer.log(
+      'MockAuthRepository: Registered $firstName $lastName (Family: $isFamilyAccount)',
+    );
+  }
+
+  @override
+  Future<void> sendOtp(String identifier) async {
+    await Future.delayed(const Duration(seconds: 1));
+    developer.log('MockAuthRepository: OTP sent to $identifier');
+  }
+
+  @override
+  Future<bool> verifyOtp(String identifier, String otp) async {
+    await Future.delayed(const Duration(seconds: 1));
+    // Accept any 4-digit code for mock
+    return otp.length == 4;
+  }
+
+  @override
+  Future<void> requestFamilyAccountOtp() async {
+    await Future.delayed(const Duration(seconds: 1));
+    developer.log('MockAuthRepository: Family account OTP requested');
   }
 
   @override

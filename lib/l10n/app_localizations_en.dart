@@ -563,4 +563,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordUpdateSuccess => 'Password updated successfully!';
+
+  @override
+  String get authFirstNameLabel => 'First Name';
+
+  @override
+  String get authFirstNameHint => 'Enter your first name';
+
+  @override
+  String get authLastNameLabel => 'Last Name';
+
+  @override
+  String get authLastNameHint => 'Enter your last name';
+
+  @override
+  String get authBirthDateLabel => 'Birth Date';
+
+  @override
+  String get authBirthDateHint => 'Select your birth date';
+
+  @override
+  String get profileFamilyAccount => 'Family Account';
+
+  @override
+  String get profileEnableFamilyAccount => 'Enable Family Account';
+
+  @override
+  String get profileFamilyAccountDescription =>
+      'Manage your children\'s profiles and activities.';
+
+  @override
+  String get profileAddChild => 'Add Child';
+
+  @override
+  String get profileNoChildren => 'No children profiles added.';
+
+  @override
+  String get profileChildName => 'Child Name';
+
+  @override
+  String get profileChildBirthDate => 'Child Birth Date';
+
+  @override
+  String get profileVerifyFamilyTitle => 'Verify Family Account';
+
+  @override
+  String profileVerifyFamilySubtitle(Object identifier) {
+    return 'To enable family account, we need to verify your identity. Enter the code sent to your $identifier.';
+  }
+
+  @override
+  String get profileFamilyEnabled => 'Family account enabled successfully!';
 }

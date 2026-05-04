@@ -111,7 +111,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  profile.name.toUpperCase(),
+                  '${profile.firstName} ${profile.lastName}'.toUpperCase(),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontFamily: AppConstants.displayFontFamily,
                     letterSpacing: 1,

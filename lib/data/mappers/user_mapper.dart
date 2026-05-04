@@ -1,4 +1,6 @@
+import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 
 /// Mapper to convert [UserProfileModel] to [User] and vice-versa.
@@ -7,7 +9,8 @@ class UserMapper {
   static User toEntity(UserProfileModel model) {
     return User(
       id: model.id,
-      name: model.name,
+      firstName: model.firstName,
+      lastName: model.lastName,
       email: model.email,
       phone: model.phone,
       avatarUrl: model.avatarUrl,
@@ -15,6 +18,9 @@ class UserMapper {
       subscriptionLevel: model.subscriptionLevel,
       subscriptionExpiry: model.subscriptionExpiry,
       totalCheckIns: model.totalCheckIns,
+      birthDate: model.birthDate,
+      isParentAccount: model.isParentAccount,
+      children: model.children.map((m) => ChildMapper.toEntity(m)).toList(),
     );
   }
 
@@ -22,7 +28,8 @@ class UserMapper {
   static UserProfileModel fromEntity(User entity) {
     return UserProfileModel(
       id: entity.id,
-      name: entity.name,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
       email: entity.email,
       phone: entity.phone,
       avatarUrl: entity.avatarUrl,
@@ -30,6 +37,36 @@ class UserMapper {
       subscriptionLevel: entity.subscriptionLevel,
       subscriptionExpiry: entity.subscriptionExpiry,
       totalCheckIns: entity.totalCheckIns,
+      birthDate: entity.birthDate,
+      isParentAccount: entity.isParentAccount,
+      children: entity.children.map((e) => ChildMapper.fromEntity(e)).toList(),
+    );
+  }
+}
+
+/// Mapper to convert [ChildProfileModel] to [ChildProfile] and vice-versa.
+class ChildMapper {
+  /// Converts [ChildProfileModel] to [ChildProfile].
+  static ChildProfile toEntity(ChildProfileModel model) {
+    return ChildProfile(
+      id: model.id,
+      firstName: model.firstName,
+      lastName: model.lastName,
+      birthDate: model.birthDate,
+      gender: model.gender,
+      avatarUrl: model.avatarUrl,
+    );
+  }
+
+  /// Converts [ChildProfile] to [ChildProfileModel].
+  static ChildProfileModel fromEntity(ChildProfile entity) {
+    return ChildProfileModel(
+      id: entity.id,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
+      birthDate: entity.birthDate,
+      gender: entity.gender,
+      avatarUrl: entity.avatarUrl,
     );
   }
 }
