@@ -15,6 +15,11 @@
   "commonAppNamePart1": "BOURGO",
   "commonAppNamePart2": "ARENA",
   "commonLoadingFailed": "Failed to load data. Please try again.",
+  "commonGenderMale": "Male",
+  "commonGenderFemale": "Female",
+  "commonGenderOther": "Other",
+  "commonErrorOccurred": "An error occurred. Please try again.",
+  "commonImagePickerPlaceholder": "Image picker would open here",
   
   "navHome": "HOME",
   "navActivities": "ACTIVITIES",
@@ -50,8 +55,6 @@
   "authPasswordLabel": "Password",
   "authLoginTitle": "Login",
   "authLoginSubtitle": "Welcome back! Log in to continue.",
-  "authLoginTitle": "Login",
-  "authLoginSubtitle": "Welcome back! Log in to continue.",
   "authRegisterTitle": "Registration",
   "authRegisterSubtitle": "Join the Sport HQ in Djerba and start your adventure.",
   "authFullNameLabel": "Full Name",
@@ -67,7 +70,7 @@
   "authVerificationTitle": "VERIFICATION",
   "authOtpSubtitlePrefix": "Enter the 4-digit code sent to ",
   "authOtpSubtitleDefault": "your number",
-  "authOtpResendPrefix": "Resend code in ",
+  "authOtpResendTimer": "Resend code in {seconds}s",
   "authNewPasswordTitle": "New Password",
   "authNewPasswordSubtitle": "Create a new secure password for your account.",
   "authNewPasswordLabel": "New Password",
@@ -225,6 +228,7 @@
   "authDoItLater": "Do it later",
   "authAccountOverviewTitle": "Account Overview",
   "authAccountOverviewSubtitle": "Review your details and upload a profile picture.",
+  "authProfilePictureRecommendation": "We recommend uploading a clear photo of yourself for recognition at the arena entrance.",
   "authConfirmContinue": "Confirm & Continue",
   "authEditInformation": "Edit Information",
   "authPinSetupTitle": "Secure PIN",
@@ -235,5 +239,7 @@
   "languageSelectionSubtitle": "Please select your preferred language to continue",
   "languageLabel": "Select Language",
   "languageEnglish": "English",
-  "languageFrench": "Français"
+  "languageFrench": "Français",
+  "authGenderLabel": "Gender",
+  "authGenderHint": "Select gender"
 }

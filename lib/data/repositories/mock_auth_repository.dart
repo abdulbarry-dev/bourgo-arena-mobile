@@ -78,5 +78,15 @@ class MockAuthRepository implements AuthRepository {
   Future<String?> getToken() async => 'mock_token_abc';
 
   @override
+  Future<void> completeRegistration(User user) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    _currentUser = user;
+    _authStateController.add(_currentUser);
+    developer.log(
+      'MockAuthRepository: Registration completed for ${user.email}',
+    );
+  }
+
+  @override
   Stream<User?> get onAuthStateChanged => _authStateController.stream;
 }

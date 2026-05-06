@@ -53,6 +53,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonLoadingFailed => 'Failed to load data. Please try again.';
 
   @override
+  String get commonGenderMale => 'Male';
+
+  @override
+  String get commonGenderFemale => 'Female';
+
+  @override
+  String get commonGenderOther => 'Other';
+
+  @override
+  String get commonErrorOccurred => 'An error occurred. Please try again.';
+
+  @override
+  String get commonImagePickerPlaceholder => 'Image picker would open here';
+
+  @override
   String get navHome => 'HOME';
 
   @override
@@ -195,7 +210,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authOtpSubtitleDefault => 'your number';
 
   @override
-  String get authOtpResendPrefix => 'Resend code in ';
+  String authOtpResendTimer(Object seconds) {
+    return 'Resend code in ${seconds}s';
+  }
 
   @override
   String get authNewPasswordTitle => 'New Password';
@@ -614,4 +631,90 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileFamilyEnabled => 'Family account enabled successfully!';
+
+  @override
+  String get authVerificationMethodTitle => 'Security Verification';
+
+  @override
+  String get authVerificationMethodSubtitle =>
+      'Choose a method to receive your verification code.';
+
+  @override
+  String get authEmailMethod => 'Email Address';
+
+  @override
+  String get authPhoneMethod => 'Phone Number';
+
+  @override
+  String get authMethodAccessInstruction =>
+      'Make sure you have access to the selected method.';
+
+  @override
+  String get authFamilyOnboardingTitle => 'Family Members';
+
+  @override
+  String get authFamilyOnboardingSubtitle =>
+      'Add details for your family members (Optional).';
+
+  @override
+  String get authAddMember => 'Add Member';
+
+  @override
+  String get authAddedMembers => 'Added Members';
+
+  @override
+  String get authDoItLater => 'Do it later';
+
+  @override
+  String get authAccountOverviewTitle => 'Account Overview';
+
+  @override
+  String get authAccountOverviewSubtitle =>
+      'Review your details and upload a profile picture.';
+
+  @override
+  String get authProfilePictureRecommendation =>
+      'We recommend uploading a clear photo of yourself for recognition at the arena entrance.';
+
+  @override
+  String get authConfirmContinue => 'Confirm & Continue';
+
+  @override
+  String get authEditInformation => 'Edit Information';
+
+  @override
+  String get authPinSetupTitle => 'Secure PIN';
+
+  @override
+  String get authPinSetupSubtitle =>
+      'Create a 4-digit PIN for your first gym entry.';
+
+  @override
+  String get authPinSetupInstruction =>
+      'This PIN will be used at the gym kiosks.';
+
+  @override
+  String get authCompleteRegistration => 'Complete Registration';
+
+  @override
+  String get languageSelectionTitle => 'Welcome to Bourgo Arena';
+
+  @override
+  String get languageSelectionSubtitle =>
+      'Please select your preferred language to continue';
+
+  @override
+  String get languageLabel => 'Select Language';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageFrench => 'Français';
+
+  @override
+  String get authGenderLabel => 'Gender';
+
+  @override
+  String get authGenderHint => 'Select gender';
 }

@@ -73,7 +73,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Expanded(
                           child: AuthTextField(
                             label: l10n.authFirstNameLabel,
-                            hint: 'First',
+                            hint: l10n.authFirstNameHint,
                             leadingIcon: Symbols.person,
                             controller: _viewModel.firstNameController,
                             validator: (value) => value?.isEmpty ?? true
@@ -85,7 +85,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Expanded(
                           child: AuthTextField(
                             label: l10n.authLastNameLabel,
-                            hint: 'Last',
+                            hint: l10n.authLastNameHint,
                             leadingIcon: Symbols.person,
                             controller: _viewModel.lastNameController,
                             validator: (value) => value?.isEmpty ?? true
@@ -120,7 +120,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const SizedBox(height: 20),
                     AuthTextField(
                       label: l10n.authBirthDateLabel,
-                      hint: 'Select your birth date',
+                      hint: l10n.authBirthDateHint,
                       leadingIcon: Symbols.calendar_today,
                       controller: _viewModel.birthDateController,
                       readOnly: true,
@@ -183,12 +183,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ? null
                           : () => _viewModel.register(context),
                       child: _viewModel.isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Colors.black,
+                                color: theme.colorScheme.onPrimary,
                               ),
                             )
                           : Text(l10n.authRegister),
@@ -199,9 +199,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         Text(
                           l10n.authHaveAccount,
-                          style: TextStyle(
-                            color: Colors.white.withAlpha((0.65 * 255).round()),
-                            fontSize: 14,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                         TextButton(

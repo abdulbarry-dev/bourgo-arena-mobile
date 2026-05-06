@@ -44,6 +44,19 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Completes the registration and signs the user in.
+  Future<void> completeRegistration(User user) async {
+    _setLoading(true);
+    try {
+      await _authRepository.completeRegistration(user);
+    } catch (e) {
+      developer.log('Complete registration failed', error: e);
+      rethrow;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   /// Logs out the current user.
   Future<void> logout() async {
     _setLoading(true);

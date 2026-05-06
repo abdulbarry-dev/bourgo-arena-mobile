@@ -122,7 +122,10 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/pin-setup',
-      builder: (context, state) => const PinSetupScreen(),
+      builder: (context, state) {
+        final registrationData = state.extra as Map<String, dynamic>;
+        return PinSetupScreen(registrationData: registrationData);
+      },
     ),
     GoRoute(
       path: '/forgot-password',

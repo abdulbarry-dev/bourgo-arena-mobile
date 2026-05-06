@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,6 @@ class LanguageSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final appColors = theme.extension<AppColors>()!;
     final selectedLocale = ValueNotifier<Locale>(viewModel.locale);
 
     return Scaffold(
@@ -36,6 +36,12 @@ class LanguageSelectionScreen extends StatelessWidget {
             ),
           ),
 
+          // Pattern Overlay (Optional, but adds premium feel)
+          Opacity(
+            opacity: 0.03,
+            child: CustomPaint(size: Size.infinite, painter: _GridPainter()),
+          ),
+
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -44,64 +50,99 @@ class LanguageSelectionScreen extends StatelessWidget {
                 children: [
                   const Spacer(flex: 2),
 
-                  // Header
+                  // Brand Header
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: BourgoTheme.primaryNeon.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: BourgoTheme.primaryNeon.withValues(
+                              alpha: 0.1,
+                            ),
+                            blurRadius: 40,
+                            spreadRadius: 10,
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Symbols.language,
+                        size: 64,
+                        color: BourgoTheme.primaryNeon,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 48),
+
                   Text(
                     l10n.languageSelectionTitle,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
                     textAlign: TextAlign.center,
+                    style: theme.textTheme.displaySmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                  const SizedBox(height: 12),
+
+                  const SizedBox(height: 16),
+
                   Text(
                     l10n.languageSelectionSubtitle,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
                     textAlign: TextAlign.center,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.7),
+                    ),
                   ),
 
-                  const Spacer(flex: 1),
+                  const Spacer(),
 
-                  // Language Selection List
+                  // Professional Selection UI
                   ValueListenableBuilder<Locale>(
                     valueListenable: selectedLocale,
-                    builder: (context, currentLocale, _) {
+                    builder: (context, locale, child) {
                       return Column(
                         children: [
                           _LanguageOption(
                             label: l10n.languageEnglish,
                             code: 'EN',
-                            isSelected: currentLocale.languageCode == 'en',
-                            onTap: () => selectedLocale.value = const Locale('en'),
+                            isSelected: locale.languageCode == 'en',
+                            onTap: () =>
+                                selectedLocale.value = const Locale('en'),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           _LanguageOption(
                             label: l10n.languageFrench,
                             code: 'FR',
-                            isSelected: currentLocale.languageCode == 'fr',
-                            onTap: () => selectedLocale.value = const Locale('fr'),
+                            isSelected: locale.languageCode == 'fr',
+                            onTap: () =>
+                                selectedLocale.value = const Locale('fr'),
                           ),
                         ],
                       );
                     },
                   ),
 
-                  const Spacer(flex: 3),
+                  const SizedBox(height: 48),
 
                   // Continue Button
                   ValueListenableBuilder<Locale>(
                     valueListenable: selectedLocale,
-                    builder: (context, locale, _) {
+                    builder: (context, locale, child) {
                       return ElevatedButton(
-                        onPressed: () => _handleContinue(context, locale),
+                        onPressed: () {
+                          viewModel.updateLocale(locale);
+                          context.go('/register');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: BourgoTheme.primaryNeon,
+                          foregroundColor: Colors.black,
+                        ),
                         child: Text(l10n.commonStart),
                       );
                     },
                   ),
-
-                  const SizedBox(height: 24),
 
                   // Brand Footer (Subtle)
                   Center(
@@ -124,13 +165,6 @@ class LanguageSelectionScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Future<void> _handleContinue(BuildContext context, Locale locale) async {
-    await viewModel.updateLocale(locale);
-    if (context.mounted) {
-      context.go('/'); // Redirect to onboarding/home
-    }
   }
 }
 
@@ -160,9 +194,7 @@ class _LanguageOption extends StatelessWidget {
             : appColors.bgElevated,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isSelected
-              ? theme.colorScheme.primary
-              : appColors.bgBorder,
+          color: isSelected ? theme.colorScheme.primary : appColors.bgBorder,
           width: 2,
         ),
       ),
@@ -204,16 +236,14 @@ class _LanguageOption extends StatelessWidget {
                       color: isSelected
                           ? theme.colorScheme.primary
                           : theme.colorScheme.onSurface,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ),
                 if (isSelected)
-                  Icon(
-                    Symbols.check_circle,
-                    color: theme.colorScheme.primary,
-                  ),
+                  Icon(Symbols.check_circle, color: theme.colorScheme.primary),
               ],
             ),
           ),
@@ -221,4 +251,27 @@ class _LanguageOption extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A custom painter that draws a subtle grid pattern.
+class _GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 1.0;
+
+    const spacing = 40.0;
+
+    for (double x = 0; x < size.width; x += spacing) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+
+    for (double y = 0; y < size.height; y += spacing) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

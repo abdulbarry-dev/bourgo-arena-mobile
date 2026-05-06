@@ -6,26 +6,28 @@ import 'package:material_symbols_icons/symbols.dart';
 class AuthHeader extends StatelessWidget {
   final String title;
   final String subtitle;
-  final bool showBackButton;
+  final bool? showBackButton;
 
   const AuthHeader({
     super.key,
     required this.title,
     required this.subtitle,
-    this.showBackButton = true,
+    this.showBackButton,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bool effectiveShowBackButton =
+        showBackButton ?? Navigator.of(context).canPop();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (showBackButton) ...[
+        if (effectiveShowBackButton) ...[
           IconButton(
             onPressed: () => context.pop(),
-            icon: const Icon(Symbols.arrow_back),
+            icon: const Icon(Symbols.arrow_back, color: Colors.white),
             padding: EdgeInsets.zero,
             alignment: Alignment.centerLeft,
           ),

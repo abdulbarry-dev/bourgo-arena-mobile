@@ -24,7 +24,11 @@ class AccountSetupScreen extends StatelessWidget {
     final phone = registrationData['phone'] as String;
 
     return Scaffold(
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -39,42 +43,68 @@ class AccountSetupScreen extends StatelessWidget {
 
               // Profile Picture Section
               Center(
-                child: Stack(
+                child: Column(
                   children: [
-                    Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: appColors.bgElevated,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.3,
+                    InkWell(
+                      onTap: () {
+                        // In a real app, this would trigger image picker
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(l10n.commonImagePickerPlaceholder),
                           ),
-                          width: 2,
-                        ),
-                      ),
-                      child: Icon(
-                        Symbols.person,
-                        size: 64,
-                        color: theme.colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.5,
-                        ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(60),
+                      child: Stack(
+                        children: [
+                          Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: appColors.bgElevated,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.3,
+                                ),
+                                width: 2,
+                              ),
+                            ),
+                            child: Icon(
+                              Symbols.person,
+                              size: 64,
+                              color: theme.colorScheme.onSurfaceVariant
+                                  .withValues(alpha: 0.5),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Symbols.add_a_photo,
+                                size: 20,
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: Text(
+                        l10n.authProfilePictureRecommendation,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.labelMedium?.copyWith(
                           color: theme.colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Symbols.add_a_photo,
-                          size: 20,
-                          color: theme.colorScheme.onPrimary,
+                          fontStyle: FontStyle.italic,
                         ),
                       ),
                     ),
@@ -118,7 +148,8 @@ class AccountSetupScreen extends StatelessWidget {
               const SizedBox(height: 48),
 
               ElevatedButton(
-                onPressed: () => context.push('/pin-setup'),
+                onPressed: () =>
+                    context.push('/pin-setup', extra: registrationData),
                 child: Text(l10n.authConfirmContinue),
               ),
             ],

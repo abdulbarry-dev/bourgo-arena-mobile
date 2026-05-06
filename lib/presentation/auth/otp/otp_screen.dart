@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
@@ -56,11 +57,13 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        iconTheme: const IconThemeData(color: Colors.white),
+        automaticallyImplyLeading: false,
+        iconTheme: IconThemeData(color: theme.colorScheme.onSurface),
       ),
       body: SafeArea(
         child: Padding(
@@ -69,9 +72,9 @@ class _OtpScreenState extends State<OtpScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               AuthHeader(
-                title: AppLocalizations.of(context)!.authVerificationTitle,
+                title: l10n.authVerificationTitle,
                 subtitle:
-                    '${AppLocalizations.of(context)!.authOtpSubtitlePrefix}${widget.destination ?? AppLocalizations.of(context)!.authOtpSubtitleDefault}.',
+                    '${l10n.authOtpSubtitlePrefix}${widget.destination ?? l10n.authOtpSubtitleDefault}.',
               ),
               const SizedBox(height: 48),
               Row(
@@ -83,21 +86,21 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: Column(
                   children: [
                     Text(
-                      '${AppLocalizations.of(context)!.authOtpResendPrefix}${_timerCount}s',
+                      l10n.authOtpResendTimer(_timerCount.toString()),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                     if (_timerCount == 0)
                       Padding(
-                        padding: const EdgeInsets.top(8),
+                        padding: const EdgeInsets.only(top: 16),
                         child: TextButton(
                           onPressed: () {
                             setState(() => _timerCount = 60);
                             _startTimer();
                           },
                           child: Text(
-                            AppLocalizations.of(context)!.authSendCode,
+                            l10n.authSendCode,
                             style: TextStyle(
                               color: theme.colorScheme.primary,
                               fontWeight: FontWeight.bold,
@@ -122,7 +125,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         'lastName': '',
                       },
                 ),
-                child: Text(AppLocalizations.of(context)!.authVerify),
+                child: Text(l10n.authVerify),
               ),
             ],
           ),

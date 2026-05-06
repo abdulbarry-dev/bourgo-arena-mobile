@@ -182,6 +182,36 @@ abstract class AppLocalizations {
   /// **'Échec du chargement des données. Veuillez réessayer.'**
   String get commonLoadingFailed;
 
+  /// No description provided for @commonGenderMale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Homme'**
+  String get commonGenderMale;
+
+  /// No description provided for @commonGenderFemale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Femme'**
+  String get commonGenderFemale;
+
+  /// No description provided for @commonGenderOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre'**
+  String get commonGenderOther;
+
+  /// No description provided for @commonErrorOccurred.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur est survenue. Veuillez réessayer.'**
+  String get commonErrorOccurred;
+
+  /// No description provided for @commonImagePickerPlaceholder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le sélecteur d\'image s\'ouvrirait ici'**
+  String get commonImagePickerPlaceholder;
+
   /// No description provided for @navHome.
   ///
   /// In fr, this message translates to:
@@ -458,11 +488,11 @@ abstract class AppLocalizations {
   /// **'votre numéro'**
   String get authOtpSubtitleDefault;
 
-  /// No description provided for @authOtpResendPrefix.
+  /// No description provided for @authOtpResendTimer.
   ///
   /// In fr, this message translates to:
-  /// **'Renvoyer le code dans '**
-  String get authOtpResendPrefix;
+  /// **'Renvoyer le code dans {seconds}s'**
+  String authOtpResendTimer(Object seconds);
 
   /// No description provided for @authNewPasswordTitle.
   ///
@@ -1279,6 +1309,162 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Compte famille activé avec succès !'**
   String get profileFamilyEnabled;
+
+  /// No description provided for @authVerificationMethodTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification de Sécurité'**
+  String get authVerificationMethodTitle;
+
+  /// No description provided for @authVerificationMethodSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez une méthode pour recevoir votre code de vérification.'**
+  String get authVerificationMethodSubtitle;
+
+  /// No description provided for @authEmailMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse E-mail'**
+  String get authEmailMethod;
+
+  /// No description provided for @authPhoneMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de Téléphone'**
+  String get authPhoneMethod;
+
+  /// No description provided for @authMethodAccessInstruction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Assurez-vous d\'avoir accès à la méthode sélectionnée.'**
+  String get authMethodAccessInstruction;
+
+  /// No description provided for @authFamilyOnboardingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membres de la Famille'**
+  String get authFamilyOnboardingTitle;
+
+  /// No description provided for @authFamilyOnboardingSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez les détails de vos membres de famille (Optionnel).'**
+  String get authFamilyOnboardingSubtitle;
+
+  /// No description provided for @authAddMember.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un membre'**
+  String get authAddMember;
+
+  /// No description provided for @authAddedMembers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membres ajoutés'**
+  String get authAddedMembers;
+
+  /// No description provided for @authDoItLater.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus tard'**
+  String get authDoItLater;
+
+  /// No description provided for @authAccountOverviewTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aperçu du Compte'**
+  String get authAccountOverviewTitle;
+
+  /// No description provided for @authAccountOverviewSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez vos informations et téléchargez une photo de profil.'**
+  String get authAccountOverviewSubtitle;
+
+  /// No description provided for @authProfilePictureRecommendation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous vous recommandons de télécharger une photo claire de vous-même pour être reconnu à l\'entrée de l\'arène.'**
+  String get authProfilePictureRecommendation;
+
+  /// No description provided for @authConfirmContinue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer et continuer'**
+  String get authConfirmContinue;
+
+  /// No description provided for @authEditInformation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier les informations'**
+  String get authEditInformation;
+
+  /// No description provided for @authPinSetupTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code PIN Sécurisé'**
+  String get authPinSetupTitle;
+
+  /// No description provided for @authPinSetupSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créez un code PIN à 4 chiffres pour votre premier accès.'**
+  String get authPinSetupSubtitle;
+
+  /// No description provided for @authPinSetupInstruction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce code PIN sera utilisé aux bornes de la salle.'**
+  String get authPinSetupInstruction;
+
+  /// No description provided for @authCompleteRegistration.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminer l\'inscription'**
+  String get authCompleteRegistration;
+
+  /// No description provided for @languageSelectionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bienvenue à Bourgo Arena'**
+  String get languageSelectionTitle;
+
+  /// No description provided for @languageSelectionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez sélectionner votre langue préférée pour continuer'**
+  String get languageSelectionSubtitle;
+
+  /// No description provided for @languageLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir la langue'**
+  String get languageLabel;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In fr, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @languageFrench.
+  ///
+  /// In fr, this message translates to:
+  /// **'Français'**
+  String get languageFrench;
+
+  /// No description provided for @authGenderLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Genre'**
+  String get authGenderLabel;
+
+  /// No description provided for @authGenderHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez le genre'**
+  String get authGenderHint;
 }
 
 class _AppLocalizationsDelegate

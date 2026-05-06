@@ -15,6 +15,11 @@
   "commonAppNamePart1": "BOURGO",
   "commonAppNamePart2": "ARENA",
   "commonLoadingFailed": "Échec du chargement des données. Veuillez réessayer.",
+  "commonGenderMale": "Homme",
+  "commonGenderFemale": "Femme",
+  "commonGenderOther": "Autre",
+  "commonErrorOccurred": "Une erreur est survenue. Veuillez réessayer.",
+  "commonImagePickerPlaceholder": "Le sélecteur d'image s'ouvrirait ici",
   
   "navHome": "ACCUEIL",
   "navActivities": "ACTIVITÉS",
@@ -65,7 +70,7 @@
   "authVerificationTitle": "VÉRIFICATION",
   "authOtpSubtitlePrefix": "Entrez le code à 4 chiffres envoyé à ",
   "authOtpSubtitleDefault": "votre numéro",
-  "authOtpResendPrefix": "Renvoyer le code dans ",
+  "authOtpResendTimer": "Renvoyer le code dans {seconds}s",
   "authNewPasswordTitle": "Nouveau mot de passe",
   "authNewPasswordSubtitle": "Créez un nouveau mot de passe sécurisé pour votre compte.",
   "authNewPasswordLabel": "Nouveau mot de passe",
@@ -222,8 +227,9 @@
   "authAddedMembers": "Membres ajoutés",
   "authDoItLater": "Plus tard",
   "authAccountOverviewTitle": "Aperçu du Compte",
-  "authAccountOverviewSubtitle": "Vérifiez vos informations et ajoutez une photo de profil.",
-  "authConfirmContinue": "Confirmer et Continuer",
+  "authAccountOverviewSubtitle": "Vérifiez vos informations et téléchargez une photo de profil.",
+  "authProfilePictureRecommendation": "Nous vous recommandons de télécharger une photo claire de vous-même pour être reconnu à l'entrée de l'arène.",
+  "authConfirmContinue": "Confirmer et continuer",
   "authEditInformation": "Modifier les informations",
   "authPinSetupTitle": "Code PIN Sécurisé",
   "authPinSetupSubtitle": "Créez un code PIN à 4 chiffres pour votre premier accès.",
@@ -233,5 +239,7 @@
   "languageSelectionSubtitle": "Veuillez sélectionner votre langue préférée pour continuer",
   "languageLabel": "Choisir la langue",
   "languageEnglish": "English",
-  "languageFrench": "Français"
+  "languageFrench": "Français",
+  "authGenderLabel": "Genre",
+  "authGenderHint": "Sélectionnez le genre"
 }

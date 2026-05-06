@@ -78,6 +78,21 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> completeRegistration(User user) async {
+    // This would typically be a multi-part form or a complex JSON object
+    // depending on the backend requirements for profile completion.
+    await _apiClient.post('/auth/complete-registration', {
+      'first_name': user.firstName,
+      'last_name': user.lastName,
+      'email': user.email,
+      'phone': user.phone,
+      'is_parent_account': user.isParentAccount,
+      // Add other fields as needed by the API
+    });
+    _authStateController.add(user);
+  }
+
+  @override
   Future<String?> getToken() async {
     // In a real app, this might come from secure storage
     return null;

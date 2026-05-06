@@ -54,6 +54,23 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec du chargement des données. Veuillez réessayer.';
 
   @override
+  String get commonGenderMale => 'Homme';
+
+  @override
+  String get commonGenderFemale => 'Femme';
+
+  @override
+  String get commonGenderOther => 'Autre';
+
+  @override
+  String get commonErrorOccurred =>
+      'Une erreur est survenue. Veuillez réessayer.';
+
+  @override
+  String get commonImagePickerPlaceholder =>
+      'Le sélecteur d\'image s\'ouvrirait ici';
+
+  @override
   String get navHome => 'ACCUEIL';
 
   @override
@@ -197,7 +214,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authOtpSubtitleDefault => 'votre numéro';
 
   @override
-  String get authOtpResendPrefix => 'Renvoyer le code dans ';
+  String authOtpResendTimer(Object seconds) {
+    return 'Renvoyer le code dans ${seconds}s';
+  }
 
   @override
   String get authNewPasswordTitle => 'Nouveau mot de passe';
@@ -616,4 +635,90 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profileFamilyEnabled => 'Compte famille activé avec succès !';
+
+  @override
+  String get authVerificationMethodTitle => 'Vérification de Sécurité';
+
+  @override
+  String get authVerificationMethodSubtitle =>
+      'Choisissez une méthode pour recevoir votre code de vérification.';
+
+  @override
+  String get authEmailMethod => 'Adresse E-mail';
+
+  @override
+  String get authPhoneMethod => 'Numéro de Téléphone';
+
+  @override
+  String get authMethodAccessInstruction =>
+      'Assurez-vous d\'avoir accès à la méthode sélectionnée.';
+
+  @override
+  String get authFamilyOnboardingTitle => 'Membres de la Famille';
+
+  @override
+  String get authFamilyOnboardingSubtitle =>
+      'Ajoutez les détails de vos membres de famille (Optionnel).';
+
+  @override
+  String get authAddMember => 'Ajouter un membre';
+
+  @override
+  String get authAddedMembers => 'Membres ajoutés';
+
+  @override
+  String get authDoItLater => 'Plus tard';
+
+  @override
+  String get authAccountOverviewTitle => 'Aperçu du Compte';
+
+  @override
+  String get authAccountOverviewSubtitle =>
+      'Vérifiez vos informations et téléchargez une photo de profil.';
+
+  @override
+  String get authProfilePictureRecommendation =>
+      'Nous vous recommandons de télécharger une photo claire de vous-même pour être reconnu à l\'entrée de l\'arène.';
+
+  @override
+  String get authConfirmContinue => 'Confirmer et continuer';
+
+  @override
+  String get authEditInformation => 'Modifier les informations';
+
+  @override
+  String get authPinSetupTitle => 'Code PIN Sécurisé';
+
+  @override
+  String get authPinSetupSubtitle =>
+      'Créez un code PIN à 4 chiffres pour votre premier accès.';
+
+  @override
+  String get authPinSetupInstruction =>
+      'Ce code PIN sera utilisé aux bornes de la salle.';
+
+  @override
+  String get authCompleteRegistration => 'Terminer l\'inscription';
+
+  @override
+  String get languageSelectionTitle => 'Bienvenue à Bourgo Arena';
+
+  @override
+  String get languageSelectionSubtitle =>
+      'Veuillez sélectionner votre langue préférée pour continuer';
+
+  @override
+  String get languageLabel => 'Choisir la langue';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageFrench => 'Français';
+
+  @override
+  String get authGenderLabel => 'Genre';
+
+  @override
+  String get authGenderHint => 'Sélectionnez le genre';
 }

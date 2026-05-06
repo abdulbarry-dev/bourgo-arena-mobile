@@ -30,6 +30,9 @@ abstract interface class AuthRepository {
   /// Retrieves the current auth token, if any.
   Future<String?> getToken();
 
+  /// Completes the registration process and signs the user in.
+  Future<void> completeRegistration(User user);
+
   /// Stream of authentication state changes.
   Stream<User?> get onAuthStateChanged;
 }
