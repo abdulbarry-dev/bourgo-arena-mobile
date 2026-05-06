@@ -38,12 +38,24 @@ class RegisterViewModel extends ChangeNotifier {
   void register(BuildContext context) {
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
-      // Simulate API call with all fields
-      // In a real app, we would send firstName, lastName, email, phone, password, birthDate, isParentAccount
-      Future.delayed(const Duration(seconds: 2), () {
+
+      // Simulate registration data persistence or API call
+      final registrationData = {
+        'firstName': firstNameController.text,
+        'lastName': lastNameController.text,
+        'email': emailController.text,
+        'phone': phoneController.text,
+        'isParentAccount': _isParentAccount,
+      };
+
+      Future.delayed(const Duration(seconds: 1), () {
         if (context.mounted) {
           setLoading(false);
-          context.push('/otp', extra: emailController.text);
+          if (_isParentAccount) {
+            context.push('/family-onboarding', extra: registrationData);
+          } else {
+            context.push('/verification-method', extra: registrationData);
+          }
         }
       });
     }

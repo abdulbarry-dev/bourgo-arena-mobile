@@ -29,8 +29,10 @@ void main() {
 
     when(() => mockSettingsViewModel.themeMode).thenReturn(ThemeMode.dark);
     when(() => mockSettingsViewModel.locale).thenReturn(const Locale('fr'));
+    when(() => mockSettingsViewModel.isLanguageSelected).thenReturn(true);
     when(() => mockAuthService.isAuthenticated).thenReturn(false);
     when(() => mockAuthService.addListener(any())).thenReturn(null);
+    when(() => mockSettingsViewModel.addListener(any())).thenReturn(null);
   });
 
   testWidgets('Onboarding screen smoke test', (WidgetTester tester) async {

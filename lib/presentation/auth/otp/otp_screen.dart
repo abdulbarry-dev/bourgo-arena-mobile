@@ -8,8 +8,9 @@ import 'package:go_router/go_router.dart';
 /// High-fidelity OTP verification screen for Bourgo Arena.
 class OtpScreen extends StatefulWidget {
   final String? destination;
+  final Map<String, dynamic>? registrationData;
 
-  const OtpScreen({super.key, this.destination});
+  const OtpScreen({super.key, this.destination, this.registrationData});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -83,19 +84,25 @@ class _OtpScreenState extends State<OtpScreen> {
                   children: [
                     Text(
                       '${AppLocalizations.of(context)!.authOtpResendPrefix}${_timerCount}s',
-                      style: const TextStyle(color: Colors.white38),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     if (_timerCount == 0)
-                      TextButton(
-                        onPressed: () {
-                          setState(() => _timerCount = 60);
-                          _startTimer();
-                        },
-                        child: Text(
-                          AppLocalizations.of(context)!.authSendCode,
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.top(8),
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() => _timerCount = 60);
+                            _startTimer();
+                          },
+                          child: Text(
+                            AppLocalizations.of(context)!.authSendCode,
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                         ),
                       ),
@@ -104,7 +111,17 @@ class _OtpScreenState extends State<OtpScreen> {
               ),
               const Spacer(),
               ElevatedButton(
-                onPressed: () => context.go('/'),
+                onPressed: () => context.push(
+                  '/account-setup',
+                  extra:
+                      widget.registrationData ??
+                      {
+                        'email': widget.destination ?? '',
+                        'phone': '',
+                        'firstName': 'User',
+                        'lastName': '',
+                      },
+                ),
                 child: Text(AppLocalizations.of(context)!.authVerify),
               ),
             ],
@@ -116,9 +133,10 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Widget _buildOTPField(int index) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
 
     return SizedBox(
-      width: 70,
+      width: 72,
       height: 80,
       child: TextField(
         controller: _controllers[index],
@@ -126,24 +144,23 @@ class _OtpScreenState extends State<OtpScreen> {
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         maxLength: 1,
-        style: const TextStyle(
-          fontSize: 28,
+        style: theme.textTheme.headlineMedium?.copyWith(
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: theme.colorScheme.onSurface,
         ),
         inputFormatters: [FilteringTextInputFormatter.digitsOnly],
         decoration: InputDecoration(
           counterText: '',
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Colors.white10, width: 2),
+            borderSide: BorderSide(color: appColors.bgBorder, width: 2),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
           ),
           filled: true,
-          fillColor: Colors.white.withAlpha(5),
+          fillColor: appColors.bgElevated,
         ),
         onChanged: (value) {
           if (value.isNotEmpty && index < 3) {

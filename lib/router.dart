@@ -5,7 +5,11 @@ import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_pas
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/new_password/new_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/register/account_setup_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/register/family_onboarding_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/register/pin_setup_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/register/verification_method_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_flow_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_success_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/common/offline_screen.dart';
@@ -52,6 +56,10 @@ GoRouter createRouter(
         state.matchedLocation == '/login' ||
         state.matchedLocation == '/register' ||
         state.matchedLocation == '/otp' ||
+        state.matchedLocation == '/verification-method' ||
+        state.matchedLocation == '/family-onboarding' ||
+        state.matchedLocation == '/account-setup' ||
+        state.matchedLocation == '/pin-setup' ||
         state.matchedLocation == '/forgot-password' ||
         state.matchedLocation == '/new-password' ||
         state.matchedLocation == '/';
@@ -84,9 +92,37 @@ GoRouter createRouter(
     GoRoute(
       path: '/otp',
       builder: (context, state) {
-        final destination = state.extra as String?;
-        return OtpScreen(destination: destination);
+        final data = state.extra as Map<String, dynamic>?;
+        return OtpScreen(
+          destination: data?['destination'] as String?,
+          registrationData: data?['registrationData'] as Map<String, dynamic>?,
+        );
       },
+    ),
+    GoRoute(
+      path: '/verification-method',
+      builder: (context, state) {
+        final registrationData = state.extra as Map<String, dynamic>;
+        return VerificationMethodScreen(registrationData: registrationData);
+      },
+    ),
+    GoRoute(
+      path: '/family-onboarding',
+      builder: (context, state) {
+        final registrationData = state.extra as Map<String, dynamic>;
+        return FamilyOnboardingScreen(registrationData: registrationData);
+      },
+    ),
+    GoRoute(
+      path: '/account-setup',
+      builder: (context, state) {
+        final registrationData = state.extra as Map<String, dynamic>;
+        return AccountSetupScreen(registrationData: registrationData);
+      },
+    ),
+    GoRoute(
+      path: '/pin-setup',
+      builder: (context, state) => const PinSetupScreen(),
     ),
     GoRoute(
       path: '/forgot-password',
