@@ -1465,6 +1465,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Sélectionnez le genre'**
   String get authGenderHint;
+
+  /// No description provided for @errorNotFoundTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAGE INTROUVABLE'**
+  String get errorNotFoundTitle;
+
+  /// No description provided for @errorNotFoundSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oups ! La page que vous cherchez n\'existe pas ou a été déplacée.'**
+  String get errorNotFoundSubtitle;
+
+  /// No description provided for @errorNotFoundAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'RETOUR À L\'ACCUEIL'**
+  String get errorNotFoundAction;
 }
 
 class _AppLocalizationsDelegate

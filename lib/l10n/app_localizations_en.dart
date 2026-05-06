@@ -717,4 +717,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authGenderHint => 'Select gender';
+
+  @override
+  String get errorNotFoundTitle => 'PAGE NOT FOUND';
+
+  @override
+  String get errorNotFoundSubtitle =>
+      'Oops! The page you\'re looking for doesn\'t exist or has been moved.';
+
+  @override
+  String get errorNotFoundAction => 'GO BACK HOME';
 }

@@ -241,5 +241,9 @@
   "languageEnglish": "English",
   "languageFrench": "Français",
   "authGenderLabel": "Gender",
-  "authGenderHint": "Select gender"
+  "authGenderHint": "Select gender",
+
+  "errorNotFoundTitle": "PAGE NOT FOUND",
+  "errorNotFoundSubtitle": "Oops! The page you're looking for doesn't exist or has been moved.",
+  "errorNotFoundAction": "GO BACK HOME"
 }

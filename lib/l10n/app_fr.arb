@@ -241,5 +241,9 @@
   "languageEnglish": "English",
   "languageFrench": "Français",
   "authGenderLabel": "Genre",
-  "authGenderHint": "Sélectionnez le genre"
+  "authGenderHint": "Sélectionnez le genre",
+
+  "errorNotFoundTitle": "PAGE INTROUVABLE",
+  "errorNotFoundSubtitle": "Oups ! La page que vous cherchez n'existe pas ou a été déplacée.",
+  "errorNotFoundAction": "RETOUR À L'ACCUEIL"
 }

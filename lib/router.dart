@@ -12,6 +12,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/register/register_screen.d
 import 'package:bourgo_arena_mobile/presentation/auth/register/verification_method_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_flow_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_success_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/common/not_found_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/common/offline_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_screen.dart';
@@ -38,6 +39,7 @@ GoRouter createRouter(
   ActivityService activityService,
 ) => GoRouter(
   initialLocation: '/',
+  errorBuilder: (context, state) => NotFoundScreen(error: state.error),
   refreshListenable: Listenable.merge([authService, settingsViewModel]),
   redirect: (context, state) {
     // 1. Force Language Selection if not set
