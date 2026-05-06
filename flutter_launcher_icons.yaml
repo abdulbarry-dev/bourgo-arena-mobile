@@ -1,0 +1,19 @@
+flutter_launcher_icons:
+  # Source image (1024×1024 PNG with transparency)
+  image_path: "assets/icons/app_icon.png"
+
+  android: true
+  ios: true
+
+  # Keep the transparent background on Android adaptive icon.
+  # The foreground will be the logo; background color matches the
+  # app's primary dark surface (#0D0D0D).
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#0D0D0D"
+
+  # Remove the old icon rounding on iOS (uses system rounding instead)
+  remove_alpha_ios: true
+  
+  # Optional: web favicon (does not affect mobile)
+  web:
+    generate: false

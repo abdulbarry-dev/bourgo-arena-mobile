@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="bourgo_arena_mobile"
+        android:label="Bourgo Arena"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
