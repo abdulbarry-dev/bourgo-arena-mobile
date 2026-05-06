@@ -51,7 +51,9 @@ class AuthTextField extends StatelessWidget {
           onTap: onTap,
           validator: validator,
           keyboardType: keyboardType,
-          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: leadingIcon != null

@@ -39,7 +39,7 @@ class ActivityCard extends StatelessWidget {
             ),
           ),
           border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.2),
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
           ),
         ),
         child: Stack(

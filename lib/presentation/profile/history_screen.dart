@@ -139,10 +139,10 @@ class _AccessMethodTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.3),
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
         ),
       ),
       child: Row(
@@ -171,13 +171,12 @@ class _AccessMethodTile extends StatelessWidget {
                   isSet
                       ? l10n.profileStatusConfigured
                       : l10n.profileStatusNotConfigured,
-                  style: TextStyle(
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: isSet
-                        ? Colors.greenAccent
+                        ? theme.colorScheme.primary
                         : theme.colorScheme.onSurfaceVariant.withValues(
                             alpha: 0.6,
                           ),
-                    fontSize: 12,
                   ),
                 ),
               ],
@@ -187,7 +186,7 @@ class _AccessMethodTile extends StatelessWidget {
           if (isSet)
             Icon(
               Symbols.check_circle,
-              color: Colors.greenAccent.withValues(alpha: 0.5),
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
               size: 20,
             ),
         ],
@@ -225,9 +224,7 @@ class _CheckinHistoryList extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(
-                    alpha: 0.3,
-                  ),
+                  color: theme.colorScheme.surfaceContainerHighest,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -243,7 +240,9 @@ class _CheckinHistoryList extends StatelessWidget {
                   children: [
                     Text(
                       l10n.profileCheckinEntry,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '${item['location']}',
@@ -260,9 +259,8 @@ class _CheckinHistoryList extends StatelessWidget {
                 children: [
                   Text(
                     '${item['date']}',
-                    style: const TextStyle(
+                    style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
-                      fontSize: 13,
                     ),
                   ),
                   Text(

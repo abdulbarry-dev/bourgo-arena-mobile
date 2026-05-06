@@ -18,10 +18,10 @@ class ReservationCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -129,28 +129,29 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     Color color;
     String label;
     IconData icon;
 
     switch (status.toLowerCase()) {
       case 'confirmed':
-        color = const Color(0xFFAAFF00);
+        color = theme.colorScheme.primary;
         label = AppLocalizations.of(context)!.activitiesStatusConfirmed;
         icon = Symbols.check_circle;
         break;
       case 'pending':
-        color = const Color(0xFFFF9500);
+        color = Colors.orange;
         label = AppLocalizations.of(context)!.activitiesStatusPending;
         icon = Symbols.schedule;
         break;
       case 'cancelled':
-        color = const Color(0xFFFF3B30);
+        color = theme.colorScheme.error;
         label = AppLocalizations.of(context)!.activitiesStatusCancelled;
         icon = Symbols.cancel;
         break;
       default:
-        color = Colors.grey;
+        color = theme.colorScheme.onSurfaceVariant;
         label = status.toUpperCase();
         icon = Symbols.info;
     }

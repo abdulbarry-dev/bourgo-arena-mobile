@@ -63,10 +63,12 @@ class BourgoTheme {
       brightness: Brightness.light,
       primary: const Color(0xFF558800), // Slightly deeper for light mode
       onPrimary: Colors.white,
-      surface: const Color(0xFFFCFCFC),
+      surface: const Color(0xFFF5F5F5), // Slightly darker background
       onSurface: const Color(0xFF1A1A1A),
       onSurfaceVariant: const Color(0xFF454545),
-      outline: const Color(0xFFE0E0E0),
+      outline: const Color(0xFFCCCCCC), // Darker outline for visibility
+      surfaceContainer: Colors.white, // Pure white for cards
+      surfaceContainerLow: const Color(0xFFFAFAFA),
     );
 
     return ThemeData(
