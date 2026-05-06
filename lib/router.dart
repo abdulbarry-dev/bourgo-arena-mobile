@@ -21,6 +21,8 @@ import 'package:bourgo_arena_mobile/presentation/settings/privacy_policy_screen.
 import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/onboarding/language_selection_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
 /// App routing configuration using GoRouter.
@@ -30,8 +32,21 @@ GoRouter createRouter(
   ActivityService activityService,
 ) => GoRouter(
   initialLocation: '/',
-  refreshListenable: authService,
+  refreshListenable: Listenable.merge([authService, settingsViewModel]),
   redirect: (context, state) {
+    // 1. Force Language Selection if not set
+    if (!settingsViewModel.isLanguageSelected) {
+      return state.matchedLocation == '/language-selection'
+          ? null
+          : '/language-selection';
+    }
+
+    // 2. Prevent accessing language selection once set
+    if (state.matchedLocation == '/language-selection') {
+      return '/';
+    }
+
+    // 3. Auth Redirection
     final bool isAuthenticated = authService.isAuthenticated;
     final bool isAuthRoute =
         state.matchedLocation == '/login' ||
@@ -52,6 +67,11 @@ GoRouter createRouter(
     return null;
   },
   routes: [
+    GoRoute(
+      path: '/language-selection',
+      builder: (context, state) =>
+          LanguageSelectionScreen(viewModel: settingsViewModel),
+    ),
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
     GoRoute(
       path: '/login',
