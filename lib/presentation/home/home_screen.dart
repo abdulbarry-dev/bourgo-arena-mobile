@@ -1,4 +1,6 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
@@ -25,7 +27,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = HomeViewModel(dataService: DataService());
+    _viewModel = HomeViewModel(
+      activityService: locator<ActivityService>(),
+      dataService: locator<DataService>(),
+    );
     _viewModel.loadHomeData();
   }
 
@@ -55,15 +60,16 @@ class _HomeScreenState extends State<HomeScreen> {
             elevation: 0,
             title: Text(
               AppLocalizations.of(context)!.appName.toUpperCase(),
-              style: const TextStyle(
+              style: theme.textTheme.titleLarge?.copyWith(
                 fontFamily: AppConstants.displayFontFamily,
-                fontSize: 20,
-                letterSpacing: 1.5,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+                fontSize: 18,
               ),
             ),
             actions: [
               IconButton(
-                onPressed: () => MainLayout.tabController.value = 1,
+                onPressed: () => context.push('/search'),
                 icon: const Icon(Symbols.search),
               ),
               IconButton(
@@ -78,9 +84,29 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 // Hero Section
                 Container(
-                  height: 200,
+                  height: 220,
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                   padding: const EdgeInsets.all(24),
-                  alignment: Alignment.bottomLeft,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(24),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        theme.colorScheme.primaryContainer.withValues(
+                          alpha: 0.3,
+                        ),
+                        theme.colorScheme.surface,
+                      ],
+                    ),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      width: 1,
+                    ),
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         AppLocalizations.of(context)!.homeHeroPart1,
                         style: theme.textTheme.displayMedium?.copyWith(
-                          color: Colors.white,
+                          color: theme.colorScheme.onSurface,
                           fontFamily: AppConstants.displayFontFamily,
                           height: 0.9,
                         ),
@@ -109,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 TickerStrip(
                   text: AppLocalizations.of(context)!.homeTicker,
                   backgroundColor: theme.colorScheme.primary,
-                  textColor: Colors.black,
+                  textColor: theme.colorScheme.onPrimary,
                 ),
 
                 const SizedBox(height: 32),
@@ -124,7 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         AppLocalizations.of(context)!.homeActivitiesTitle,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontFamily: AppConstants.displayFontFamily,
-                          letterSpacing: 1,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.2,
                         ),
                       ),
                       TextButton(
@@ -173,7 +200,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         AppLocalizations.of(context)!.homeTodayTitle,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontFamily: AppConstants.displayFontFamily,
-                          letterSpacing: 1,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.2,
                         ),
                       ),
                       TextButton(
@@ -210,7 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     itemCount: _viewModel.todayCourses.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 12),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       return TodayCourseCard(
                         course: _viewModel.todayCourses[index],

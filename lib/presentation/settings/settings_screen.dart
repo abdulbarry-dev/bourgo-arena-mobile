@@ -1,5 +1,5 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/settings/settings_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -87,12 +87,12 @@ class SettingsScreen extends StatelessWidget {
                   _SettingsTile(
                     icon: Symbols.description,
                     title: l10n.settingsTerms,
-                    onTap: () {},
+                    onTap: () => context.push('/terms'),
                   ),
                   _SettingsTile(
                     icon: Symbols.policy,
                     title: l10n.settingsPrivacy,
-                    onTap: () {},
+                    onTap: () => context.push('/privacy'),
                   ),
                 ],
               ),
@@ -157,7 +157,9 @@ class SettingsScreen extends StatelessWidget {
             RadioListTile<String>(
               title: const Text('English'),
               value: 'en',
+              // ignore: deprecated_member_use
               groupValue: viewModel.locale.languageCode,
+              // ignore: deprecated_member_use
               onChanged: (val) {
                 if (val != null) {
                   viewModel.updateLocale(Locale(val));
@@ -168,7 +170,9 @@ class SettingsScreen extends StatelessWidget {
             RadioListTile<String>(
               title: const Text('Français'),
               value: 'fr',
+              // ignore: deprecated_member_use
               groupValue: viewModel.locale.languageCode,
+              // ignore: deprecated_member_use
               onChanged: (val) {
                 if (val != null) {
                   viewModel.updateLocale(Locale(val));
@@ -193,7 +197,9 @@ class SettingsScreen extends StatelessWidget {
             RadioListTile<ThemeMode>(
               title: Text(l10n.settingsThemeSystem),
               value: ThemeMode.system,
+              // ignore: deprecated_member_use
               groupValue: viewModel.themeMode,
+              // ignore: deprecated_member_use
               onChanged: (val) {
                 if (val != null) {
                   viewModel.updateThemeMode(val);
@@ -204,7 +210,9 @@ class SettingsScreen extends StatelessWidget {
             RadioListTile<ThemeMode>(
               title: Text(l10n.settingsThemeLight),
               value: ThemeMode.light,
+              // ignore: deprecated_member_use
               groupValue: viewModel.themeMode,
+              // ignore: deprecated_member_use
               onChanged: (val) {
                 if (val != null) {
                   viewModel.updateThemeMode(val);
@@ -215,7 +223,9 @@ class SettingsScreen extends StatelessWidget {
             RadioListTile<ThemeMode>(
               title: Text(l10n.settingsThemeDark),
               value: ThemeMode.dark,
+              // ignore: deprecated_member_use
               groupValue: viewModel.themeMode,
+              // ignore: deprecated_member_use
               onChanged: (val) {
                 if (val != null) {
                   viewModel.updateThemeMode(val);

@@ -18,9 +18,11 @@ class ReservationCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withAlpha(20)),
+        border: Border.all(
+          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         children: [
@@ -33,13 +35,18 @@ class ReservationCard extends StatelessWidget {
                 Text(
                   reservation.id,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: Colors.white.withAlpha(100),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.5,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Colors.white10),
+          Divider(
+            height: 1,
+            color: theme.colorScheme.outline.withValues(alpha: 0.1),
+          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -55,32 +62,44 @@ class ReservationCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Row(
+                      Wrap(
+                        spacing: 16,
+                        runSpacing: 8,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          const Icon(
-                            Symbols.calendar_month,
-                            size: 16,
-                            color: Colors.white70,
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Symbols.calendar_month,
+                                size: 16,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                reservation.date,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            reservation.date,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white70,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          const Icon(
-                            Symbols.schedule,
-                            size: 16,
-                            color: Colors.white70,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            reservation.time,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: Colors.white70,
-                            ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Symbols.schedule,
+                                size: 16,
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                reservation.time,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -110,28 +129,29 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     Color color;
     String label;
     IconData icon;
 
     switch (status.toLowerCase()) {
       case 'confirmed':
-        color = const Color(0xFFAAFF00);
+        color = theme.colorScheme.primary;
         label = AppLocalizations.of(context)!.activitiesStatusConfirmed;
         icon = Symbols.check_circle;
         break;
       case 'pending':
-        color = const Color(0xFFFF9500);
+        color = Colors.orange;
         label = AppLocalizations.of(context)!.activitiesStatusPending;
         icon = Symbols.schedule;
         break;
       case 'cancelled':
-        color = const Color(0xFFFF3B30);
+        color = theme.colorScheme.error;
         label = AppLocalizations.of(context)!.activitiesStatusCancelled;
         icon = Symbols.cancel;
         break;
       default:
-        color = Colors.grey;
+        color = theme.colorScheme.onSurfaceVariant;
         label = status.toUpperCase();
         icon = Symbols.info;
     }

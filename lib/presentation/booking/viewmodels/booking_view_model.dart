@@ -1,12 +1,13 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:flutter/material.dart';
-import 'package:bourgo_arena_mobile/data/models/activity.dart';
-import 'package:bourgo_arena_mobile/data/models/time_slot.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'dart:developer' as developer;
 
 /// ViewModel for the multi-step booking flow.
 class BookingViewModel extends ChangeNotifier {
-  final DataService _dataService;
+  final ActivityService _activityService;
 
   int _currentStep = 0;
   Activity? _selectedActivity;
@@ -17,12 +18,13 @@ class BookingViewModel extends ChangeNotifier {
   List<Activity> _activities = [];
   List<TimeSlot> _availableSlots = [];
   bool _isLoading = false;
+  String? _error;
 
   /// Creates a new [BookingViewModel] instance.
   BookingViewModel({
-    required DataService dataService,
+    required ActivityService activityService,
     Activity? initialActivity,
-  }) : _dataService = dataService,
+  }) : _activityService = activityService,
        _selectedActivity = initialActivity {
     if (_selectedActivity != null) {
       _currentStep = 1;
@@ -40,6 +42,7 @@ class BookingViewModel extends ChangeNotifier {
   List<Activity> get activities => _activities;
   List<TimeSlot> get availableSlots => _availableSlots;
   bool get isLoading => _isLoading;
+  String? get error => _error;
 
   void nextStep() {
     if (_currentStep < 2) {
@@ -81,22 +84,47 @@ class BookingViewModel extends ChangeNotifier {
 
   Future<void> _loadActivities() async {
     _isLoading = true;
+    _error = null;
     notifyListeners();
-    _activities = await _dataService.getActivities();
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _activityService.fetchActivities();
+      _activities = _activityService.activities;
+    } catch (e) {
+      _error = 'activities_loading_failed';
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   Future<void> _loadSlots() async {
-    if (_selectedActivity == null) return;
-    _isLoading = true;
-    notifyListeners();
-    // In a real app, we'd pass the date too.
     final activity = _selectedActivity;
-    if (activity != null) {
-      _availableSlots = await _dataService.getTimeSlots(activity.id);
-    }
-    _isLoading = false;
+    if (activity == null) return;
+
+    _isLoading = true;
+    _error = null;
     notifyListeners();
+
+    try {
+      developer.log(
+        'BookingViewModel: Loading slots for activity: ${activity.id}',
+      );
+      // In a real app, we'd pass the date too to the service.
+      _availableSlots = await _activityService.getTimeSlots(activity.id);
+      developer.log(
+        'BookingViewModel: Loaded ${_availableSlots.length} slots for ${activity.id}',
+      );
+    } catch (e, stack) {
+      developer.log(
+        'BookingViewModel: Error loading slots: $e',
+        error: e,
+        stackTrace: stack,
+      );
+      _error = 'slots_loading_failed';
+      _availableSlots = [];
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

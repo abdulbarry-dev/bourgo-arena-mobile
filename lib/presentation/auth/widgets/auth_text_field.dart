@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/theme.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 
 /// A custom themed text field for authentication screens.
@@ -7,6 +7,8 @@ class AuthTextField extends StatelessWidget {
   final String hint;
   final IconData? leadingIcon;
   final bool isPassword;
+  final bool readOnly;
+  final VoidCallback? onTap;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
   final TextInputType keyboardType;
@@ -17,6 +19,8 @@ class AuthTextField extends StatelessWidget {
     required this.hint,
     this.leadingIcon,
     this.isPassword = false,
+    this.readOnly = false,
+    this.onTap,
     this.controller,
     this.validator,
     this.keyboardType = TextInputType.text,
@@ -43,9 +47,13 @@ class AuthTextField extends StatelessWidget {
         TextFormField(
           controller: controller,
           obscureText: isPassword,
+          readOnly: readOnly,
+          onTap: onTap,
           validator: validator,
           keyboardType: keyboardType,
-          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.white),
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
           decoration: InputDecoration(
             hintText: hint,
             prefixIcon: leadingIcon != null

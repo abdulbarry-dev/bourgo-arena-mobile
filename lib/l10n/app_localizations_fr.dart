@@ -54,6 +54,23 @@ class AppLocalizationsFr extends AppLocalizations {
       'Échec du chargement des données. Veuillez réessayer.';
 
   @override
+  String get commonGenderMale => 'Homme';
+
+  @override
+  String get commonGenderFemale => 'Femme';
+
+  @override
+  String get commonGenderOther => 'Autre';
+
+  @override
+  String get commonErrorOccurred =>
+      'Une erreur est survenue. Veuillez réessayer.';
+
+  @override
+  String get commonImagePickerPlaceholder =>
+      'Le sélecteur d\'image s\'ouvrirait ici';
+
+  @override
   String get navHome => 'ACCUEIL';
 
   @override
@@ -197,7 +214,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authOtpSubtitleDefault => 'votre numéro';
 
   @override
-  String get authOtpResendPrefix => 'Renvoyer le code dans ';
+  String authOtpResendTimer(Object seconds) {
+    return 'Renvoyer le code dans ${seconds}s';
+  }
 
   @override
   String get authNewPasswordTitle => 'Nouveau mot de passe';
@@ -283,10 +302,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileBenefit4 => '-10% au Pro Shop';
 
   @override
-  String get profileHistoryTitle => 'HISTORIQUE & CHECK-IN';
+  String get profileHistoryTitle => 'ACCÈS & HISTORIQUE';
 
   @override
-  String get profileTabCheckin => 'CHECK-IN';
+  String get profileTabCheckin => 'ACCÈS';
 
   @override
   String get profileTabHistory => 'HISTORIQUE';
@@ -300,6 +319,30 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get profileQrScanInstruction =>
       'Scannez ce code à l\'entrée pour valider votre présence.';
+
+  @override
+  String get profileAccessMethods => 'MÉTHODES D\'ACCÈS';
+
+  @override
+  String get profileAccessPin => 'Code PIN';
+
+  @override
+  String get profileAccessFingerprint => 'Empreinte digitale';
+
+  @override
+  String get profileAccessNfc => 'Carte NFC';
+
+  @override
+  String get profileStatusConfigured => 'Configuré';
+
+  @override
+  String get profileStatusNotConfigured => 'Non configuré';
+
+  @override
+  String get profileCheckinHistory => 'HISTORIQUE D\'ACCÈS';
+
+  @override
+  String get profileCheckinEntry => 'Entrée enregistrée';
 
   @override
   String get profileNoHistory => 'Aucune réservation passée.';
@@ -540,5 +583,152 @@ class AppLocalizationsFr extends AppLocalizations {
   String get passwordCurrentHint => 'Entrez votre mot de passe actuel';
 
   @override
-  String get passwordUpdateSuccess => 'Mot de passe mis à jour avec succès !';
+  String get passwordUpdateSuccess => 'Mot de passe mis à jour avec succès!';
+
+  @override
+  String get authFirstNameLabel => 'Prénom';
+
+  @override
+  String get authFirstNameHint => 'Entrez votre prénom';
+
+  @override
+  String get authLastNameLabel => 'Nom';
+
+  @override
+  String get authLastNameHint => 'Entrez votre nom';
+
+  @override
+  String get authBirthDateLabel => 'Date de naissance';
+
+  @override
+  String get authBirthDateHint => 'Sélectionnez votre date de naissance';
+
+  @override
+  String get profileFamilyAccount => 'Compte Famille';
+
+  @override
+  String get profileEnableFamilyAccount => 'Activer le compte famille';
+
+  @override
+  String get profileFamilyAccountDescription =>
+      'Gérez les profils et activités de vos enfants.';
+
+  @override
+  String get profileAddChild => 'Ajouter un enfant';
+
+  @override
+  String get profileNoChildren => 'Aucun profil d\'enfant ajouté.';
+
+  @override
+  String get profileChildName => 'Nom de l\'enfant';
+
+  @override
+  String get profileChildBirthDate => 'Date de naissance de l\'enfant';
+
+  @override
+  String get profileVerifyFamilyTitle => 'Vérifier le compte famille';
+
+  @override
+  String profileVerifyFamilySubtitle(Object identifier) {
+    return 'Pour activer le compte famille, nous devons vérifier votre identité. Entrez le code envoyé à votre $identifier.';
+  }
+
+  @override
+  String get profileFamilyEnabled => 'Compte famille activé avec succès !';
+
+  @override
+  String get authVerificationMethodTitle => 'Vérification de Sécurité';
+
+  @override
+  String get authVerificationMethodSubtitle =>
+      'Choisissez une méthode pour recevoir votre code de vérification.';
+
+  @override
+  String get authEmailMethod => 'Adresse E-mail';
+
+  @override
+  String get authPhoneMethod => 'Numéro de Téléphone';
+
+  @override
+  String get authMethodAccessInstruction =>
+      'Assurez-vous d\'avoir accès à la méthode sélectionnée.';
+
+  @override
+  String get authFamilyOnboardingTitle => 'Membres de la Famille';
+
+  @override
+  String get authFamilyOnboardingSubtitle =>
+      'Ajoutez les détails de vos membres de famille (Optionnel).';
+
+  @override
+  String get authAddMember => 'Ajouter un membre';
+
+  @override
+  String get authAddedMembers => 'Membres ajoutés';
+
+  @override
+  String get authDoItLater => 'Plus tard';
+
+  @override
+  String get authAccountOverviewTitle => 'Aperçu du Compte';
+
+  @override
+  String get authAccountOverviewSubtitle =>
+      'Vérifiez vos informations et téléchargez une photo de profil.';
+
+  @override
+  String get authProfilePictureRecommendation =>
+      'Nous vous recommandons de télécharger une photo claire de vous-même pour être reconnu à l\'entrée de l\'arène.';
+
+  @override
+  String get authConfirmContinue => 'Confirmer et continuer';
+
+  @override
+  String get authEditInformation => 'Modifier les informations';
+
+  @override
+  String get authPinSetupTitle => 'Code PIN Sécurisé';
+
+  @override
+  String get authPinSetupSubtitle =>
+      'Créez un code PIN à 4 chiffres pour votre premier accès.';
+
+  @override
+  String get authPinSetupInstruction =>
+      'Ce code PIN sera utilisé aux bornes de la salle.';
+
+  @override
+  String get authCompleteRegistration => 'Terminer l\'inscription';
+
+  @override
+  String get languageSelectionTitle => 'Bienvenue à Bourgo Arena';
+
+  @override
+  String get languageSelectionSubtitle =>
+      'Veuillez sélectionner votre langue préférée pour continuer';
+
+  @override
+  String get languageLabel => 'Choisir la langue';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageFrench => 'Français';
+
+  @override
+  String get authGenderLabel => 'Genre';
+
+  @override
+  String get authGenderHint => 'Sélectionnez le genre';
+
+  @override
+  String get errorNotFoundTitle => 'PAGE INTROUVABLE';
+
+  @override
+  String get errorNotFoundSubtitle =>
+      'Oups ! La page que vous cherchez n\'existe pas ou a été déplacée.';
+
+  @override
+  String get errorNotFoundAction => 'RETOUR À L\'ACCUEIL';
 }

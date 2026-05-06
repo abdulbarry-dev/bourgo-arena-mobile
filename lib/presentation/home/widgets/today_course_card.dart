@@ -7,11 +7,7 @@ class TodayCourseCard extends StatelessWidget {
   final Course course;
   final VoidCallback onTap;
 
-  const TodayCourseCard({
-    super.key,
-    required this.course,
-    required this.onTap,
-  });
+  const TodayCourseCard({super.key, required this.course, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +21,7 @@ class TodayCourseCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHighest.withAlpha(80),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: theme.colorScheme.outline.withAlpha(30),
-          ),
+          border: Border.all(color: theme.colorScheme.outline.withAlpha(30)),
         ),
         child: Row(
           children: [
@@ -86,7 +80,9 @@ class TodayCourseCard extends StatelessWidget {
                       Icon(
                         Symbols.person,
                         size: 14,
-                        color: theme.colorScheme.onSurfaceVariant.withAlpha(180),
+                        color: theme.colorScheme.onSurfaceVariant.withAlpha(
+                          180,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -110,9 +106,7 @@ class TodayCourseCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                course.isFull
-                    ? 'FULL'
-                    : '${course.remainingSpots} LEFT',
+                course.isFull ? 'FULL' : '${course.remainingSpots} LEFT',
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: course.isFull

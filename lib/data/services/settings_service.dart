@@ -34,6 +34,11 @@ class SettingsService {
     return Locale(localeCode);
   }
 
+  /// Checks if the user has explicitly selected a language.
+  bool isLanguageSelected() {
+    return _prefs.containsKey(_localeKey);
+  }
+
   /// Persists the [Locale].
   Future<void> setLocale(Locale locale) async {
     await _prefs.setString(_localeKey, locale.languageCode);

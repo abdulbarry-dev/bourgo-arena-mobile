@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
@@ -45,11 +45,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 const SizedBox(height: 32),
                 Text(
                   AppLocalizations.of(context)!.profileAdvantages,
-                  style: TextStyle(
-                    fontSize: 12,
+                  style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
-                    color: Colors.white54,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -123,26 +122,31 @@ class _ActivePlanCard extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
               ),
-              const Icon(Symbols.verified, color: Colors.white24, size: 40),
+              Icon(
+                Symbols.verified,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                size: 40,
+              ),
             ],
           ),
           const SizedBox(height: 24),
           Text(
             AppLocalizations.of(context)!.profileNextBilling,
-            style: const TextStyle(
-              color: Colors.white54,
-              fontSize: 10,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
               letterSpacing: 1,
             ),
           ),
           Text(
             profile?.subscriptionExpiry ?? '...',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 24),
           LinearProgressIndicator(
             value: 0.7,
-            backgroundColor: Colors.white12,
+            backgroundColor: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(2),
           ),
           const SizedBox(height: 8),
@@ -151,11 +155,15 @@ class _ActivePlanCard extends StatelessWidget {
             children: [
               Text(
                 AppLocalizations.of(context)!.profileMonthlyUsage,
-                style: const TextStyle(color: Colors.white54, fontSize: 12),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
               ),
-              const Text(
+              Text(
                 '70%',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),
@@ -184,7 +192,14 @@ class _BenefitItem extends StatelessWidget {
             size: 20,
           ),
           const SizedBox(width: 12),
-          Text(text, style: const TextStyle(color: Colors.white70)),
+          Expanded(
+            child: Text(
+              text,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
         ],
       ),
     );

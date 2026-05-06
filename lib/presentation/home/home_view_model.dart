@@ -1,23 +1,36 @@
-import 'package:bourgo_arena_mobile/data/models/activity.dart';
 import 'package:bourgo_arena_mobile/data/models/course.dart';
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
 /// ViewModel for the Home screen.
 class HomeViewModel extends ChangeNotifier {
+  final ActivityService _activityService;
   final DataService _dataService;
 
-  HomeViewModel({required DataService dataService})
-    : _dataService = dataService;
+  HomeViewModel({
+    required ActivityService activityService,
+    required DataService dataService,
+  }) : _activityService = activityService,
+       _dataService = dataService {
+    _activityService.addListener(notifyListeners);
+  }
+
+  @override
+  void dispose() {
+    _activityService.removeListener(notifyListeners);
+    super.dispose();
+  }
 
   int _currentIndex = 0;
   int get currentIndex => _currentIndex;
 
   bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  bool get isLoading => _isLoading || _activityService.isLoading;
 
-  List<Activity> _activities = [];
-  List<Activity> get activities => _activities;
+  List<Activity> get activities => _activityService.activities;
 
   List<Course> _todayCourses = [];
   List<Course> get todayCourses => _todayCourses;
@@ -29,18 +42,24 @@ class HomeViewModel extends ChangeNotifier {
 
   /// Loads all data required for the home screen.
   Future<void> loadHomeData() async {
+    developer.log('HomeViewModel: loadHomeData() started');
     _isLoading = true;
     notifyListeners();
 
     try {
-      final allActivities = await _dataService.getActivities();
-      _activities = allActivities;
+      // Load activities via ActivityService (Domain Entities)
+      await _activityService.fetchActivities();
 
+      // Load courses via DataService (for now)
       final allCourses = await _dataService.getCourses();
       final today = DateTime.now().weekday;
       _todayCourses = allCourses.where((c) => c.dayOfWeek == today).toList();
-    } catch (e) {
-      // In a real app, handle error
+
+      developer.log(
+        'Home Data Loaded: ${activities.length} activities, ${_todayCourses.length} courses for day $today',
+      );
+    } catch (e, stack) {
+      developer.log('Error loading home data: $e', error: e, stackTrace: stack);
     } finally {
       _isLoading = false;
       notifyListeners();

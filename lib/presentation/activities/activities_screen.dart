@@ -1,6 +1,8 @@
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/activities/activities_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
@@ -25,7 +27,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   @override
   void initState() {
     super.initState();
-    _viewModel = ActivitiesViewModel(dataService: DataService());
+    _viewModel = ActivitiesViewModel(dataService: locator<DataService>());
     _tabController = TabController(length: 2, vsync: this);
     _viewModel.loadData();
   }
@@ -47,32 +49,21 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
         return Scaffold(
           appBar: AppBar(
             backgroundColor: theme.colorScheme.surface,
-            title: Row(
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.commonAppNamePart1,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  AppLocalizations.of(context)!.commonAppNamePart2,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ],
+            title: Text(
+              AppLocalizations.of(context)!.appName.toUpperCase(),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontFamily: AppConstants.displayFontFamily,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 2.0,
+                fontSize: 18,
+              ),
             ),
             bottom: TabBar(
               controller: _tabController,
               indicatorColor: theme.colorScheme.primary,
               indicatorSize: TabBarIndicatorSize.tab,
               labelColor: theme.colorScheme.primary,
-              unselectedLabelColor: Colors.white70,
+              unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
               labelStyle: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -133,7 +124,7 @@ class _ActivitiesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       itemCount: viewModel.activities.length,
       itemBuilder: (context, index) {
         final activity = viewModel.activities[index];
@@ -180,12 +171,13 @@ class _ReservationsTab extends StatelessWidget {
         message: AppLocalizations.of(context)!.activitiesNoReservationsSubtitle,
         icon: Symbols.calendar_add_on,
         actionLabel: AppLocalizations.of(context)!.activitiesNoReservationsCTA,
-        onAction: () => MainLayout.tabController.value = 0, // Go to Explorer tab
+        onAction: () =>
+            MainLayout.tabController.value = 0, // Go to Explorer tab
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       itemCount: viewModel.reservations.length,
       itemBuilder: (context, index) {
         return ReservationCard(reservation: viewModel.reservations[index]);

@@ -60,38 +60,44 @@ class _StepCircle extends StatelessWidget {
     final theme = Theme.of(context);
     final color = isCompleted || isActive
         ? theme.colorScheme.primary
-        : Colors.white24;
+        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.24);
 
-    return Column(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isCompleted
-                ? theme.colorScheme.primary
-                : isActive
-                ? theme.colorScheme.primary.withAlpha(40)
-                : theme.colorScheme.surface,
-            border: Border.all(color: color, width: 1.5),
+    return SizedBox(
+      width: 80,
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isCompleted
+                  ? theme.colorScheme.primary
+                  : isActive
+                  ? theme.colorScheme.primary.withAlpha(40)
+                  : theme.colorScheme.surface,
+              border: Border.all(color: color, width: 1.5),
+            ),
+            child: Icon(
+              isCompleted ? Symbols.check : icon,
+              size: 20,
+              color: isCompleted ? theme.colorScheme.onPrimary : color,
+            ),
           ),
-          child: Icon(
-            isCompleted ? Symbols.check : icon,
-            size: 20,
-            color: isCompleted ? Colors.black : color,
+          const SizedBox(height: 8),
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.5,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: color,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -108,7 +114,9 @@ class _StepLine extends StatelessWidget {
       child: Container(
         height: 1.5,
         margin: const EdgeInsets.only(bottom: 24),
-        color: isCompleted ? theme.colorScheme.primary : Colors.white12,
+        color: isCompleted
+            ? theme.colorScheme.primary
+            : theme.colorScheme.outline.withValues(alpha: 0.12),
       ),
     );
   }

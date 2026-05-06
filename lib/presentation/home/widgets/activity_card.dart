@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/constants.dart';
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:flutter/material.dart';
 
 /// A card widget representing a sports activity.
@@ -38,7 +38,9 @@ class ActivityCard extends StatelessWidget {
               BlendMode.darken,
             ),
           ),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+          border: Border.all(
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
+          ),
         ),
         child: Stack(
           children: [

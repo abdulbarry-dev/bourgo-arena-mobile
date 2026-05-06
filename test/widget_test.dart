@@ -1,6 +1,8 @@
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/main.dart';
-import 'package:bourgo_arena_mobile/presentation/settings/settings_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,16 +11,28 @@ class MockSettingsViewModel extends Mock implements SettingsViewModel {}
 
 class MockAuthService extends Mock implements AuthService {}
 
+class MockActivityService extends Mock implements ActivityService {}
+
 void main() {
   late MockSettingsViewModel mockSettingsViewModel;
   late MockAuthService mockAuthService;
+  late MockActivityService mockActivityService;
 
-  setUp(() {
+  setUp(() async {
     mockSettingsViewModel = MockSettingsViewModel();
     mockAuthService = MockAuthService();
+    mockActivityService = MockActivityService();
+
+    // Reset locator before each test
+    await locator.reset();
+    locator.registerSingleton<ActivityService>(mockActivityService);
+
     when(() => mockSettingsViewModel.themeMode).thenReturn(ThemeMode.dark);
     when(() => mockSettingsViewModel.locale).thenReturn(const Locale('fr'));
+    when(() => mockSettingsViewModel.isLanguageSelected).thenReturn(true);
     when(() => mockAuthService.isAuthenticated).thenReturn(false);
+    when(() => mockAuthService.addListener(any())).thenReturn(null);
+    when(() => mockSettingsViewModel.addListener(any())).thenReturn(null);
   });
 
   testWidgets('Onboarding screen smoke test', (WidgetTester tester) async {

@@ -182,6 +182,36 @@ abstract class AppLocalizations {
   /// **'Échec du chargement des données. Veuillez réessayer.'**
   String get commonLoadingFailed;
 
+  /// No description provided for @commonGenderMale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Homme'**
+  String get commonGenderMale;
+
+  /// No description provided for @commonGenderFemale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Femme'**
+  String get commonGenderFemale;
+
+  /// No description provided for @commonGenderOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autre'**
+  String get commonGenderOther;
+
+  /// No description provided for @commonErrorOccurred.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur est survenue. Veuillez réessayer.'**
+  String get commonErrorOccurred;
+
+  /// No description provided for @commonImagePickerPlaceholder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le sélecteur d\'image s\'ouvrirait ici'**
+  String get commonImagePickerPlaceholder;
+
   /// No description provided for @navHome.
   ///
   /// In fr, this message translates to:
@@ -458,11 +488,11 @@ abstract class AppLocalizations {
   /// **'votre numéro'**
   String get authOtpSubtitleDefault;
 
-  /// No description provided for @authOtpResendPrefix.
+  /// No description provided for @authOtpResendTimer.
   ///
   /// In fr, this message translates to:
-  /// **'Renvoyer le code dans '**
-  String get authOtpResendPrefix;
+  /// **'Renvoyer le code dans {seconds}s'**
+  String authOtpResendTimer(Object seconds);
 
   /// No description provided for @authNewPasswordTitle.
   ///
@@ -629,13 +659,13 @@ abstract class AppLocalizations {
   /// No description provided for @profileHistoryTitle.
   ///
   /// In fr, this message translates to:
-  /// **'HISTORIQUE & CHECK-IN'**
+  /// **'ACCÈS & HISTORIQUE'**
   String get profileHistoryTitle;
 
   /// No description provided for @profileTabCheckin.
   ///
   /// In fr, this message translates to:
-  /// **'CHECK-IN'**
+  /// **'ACCÈS'**
   String get profileTabCheckin;
 
   /// No description provided for @profileTabHistory.
@@ -661,6 +691,54 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Scannez ce code à l\'entrée pour valider votre présence.'**
   String get profileQrScanInstruction;
+
+  /// No description provided for @profileAccessMethods.
+  ///
+  /// In fr, this message translates to:
+  /// **'MÉTHODES D\'ACCÈS'**
+  String get profileAccessMethods;
+
+  /// No description provided for @profileAccessPin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code PIN'**
+  String get profileAccessPin;
+
+  /// No description provided for @profileAccessFingerprint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Empreinte digitale'**
+  String get profileAccessFingerprint;
+
+  /// No description provided for @profileAccessNfc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte NFC'**
+  String get profileAccessNfc;
+
+  /// No description provided for @profileStatusConfigured.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configuré'**
+  String get profileStatusConfigured;
+
+  /// No description provided for @profileStatusNotConfigured.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non configuré'**
+  String get profileStatusNotConfigured;
+
+  /// No description provided for @profileCheckinHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'HISTORIQUE D\'ACCÈS'**
+  String get profileCheckinHistory;
+
+  /// No description provided for @profileCheckinEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrée enregistrée'**
+  String get profileCheckinEntry;
 
   /// No description provided for @profileNoHistory.
   ///
@@ -1133,8 +1211,278 @@ abstract class AppLocalizations {
   /// No description provided for @passwordUpdateSuccess.
   ///
   /// In fr, this message translates to:
-  /// **'Mot de passe mis à jour avec succès !'**
+  /// **'Mot de passe mis à jour avec succès!'**
   String get passwordUpdateSuccess;
+
+  /// No description provided for @authFirstNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prénom'**
+  String get authFirstNameLabel;
+
+  /// No description provided for @authFirstNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez votre prénom'**
+  String get authFirstNameHint;
+
+  /// No description provided for @authLastNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom'**
+  String get authLastNameLabel;
+
+  /// No description provided for @authLastNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez votre nom'**
+  String get authLastNameHint;
+
+  /// No description provided for @authBirthDateLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de naissance'**
+  String get authBirthDateLabel;
+
+  /// No description provided for @authBirthDateHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez votre date de naissance'**
+  String get authBirthDateHint;
+
+  /// No description provided for @profileFamilyAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte Famille'**
+  String get profileFamilyAccount;
+
+  /// No description provided for @profileEnableFamilyAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer le compte famille'**
+  String get profileEnableFamilyAccount;
+
+  /// No description provided for @profileFamilyAccountDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérez les profils et activités de vos enfants.'**
+  String get profileFamilyAccountDescription;
+
+  /// No description provided for @profileAddChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un enfant'**
+  String get profileAddChild;
+
+  /// No description provided for @profileNoChildren.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun profil d\'enfant ajouté.'**
+  String get profileNoChildren;
+
+  /// No description provided for @profileChildName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de l\'enfant'**
+  String get profileChildName;
+
+  /// No description provided for @profileChildBirthDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de naissance de l\'enfant'**
+  String get profileChildBirthDate;
+
+  /// No description provided for @profileVerifyFamilyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier le compte famille'**
+  String get profileVerifyFamilyTitle;
+
+  /// No description provided for @profileVerifyFamilySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour activer le compte famille, nous devons vérifier votre identité. Entrez le code envoyé à votre {identifier}.'**
+  String profileVerifyFamilySubtitle(Object identifier);
+
+  /// No description provided for @profileFamilyEnabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte famille activé avec succès !'**
+  String get profileFamilyEnabled;
+
+  /// No description provided for @authVerificationMethodTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification de Sécurité'**
+  String get authVerificationMethodTitle;
+
+  /// No description provided for @authVerificationMethodSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez une méthode pour recevoir votre code de vérification.'**
+  String get authVerificationMethodSubtitle;
+
+  /// No description provided for @authEmailMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse E-mail'**
+  String get authEmailMethod;
+
+  /// No description provided for @authPhoneMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de Téléphone'**
+  String get authPhoneMethod;
+
+  /// No description provided for @authMethodAccessInstruction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Assurez-vous d\'avoir accès à la méthode sélectionnée.'**
+  String get authMethodAccessInstruction;
+
+  /// No description provided for @authFamilyOnboardingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membres de la Famille'**
+  String get authFamilyOnboardingTitle;
+
+  /// No description provided for @authFamilyOnboardingSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoutez les détails de vos membres de famille (Optionnel).'**
+  String get authFamilyOnboardingSubtitle;
+
+  /// No description provided for @authAddMember.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un membre'**
+  String get authAddMember;
+
+  /// No description provided for @authAddedMembers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membres ajoutés'**
+  String get authAddedMembers;
+
+  /// No description provided for @authDoItLater.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus tard'**
+  String get authDoItLater;
+
+  /// No description provided for @authAccountOverviewTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aperçu du Compte'**
+  String get authAccountOverviewTitle;
+
+  /// No description provided for @authAccountOverviewSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez vos informations et téléchargez une photo de profil.'**
+  String get authAccountOverviewSubtitle;
+
+  /// No description provided for @authProfilePictureRecommendation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous vous recommandons de télécharger une photo claire de vous-même pour être reconnu à l\'entrée de l\'arène.'**
+  String get authProfilePictureRecommendation;
+
+  /// No description provided for @authConfirmContinue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer et continuer'**
+  String get authConfirmContinue;
+
+  /// No description provided for @authEditInformation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier les informations'**
+  String get authEditInformation;
+
+  /// No description provided for @authPinSetupTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code PIN Sécurisé'**
+  String get authPinSetupTitle;
+
+  /// No description provided for @authPinSetupSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créez un code PIN à 4 chiffres pour votre premier accès.'**
+  String get authPinSetupSubtitle;
+
+  /// No description provided for @authPinSetupInstruction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce code PIN sera utilisé aux bornes de la salle.'**
+  String get authPinSetupInstruction;
+
+  /// No description provided for @authCompleteRegistration.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminer l\'inscription'**
+  String get authCompleteRegistration;
+
+  /// No description provided for @languageSelectionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bienvenue à Bourgo Arena'**
+  String get languageSelectionTitle;
+
+  /// No description provided for @languageSelectionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez sélectionner votre langue préférée pour continuer'**
+  String get languageSelectionSubtitle;
+
+  /// No description provided for @languageLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir la langue'**
+  String get languageLabel;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In fr, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @languageFrench.
+  ///
+  /// In fr, this message translates to:
+  /// **'Français'**
+  String get languageFrench;
+
+  /// No description provided for @authGenderLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Genre'**
+  String get authGenderLabel;
+
+  /// No description provided for @authGenderHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez le genre'**
+  String get authGenderHint;
+
+  /// No description provided for @errorNotFoundTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAGE INTROUVABLE'**
+  String get errorNotFoundTitle;
+
+  /// No description provided for @errorNotFoundSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oups ! La page que vous cherchez n\'existe pas ou a été déplacée.'**
+  String get errorNotFoundSubtitle;
+
+  /// No description provided for @errorNotFoundAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'RETOUR À L\'ACCUEIL'**
+  String get errorNotFoundAction;
 }
 
 class _AppLocalizationsDelegate

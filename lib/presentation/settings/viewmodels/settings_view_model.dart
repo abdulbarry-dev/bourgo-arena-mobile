@@ -21,6 +21,9 @@ class SettingsViewModel extends ChangeNotifier {
   /// The current [Locale].
   Locale get locale => _locale;
 
+  /// Whether the user has explicitly selected a language.
+  bool get isLanguageSelected => _settingsService.isLanguageSelected();
+
   /// Whether push notifications are enabled.
   bool get notificationsEnabled => _notificationsEnabled;
 

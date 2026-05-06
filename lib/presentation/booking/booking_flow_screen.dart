@@ -1,7 +1,7 @@
-import 'package:bourgo_arena_mobile/data/models/activity.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/booking/booking_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/payment_step.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/select_sport_step.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/select_time_step.dart';
@@ -12,8 +12,13 @@ import 'package:flutter/material.dart';
 class BookingFlowScreen extends StatefulWidget {
   /// Optional activity to start the booking flow with.
   final Activity? initialActivity;
+  final ActivityService activityService;
 
-  const BookingFlowScreen({super.key, this.initialActivity});
+  const BookingFlowScreen({
+    super.key,
+    this.initialActivity,
+    required this.activityService,
+  });
 
   @override
   State<BookingFlowScreen> createState() => _BookingFlowScreenState();
@@ -26,7 +31,7 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
   void initState() {
     super.initState();
     _viewModel = BookingViewModel(
-      dataService: DataService(),
+      activityService: widget.activityService,
       initialActivity: widget.initialActivity,
     );
   }
