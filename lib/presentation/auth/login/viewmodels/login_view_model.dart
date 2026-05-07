@@ -1,9 +1,10 @@
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Login screen.
 class LoginViewModel extends ChangeNotifier {
-  final AuthService _authService;
+  final LoginUseCase _loginUseCase;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController identifierController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -11,7 +12,7 @@ class LoginViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  LoginViewModel(this._authService);
+  LoginViewModel(this._loginUseCase);
 
   void setLoading(bool value) {
     _isLoading = value;
@@ -22,19 +23,19 @@ class LoginViewModel extends ChangeNotifier {
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
 
-      try {
-        await _authService.login(
-          identifierController.text,
-          passwordController.text,
-        );
-      } catch (e) {
+      final result = await _loginUseCase(
+        identifierController.text,
+        passwordController.text,
+      );
+
+      setLoading(false);
+
+      if (result case Failure failure) {
         if (context.mounted) {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('Login failed: $e')));
+          ).showSnackBar(SnackBar(content: Text(failure.message)));
         }
-      } finally {
-        setLoading(false);
       }
       // Note: GoRouter redirect in router.dart will handle navigation on success
     }

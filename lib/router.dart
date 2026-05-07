@@ -29,6 +29,9 @@ import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_scree
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/onboarding/language_selection_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -88,11 +91,15 @@ GoRouter createRouter(
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
     GoRoute(
       path: '/login',
-      builder: (context, state) => LoginScreen(authService: authService),
+      builder: (context, state) => LoginScreen(
+        loginUseCase: locator<LoginUseCase>(),
+      ),
     ),
     GoRoute(
       path: '/register',
-      builder: (context, state) => const RegisterScreen(),
+      builder: (context, state) => RegisterScreen(
+        registerUseCase: locator<RegisterUseCase>(),
+      ),
     ),
     GoRoute(
       path: '/otp',

@@ -5,19 +5,7 @@ class AppConfig {
   /// The base URL for the production API.
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'https://api.bourgoarena.tn',
-  );
-
-  /// Whether to use mock data instead of calling the real API.
-  static const bool useMockData = bool.fromEnvironment(
-    'USE_MOCK_DATA',
-    defaultValue: true,
-  );
-
-  /// Whether to use the mock server interceptor.
-  static const bool useMockServer = bool.fromEnvironment(
-    'USE_MOCK_SERVER',
-    defaultValue: false,
+    defaultValue: 'https://api.bourgoarena.tn/api',
   );
 
   /// The timeout duration for API requests in milliseconds.

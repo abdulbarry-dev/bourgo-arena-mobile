@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.da
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen that prompts the user to select their preferred language.
@@ -22,138 +23,123 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final currentLocale = widget.viewModel.locale;
 
     return Scaffold(
-      body: AuthBackground(
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const SizedBox(height: 40),
+      body: ListenableBuilder(
+        listenable: widget.viewModel,
+        builder: (context, _) {
+          final currentLocale = widget.viewModel.locale;
+          final l10n = AppLocalizations.of(context)!;
 
-                        // Brand Header
-                        Center(
-                          child: Hero(
-                            tag: 'app_logo',
-                            child: Container(
-                              padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary
-                                    .withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: theme.colorScheme.primary
-                                        .withValues(alpha: 0.1),
-                                    blurRadius: 40,
-                                    spreadRadius: 10,
-                                  ),
-                                ],
-                              ),
-                              child: const BrandLogo(
-                                size: 80,
-                                useVertical: true,
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 48),
-
-                        Text(
-                          l10n.languageSelectionTitle,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.displaySmall?.copyWith(
-                            color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        Text(
-                          l10n.languageSelectionSubtitle,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-
-                        const SizedBox(height: 48),
-
-                        // Professional Selection UI
-                        Column(
+          return AuthBackground(
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            _LanguageOption(
-                              label: l10n.languageEnglish,
-                              code: 'EN',
-                              isSelected: currentLocale.languageCode == 'en',
-                              onTap: () => widget.viewModel.updateLocale(
-                                const Locale('en'),
+                            const SizedBox(height: 40),
+
+                            // Brand Header
+                            const Center(
+                              child: BrandLogo(
+                                size: 100,
+                                useVertical: true,
+                                isPremium: true,
+                                heroTag: 'app_logo',
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            _LanguageOption(
-                              label: l10n.languageFrench,
-                              code: 'FR',
-                              isSelected: currentLocale.languageCode == 'fr',
-                              onTap: () => widget.viewModel.updateLocale(
-                                const Locale('fr'),
+
+                            const SizedBox(height: 48),
+
+                            Text(
+                              l10n.languageSelectionTitle,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.displaySmall?.copyWith(
+                                color: theme.colorScheme.onSurface,
+                                fontWeight: FontWeight.w900,
                               ),
                             ),
+
+                            const SizedBox(height: 16),
+
+                            Text(
+                              l10n.languageSelectionSubtitle,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+
+                            const SizedBox(height: 48),
+
+                            // Professional Selection UI
+                            Column(
+                              children: [
+                                _LanguageOption(
+                                  label: l10n.languageEnglish,
+                                  code: 'EN',
+                                  isSelected:
+                                      currentLocale.languageCode == 'en',
+                                  onTap: () => widget.viewModel.updateLocale(
+                                    const Locale('en'),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                _LanguageOption(
+                                  label: l10n.languageFrench,
+                                  code: 'FR',
+                                  isSelected:
+                                      currentLocale.languageCode == 'fr',
+                                  onTap: () => widget.viewModel.updateLocale(
+                                    const Locale('fr'),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 48),
+
+                            // Continue Button
+                            ElevatedButton(
+                              onPressed: () {
+                                // Proceed to onboarding or home
+                                context.go('/onboarding');
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                              ),
+                              child: Text(l10n.commonStart),
+                            ),
+
+                            const SizedBox(height: 48),
+
+                            // Brand Footer (Official Logo)
+                            const Center(
+                              child: BrandLogo(size: 32, useVertical: true),
+                            ),
+                            const SizedBox(height: 24),
                           ],
                         ),
-
-                        const SizedBox(height: 48),
-
-                        // Continue Button
-                        ElevatedButton(
-                          onPressed: () {
-                            // Already updated locale, just proceed if needed
-                            // For now, we stay on the screen until user hits continue
-                            // which might redirect via router if they are done.
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 16,
-                            ),
-                          ),
-                          child: Text(l10n.commonStart),
-                        ),
-
-                        const SizedBox(height: 48),
-
-                        // Brand Footer (Official Logo)
-                        const Center(
-                          child: BrandLogo(
-                            size: 32,
-                            useVertical: true,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
       ),
     );
   }

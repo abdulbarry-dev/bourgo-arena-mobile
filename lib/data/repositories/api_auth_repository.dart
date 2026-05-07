@@ -15,16 +15,19 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<User> login(String email, String password) async {
-    final response = await _apiClient.post('/auth/login', {
-      'email': email,
-      'password': password,
-    });
+    final response =
+        await _apiClient.post('/auth/login', {
+              'email': email,
+              'password': password,
+            })
+            as Map<String, dynamic>;
 
     final token = response['token'] as String;
     _apiClient.setToken(token);
 
     // Fetch user profile after login
-    final userResponse = await _apiClient.get('/user/profile');
+    final userResponse =
+        await _apiClient.get('/user/profile') as Map<String, dynamic>;
     final userModel = UserProfileModel.fromJson(userResponse);
     final user = UserMapper.toEntity(userModel);
 
@@ -34,9 +37,14 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    await _apiClient.post('/auth/logout', {});
-    _apiClient.setToken(null);
-    _authStateController.add(null);
+    try {
+      await _apiClient.post('/auth/logout', {});
+    } catch (_) {
+      // Ignore logout errors (e.g. token already expired)
+    } finally {
+      _apiClient.setToken(null);
+      _authStateController.add(null);
+    }
   }
 
   @override
@@ -49,11 +57,11 @@ class ApiAuthRepository implements AuthRepository {
     bool isFamilyAccount = false,
   }) async {
     await _apiClient.post('/auth/register', {
-      'first_name': firstName,
-      'last_name': lastName,
+      'name': '$firstName $lastName',
       'email': email,
       'phone': phone,
       'password': password,
+      'password_confirmation': password, // Ideally passed from UI
       'is_family_account': isFamilyAccount,
     });
   }
@@ -65,10 +73,12 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<bool> verifyOtp(String identifier, String otp) async {
-    final response = await _apiClient.post('/auth/verify-otp', {
-      'identifier': identifier,
-      'otp': otp,
-    });
+    final response =
+        await _apiClient.post('/auth/verify-otp', {
+              'identifier': identifier,
+              'otp': otp,
+            })
+            as Map<String, dynamic>;
     return response['success'] == true;
   }
 
@@ -79,22 +89,18 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<void> completeRegistration(User user) async {
-    // This would typically be a multi-part form or a complex JSON object
-    // depending on the backend requirements for profile completion.
     await _apiClient.post('/auth/complete-registration', {
-      'first_name': user.firstName,
-      'last_name': user.lastName,
+      'name': '${user.firstName} ${user.lastName}',
       'email': user.email,
       'phone': user.phone,
       'is_parent_account': user.isParentAccount,
-      // Add other fields as needed by the API
     });
     _authStateController.add(user);
   }
 
   @override
   Future<String?> getToken() async {
-    // In a real app, this might come from secure storage
+    // In a production app, this would be retrieved from secure storage (e.g. flutter_secure_storage)
     return null;
   }
 

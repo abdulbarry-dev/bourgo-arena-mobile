@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/viewmodels/login_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -10,9 +10,9 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// The login screen for Bourgo Arena.
 class LoginScreen extends StatefulWidget {
-  final AuthService authService;
+  final LoginUseCase loginUseCase;
 
-  const LoginScreen({super.key, required this.authService});
+  const LoginScreen({super.key, required this.loginUseCase});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = LoginViewModel(widget.authService);
+    _viewModel = LoginViewModel(widget.loginUseCase);
   }
 
   @override

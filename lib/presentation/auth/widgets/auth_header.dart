@@ -46,6 +46,7 @@ class AuthHeader extends StatelessWidget {
           child: BrandLogo(
             size: 100,
             useVertical: true,
+            isPremium: true,
             heroTag: 'app_logo',
           ),
         ),

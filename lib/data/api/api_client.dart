@@ -16,7 +16,7 @@ class ApiClient {
   }
 
   /// Sends a GET request to the specified [path].
-  Future<Map<String, dynamic>> get(String path) async {
+  Future<dynamic> get(String path) async {
     final response = await _client.get(
       Uri.parse('$baseUrl$path'),
       headers: _headers,
@@ -25,7 +25,7 @@ class ApiClient {
   }
 
   /// Sends a POST request to the specified [path] with [body].
-  Future<Map<String, dynamic>> post(String path, dynamic body) async {
+  Future<dynamic> post(String path, dynamic body) async {
     final response = await _client.post(
       Uri.parse('$baseUrl$path'),
       headers: _headers,
@@ -35,7 +35,7 @@ class ApiClient {
   }
 
   /// Sends a PUT request to the specified [path] with [body].
-  Future<Map<String, dynamic>> put(String path, dynamic body) async {
+  Future<dynamic> put(String path, dynamic body) async {
     final response = await _client.put(
       Uri.parse('$baseUrl$path'),
       headers: _headers,
@@ -64,10 +64,10 @@ class ApiClient {
     return headers;
   }
 
-  Map<String, dynamic> _handleResponse(http.Response response) {
+  dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      if (response.body.isEmpty) return {};
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.body.isEmpty) return null;
+      return jsonDecode(response.body);
     } else {
       // TODO: Implement custom exception handling
       throw Exception('API Error: ${response.statusCode} ${response.body}');

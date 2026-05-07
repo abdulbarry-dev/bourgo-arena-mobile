@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const BrandLogo(size: 32),
+                const BrandLogo(size: 32, isPremium: true),
                 const SizedBox(width: 12),
                 Text(
                   AppLocalizations.of(context)!.appName.toUpperCase(),

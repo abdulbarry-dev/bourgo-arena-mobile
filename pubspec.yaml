@@ -44,7 +44,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   shared_preferences: ^2.5.5
-  flutter_api_mock_server: ^0.0.1
   http: ^1.6.0
   get_it: ^9.2.1
 
@@ -75,7 +74,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/data/
     - assets/icons/app_icon.png
     - assets/icons/brandmark-vert.png
     - assets/images/
