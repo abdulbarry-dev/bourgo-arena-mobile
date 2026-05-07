@@ -15,6 +15,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tagline => 'Le QG du Sport à Djerba';
 
   @override
+  String get onboardingTitle => 'REPOUSSEZ VOS LIMITES';
+
+  @override
+  String get onboardingSubtitle =>
+      'Découvrez le centre de performance sportive ultime au cœur de Djerba.';
+
+  @override
   String get commonRetry => 'RÉESSAYER';
 
   @override

@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -8,11 +9,14 @@ class AuthHeader extends StatelessWidget {
   final String subtitle;
   final bool? showBackButton;
 
+  final Color? subtitleColor;
+
   const AuthHeader({
     super.key,
     required this.title,
     required this.subtitle,
     this.showBackButton,
+    this.subtitleColor,
   });
 
   @override
@@ -27,21 +31,25 @@ class AuthHeader extends StatelessWidget {
         if (effectiveShowBackButton) ...[
           IconButton(
             onPressed: () => context.pop(),
-            icon: const Icon(Symbols.arrow_back, color: Colors.white),
+            icon: Icon(Symbols.arrow_back, color: theme.colorScheme.onSurface),
             padding: EdgeInsets.zero,
             alignment: Alignment.centerLeft,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
         ],
+        const BrandLogo(size: 48, heroTag: 'app_logo'),
+        const SizedBox(height: 24),
         Text(
           title,
-          style: theme.textTheme.headlineLarge?.copyWith(color: Colors.white),
+          style: theme.textTheme.headlineLarge?.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         const SizedBox(height: 8),
         Text(
           subtitle,
           style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurface.withAlpha((0.65 * 255).round()),
+            color: subtitleColor ?? theme.colorScheme.onSurfaceVariant,
           ),
         ),
       ],

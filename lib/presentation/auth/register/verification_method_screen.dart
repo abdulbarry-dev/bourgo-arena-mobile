@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -20,13 +21,8 @@ class VerificationMethodScreen extends StatelessWidget {
     final email = registrationData['email'] as String;
     final phone = registrationData['phone'] as String;
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
-      body: SafeArea(
+    return AuthBackground(
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
           child: Column(
@@ -94,9 +90,9 @@ class _MethodCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: appColors.bgElevated,
+        color: theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: appColors.bgBorder),
+        border: Border.all(color: theme.colorScheme.outlineVariant),
       ),
       child: Material(
         color: Colors.transparent,

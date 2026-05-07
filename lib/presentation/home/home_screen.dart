@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/ticker_strip.dart';
@@ -58,14 +59,20 @@ class _HomeScreenState extends State<HomeScreen> {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            title: Text(
-              AppLocalizations.of(context)!.appName.toUpperCase(),
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontFamily: AppConstants.displayFontFamily,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2.0,
-                fontSize: 18,
-              ),
+            title: Row(
+              children: [
+                const BrandLogo(size: 28),
+                const SizedBox(width: 12),
+                Text(
+                  AppLocalizations.of(context)!.appName.toUpperCase(),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontFamily: AppConstants.displayFontFamily,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 2.0,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
             ),
             actions: [
               IconButton(

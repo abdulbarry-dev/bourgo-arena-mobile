@@ -110,6 +110,18 @@ abstract class AppLocalizations {
   /// **'Le QG du Sport à Djerba'**
   String get tagline;
 
+  /// No description provided for @onboardingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'REPOUSSEZ VOS LIMITES'**
+  String get onboardingTitle;
+
+  /// No description provided for @onboardingSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Découvrez le centre de performance sportive ultime au cœur de Djerba.'**
+  String get onboardingSubtitle;
+
   /// No description provided for @commonRetry.
   ///
   /// In fr, this message translates to:

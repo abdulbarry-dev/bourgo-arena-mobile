@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/viewmodels/login_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:flutter/material.dart';
@@ -34,103 +35,109 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListenableBuilder(
-        listenable: _viewModel,
-        builder: (context, _) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _viewModel.formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AuthHeader(
-                      title: AppLocalizations.of(context)!.authLoginTitle,
-                      subtitle: AppLocalizations.of(context)!.authLoginSubtitle,
-                    ),
-                    const SizedBox(height: 48),
-                    AuthTextField(
-                      label: AppLocalizations.of(context)!.authIdentifierLabel,
-                      hint: AppLocalizations.of(context)!.authEmailHint,
-                      leadingIcon: Symbols.person,
-                      controller: _viewModel.identifierController,
-                      validator: (value) => value?.isEmpty ?? true
-                          ? AppLocalizations.of(context)!.commonRequiredField
-                          : null,
-                    ),
-                    const SizedBox(height: 24),
-                    AuthTextField(
-                      label: AppLocalizations.of(context)!.authPasswordLabel,
-                      hint: AppLocalizations.of(context)!.authPasswordHint,
-                      leadingIcon: Symbols.lock,
-                      isPassword: true,
-                      controller: _viewModel.passwordController,
-                      validator: (value) => value?.isEmpty ?? true
-                          ? AppLocalizations.of(context)!.commonRequiredField
-                          : null,
-                    ),
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => context.push('/forgot-password'),
-                        child: Text(
-                          AppLocalizations.of(context)!.authForgotPassword,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.primary,
-                            fontSize: 12,
-                          ),
-                        ),
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    return AuthBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: ListenableBuilder(
+          listenable: _viewModel,
+          builder: (context, _) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _viewModel.formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AuthHeader(
+                        title: l10n.authLoginTitle,
+                        subtitle: l10n.authLoginSubtitle,
                       ),
-                    ),
-                    const SizedBox(height: 32),
-                    ElevatedButton(
-                      onPressed: _viewModel.isLoading
-                          ? null
-                          : () => _viewModel.login(context),
-                      child: _viewModel.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.black,
-                              ),
-                            )
-                          : Text(AppLocalizations.of(context)!.authLogin),
-                    ),
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!.authNoAccount,
-                          style: TextStyle(
-                            color: Colors.white.withAlpha((0.65 * 255).round()),
-                            fontSize: 14,
-                          ),
-                        ),
-                        TextButton(
-                          onPressed: () => context.push('/register'),
+                      const SizedBox(height: 48),
+                      AuthTextField(
+                        label: l10n.authIdentifierLabel,
+                        hint: l10n.authEmailHint,
+                        leadingIcon: Symbols.person,
+                        controller: _viewModel.identifierController,
+                        validator: (value) => value?.isEmpty ?? true
+                            ? l10n.commonRequiredField
+                            : null,
+                      ),
+                      const SizedBox(height: 24),
+                      AuthTextField(
+                        label: l10n.authPasswordLabel,
+                        hint: l10n.authPasswordHint,
+                        leadingIcon: Symbols.lock,
+                        isPassword: true,
+                        controller: _viewModel.passwordController,
+                        validator: (value) => value?.isEmpty ?? true
+                            ? l10n.commonRequiredField
+                            : null,
+                      ),
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => context.push('/forgot-password'),
                           child: Text(
-                            AppLocalizations.of(context)!.authRegister,
+                            l10n.authForgotPassword,
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                              color: theme.colorScheme.primary,
+                              fontSize: 12,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 32),
+                      ElevatedButton(
+                        onPressed: _viewModel.isLoading
+                            ? null
+                            : () => _viewModel.login(context),
+                        child: _viewModel.isLoading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.colorScheme.onPrimary,
+                                ),
+                              )
+                            : Text(l10n.authLogin),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            l10n.authNoAccount,
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontSize: 14,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => context.push('/register'),
+                            child: Text(
+                              l10n.authRegister,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

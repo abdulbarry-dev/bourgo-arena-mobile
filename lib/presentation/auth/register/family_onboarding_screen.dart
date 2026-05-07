@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/viewmodels/family_onboarding_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:flutter/material.dart';
@@ -64,89 +65,96 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
+    return AuthBackground(
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        actions: [
-          TextButton(
-            onPressed: _onContinue,
-            child: Text(
-              l10n.authDoItLater,
-              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          actions: [
+            TextButton(
+              onPressed: _onContinue,
+              child: Text(
+                l10n.authDoItLater,
+                style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: ListenableBuilder(
-        listenable: _viewModel,
-        builder: (context, _) {
-          return SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        AuthHeader(
-                          title: l10n.authFamilyOnboardingTitle,
-                          subtitle: l10n.authFamilyOnboardingSubtitle,
-                        ),
-                        const SizedBox(height: 32),
-                      ],
+            const SizedBox(width: 16),
+          ],
+        ),
+        body: ListenableBuilder(
+          listenable: _viewModel,
+          builder: (context, _) {
+            return SafeArea(
+              child: CustomScrollView(
+                slivers: [
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AuthHeader(
+                            title: l10n.authFamilyOnboardingTitle,
+                            subtitle: l10n.authFamilyOnboardingSubtitle,
+                            subtitleColor: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                if (_viewModel.members.isNotEmpty)
-                  SliverToBoxAdapter(
-                    child: _MembersList(
-                      members: _viewModel.members,
-                      onRemove: _viewModel.removeMember,
+                  if (_viewModel.members.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: _MembersList(
+                        members: _viewModel.members,
+                        onRemove: _viewModel.removeMember,
+                      ),
+                    ),
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                      vertical: 24.0,
+                    ),
+                    sliver: SliverToBoxAdapter(
+                      child: Column(
+                        children: [
+                          FamilyMemberForm(
+                            firstNameController: _viewModel.firstNameController,
+                            lastNameController: _viewModel.lastNameController,
+                            birthDateController: _viewModel.birthDateController,
+                            selectedGender: _viewModel.selectedGender,
+                            onGenderChanged: _viewModel.setGender,
+                            onSelectBirthDate: _selectBirthDate,
+                            onAdd: _viewModel.addMember,
+                            firstNameError: _viewModel.hasFirstNameError
+                                ? l10n.commonRequiredField
+                                : null,
+                            lastNameError: _viewModel.hasLastNameError
+                                ? l10n.commonRequiredField
+                                : null,
+                            genderError: _viewModel.hasGenderError
+                                ? l10n.commonRequiredField
+                                : null,
+                            birthDateError: _viewModel.hasBirthDateError
+                                ? l10n.commonRequiredField
+                                : null,
+                          ),
+                          const SizedBox(height: 48),
+                          ElevatedButton(
+                            onPressed: _onContinue,
+                            child: Text(l10n.commonStart),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                SliverPadding(
-                  padding: const EdgeInsets.all(24.0),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        FamilyMemberForm(
-                          firstNameController: _viewModel.firstNameController,
-                          lastNameController: _viewModel.lastNameController,
-                          birthDateController: _viewModel.birthDateController,
-                          selectedGender: _viewModel.selectedGender,
-                          onGenderChanged: _viewModel.setGender,
-                          onSelectBirthDate: _selectBirthDate,
-                          onAdd: _viewModel.addMember,
-                          firstNameError: _viewModel.hasFirstNameError
-                              ? l10n.commonRequiredField
-                              : null,
-                          lastNameError: _viewModel.hasLastNameError
-                              ? l10n.commonRequiredField
-                              : null,
-                          genderError: _viewModel.hasGenderError
-                              ? l10n.commonRequiredField
-                              : null,
-                          birthDateError: _viewModel.hasBirthDateError
-                              ? l10n.commonRequiredField
-                              : null,
-                        ),
-                        const SizedBox(height: 48),
-                        ElevatedButton(
-                          onPressed: _onContinue,
-                          child: Text(l10n.commonStart),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -12,4 +12,8 @@ class AppConstants {
   // Payment Method IDs (Logical IDs)
   static const String paymentMethodCardId = 'Credit Card';
   static const String paymentMethodWalletId = 'Bourgo Pay';
+  // Assets
+  static const String assetAppIcon = 'assets/icons/app_icon.png';
+  static const String assetBrandmarkVertical =
+      'assets/icons/brandmark-vert.png';
 }

@@ -1,11 +1,10 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 
 /// Screen for setting up a gym entry PIN.
@@ -21,25 +20,20 @@ class PinSetupScreen extends StatefulWidget {
 }
 
 class _PinSetupScreenState extends State<PinSetupScreen> {
-  final List<TextEditingController> _controllers = List.generate(
-    4,
-    (_) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  String _pin = '';
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void dispose() {
-    for (var controller in _controllers) {
-      controller.dispose();
-    }
-    for (var node in _focusNodes) {
-      node.dispose();
-    }
     super.dispose();
   }
 
   Future<void> _onFinish() async {
-    final pin = _controllers.map((e) => e.text).join();
+    final pin = _pin;
     if (pin.length == 4) {
       final authService = locator<AuthService>();
 
@@ -83,109 +77,215 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: AppBar(
+    return AuthBackground(
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AuthHeader(
-                title: l10n.authPinSetupTitle,
-                subtitle: l10n.authPinSetupSubtitle,
-              ),
-              const SizedBox(height: 64),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: List.generate(4, (index) => _buildPinField(index)),
-              ),
-
-              const Spacer(),
-
-              Text(
-                l10n.authPinSetupInstruction,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AuthHeader(
+                  title: l10n.authPinSetupTitle,
+                  subtitle: l10n.authPinSetupSubtitle,
                 ),
-              ),
-              const SizedBox(height: 32),
-
-              ListenableBuilder(
-                listenable: locator<AuthService>(),
-                builder: (context, _) {
-                  final isLoading = locator<AuthService>().isLoading;
-                  return ElevatedButton(
-                    onPressed: isLoading ? null : _onFinish,
-                    child: isLoading
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(l10n.authCompleteRegistration),
-                  );
-                },
-              ),
-            ],
+                const SizedBox(height: 64),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    4,
+                    (index) => _PinIndicator(
+                      isFilled: _pin.length > index,
+                      isCurrent: _pin.length == index,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                _NumericKeypad(
+                  onNumberPressed: _onNumberPressed,
+                  onBackspacePressed: _onBackspacePressed,
+                ),
+                const SizedBox(height: 32),
+                ListenableBuilder(
+                  listenable: locator<AuthService>(),
+                  builder: (context, _) {
+                    final isLoading = locator<AuthService>().isLoading;
+                    final isComplete = _pin.length == 4;
+                    return ElevatedButton(
+                      onPressed: (isLoading || !isComplete) ? null : _onFinish,
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(l10n.authCompleteRegistration),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildPinField(int index) {
+  void _onNumberPressed(String number) {
+    if (_pin.length < 4) {
+      setState(() => _pin += number);
+    }
+  }
+
+  void _onBackspacePressed() {
+    if (_pin.isNotEmpty) {
+      setState(() => _pin = _pin.substring(0, _pin.length - 1));
+    }
+  }
+}
+
+class _PinIndicator extends StatelessWidget {
+  final bool isFilled;
+  final bool isCurrent;
+
+  const _PinIndicator({required this.isFilled, required this.isCurrent});
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
 
-    return SizedBox(
-      width: 72,
-      height: 80,
-      child: TextField(
-        controller: _controllers[index],
-        focusNode: _focusNodes[index],
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        maxLength: 1,
-        obscureText: true,
-        style: theme.textTheme.headlineMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-          color: theme.colorScheme.onSurface,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      width: isCurrent ? 24 : 20,
+      height: isCurrent ? 24 : 20,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: isFilled
+            ? theme.colorScheme.primary
+            : theme.colorScheme.surfaceContainerHigh,
+        border: Border.all(
+          color: isCurrent
+              ? theme.colorScheme.primary
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+          width: 2,
         ),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-        decoration: InputDecoration(
-          counterText: '',
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: appColors.bgBorder, width: 2),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
-          ),
-          filled: true,
-          fillColor: appColors.bgElevated,
-        ),
-        onChanged: (value) {
-          if (value.isNotEmpty && index < 3) {
-            _focusNodes[index + 1].requestFocus();
-          } else if (value.isEmpty && index > 0) {
-            _focusNodes[index - 1].requestFocus();
-          }
+        boxShadow: isFilled
+            ? [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  spreadRadius: 2,
+                ),
+              ]
+            : null,
+      ),
+    );
+  }
+}
 
-          if (index == 3 && value.isNotEmpty) {
-            _focusNodes[index].unfocus();
-          }
-        },
+class _NumericKeypad extends StatelessWidget {
+  final Function(String) onNumberPressed;
+  final VoidCallback onBackspacePressed;
+
+  const _NumericKeypad({
+    required this.onNumberPressed,
+    required this.onBackspacePressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var row in [
+          ['1', '2', '3'],
+          ['4', '5', '6'],
+          ['7', '8', '9'],
+        ])
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (var number in row)
+                  _KeypadButton(
+                    label: number,
+                    onPressed: () => onNumberPressed(number),
+                  ),
+              ],
+            ),
+          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const SizedBox(width: 80), // Empty space for alignment
+            _KeypadButton(label: '0', onPressed: () => onNumberPressed('0')),
+            _KeypadButton(
+              icon: Icons.backspace_outlined,
+              onPressed: onBackspacePressed,
+              isAction: true,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _KeypadButton extends StatelessWidget {
+  final String? label;
+  final IconData? icon;
+  final VoidCallback onPressed;
+  final bool isAction;
+
+  const _KeypadButton({
+    this.label,
+    this.icon,
+    required this.onPressed,
+    this.isAction = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(40),
+        child: Container(
+          width: 80,
+          height: 80,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isAction
+                ? Colors.transparent
+                : theme.colorScheme.surfaceContainer,
+            border: isAction
+                ? null
+                : Border.all(color: theme.colorScheme.outlineVariant, width: 1),
+          ),
+          child: label != null
+              ? Text(
+                  label!,
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                )
+              : Icon(icon, color: theme.colorScheme.onSurface, size: 28),
+        ),
       ),
     );
   }

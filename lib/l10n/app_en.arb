@@ -2,6 +2,8 @@
   "@@locale": "en",
   "appName": "Bourgo Arena",
   "tagline": "The Sport HQ in Djerba",
+  "onboardingTitle": "PUSH YOUR LIMITS",
+  "onboardingSubtitle": "Experience the ultimate sport performance center in the heart of Djerba.",
   
   "commonRetry": "RETRY",
   "commonLoadingError": "Loading Error",

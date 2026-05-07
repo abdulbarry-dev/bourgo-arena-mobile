@@ -2,6 +2,8 @@
   "@@locale": "fr",
   "appName": "Bourgo Arena",
   "tagline": "Le QG du Sport à Djerba",
+  "onboardingTitle": "REPOUSSEZ VOS LIMITES",
+  "onboardingSubtitle": "Découvrez le centre de performance sportive ultime au cœur de Djerba.",
   
   "commonRetry": "RÉESSAYER",
   "commonLoadingError": "Erreur de chargement",

@@ -15,6 +15,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tagline => 'The Sport HQ in Djerba';
 
   @override
+  String get onboardingTitle => 'PUSH YOUR LIMITS';
+
+  @override
+  String get onboardingSubtitle =>
+      'Experience the ultimate sport performance center in the heart of Djerba.';
+
+  @override
   String get commonRetry => 'RETRY';
 
   @override
