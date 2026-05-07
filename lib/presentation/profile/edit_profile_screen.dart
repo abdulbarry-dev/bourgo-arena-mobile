@@ -1,5 +1,4 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -32,7 +31,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     _viewModel = EditProfileViewModel(
       dataService: locator<DataService>(),
-      authService: locator<AuthService>(),
     );
     _viewModel.addListener(_onViewModelChange);
   }

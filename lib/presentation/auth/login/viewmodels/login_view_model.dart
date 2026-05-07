@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:flutter/material.dart';
 
@@ -30,14 +29,18 @@ class LoginViewModel extends ChangeNotifier {
 
       setLoading(false);
 
-      if (result case Failure failure) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(failure.message)));
-        }
-      }
-      // Note: GoRouter redirect in router.dart will handle navigation on success
+      result.fold(
+        onFailure: (failure) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(failure.message)));
+          }
+        },
+        onSuccess: (user) {
+          // Note: GoRouter redirect in router.dart will handle navigation on success
+        },
+      );
     }
   }
 

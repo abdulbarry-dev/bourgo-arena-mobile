@@ -6,7 +6,7 @@ import 'package:bourgo_arena_mobile/data/repositories/api_reservation_repository
 import 'package:bourgo_arena_mobile/data/repositories/api_user_repository.dart';
 import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/data/services/reservation_service.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -16,6 +16,10 @@ import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:get_it/get_it.dart';
@@ -48,12 +52,18 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => LoginUseCase(locator()));
   locator.registerLazySingleton(() => LogoutUseCase(locator()));
   locator.registerLazySingleton(() => RegisterUseCase(locator()));
+  locator.registerLazySingleton(() => CompleteRegistrationUseCase(locator()));
+  locator.registerLazySingleton(() => SendOtpUseCase(locator()));
+  locator.registerLazySingleton(() => VerifyOtpUseCase(locator()));
+  locator.registerLazySingleton(() => RequestFamilyAccountOtpUseCase(locator()));
   locator.registerLazySingleton(() => GetActivitiesUseCase(locator()));
   locator.registerLazySingleton(() => GetUserBookingsUseCase(locator()));
   locator.registerLazySingleton(() => CancelBookingUseCase(locator()));
 
+  // State Notifiers
+  locator.registerLazySingleton(() => AuthStateNotifier(locator()));
+
   // Services
-  locator.registerLazySingleton(() => AuthService(locator()));
   locator.registerLazySingleton(() => ActivityService(locator()));
   locator.registerLazySingleton(() => ReservationService(locator()));
   locator.registerLazySingleton(

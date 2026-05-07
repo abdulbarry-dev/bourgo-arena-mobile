@@ -1,6 +1,6 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/main.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
@@ -10,18 +10,18 @@ import 'package:mocktail/mocktail.dart';
 
 class MockSettingsViewModel extends Mock implements SettingsViewModel {}
 
-class MockAuthService extends Mock implements AuthService {}
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 class MockActivityService extends Mock implements ActivityService {}
 
 void main() {
   late MockSettingsViewModel mockSettingsViewModel;
-  late MockAuthService mockAuthService;
+  late MockAuthStateNotifier mockAuthStateNotifier;
   late MockActivityService mockActivityService;
 
   setUp(() async {
     mockSettingsViewModel = MockSettingsViewModel();
-    mockAuthService = MockAuthService();
+    mockAuthStateNotifier = MockAuthStateNotifier();
     mockActivityService = MockActivityService();
 
     // Reset locator before each test
@@ -31,8 +31,8 @@ void main() {
     when(() => mockSettingsViewModel.themeMode).thenReturn(ThemeMode.dark);
     when(() => mockSettingsViewModel.locale).thenReturn(const Locale('fr'));
     when(() => mockSettingsViewModel.isLanguageSelected).thenReturn(true);
-    when(() => mockAuthService.isAuthenticated).thenReturn(false);
-    when(() => mockAuthService.addListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(false);
+    when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
     when(() => mockSettingsViewModel.addListener(any())).thenReturn(null);
   });
 
@@ -41,7 +41,7 @@ void main() {
     await tester.pumpWidget(
       BourgoArenaApp(
         settingsViewModel: mockSettingsViewModel,
-        authService: mockAuthService,
+        authStateNotifier: mockAuthStateNotifier,
       ),
     );
 

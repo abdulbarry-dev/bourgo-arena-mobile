@@ -1,7 +1,9 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -27,7 +29,9 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
     super.initState();
     _viewModel = FamilyManagementViewModel(
       dataService: locator<DataService>(),
-      authService: locator<AuthService>(),
+
+      verifyOtpUseCase: locator<VerifyOtpUseCase>(),
+      requestFamilyAccountOtpUseCase: locator<RequestFamilyAccountOtpUseCase>(),
     );
   }
 

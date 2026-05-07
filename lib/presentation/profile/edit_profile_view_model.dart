@@ -1,5 +1,4 @@
 import 'package:bourgo_arena_mobile/data/models/user_profile.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
@@ -14,7 +13,6 @@ class EditProfileViewModel extends ChangeNotifier {
 
   EditProfileViewModel({
     required DataService dataService,
-    required AuthService authService,
   }) : _dataService = dataService {
     _loadProfile();
   }

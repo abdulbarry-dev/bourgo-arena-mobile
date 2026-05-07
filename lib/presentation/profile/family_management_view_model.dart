@@ -1,6 +1,8 @@
 import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
@@ -8,7 +10,9 @@ import 'dart:developer' as developer;
 /// ViewModel for managing family account and children profiles.
 class FamilyManagementViewModel extends ChangeNotifier {
   final DataService _dataService;
-  final AuthService _authService;
+
+  final VerifyOtpUseCase _verifyOtpUseCase;
+  final RequestFamilyAccountOtpUseCase _requestFamilyAccountOtpUseCase;
 
   UserProfile? _profile;
   bool _isLoading = true;
@@ -29,9 +33,11 @@ class FamilyManagementViewModel extends ChangeNotifier {
 
   FamilyManagementViewModel({
     required DataService dataService,
-    required AuthService authService,
+    required VerifyOtpUseCase verifyOtpUseCase,
+    required RequestFamilyAccountOtpUseCase requestFamilyAccountOtpUseCase,
   }) : _dataService = dataService,
-       _authService = authService {
+       _verifyOtpUseCase = verifyOtpUseCase,
+       _requestFamilyAccountOtpUseCase = requestFamilyAccountOtpUseCase {
     _loadProfile();
   }
 
@@ -67,17 +73,15 @@ class FamilyManagementViewModel extends ChangeNotifier {
   Future<bool> requestFamilyAccountOtp() async {
     if (_profile == null) return false;
 
-    try {
-      final identifier = _profile!.phone.isNotEmpty
-          ? _profile!.phone
-          : _profile!.email;
-      await _authService.sendOtp(identifier);
-      _isOtpSent = true;
-      notifyListeners();
-      return true;
-    } catch (e) {
-      return false;
-    }
+    final result = await _requestFamilyAccountOtpUseCase();
+    return result.fold(
+      onSuccess: (_) {
+        _isOtpSent = true;
+        notifyListeners();
+        return true;
+      },
+      onFailure: (_) => false,
+    );
   }
 
   /// Verifies the OTP and enables family account.
@@ -87,25 +91,30 @@ class FamilyManagementViewModel extends ChangeNotifier {
     _isVerifyingOtp = true;
     notifyListeners();
 
-    try {
-      final identifier = _profile!.phone.isNotEmpty
-          ? _profile!.phone
-          : _profile!.email;
-      final success = await _authService.verifyOtp(identifier, otp);
-
-      if (success) {
-        final updatedProfile = _profile!.copyWith(isParentAccount: true);
-        await _dataService.updateProfile(updatedProfile);
-        _profile = updatedProfile;
-        _isOtpSent = false;
-      }
-      return success;
-    } catch (e) {
-      return false;
-    } finally {
-      _isVerifyingOtp = false;
-      notifyListeners();
-    }
+    final identifier = _profile!.phone.isNotEmpty
+        ? _profile!.phone
+        : _profile!.email;
+        
+    final result = await _verifyOtpUseCase(identifier, otp);
+    
+    return result.fold(
+      onSuccess: (success) async {
+        if (success) {
+          final updatedProfile = _profile!.copyWith(isParentAccount: true);
+          await _dataService.updateProfile(updatedProfile);
+          _profile = updatedProfile;
+          _isOtpSent = false;
+        }
+        _isVerifyingOtp = false;
+        notifyListeners();
+        return success;
+      },
+      onFailure: (_) {
+        _isVerifyingOtp = false;
+        notifyListeners();
+        return false;
+      },
+    );
   }
 
   /// Disables family account features.

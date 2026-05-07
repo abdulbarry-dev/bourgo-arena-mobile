@@ -1,7 +1,7 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/data/services/settings_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
@@ -23,7 +23,7 @@ Future<void> main() async {
   runApp(
     BourgoArenaApp(
       settingsViewModel: settingsViewModel,
-      authService: locator<AuthService>(),
+      authStateNotifier: locator<AuthStateNotifier>(),
     ),
   );
 }
@@ -31,13 +31,13 @@ Future<void> main() async {
 /// The root widget of the Bourgo Arena application.
 class BourgoArenaApp extends StatefulWidget {
   final SettingsViewModel settingsViewModel;
-  final AuthService authService;
+  final AuthStateNotifier authStateNotifier;
 
   /// Creates a [BourgoArenaApp].
   const BourgoArenaApp({
     super.key,
     required this.settingsViewModel,
-    required this.authService,
+    required this.authStateNotifier,
   });
 
   @override
@@ -52,7 +52,7 @@ class _BourgoArenaAppState extends State<BourgoArenaApp> {
     super.initState();
     _router = createRouter(
       widget.settingsViewModel,
-      widget.authService,
+      widget.authStateNotifier,
       locator<ActivityService>(),
     );
   }

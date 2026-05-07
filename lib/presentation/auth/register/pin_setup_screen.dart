@@ -1,5 +1,5 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -22,6 +22,8 @@ class PinSetupScreen extends StatefulWidget {
 class _PinSetupScreenState extends State<PinSetupScreen> {
   String _pin = '';
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -35,7 +37,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   Future<void> _onFinish() async {
     final pin = _pin;
     if (pin.length == 4) {
-      final authService = locator<AuthService>();
+      setState(() => _isLoading = true);
 
       try {
         // Construct a User object from registration data
@@ -57,19 +59,29 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           children: const [],
         );
 
-        await authService.completeRegistration(user);
+        final completeRegistrationUseCase = locator<CompleteRegistrationUseCase>();
+        final result = await completeRegistrationUseCase(user);
 
+        result.fold(
+          onSuccess: (_) {
+            if (mounted) {
+              context.go('/home');
+            }
+          },
+          onFailure: (failure) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(failure.message),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            }
+          },
+        );
+      } finally {
         if (mounted) {
-          context.go('/home');
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.commonErrorOccurred),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          setState(() => _isLoading = false);
         }
       }
     }
@@ -115,14 +127,12 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                   onBackspacePressed: _onBackspacePressed,
                 ),
                 const SizedBox(height: 32),
-                ListenableBuilder(
-                  listenable: locator<AuthService>(),
-                  builder: (context, _) {
-                    final isLoading = locator<AuthService>().isLoading;
+                Builder(
+                  builder: (context) {
                     final isComplete = _pin.length == 4;
                     return ElevatedButton(
-                      onPressed: (isLoading || !isComplete) ? null : _onFinish,
-                      child: isLoading
+                      onPressed: (_isLoading || !isComplete) ? null : _onFinish,
+                      child: _isLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,

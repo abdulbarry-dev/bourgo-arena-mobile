@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -57,26 +56,29 @@ class RegisterViewModel extends ChangeNotifier {
       setLoading(false);
 
       if (context.mounted) {
-        if (result is Success) {
-          // Prepare data for the next onboarding/verification screen
-          final registrationData = {
-            'firstName': firstNameController.text,
-            'lastName': lastNameController.text,
-            'email': emailController.text,
-            'phone': phoneController.text,
-            'isParentAccount': _isParentAccount,
-          };
+        result.fold(
+          onSuccess: (_) {
+            // Prepare data for the next onboarding/verification screen
+            final registrationData = {
+              'firstName': firstNameController.text,
+              'lastName': lastNameController.text,
+              'email': emailController.text,
+              'phone': phoneController.text,
+              'isParentAccount': _isParentAccount,
+            };
 
-          if (_isParentAccount) {
-            context.push('/family-onboarding', extra: registrationData);
-          } else {
-            context.push('/verification-method', extra: registrationData);
-          }
-        } else if (result is Failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result.message)),
-          );
-        }
+            if (_isParentAccount) {
+              context.push('/family-onboarding', extra: registrationData);
+            } else {
+              context.push('/verification-method', extra: registrationData);
+            }
+          },
+          onFailure: (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(failure.message)),
+            );
+          },
+        );
       }
     }
   }

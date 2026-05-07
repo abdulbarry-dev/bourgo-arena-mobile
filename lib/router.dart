@@ -1,5 +1,5 @@
 import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
@@ -39,12 +39,12 @@ import 'package:go_router/go_router.dart';
 /// App routing configuration using GoRouter.
 GoRouter createRouter(
   SettingsViewModel settingsViewModel,
-  AuthService authService,
+  AuthStateNotifier authStateNotifier,
   ActivityService activityService,
 ) => GoRouter(
   initialLocation: '/',
   errorBuilder: (context, state) => NotFoundScreen(error: state.error),
-  refreshListenable: Listenable.merge([authService, settingsViewModel]),
+  refreshListenable: Listenable.merge([authStateNotifier, settingsViewModel]),
   redirect: (context, state) {
     // 1. Force Language Selection if not set
     if (!settingsViewModel.isLanguageSelected) {
@@ -59,7 +59,7 @@ GoRouter createRouter(
     }
 
     // 3. Auth Redirection
-    final bool isAuthenticated = authService.isAuthenticated;
+    final bool isAuthenticated = authStateNotifier.isAuthenticated;
     final bool isAuthRoute =
         state.matchedLocation == '/login' ||
         state.matchedLocation == '/register' ||
