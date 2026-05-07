@@ -1,11 +1,8 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
-import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -85,24 +82,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Future<void> _selectChildBirthDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate:
-          _viewModel.selectedChildBirthDate ??
-          DateTime.now().subtract(const Duration(days: 365 * 10)),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-
-    if (picked != null) {
-      _viewModel.setChildBirthDate(picked);
-      _viewModel.childBirthDateController.text = DateFormat.yMMMd().format(
-        picked,
-      );
-    }
-  }
-
   Future<void> _save() async {
     if (_formKey.currentState?.validate() ?? false) {
       final success = await _viewModel.saveProfile(
@@ -134,137 +113,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
-  Future<void> _toggleFamilyAccount(bool value) async {
-    if (value) {
-      final success = await _viewModel.requestFamilyAccountOtp();
-      if (success && mounted) {
-        _showOtpDialog();
-      }
-    } else {
-      _showDisableFamilyDialog();
-    }
-  }
-
-  void _showDisableFamilyDialog() {
-    final l10n = AppLocalizations.of(context)!;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.profileDisableFamilyTitle),
-        content: Text(l10n.profileDisableFamilyContent),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.commonCancel),
-          ),
-          TextButton(
-            onPressed: () {
-              _viewModel.disableFamilyAccount();
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: Text(l10n.profileDisableConfirm),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showOtpDialog() {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-    final otpController = TextEditingController();
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: appColors.bgElevated,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        title: Text(
-          l10n.profileVerifyFamilyTitle,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.profileVerifyFamilySubtitle(
-                _viewModel.profile!.phone.isNotEmpty
-                    ? _viewModel.profile!.phone
-                    : _viewModel.profile!.email,
-              ),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            AuthTextField(
-              label: 'OTP CODE',
-              hint: '000000',
-              leadingIcon: Symbols.lock,
-              controller: otpController,
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              l10n.commonCancel,
-              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ),
-          ListenableBuilder(
-            listenable: _viewModel,
-            builder: (context, _) => ElevatedButton(
-              onPressed: _viewModel.isVerifyingOtp
-                  ? null
-                  : () async {
-                      final success = await _viewModel.verifyFamilyAccountOtp(
-                        otpController.text,
-                      );
-                      if (!context.mounted) return;
-                      if (success) {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              AppLocalizations.of(
-                                context,
-                              )!.profileFamilyEnabled,
-                            ),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      }
-                    },
-              child: _viewModel.isVerifyingOtp
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(l10n.authVerify),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
 
     return Scaffold(
       appBar: AppBar(
@@ -338,35 +189,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     readOnly: true,
                     onTap: _selectBirthDate,
                   ),
-                  const SizedBox(height: 32),
-                  const Divider(),
-                  const SizedBox(height: 24),
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: appColors.bgElevated,
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: appColors.bgBorder),
-                    ),
-                    child: Column(
-                      children: [
-                        FamilyAccountToggle(
-                          value: profile.isParentAccount,
-                          onChanged: _toggleFamilyAccount,
-                        ),
-                        if (profile.isParentAccount) ...[
-                          const SizedBox(height: 24),
-                          const Divider(),
-                          const SizedBox(height: 24),
-                          _ChildrenSection(
-                            children: profile.children,
-                            viewModel: _viewModel,
-                            onSelectBirthDate: _selectChildBirthDate,
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
                   const SizedBox(height: 40),
                   ElevatedButton(
                     onPressed: _viewModel.isSaving ? null : _save,
@@ -387,107 +209,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           );
         },
       ),
-    );
-  }
-}
-
-class _ChildrenSection extends StatelessWidget {
-  final List<ChildProfileModel> children;
-  final EditProfileViewModel viewModel;
-  final VoidCallback onSelectBirthDate;
-
-  const _ChildrenSection({
-    required this.children,
-    required this.viewModel,
-    required this.onSelectBirthDate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          l10n.authAddedMembers.toUpperCase(),
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 16),
-        if (children.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant,
-                style: BorderStyle.solid,
-              ),
-            ),
-            child: Text(
-              l10n.profileNoChildren,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          )
-        else
-          SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: children.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 16),
-              itemBuilder: (context, index) {
-                final child = children[index];
-                return FamilyMemberCard(
-                  name: child.name,
-                  gender: child.gender,
-                  onRemove: () => viewModel.removeChild(child.id),
-                );
-              },
-            ),
-          ),
-        const SizedBox(height: 32),
-        Text(
-          l10n.profileAddChild.toUpperCase(),
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 16),
-        FamilyMemberForm(
-          firstNameController: viewModel.childFirstNameController,
-          lastNameController: viewModel.childLastNameController,
-          birthDateController: viewModel.childBirthDateController,
-          selectedGender: viewModel.selectedChildGender,
-          onGenderChanged: viewModel.setChildGender,
-          onSelectBirthDate: onSelectBirthDate,
-          onAdd: () => viewModel.addChildFromForm(),
-          firstNameError: viewModel.hasChildFirstNameError
-              ? l10n.commonRequiredField
-              : null,
-          lastNameError: viewModel.hasChildLastNameError
-              ? l10n.commonRequiredField
-              : null,
-          genderError: viewModel.hasChildGenderError
-              ? l10n.commonRequiredField
-              : null,
-          birthDateError: viewModel.hasChildBirthDateError
-              ? l10n.commonRequiredField
-              : null,
-        ),
-      ],
     );
   }
 }

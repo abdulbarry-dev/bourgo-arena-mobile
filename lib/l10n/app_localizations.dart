@@ -1082,6 +1082,12 @@ abstract class AppLocalizations {
   /// **'Modifier le profil'**
   String get settingsEditProfile;
 
+  /// No description provided for @settingsManageFamily.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer la famille'**
+  String get settingsManageFamily;
+
   /// No description provided for @settingsChangePassword.
   ///
   /// In fr, this message translates to:

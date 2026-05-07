@@ -515,6 +515,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsEditProfile => 'Edit Profile';
 
   @override
+  String get settingsManageFamily => 'Manage Family';
+
+  @override
   String get settingsChangePassword => 'Change Password';
 
   @override

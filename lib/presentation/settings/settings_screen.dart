@@ -42,6 +42,11 @@ class SettingsScreen extends StatelessWidget {
                     title: l10n.settingsChangePassword,
                     onTap: () => context.push('/change-password'),
                   ),
+                  _SettingsTile(
+                    icon: Symbols.family_restroom,
+                    title: l10n.settingsManageFamily,
+                    onTap: () => context.push('/family-management'),
+                  ),
                 ],
               ),
               const Divider(height: 32, indent: 16, endIndent: 16),

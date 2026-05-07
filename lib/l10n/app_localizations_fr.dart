@@ -519,6 +519,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsEditProfile => 'Modifier le profil';
 
   @override
+  String get settingsManageFamily => 'Gérer la famille';
+
+  @override
   String get settingsChangePassword => 'Changer le mot de passe';
 
   @override
