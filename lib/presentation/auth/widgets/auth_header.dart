@@ -26,30 +26,49 @@ class AuthHeader extends StatelessWidget {
         showBackButton ?? Navigator.of(context).canPop();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (effectiveShowBackButton) ...[
-          IconButton(
-            onPressed: () => context.pop(),
-            icon: Icon(Symbols.arrow_back, color: theme.colorScheme.onSurface),
-            padding: EdgeInsets.zero,
+          Align(
             alignment: Alignment.centerLeft,
+            child: IconButton(
+              onPressed: () => context.pop(),
+              icon: Icon(
+                Symbols.arrow_back,
+                color: theme.colorScheme.onSurface,
+              ),
+              padding: EdgeInsets.zero,
+            ),
           ),
           const SizedBox(height: 16),
         ],
-        const BrandLogo(size: 48, heroTag: 'app_logo'),
-        const SizedBox(height: 24),
-        Text(
-          title,
-          style: theme.textTheme.headlineLarge?.copyWith(
-            color: theme.colorScheme.onSurface,
+        const Center(
+          child: BrandLogo(
+            size: 100,
+            useVertical: true,
+            heroTag: 'app_logo',
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 32),
         Text(
-          subtitle,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: subtitleColor ?? theme.colorScheme.onSurfaceVariant,
+          title,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.displaySmall?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: subtitleColor ?? theme.colorScheme.onSurfaceVariant,
+              height: 1.5,
+            ),
           ),
         ),
       ],

@@ -45,11 +45,14 @@ void main() {
       ),
     );
 
+    // Wait for any animations and initializations
+    await tester.pumpAndSettle();
+
     // Verify that the onboarding screen displays the brand logo.
     expect(find.byType(BrandLogo), findsOneWidget);
 
-    // Verify that the "COMMENCER" button is present.
-    // Note: This depends on the default locale (fr) we mocked.
+    // Verify that the start button is present.
+    // In fr locale, commonStart is "COMMENCER"
     expect(find.text('COMMENCER'), findsOneWidget);
   });
 }

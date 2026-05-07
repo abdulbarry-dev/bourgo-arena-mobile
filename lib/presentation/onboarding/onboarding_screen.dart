@@ -23,48 +23,53 @@ class OnboardingScreen extends StatelessWidget {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       const SizedBox(height: 80),
 
                       // Brand Logo
-                      const BrandLogo(
-                        size: 140,
-                        useVertical: true,
-                        heroTag: 'app_logo',
+                      const Center(
+                        child: BrandLogo(
+                          size: 140,
+                          useVertical: true,
+                          heroTag: 'app_logo',
+                        ),
                       ),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 64),
 
                       // Tagline
                       Text(
                         AppLocalizations.of(context)!.tagline.toUpperCase(),
+                        textAlign: TextAlign.center,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.bold,
-                          letterSpacing: 3.0,
+                          letterSpacing: 4.0,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 16),
                       Text(
                         AppLocalizations.of(context)!.onboardingTitle,
+                        textAlign: TextAlign.center,
                         style: theme.textTheme.displayMedium?.copyWith(
                           fontWeight: FontWeight.w900,
                           height: 1.1,
                           color: theme.colorScheme.onSurface,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 24),
                       Text(
                         AppLocalizations.of(context)!.onboardingSubtitle,
+                        textAlign: TextAlign.center,
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                           height: 1.5,
                         ),
                       ),
 
-                      // Pushes button to bottom if space allows
-                      const SizedBox(height: 120),
+                      const SizedBox(height: 64),
 
                       // Action Buttons
                       Column(
@@ -73,6 +78,11 @@ class OnboardingScreen extends StatelessWidget {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () => context.push('/register'),
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 18,
+                                ),
+                              ),
                               child: Text(
                                 AppLocalizations.of(context)!.commonStart,
                               ),
@@ -83,6 +93,11 @@ class OnboardingScreen extends StatelessWidget {
                             width: double.infinity,
                             child: OutlinedButton(
                               onPressed: () => context.push('/login'),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 18,
+                                ),
+                              ),
                               child: Text(
                                 AppLocalizations.of(context)!.authLogin,
                               ),
@@ -91,7 +106,7 @@ class OnboardingScreen extends StatelessWidget {
                         ],
                       ),
 
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 48),
                     ],
                   ),
                 ),

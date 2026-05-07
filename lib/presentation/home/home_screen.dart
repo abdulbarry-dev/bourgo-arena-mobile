@@ -60,16 +60,18 @@ class _HomeScreenState extends State<HomeScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             title: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                const BrandLogo(size: 28),
+                const BrandLogo(size: 32),
                 const SizedBox(width: 12),
                 Text(
                   AppLocalizations.of(context)!.appName.toUpperCase(),
-                  style: theme.textTheme.titleLarge?.copyWith(
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontFamily: AppConstants.displayFontFamily,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2.0,
-                    fontSize: 18,
+                    fontSize: 16,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ],

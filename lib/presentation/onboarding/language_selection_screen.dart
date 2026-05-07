@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -18,24 +19,11 @@ class LanguageSelectionScreen extends StatefulWidget {
 }
 
 class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
-  late final ValueNotifier<Locale> _selectedLocale;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedLocale = ValueNotifier<Locale>(widget.viewModel.locale);
-  }
-
-  @override
-  void dispose() {
-    _selectedLocale.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final currentLocale = widget.viewModel.locale;
 
     return Scaffold(
       body: AuthBackground(
@@ -44,9 +32,13 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
             builder: (context, constraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
+                  ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -54,27 +46,27 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
                         // Brand Header
                         Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(
-                                alpha: 0.1,
-                              ),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: theme.colorScheme.primary.withValues(
-                                    alpha: 0.1,
+                          child: Hero(
+                            tag: 'app_logo',
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary
+                                    .withValues(alpha: 0.1),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: theme.colorScheme.primary
+                                        .withValues(alpha: 0.1),
+                                    blurRadius: 40,
+                                    spreadRadius: 10,
                                   ),
-                                  blurRadius: 40,
-                                  spreadRadius: 10,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              Symbols.language,
-                              size: 64,
-                              color: theme.colorScheme.primary,
+                                ],
+                              ),
+                              child: const BrandLogo(
+                                size: 80,
+                                useVertical: true,
+                              ),
                             ),
                           ),
                         ),
@@ -103,65 +95,54 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
                         const SizedBox(height: 48),
 
                         // Professional Selection UI
-                        ValueListenableBuilder<Locale>(
-                          valueListenable: _selectedLocale,
-                          builder: (context, locale, child) {
-                            return Column(
-                              children: [
-                                _LanguageOption(
-                                  label: l10n.languageEnglish,
-                                  code: 'EN',
-                                  isSelected: locale.languageCode == 'en',
-                                  onTap: () => _selectedLocale.value =
-                                      const Locale('en'),
-                                ),
-                                const SizedBox(height: 12),
-                                _LanguageOption(
-                                  label: l10n.languageFrench,
-                                  code: 'FR',
-                                  isSelected: locale.languageCode == 'fr',
-                                  onTap: () => _selectedLocale.value =
-                                      const Locale('fr'),
-                                ),
-                              ],
-                            );
-                          },
+                        Column(
+                          children: [
+                            _LanguageOption(
+                              label: l10n.languageEnglish,
+                              code: 'EN',
+                              isSelected: currentLocale.languageCode == 'en',
+                              onTap: () => widget.viewModel.updateLocale(
+                                const Locale('en'),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            _LanguageOption(
+                              label: l10n.languageFrench,
+                              code: 'FR',
+                              isSelected: currentLocale.languageCode == 'fr',
+                              onTap: () => widget.viewModel.updateLocale(
+                                const Locale('fr'),
+                              ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 48),
 
                         // Continue Button
-                        ValueListenableBuilder<Locale>(
-                          valueListenable: _selectedLocale,
-                          builder: (context, locale, child) {
-                            return ElevatedButton(
-                              onPressed: () async {
-                                // Await the update to ensure persistence is done
-                                await widget.viewModel.updateLocale(locale);
-                                // Redirection is handled by the router automatically
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.colorScheme.primary,
-                                foregroundColor: theme.colorScheme.onPrimary,
-                              ),
-                              child: Text(l10n.commonStart),
-                            );
+                        ElevatedButton(
+                          onPressed: () {
+                            // Already updated locale, just proceed if needed
+                            // For now, we stay on the screen until user hits continue
+                            // which might redirect via router if they are done.
                           },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                            ),
+                          ),
+                          child: Text(l10n.commonStart),
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 48),
 
-                        // Brand Footer (Subtle)
-                        Center(
-                          child: Opacity(
-                            opacity: 0.5,
-                            child: Text(
-                              'BOURGO ARENA',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: theme.colorScheme.onSurface,
-                                letterSpacing: 4.0,
-                              ),
-                            ),
+                        // Brand Footer (Official Logo)
+                        const Center(
+                          child: BrandLogo(
+                            size: 32,
+                            useVertical: true,
                           ),
                         ),
                         const SizedBox(height: 24),
