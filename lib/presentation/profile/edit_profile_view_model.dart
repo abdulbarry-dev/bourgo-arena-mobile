@@ -15,6 +15,9 @@ class EditProfileViewModel extends ChangeNotifier {
   bool _isSaving = false;
   bool _isOtpSent = false;
   bool _isVerifyingOtp = false;
+  String? _childNameError;
+  String? _childGenderError;
+  String? _childBirthDateError;
 
   EditProfileViewModel({
     required DataService dataService,
@@ -29,6 +32,9 @@ class EditProfileViewModel extends ChangeNotifier {
   bool get isSaving => _isSaving;
   bool get isOtpSent => _isOtpSent;
   bool get isVerifyingOtp => _isVerifyingOtp;
+  String? get childNameError => _childNameError;
+  String? get childGenderError => _childGenderError;
+  String? get childBirthDateError => _childBirthDateError;
 
   Future<void> _loadProfile() async {
     try {
@@ -118,6 +124,24 @@ class EditProfileViewModel extends ChangeNotifier {
     }
   }
 
+  /// Disables family account features.
+  Future<bool> disableFamilyAccount() async {
+    if (_profile == null) return false;
+
+    try {
+      final updatedProfile = _profile!.copyWith(
+        isParentAccount: false,
+        children: [], // Optionally clear children
+      );
+      await _dataService.updateProfile(updatedProfile);
+      _profile = updatedProfile;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   /// Adds a child profile.
   Future<bool> addChild(ChildProfileModel child) async {
     if (_profile == null) return false;
@@ -135,14 +159,71 @@ class EditProfileViewModel extends ChangeNotifier {
     }
   }
 
+  // --- Family Member Form State ---
+
+  final childNameController = TextEditingController();
+  final childBirthDateController = TextEditingController();
+  String? _selectedChildGender;
+  DateTime? _selectedChildBirthDate;
+
+  String? get selectedChildGender => _selectedChildGender;
+  DateTime? get selectedChildBirthDate => _selectedChildBirthDate;
+
+  void setChildGender(String? gender) {
+    _selectedChildGender = gender;
+    notifyListeners();
+  }
+
+  void setChildBirthDate(DateTime date) {
+    _selectedChildBirthDate = date;
+    notifyListeners();
+  }
+
+  void clearChildForm() {
+    childNameController.clear();
+    childBirthDateController.clear();
+    _selectedChildGender = null;
+    _selectedChildBirthDate = null;
+    _childNameError = null;
+    _childGenderError = null;
+    _childBirthDateError = null;
+    notifyListeners();
+  }
+
+  Future<bool> addChildFromForm() async {
+    _childNameError = childNameController.text.isEmpty ? 'Required' : null;
+    _childBirthDateError = _selectedChildBirthDate == null ? 'Required' : null;
+    _childGenderError = _selectedChildGender == null ? 'Required' : null;
+
+    if (_childNameError != null ||
+        _childBirthDateError != null ||
+        _childGenderError != null) {
+      notifyListeners();
+      return false;
+    }
+
+    final newChild = ChildProfileModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      firstName: childNameController.text,
+      lastName: _profile?.lastName ?? '',
+      birthDate: _selectedChildBirthDate!,
+      gender: _selectedChildGender!,
+    );
+
+    final success = await addChild(newChild);
+    if (success) {
+      clearChildForm();
+    }
+    return success;
+  }
+
   /// Removes a child profile.
   Future<bool> removeChild(String childId) async {
     if (_profile == null) return false;
 
     try {
-      final updatedChildren = _profile!.children
-          .where((c) => c.id != childId)
-          .toList();
+      final updatedChildren =
+          _profile!.children.where((c) => c.id != childId).toList();
       final updatedProfile = _profile!.copyWith(children: updatedChildren);
       await _dataService.updateProfile(updatedProfile);
       _profile = updatedProfile;
@@ -151,5 +232,12 @@ class EditProfileViewModel extends ChangeNotifier {
     } catch (e) {
       return false;
     }
+  }
+
+  @override
+  void dispose() {
+    childNameController.dispose();
+    childBirthDateController.dispose();
+    super.dispose();
   }
 }

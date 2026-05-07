@@ -1,8 +1,11 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
 import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
 import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -45,6 +48,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _birthDateController.dispose();
+    _viewModel.dispose();
     super.dispose();
   }
 
@@ -81,6 +85,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     }
   }
 
+  Future<void> _selectChildBirthDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _viewModel.selectedChildBirthDate ??
+          DateTime.now().subtract(const Duration(days: 365 * 10)),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+
+    if (picked != null) {
+      _viewModel.setChildBirthDate(picked);
+      _viewModel.childBirthDateController.text =
+          DateFormat.yMMMd().format(picked);
+    }
+  }
+
   Future<void> _save() async {
     if (_formKey.currentState?.validate() ?? false) {
       final success = await _viewModel.saveProfile(
@@ -92,7 +112,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
 
       if (mounted) {
-        if (success && mounted) {
+        if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(AppLocalizations.of(context)!.profileUpdateSuccess),
@@ -100,7 +120,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           );
           context.pop();
-        } else if (mounted) {
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Error updating profile'),
@@ -113,30 +133,61 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _toggleFamilyAccount(bool value) async {
-    if (value && !_viewModel.profile!.isParentAccount) {
-      // Request OTP to enable
-      final requested = await _viewModel.requestFamilyAccountOtp();
-      if (requested && mounted) {
+    if (value) {
+      final success = await _viewModel.requestFamilyAccountOtp();
+      if (success && mounted) {
         _showOtpDialog();
       }
-    } else if (!value && _viewModel.profile!.isParentAccount) {
-      // Disable directly or confirm
-      // For now just allow it
-      // In a real app we might want to warn about losing children data
+    } else {
+      _showDisableFamilyDialog();
     }
+  }
+
+  void _showDisableFamilyDialog() {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.profileFamilyAccount),
+        content: Text('Are you sure you want to disable the family account? This will remove all child profiles.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () {
+              _viewModel.disableFamilyAccount();
+              Navigator.pop(context);
+            },
+            child: Text(l10n.commonConfirm),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showOtpDialog() {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
     final otpController = TextEditingController();
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: Text(l10n.profileVerifyFamilyTitle),
+        backgroundColor: appColors.bgElevated,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: Text(
+          l10n.profileVerifyFamilyTitle,
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               l10n.profileVerifyFamilySubtitle(
@@ -144,14 +195,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ? _viewModel.profile!.phone
                     : _viewModel.profile!.email,
               ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: otpController,
-              decoration: const InputDecoration(
-                labelText: 'OTP Code',
-                border: OutlineInputBorder(),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
+            ),
+            const SizedBox(height: 24),
+            AuthTextField(
+              label: 'OTP CODE',
+              hint: '000000',
+              leadingIcon: Symbols.lock,
+              controller: otpController,
               keyboardType: TextInputType.number,
             ),
           ],
@@ -159,11 +212,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              l10n.commonCancel,
+              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
+            ),
           ),
           ListenableBuilder(
             listenable: _viewModel,
-            builder: (context, _) => TextButton(
+            builder: (context, _) => ElevatedButton(
               onPressed: _viewModel.isVerifyingOtp
                   ? null
                   : () async {
@@ -203,6 +259,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
 
     return Scaffold(
       appBar: AppBar(
@@ -233,126 +290,81 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: TextFormField(
+                        child: AuthTextField(
+                          label: l10n.authFirstNameLabel,
+                          hint: 'First name',
+                          leadingIcon: Symbols.person,
                           controller: _firstNameController,
-                          decoration: InputDecoration(
-                            labelText: l10n.authFirstNameLabel,
-                            prefixIcon: const Icon(Symbols.person),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? l10n.commonRequiredField
-                              : null,
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
-                        child: TextFormField(
+                        child: AuthTextField(
+                          label: l10n.authLastNameLabel,
+                          hint: 'Last name',
+                          leadingIcon: Symbols.person,
                           controller: _lastNameController,
-                          decoration: InputDecoration(
-                            labelText: l10n.authLastNameLabel,
-                            prefixIcon: const Icon(Symbols.person),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? l10n.commonRequiredField
-                              : null,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
+                  const SizedBox(height: 20),
+                  AuthTextField(
+                    label: l10n.authEmailLabel,
+                    hint: 'email@example.com',
+                    leadingIcon: Symbols.mail,
                     controller: _emailController,
-                    decoration: InputDecoration(
-                      labelText: l10n.authEmailLabel,
-                      prefixIcon: const Icon(Symbols.mail),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     keyboardType: TextInputType.emailAddress,
-                    validator: (value) => value == null || value.isEmpty
-                        ? l10n.commonRequiredField
-                        : null,
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
+                  const SizedBox(height: 20),
+                  AuthTextField(
+                    label: l10n.authPhoneLabel,
+                    hint: '+1 234 567 8900',
+                    leadingIcon: Symbols.phone,
                     controller: _phoneController,
-                    decoration: InputDecoration(
-                      labelText: l10n.authPhoneLabel,
-                      prefixIcon: const Icon(Symbols.phone),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     keyboardType: TextInputType.phone,
-                    validator: (value) => value == null || value.isEmpty
-                        ? l10n.commonRequiredField
-                        : null,
                   ),
-                  const SizedBox(height: 16),
-                  TextFormField(
+                  const SizedBox(height: 20),
+                  AuthTextField(
+                    label: l10n.authBirthDateLabel,
+                    hint: 'Select birth date',
+                    leadingIcon: Symbols.calendar_today,
                     controller: _birthDateController,
                     readOnly: true,
                     onTap: _selectBirthDate,
-                    decoration: InputDecoration(
-                      labelText: l10n.authBirthDateLabel,
-                      prefixIcon: const Icon(Symbols.calendar_today),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                   ),
                   const SizedBox(height: 32),
                   const Divider(),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.profileFamilyAccount,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              l10n.profileFamilyAccountDescription,
-                              style: theme.textTheme.bodySmall,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch(
-                        value: profile.isParentAccount,
-                        onChanged: _toggleFamilyAccount,
-                      ),
-                    ],
+                  const SizedBox(height: 24),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: appColors.bgElevated,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: appColors.bgBorder),
+                    ),
+                    child: Column(
+                      children: [
+                  FamilyAccountToggle(
+                    value: profile.isParentAccount,
+                    onChanged: _toggleFamilyAccount,
                   ),
-                  if (profile.isParentAccount) ...[
-                    const SizedBox(height: 24),
-                    _ChildrenList(
-                      children: profile.children,
-                      onAdd: () => _showAddChildDialog(),
-                      onRemove: (id) => _viewModel.removeChild(id),
+                        if (profile.isParentAccount) ...[
+                          const SizedBox(height: 24),
+                          const Divider(),
+                          const SizedBox(height: 24),
+                          _ChildrenSection(
+                            children: profile.children,
+                            viewModel: _viewModel,
+                            onSelectBirthDate: _selectChildBirthDate,
+                          ),
+                        ],
+                      ],
                     ),
-                  ],
+                  ),
                   const SizedBox(height: 40),
-                  FilledButton(
+                  ElevatedButton(
                     onPressed: _viewModel.isSaving ? null : _save,
-                    style: FilledButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
                     child: _viewModel.isSaving
                         ? const SizedBox(
                             height: 20,
@@ -362,13 +374,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               color: Colors.black,
                             ),
                           )
-                        : Text(
-                            l10n.profileSave,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                            ),
-                          ),
+                        : Text(l10n.profileSave),
                   ),
                 ],
               ),
@@ -378,97 +384,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
     );
   }
-
-  void _showAddChildDialog() {
-    final l10n = AppLocalizations.of(context)!;
-    final nameController = TextEditingController();
-    DateTime? childBirthDate;
-    final birthDateController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(l10n.profileAddChild),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: InputDecoration(
-                  labelText: l10n.profileChildName,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: birthDateController,
-                readOnly: true,
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now().subtract(
-                      const Duration(days: 365 * 10),
-                    ),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime.now(),
-                  );
-                  if (picked != null) {
-                    setDialogState(() {
-                      childBirthDate = picked;
-                      birthDateController.text = DateFormat.yMMMd().format(
-                        picked,
-                      );
-                    });
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: l10n.profileChildBirthDate,
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                if (nameController.text.isNotEmpty && childBirthDate != null) {
-                  final child = ChildProfileModel(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    firstName: nameController.text.split(' ').first,
-                    lastName: nameController.text.split(' ').length > 1
-                        ? nameController.text.split(' ').last
-                        : '',
-                    birthDate: childBirthDate!,
-                  );
-                  await _viewModel.addChild(child);
-                  if (context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                }
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
-class _ChildrenList extends StatelessWidget {
+class _ChildrenSection extends StatelessWidget {
   final List<ChildProfileModel> children;
-  final VoidCallback onAdd;
-  final Function(String) onRemove;
+  final EditProfileViewModel viewModel;
+  final VoidCallback onSelectBirthDate;
 
-  const _ChildrenList({
+  const _ChildrenSection({
     required this.children,
-    required this.onAdd,
-    required this.onRemove,
+    required this.viewModel,
+    required this.onSelectBirthDate,
   });
 
   @override
@@ -477,55 +403,75 @@ class _ChildrenList extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Children',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+        Text(
+          l10n.authAddedMembers.toUpperCase(),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        if (children.isEmpty)
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant,
+                style: BorderStyle.dashed,
               ),
             ),
-            TextButton.icon(
-              onPressed: onAdd,
-              icon: const Icon(Symbols.add, size: 18),
-              label: Text(l10n.profileAddChild),
-            ),
-          ],
-        ),
-        if (children.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
             child: Text(
               l10n.profileNoChildren,
-              style: theme.textTheme.bodySmall?.copyWith(
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
                 fontStyle: FontStyle.italic,
               ),
             ),
           )
         else
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: children.length,
-            itemBuilder: (context, index) {
-              final child = children[index];
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                child: ListTile(
-                  leading: const CircleAvatar(child: Icon(Symbols.child_care)),
-                  title: Text('${child.firstName} ${child.lastName}'),
-                  subtitle: Text(DateFormat.yMMMd().format(child.birthDate)),
-                  trailing: IconButton(
-                    icon: const Icon(Symbols.delete, color: Colors.red),
-                    onPressed: () => onRemove(child.id),
-                  ),
-                ),
-              );
-            },
+          SizedBox(
+            height: 140,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: children.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 16),
+              itemBuilder: (context, index) {
+                final child = children[index];
+                return FamilyMemberCard(
+                  name: child.firstName,
+                  gender: child.gender,
+                  onRemove: () => viewModel.removeChild(child.id),
+                );
+              },
+            ),
           ),
+        const SizedBox(height: 32),
+        Text(
+          l10n.profileAddChild.toUpperCase(),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+        const SizedBox(height: 16),
+        FamilyMemberForm(
+          nameController: viewModel.childNameController,
+          birthDateController: viewModel.childBirthDateController,
+          selectedGender: viewModel.selectedChildGender,
+          onGenderChanged: viewModel.setChildGender,
+          onSelectBirthDate: onSelectBirthDate,
+          onAdd: viewModel.addChildFromForm,
+          nameError: viewModel.childNameError,
+          genderError: viewModel.childGenderError,
+          birthDateError: viewModel.childBirthDateError,
+        ),
       ],
     );
   }
@@ -543,20 +489,37 @@ class _AvatarSection extends StatelessWidget {
     return Center(
       child: Stack(
         children: [
-          CircleAvatar(
-            radius: 60,
-            backgroundImage: NetworkImage(avatarUrl),
-            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                width: 2,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 60,
+              backgroundImage: NetworkImage(avatarUrl),
+              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+            ),
           ),
           Positioned(
-            bottom: 0,
-            right: 0,
+            bottom: 4,
+            right: 4,
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary,
                 shape: BoxShape.circle,
                 border: Border.all(color: theme.colorScheme.surface, width: 3),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: const Icon(Symbols.edit, size: 20, color: Colors.black),
             ),
@@ -566,3 +529,4 @@ class _AvatarSection extends StatelessWidget {
     );
   }
 }
+

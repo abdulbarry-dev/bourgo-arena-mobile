@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/viewmodels/register_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -141,41 +142,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           : null,
                     ),
                     const SizedBox(height: 24),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest
-                            .withAlpha(50),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: theme.colorScheme.outlineVariant,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.profileFamilyAccount,
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Text(
-                                  l10n.profileFamilyAccountDescription,
-                                  style: theme.textTheme.bodySmall,
-                                ),
-                              ],
-                            ),
-                          ),
-                          Switch(
-                            value: _viewModel.isParentAccount,
-                            onChanged: _viewModel.setParentAccount,
-                          ),
-                        ],
-                      ),
+                    FamilyAccountToggle(
+                      value: _viewModel.isParentAccount,
+                      onChanged: _viewModel.setParentAccount,
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton(
