@@ -245,5 +245,9 @@
 
   "errorNotFoundTitle": "PAGE NOT FOUND",
   "errorNotFoundSubtitle": "Oops! The page you're looking for doesn't exist or has been moved.",
-  "errorNotFoundAction": "GO BACK HOME"
+  "errorNotFoundAction": "GO BACK HOME",
+  "profileDisableFamilyTitle": "Disable Family Account?",
+  "profileDisableFamilyContent": "This will hide all children profiles and features. Are you sure you want to continue?",
+  "profileDisableConfirm": "DISABLE",
+  "commonCancel": "CANCEL"
 }

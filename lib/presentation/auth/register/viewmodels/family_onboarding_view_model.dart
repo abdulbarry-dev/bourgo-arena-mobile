@@ -9,9 +9,9 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   DateTime? _selectedBirthDate;
   String? _selectedGender;
-  String? _nameError;
-  String? _genderError;
-  String? _birthDateError;
+  bool _hasNameError = false;
+  bool _hasGenderError = false;
+  bool _hasBirthDateError = false;
 
   /// Returns the list of added members.
   List<ChildProfileModel> get members => List.unmodifiable(_members);
@@ -21,9 +21,9 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   /// Returns the currently selected gender.
   String? get selectedGender => _selectedGender;
-  String? get nameError => _nameError;
-  String? get genderError => _genderError;
-  String? get birthDateError => _birthDateError;
+  bool get hasNameError => _hasNameError;
+  bool get hasGenderError => _hasGenderError;
+  bool get hasBirthDateError => _hasBirthDateError;
 
   /// Sets the selected birth date.
   void setBirthDate(DateTime? date) {
@@ -39,11 +39,11 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   /// Adds a new member to the list.
   void addMember() {
-    _nameError = nameController.text.trim().isEmpty ? 'Required' : null;
-    _birthDateError = _selectedBirthDate == null ? 'Required' : null;
-    _genderError = _selectedGender == null ? 'Required' : null;
+    _hasNameError = nameController.text.trim().isEmpty;
+    _hasBirthDateError = _selectedBirthDate == null;
+    _hasGenderError = _selectedGender == null;
 
-    if (_nameError != null || _birthDateError != null || _genderError != null) {
+    if (_hasNameError || _hasBirthDateError || _hasGenderError) {
       notifyListeners();
       return;
     }
@@ -70,9 +70,9 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
     birthDateController.clear();
     _selectedBirthDate = null;
     _selectedGender = null;
-    _nameError = null;
-    _genderError = null;
-    _birthDateError = null;
+    _hasNameError = false;
+    _hasGenderError = false;
+    _hasBirthDateError = false;
     notifyListeners();
   }
 

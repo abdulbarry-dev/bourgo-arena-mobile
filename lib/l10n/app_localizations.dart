@@ -1483,6 +1483,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'RETOUR À L\'ACCUEIL'**
   String get errorNotFoundAction;
+
+  /// No description provided for @profileDisableFamilyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désactiver le compte famille ?'**
+  String get profileDisableFamilyTitle;
+
+  /// No description provided for @profileDisableFamilyContent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cela masquera tous les profils d\'enfants et les fonctionnalités. Êtes-vous sûr de vouloir continuer ?'**
+  String get profileDisableFamilyContent;
+
+  /// No description provided for @profileDisableConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉSACTIVER'**
+  String get profileDisableConfirm;
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'ANNULER'**
+  String get commonCancel;
 }
 
 class _AppLocalizationsDelegate

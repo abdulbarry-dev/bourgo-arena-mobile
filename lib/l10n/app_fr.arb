@@ -245,5 +245,9 @@
 
   "errorNotFoundTitle": "PAGE INTROUVABLE",
   "errorNotFoundSubtitle": "Oups ! La page que vous cherchez n'existe pas ou a été déplacée.",
-  "errorNotFoundAction": "RETOUR À L'ACCUEIL"
+  "errorNotFoundAction": "RETOUR À L'ACCUEIL",
+  "profileDisableFamilyTitle": "Désactiver le compte famille ?",
+  "profileDisableFamilyContent": "Cela masquera tous les profils d'enfants et les fonctionnalités. Êtes-vous sûr de vouloir continuer ?",
+  "profileDisableConfirm": "DÉSACTIVER",
+  "commonCancel": "ANNULER"
 }

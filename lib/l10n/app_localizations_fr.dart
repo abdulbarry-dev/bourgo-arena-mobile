@@ -731,4 +731,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get errorNotFoundAction => 'RETOUR À L\'ACCUEIL';
+
+  @override
+  String get profileDisableFamilyTitle => 'Désactiver le compte famille ?';
+
+  @override
+  String get profileDisableFamilyContent =>
+      'Cela masquera tous les profils d\'enfants et les fonctionnalités. Êtes-vous sûr de vouloir continuer ?';
+
+  @override
+  String get profileDisableConfirm => 'DÉSACTIVER';
+
+  @override
+  String get commonCancel => 'ANNULER';
 }

@@ -11,6 +11,7 @@ class AuthTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
+  final String? errorText;
   final TextInputType keyboardType;
 
   const AuthTextField({
@@ -23,6 +24,7 @@ class AuthTextField extends StatelessWidget {
     this.onTap,
     this.controller,
     this.validator,
+    this.errorText,
     this.keyboardType = TextInputType.text,
   });
 
@@ -56,6 +58,7 @@ class AuthTextField extends StatelessWidget {
           ),
           decoration: InputDecoration(
             hintText: hint,
+            errorText: errorText,
             prefixIcon: leadingIcon != null
                 ? Icon(
                     leadingIcon,

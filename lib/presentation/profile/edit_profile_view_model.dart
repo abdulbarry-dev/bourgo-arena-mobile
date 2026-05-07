@@ -15,9 +15,9 @@ class EditProfileViewModel extends ChangeNotifier {
   bool _isSaving = false;
   bool _isOtpSent = false;
   bool _isVerifyingOtp = false;
-  String? _childNameError;
-  String? _childGenderError;
-  String? _childBirthDateError;
+  bool _hasChildNameError = false;
+  bool _hasChildGenderError = false;
+  bool _hasChildBirthDateError = false;
 
   EditProfileViewModel({
     required DataService dataService,
@@ -32,9 +32,9 @@ class EditProfileViewModel extends ChangeNotifier {
   bool get isSaving => _isSaving;
   bool get isOtpSent => _isOtpSent;
   bool get isVerifyingOtp => _isVerifyingOtp;
-  String? get childNameError => _childNameError;
-  String? get childGenderError => _childGenderError;
-  String? get childBirthDateError => _childBirthDateError;
+  bool get hasChildNameError => _hasChildNameError;
+  bool get hasChildGenderError => _hasChildGenderError;
+  bool get hasChildBirthDateError => _hasChildBirthDateError;
 
   Future<void> _loadProfile() async {
     try {
@@ -184,20 +184,18 @@ class EditProfileViewModel extends ChangeNotifier {
     childBirthDateController.clear();
     _selectedChildGender = null;
     _selectedChildBirthDate = null;
-    _childNameError = null;
-    _childGenderError = null;
-    _childBirthDateError = null;
+    _hasChildNameError = false;
+    _hasChildGenderError = false;
+    _hasChildBirthDateError = false;
     notifyListeners();
   }
 
   Future<bool> addChildFromForm() async {
-    _childNameError = childNameController.text.isEmpty ? 'Required' : null;
-    _childBirthDateError = _selectedChildBirthDate == null ? 'Required' : null;
-    _childGenderError = _selectedChildGender == null ? 'Required' : null;
+    _hasChildNameError = childNameController.text.isEmpty;
+    _hasChildBirthDateError = _selectedChildBirthDate == null;
+    _hasChildGenderError = _selectedChildGender == null;
 
-    if (_childNameError != null ||
-        _childBirthDateError != null ||
-        _childGenderError != null) {
+    if (_hasChildNameError || _hasChildBirthDateError || _hasChildGenderError) {
       notifyListeners();
       return false;
     }
@@ -222,8 +220,9 @@ class EditProfileViewModel extends ChangeNotifier {
     if (_profile == null) return false;
 
     try {
-      final updatedChildren =
-          _profile!.children.where((c) => c.id != childId).toList();
+      final updatedChildren = _profile!.children
+          .where((c) => c.id != childId)
+          .toList();
       final updatedProfile = _profile!.copyWith(children: updatedChildren);
       await _dataService.updateProfile(updatedProfile);
       _profile = updatedProfile;

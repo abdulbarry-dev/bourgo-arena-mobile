@@ -88,7 +88,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _selectChildBirthDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: _viewModel.selectedChildBirthDate ??
+      initialDate:
+          _viewModel.selectedChildBirthDate ??
           DateTime.now().subtract(const Duration(days: 365 * 10)),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
@@ -96,8 +97,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     if (picked != null) {
       _viewModel.setChildBirthDate(picked);
-      _viewModel.childBirthDateController.text =
-          DateFormat.yMMMd().format(picked);
+      _viewModel.childBirthDateController.text = DateFormat.yMMMd().format(
+        picked,
+      );
     }
   }
 
@@ -148,8 +150,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.profileFamilyAccount),
-        content: Text('Are you sure you want to disable the family account? This will remove all child profiles.'),
+        title: Text(l10n.profileDisableFamilyTitle),
+        content: Text(l10n.profileDisableFamilyContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -160,7 +162,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _viewModel.disableFamilyAccount();
               Navigator.pop(context);
             },
-            child: Text(l10n.commonConfirm),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: Text(l10n.profileDisableConfirm),
           ),
         ],
       ),
@@ -247,7 +252,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       height: 20,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
-                  : const Text('Verify'),
+                  : Text(l10n.authVerify),
             ),
           ),
         ],
@@ -345,10 +350,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     child: Column(
                       children: [
-                  FamilyAccountToggle(
-                    value: profile.isParentAccount,
-                    onChanged: _toggleFamilyAccount,
-                  ),
+                        FamilyAccountToggle(
+                          value: profile.isParentAccount,
+                          onChanged: _toggleFamilyAccount,
+                        ),
                         if (profile.isParentAccount) ...[
                           const SizedBox(height: 24),
                           const Divider(),
@@ -422,7 +427,7 @@ class _ChildrenSection extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: theme.colorScheme.outlineVariant,
-                style: BorderStyle.dashed,
+                style: BorderStyle.solid,
               ),
             ),
             child: Text(
@@ -467,10 +472,16 @@ class _ChildrenSection extends StatelessWidget {
           selectedGender: viewModel.selectedChildGender,
           onGenderChanged: viewModel.setChildGender,
           onSelectBirthDate: onSelectBirthDate,
-          onAdd: viewModel.addChildFromForm,
-          nameError: viewModel.childNameError,
-          genderError: viewModel.childGenderError,
-          birthDateError: viewModel.childBirthDateError,
+          onAdd: () => viewModel.addChildFromForm(),
+          nameError: viewModel.hasChildNameError
+              ? l10n.commonRequiredField
+              : null,
+          genderError: viewModel.hasChildGenderError
+              ? l10n.commonRequiredField
+              : null,
+          birthDateError: viewModel.hasChildBirthDateError
+              ? l10n.commonRequiredField
+              : null,
         ),
       ],
     );
@@ -529,4 +540,3 @@ class _AvatarSection extends StatelessWidget {
     );
   }
 }
-

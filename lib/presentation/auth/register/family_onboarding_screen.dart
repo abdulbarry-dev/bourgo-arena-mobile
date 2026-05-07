@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/viewmodels/family_onboarding_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -37,7 +36,8 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
   Future<void> _selectBirthDate() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: _viewModel.selectedBirthDate ??
+      initialDate:
+          _viewModel.selectedBirthDate ??
           DateTime.now().subtract(const Duration(days: 365 * 10)),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
@@ -120,9 +120,15 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                           onGenderChanged: _viewModel.setGender,
                           onSelectBirthDate: _selectBirthDate,
                           onAdd: _viewModel.addMember,
-                          nameError: _viewModel.nameError,
-                          genderError: _viewModel.genderError,
-                          birthDateError: _viewModel.birthDateError,
+                          nameError: _viewModel.hasNameError
+                              ? l10n.commonRequiredField
+                              : null,
+                          genderError: _viewModel.hasGenderError
+                              ? l10n.commonRequiredField
+                              : null,
+                          birthDateError: _viewModel.hasBirthDateError
+                              ? l10n.commonRequiredField
+                              : null,
                         ),
                         const SizedBox(height: 48),
                         ElevatedButton(
@@ -189,4 +195,3 @@ class _MembersList extends StatelessWidget {
     );
   }
 }
-
