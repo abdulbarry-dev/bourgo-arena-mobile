@@ -34,61 +34,104 @@ class FamilyMemberCard extends StatelessWidget {
     switch (gender) {
       case 'male':
         genderIcon = Symbols.male;
-        genderColor = Colors.blue;
+        genderColor = const Color(0xFF00D1FF); // Brighter blue
       case 'female':
         genderIcon = Symbols.female;
-        genderColor = Colors.pink;
+        genderColor = const Color(0xFFFF00D1); // Brighter pink
       default:
         genderIcon = Symbols.person;
         genderColor = theme.colorScheme.primary;
     }
 
     return Container(
-      width: 120,
+      width: 130,
       decoration: BoxDecoration(
         color: appColors.bgElevated,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: appColors.bgBorder),
-      ),
-      child: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: genderColor.withValues(alpha: 0.1),
-                  child: Icon(genderIcon, color: genderColor, size: 24),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            top: 4,
-            right: 4,
-            child: IconButton(
-              onPressed: onRemove,
-              icon: Icon(
-                Symbols.close,
-                size: 16,
-                color: theme.colorScheme.error,
-              ),
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: appColors.bgBorder, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Subtle glow background
+            Positioned(
+              top: -20,
+              right: -20,
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: genderColor.withValues(alpha: 0.05),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 20,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: genderColor.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: genderColor.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Icon(genderIcon, color: genderColor, size: 28),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.2,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: onRemove,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.error.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Symbols.close,
+                      size: 14,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -164,8 +207,11 @@ class FamilyAccountToggle extends StatelessWidget {
 
 /// A form for adding or editing a family member.
 class FamilyMemberForm extends StatelessWidget {
-  /// Controller for the member's full name.
-  final TextEditingController nameController;
+  /// Controller for the member's first name.
+  final TextEditingController firstNameController;
+
+  /// Controller for the member's last name.
+  final TextEditingController lastNameController;
 
   /// Controller for the member's birth date text field.
   final TextEditingController birthDateController;
@@ -185,8 +231,11 @@ class FamilyMemberForm extends StatelessWidget {
   /// Text for the "Add" button.
   final String? addButtonLabel;
 
-  /// Error text for name field.
-  final String? nameError;
+  /// Error text for first name field.
+  final String? firstNameError;
+
+  /// Error text for last name field.
+  final String? lastNameError;
 
   /// Error text for gender selection.
   final String? genderError;
@@ -197,14 +246,16 @@ class FamilyMemberForm extends StatelessWidget {
   /// Creates a [FamilyMemberForm].
   const FamilyMemberForm({
     super.key,
-    required this.nameController,
+    required this.firstNameController,
+    required this.lastNameController,
     required this.birthDateController,
     required this.selectedGender,
     required this.onGenderChanged,
     required this.onSelectBirthDate,
     required this.onAdd,
     this.addButtonLabel,
-    this.nameError,
+    this.firstNameError,
+    this.lastNameError,
     this.genderError,
     this.birthDateError,
   });
@@ -220,17 +271,33 @@ class FamilyMemberForm extends StatelessWidget {
       decoration: BoxDecoration(
         color: appColors.bgElevated,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: appColors.bgBorder),
+        border: Border.all(color: appColors.bgBorder, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          AuthTextField(
-            label: l10n.authFullNameLabel,
-            hint: l10n.authFullNameHint,
-            leadingIcon: Symbols.person,
-            controller: nameController,
-            errorText: nameError,
+          Row(
+            children: [
+              Expanded(
+                child: AuthTextField(
+                  label: l10n.authFirstNameLabel,
+                  hint: l10n.authFirstNameHint,
+                  leadingIcon: Symbols.person,
+                  controller: firstNameController,
+                  errorText: firstNameError,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: AuthTextField(
+                  label: l10n.authLastNameLabel,
+                  hint: l10n.authLastNameHint,
+                  leadingIcon: Symbols.person,
+                  controller: lastNameController,
+                  errorText: lastNameError,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           AuthTextField(

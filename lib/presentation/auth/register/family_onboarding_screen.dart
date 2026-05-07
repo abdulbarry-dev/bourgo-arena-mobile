@@ -114,13 +114,17 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                     child: Column(
                       children: [
                         FamilyMemberForm(
-                          nameController: _viewModel.nameController,
+                          firstNameController: _viewModel.firstNameController,
+                          lastNameController: _viewModel.lastNameController,
                           birthDateController: _viewModel.birthDateController,
                           selectedGender: _viewModel.selectedGender,
                           onGenderChanged: _viewModel.setGender,
                           onSelectBirthDate: _selectBirthDate,
                           onAdd: _viewModel.addMember,
-                          nameError: _viewModel.hasNameError
+                          firstNameError: _viewModel.hasFirstNameError
+                              ? l10n.commonRequiredField
+                              : null,
+                          lastNameError: _viewModel.hasLastNameError
                               ? l10n.commonRequiredField
                               : null,
                           genderError: _viewModel.hasGenderError

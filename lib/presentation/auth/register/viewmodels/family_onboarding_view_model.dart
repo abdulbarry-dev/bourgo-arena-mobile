@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 /// ViewModel for the Family Onboarding screen.
 class FamilyOnboardingViewModel extends ChangeNotifier {
   final List<ChildProfileModel> _members = [];
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
 
   DateTime? _selectedBirthDate;
   String? _selectedGender;
-  bool _hasNameError = false;
+  bool _hasFirstNameError = false;
+  bool _hasLastNameError = false;
   bool _hasGenderError = false;
   bool _hasBirthDateError = false;
 
@@ -21,7 +23,8 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   /// Returns the currently selected gender.
   String? get selectedGender => _selectedGender;
-  bool get hasNameError => _hasNameError;
+  bool get hasFirstNameError => _hasFirstNameError;
+  bool get hasLastNameError => _hasLastNameError;
   bool get hasGenderError => _hasGenderError;
   bool get hasBirthDateError => _hasBirthDateError;
 
@@ -39,21 +42,21 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   /// Adds a new member to the list.
   void addMember() {
-    _hasNameError = nameController.text.trim().isEmpty;
+    _hasFirstNameError = firstNameController.text.trim().isEmpty;
+    _hasLastNameError = lastNameController.text.trim().isEmpty;
     _hasBirthDateError = _selectedBirthDate == null;
     _hasGenderError = _selectedGender == null;
 
-    if (_hasNameError || _hasBirthDateError || _hasGenderError) {
+    if (_hasFirstNameError ||
+        _hasLastNameError ||
+        _hasBirthDateError ||
+        _hasGenderError) {
       notifyListeners();
       return;
     }
 
-    final name = nameController.text.trim();
-    // Split name into first and last name if possible,
-    // otherwise use name as first name and empty as last name.
-    final parts = name.split(' ');
-    final firstName = parts[0];
-    final lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+    final firstName = firstNameController.text.trim();
+    final lastName = lastNameController.text.trim();
 
     _members.add(
       ChildProfileModel(
@@ -66,11 +69,13 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
     );
 
     // Reset form
-    nameController.clear();
+    firstNameController.clear();
+    lastNameController.clear();
     birthDateController.clear();
     _selectedBirthDate = null;
     _selectedGender = null;
-    _hasNameError = false;
+    _hasFirstNameError = false;
+    _hasLastNameError = false;
     _hasGenderError = false;
     _hasBirthDateError = false;
     notifyListeners();
@@ -86,7 +91,8 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    nameController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
     birthDateController.dispose();
     super.dispose();
   }

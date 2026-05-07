@@ -467,13 +467,17 @@ class _ChildrenSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         FamilyMemberForm(
-          nameController: viewModel.childNameController,
+          firstNameController: viewModel.childFirstNameController,
+          lastNameController: viewModel.childLastNameController,
           birthDateController: viewModel.childBirthDateController,
           selectedGender: viewModel.selectedChildGender,
           onGenderChanged: viewModel.setChildGender,
           onSelectBirthDate: onSelectBirthDate,
           onAdd: () => viewModel.addChildFromForm(),
-          nameError: viewModel.hasChildNameError
+          firstNameError: viewModel.hasChildFirstNameError
+              ? l10n.commonRequiredField
+              : null,
+          lastNameError: viewModel.hasChildLastNameError
               ? l10n.commonRequiredField
               : null,
           genderError: viewModel.hasChildGenderError

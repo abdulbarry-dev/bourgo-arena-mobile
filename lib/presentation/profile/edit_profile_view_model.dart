@@ -15,7 +15,8 @@ class EditProfileViewModel extends ChangeNotifier {
   bool _isSaving = false;
   bool _isOtpSent = false;
   bool _isVerifyingOtp = false;
-  bool _hasChildNameError = false;
+  bool _hasChildFirstNameError = false;
+  bool _hasChildLastNameError = false;
   bool _hasChildGenderError = false;
   bool _hasChildBirthDateError = false;
 
@@ -32,7 +33,8 @@ class EditProfileViewModel extends ChangeNotifier {
   bool get isSaving => _isSaving;
   bool get isOtpSent => _isOtpSent;
   bool get isVerifyingOtp => _isVerifyingOtp;
-  bool get hasChildNameError => _hasChildNameError;
+  bool get hasChildFirstNameError => _hasChildFirstNameError;
+  bool get hasChildLastNameError => _hasChildLastNameError;
   bool get hasChildGenderError => _hasChildGenderError;
   bool get hasChildBirthDateError => _hasChildBirthDateError;
 
@@ -161,7 +163,8 @@ class EditProfileViewModel extends ChangeNotifier {
 
   // --- Family Member Form State ---
 
-  final childNameController = TextEditingController();
+  final childFirstNameController = TextEditingController();
+  final childLastNameController = TextEditingController();
   final childBirthDateController = TextEditingController();
   String? _selectedChildGender;
   DateTime? _selectedChildBirthDate;
@@ -180,30 +183,36 @@ class EditProfileViewModel extends ChangeNotifier {
   }
 
   void clearChildForm() {
-    childNameController.clear();
+    childFirstNameController.clear();
+    childLastNameController.clear();
     childBirthDateController.clear();
     _selectedChildGender = null;
     _selectedChildBirthDate = null;
-    _hasChildNameError = false;
+    _hasChildFirstNameError = false;
+    _hasChildLastNameError = false;
     _hasChildGenderError = false;
     _hasChildBirthDateError = false;
     notifyListeners();
   }
 
   Future<bool> addChildFromForm() async {
-    _hasChildNameError = childNameController.text.isEmpty;
+    _hasChildFirstNameError = childFirstNameController.text.trim().isEmpty;
+    _hasChildLastNameError = childLastNameController.text.trim().isEmpty;
     _hasChildBirthDateError = _selectedChildBirthDate == null;
     _hasChildGenderError = _selectedChildGender == null;
 
-    if (_hasChildNameError || _hasChildBirthDateError || _hasChildGenderError) {
+    if (_hasChildFirstNameError ||
+        _hasChildLastNameError ||
+        _hasChildBirthDateError ||
+        _hasChildGenderError) {
       notifyListeners();
       return false;
     }
 
     final newChild = ChildProfileModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      firstName: childNameController.text,
-      lastName: _profile?.lastName ?? '',
+      firstName: childFirstNameController.text.trim(),
+      lastName: childLastNameController.text.trim(),
       birthDate: _selectedChildBirthDate!,
       gender: _selectedChildGender!,
     );
@@ -235,7 +244,8 @@ class EditProfileViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    childNameController.dispose();
+    childFirstNameController.dispose();
+    childLastNameController.dispose();
     childBirthDateController.dispose();
     super.dispose();
   }
