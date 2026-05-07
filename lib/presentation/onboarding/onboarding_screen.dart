@@ -31,39 +31,54 @@ class OnboardingScreen extends StatelessWidget {
 
           // Content
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Spacer(flex: 3),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 80),
 
-                  // Brand Logotype
-                  _BrandLogotype(),
+                        // Brand Logotype
+                        const _BrandLogotype(),
 
-                  const SizedBox(height: 12),
+                        const SizedBox(height: 12),
 
-                  // Tagline
-                  Text(
-                    AppLocalizations.of(context)!.tagline.toUpperCase(),
-                    style: theme.textTheme.labelLarge?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 2.0,
+                        // Tagline
+                        Text(
+                          AppLocalizations.of(context)!.tagline.toUpperCase(),
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 2.0,
+                          ),
+                        ),
+
+                        // Pushes button to bottom if space allows
+                        const SizedBox(height: 120),
+
+                        // Action Button
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () => context.push('/login'),
+                            child: Text(
+                              AppLocalizations.of(context)!.commonStart,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 32),
+                      ],
                     ),
                   ),
-
-                  const Spacer(flex: 5),
-
-                  // Action Button
-                  ElevatedButton(
-                    onPressed: () => context.push('/login'),
-                    child: Text(AppLocalizations.of(context)!.commonStart),
-                  ),
-
-                  const SizedBox(height: 32),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -73,6 +88,8 @@ class OnboardingScreen extends StatelessWidget {
 }
 
 class _BrandLogotype extends StatelessWidget {
+  const _BrandLogotype();
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

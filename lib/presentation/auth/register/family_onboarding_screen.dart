@@ -188,7 +188,7 @@ class _MembersList extends StatelessWidget {
             itemBuilder: (context, index) {
               final member = members[index];
               return FamilyMemberCard(
-                name: member.firstName,
+                name: member.name,
                 gender: member.gender,
                 onRemove: () => onRemove(index),
               );

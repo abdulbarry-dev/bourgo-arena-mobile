@@ -449,7 +449,7 @@ class _ChildrenSection extends StatelessWidget {
               itemBuilder: (context, index) {
                 final child = children[index];
                 return FamilyMemberCard(
-                  name: child.firstName,
+                  name: child.name,
                   gender: child.gender,
                   onRemove: () => viewModel.removeChild(child.id),
                 );

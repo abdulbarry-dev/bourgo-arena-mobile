@@ -21,6 +21,9 @@ class ChildProfileModel {
     this.avatarUrl,
   });
 
+  /// Returns the full name of the child.
+  String get name => '$firstName $lastName';
+
   factory ChildProfileModel.fromJson(Map<String, dynamic> json) =>
       _$ChildProfileModelFromJson(json);
 

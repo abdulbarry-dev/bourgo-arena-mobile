@@ -2,7 +2,6 @@ import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen that prompts the user to select their preferred language.
@@ -62,126 +61,139 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
           ),
 
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Spacer(flex: 2),
-
-                  // Brand Header
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: BourgoTheme.primaryNeon.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: BourgoTheme.primaryNeon.withValues(
-                              alpha: 0.1,
-                            ),
-                            blurRadius: 40,
-                            spreadRadius: 10,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Symbols.language,
-                        size: 64,
-                        color: BourgoTheme.primaryNeon,
-                      ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  Text(
-                    l10n.languageSelectionTitle,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.displaySmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  Text(
-                    l10n.languageSelectionSubtitle,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.7),
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Professional Selection UI
-                  ValueListenableBuilder<Locale>(
-                    valueListenable: _selectedLocale,
-                    builder: (context, locale, child) {
-                      return Column(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          _LanguageOption(
-                            label: l10n.languageEnglish,
-                            code: 'EN',
-                            isSelected: locale.languageCode == 'en',
-                            onTap: () =>
-                                _selectedLocale.value = const Locale('en'),
+                          const SizedBox(height: 40),
+
+                          // Brand Header
+                          Center(
+                            child: Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(
+                                color: BourgoTheme.primaryNeon.withValues(
+                                  alpha: 0.1,
+                                ),
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: BourgoTheme.primaryNeon.withValues(
+                                      alpha: 0.1,
+                                    ),
+                                    blurRadius: 40,
+                                    spreadRadius: 10,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(
+                                Symbols.language,
+                                size: 64,
+                                color: BourgoTheme.primaryNeon,
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 12),
-                          _LanguageOption(
-                            label: l10n.languageFrench,
-                            code: 'FR',
-                            isSelected: locale.languageCode == 'fr',
-                            onTap: () =>
-                                _selectedLocale.value = const Locale('fr'),
+
+                          const SizedBox(height: 48),
+
+                          Text(
+                            l10n.languageSelectionTitle,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.displaySmall?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                            ),
                           ),
+
+                          const SizedBox(height: 16),
+
+                          Text(
+                            l10n.languageSelectionSubtitle,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.7),
+                            ),
+                          ),
+
+                          const SizedBox(height: 48),
+
+                          // Professional Selection UI
+                          ValueListenableBuilder<Locale>(
+                            valueListenable: _selectedLocale,
+                            builder: (context, locale, child) {
+                              return Column(
+                                children: [
+                                  _LanguageOption(
+                                    label: l10n.languageEnglish,
+                                    code: 'EN',
+                                    isSelected: locale.languageCode == 'en',
+                                    onTap: () => _selectedLocale.value =
+                                        const Locale('en'),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  _LanguageOption(
+                                    label: l10n.languageFrench,
+                                    code: 'FR',
+                                    isSelected: locale.languageCode == 'fr',
+                                    onTap: () => _selectedLocale.value =
+                                        const Locale('fr'),
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 48),
+
+                          // Continue Button
+                          ValueListenableBuilder<Locale>(
+                            valueListenable: _selectedLocale,
+                            builder: (context, locale, child) {
+                              return ElevatedButton(
+                                onPressed: () async {
+                                  // Await the update to ensure persistence is done
+                                  await widget.viewModel.updateLocale(locale);
+                                  // Redirection is handled by the router automatically
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: BourgoTheme.primaryNeon,
+                                  foregroundColor: Colors.black,
+                                ),
+                                child: Text(l10n.commonStart),
+                              );
+                            },
+                          ),
+
+                          const SizedBox(height: 32),
+
+                          // Brand Footer (Subtle)
+                          Center(
+                            child: Opacity(
+                              opacity: 0.5,
+                              child: Text(
+                                'BOURGO ARENA',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: Colors.white,
+                                  letterSpacing: 4.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
                         ],
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 48),
-
-                  // Continue Button
-                  ValueListenableBuilder<Locale>(
-                    valueListenable: _selectedLocale,
-                    builder: (context, locale, child) {
-                      return ElevatedButton(
-                        onPressed: () async {
-                          // Await the update to ensure persistence is done
-                          await widget.viewModel.updateLocale(locale);
-                          if (context.mounted) {
-                            context.go('/register');
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: BourgoTheme.primaryNeon,
-                          foregroundColor: Colors.black,
-                        ),
-                        child: Text(l10n.commonStart),
-                      );
-                    },
-                  ),
-
-                  // Brand Footer (Subtle)
-                  Center(
-                    child: Opacity(
-                      opacity: 0.5,
-                      child: Text(
-                        'BOURGO ARENA',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: Colors.white,
-                          letterSpacing: 4.0,
-                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
