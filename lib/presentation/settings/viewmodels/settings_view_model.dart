@@ -41,8 +41,10 @@ class SettingsViewModel extends ChangeNotifier {
     if (newLocale == null || newLocale == _locale) return;
 
     _locale = newLocale;
-    notifyListeners();
+    // We persist before notifying so that GoRouter redirects see the updated state
+    // in SharedPreferences, preventing a redirection loop.
     await _settingsService.setLocale(newLocale);
+    notifyListeners();
   }
 
   /// Toggles push notifications.

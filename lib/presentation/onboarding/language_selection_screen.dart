@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen that prompts the user to select their preferred language.
-class LanguageSelectionScreen extends StatelessWidget {
+class LanguageSelectionScreen extends StatefulWidget {
   /// The view model managing app settings.
   final SettingsViewModel viewModel;
 
@@ -14,10 +14,29 @@ class LanguageSelectionScreen extends StatelessWidget {
   const LanguageSelectionScreen({super.key, required this.viewModel});
 
   @override
+  State<LanguageSelectionScreen> createState() =>
+      _LanguageSelectionScreenState();
+}
+
+class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
+  late final ValueNotifier<Locale> _selectedLocale;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedLocale = ValueNotifier<Locale>(widget.viewModel.locale);
+  }
+
+  @override
+  void dispose() {
+    _selectedLocale.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final selectedLocale = ValueNotifier<Locale>(viewModel.locale);
 
     return Scaffold(
       body: Stack(
@@ -100,7 +119,7 @@ class LanguageSelectionScreen extends StatelessWidget {
 
                   // Professional Selection UI
                   ValueListenableBuilder<Locale>(
-                    valueListenable: selectedLocale,
+                    valueListenable: _selectedLocale,
                     builder: (context, locale, child) {
                       return Column(
                         children: [
@@ -109,7 +128,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                             code: 'EN',
                             isSelected: locale.languageCode == 'en',
                             onTap: () =>
-                                selectedLocale.value = const Locale('en'),
+                                _selectedLocale.value = const Locale('en'),
                           ),
                           const SizedBox(height: 12),
                           _LanguageOption(
@@ -117,7 +136,7 @@ class LanguageSelectionScreen extends StatelessWidget {
                             code: 'FR',
                             isSelected: locale.languageCode == 'fr',
                             onTap: () =>
-                                selectedLocale.value = const Locale('fr'),
+                                _selectedLocale.value = const Locale('fr'),
                           ),
                         ],
                       );
@@ -128,12 +147,15 @@ class LanguageSelectionScreen extends StatelessWidget {
 
                   // Continue Button
                   ValueListenableBuilder<Locale>(
-                    valueListenable: selectedLocale,
+                    valueListenable: _selectedLocale,
                     builder: (context, locale, child) {
                       return ElevatedButton(
-                        onPressed: () {
-                          viewModel.updateLocale(locale);
-                          context.go('/register');
+                        onPressed: () async {
+                          // Await the update to ensure persistence is done
+                          await widget.viewModel.updateLocale(locale);
+                          if (context.mounted) {
+                            context.go('/register');
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: BourgoTheme.primaryNeon,
@@ -184,17 +206,19 @@ class _LanguageOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
+    final appColors = theme.extension<AppColors>();
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         color: isSelected
             ? theme.colorScheme.primary.withValues(alpha: 0.1)
-            : appColors.bgElevated,
+            : appColors?.bgElevated ?? theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isSelected ? theme.colorScheme.primary : appColors.bgBorder,
+          color: isSelected
+              ? theme.colorScheme.primary
+              : appColors?.bgBorder ?? theme.colorScheme.outlineVariant,
           width: 2,
         ),
       ),
