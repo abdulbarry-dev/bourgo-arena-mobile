@@ -10,6 +10,21 @@
   "subscription_expiry": "2026-12-31",
   "total_check_ins": 42,
   "birth_date": "1995-05-15T00:00:00Z",
-  "is_parent_account": false,
-  "children": []
+  "is_parent_account": true,
+  "children": [
+    {
+      "id": "child-1",
+      "first_name": "Yassine",
+      "last_name": "BOURGO",
+      "birth_date": "2015-08-20T00:00:00Z",
+      "gender": "Male"
+    },
+    {
+      "id": "child-2",
+      "first_name": "Selima",
+      "last_name": "BOURGO",
+      "birth_date": "2018-03-12T00:00:00Z",
+      "gender": "Female"
+    }
+  ]
 }

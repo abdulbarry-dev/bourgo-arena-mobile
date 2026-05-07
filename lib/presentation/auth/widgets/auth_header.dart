@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -8,11 +9,14 @@ class AuthHeader extends StatelessWidget {
   final String subtitle;
   final bool? showBackButton;
 
+  final Color? subtitleColor;
+
   const AuthHeader({
     super.key,
     required this.title,
     required this.subtitle,
     this.showBackButton,
+    this.subtitleColor,
   });
 
   @override
@@ -22,26 +26,49 @@ class AuthHeader extends StatelessWidget {
         showBackButton ?? Navigator.of(context).canPop();
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (effectiveShowBackButton) ...[
-          IconButton(
-            onPressed: () => context.pop(),
-            icon: const Icon(Symbols.arrow_back, color: Colors.white),
-            padding: EdgeInsets.zero,
+          Align(
             alignment: Alignment.centerLeft,
+            child: IconButton(
+              onPressed: () => context.pop(),
+              icon: Icon(
+                Symbols.arrow_back,
+                color: theme.colorScheme.onSurface,
+              ),
+              padding: EdgeInsets.zero,
+            ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
         ],
+        const Center(
+          child: BrandLogo(
+            size: 100,
+            useVertical: true,
+            heroTag: 'app_logo',
+          ),
+        ),
+        const SizedBox(height: 32),
         Text(
           title,
-          style: theme.textTheme.headlineLarge?.copyWith(color: Colors.white),
+          textAlign: TextAlign.center,
+          style: theme.textTheme.displaySmall?.copyWith(
+            color: theme.colorScheme.onSurface,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
+          ),
         ),
-        const SizedBox(height: 8),
-        Text(
-          subtitle,
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: theme.colorScheme.onSurface.withAlpha((0.65 * 255).round()),
+        const SizedBox(height: 12),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: subtitleColor ?? theme.colorScheme.onSurfaceVariant,
+              height: 1.5,
+            ),
           ),
         ),
       ],

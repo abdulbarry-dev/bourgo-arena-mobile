@@ -2,6 +2,8 @@
   "@@locale": "en",
   "appName": "Bourgo Arena",
   "tagline": "The Sport HQ in Djerba",
+  "onboardingTitle": "PUSH YOUR LIMITS",
+  "onboardingSubtitle": "Experience the ultimate sport performance center in the heart of Djerba.",
   
   "commonRetry": "RETRY",
   "commonLoadingError": "Loading Error",
@@ -178,6 +180,7 @@
   "settingsSectionLegal": "LEGAL",
   "settingsSectionAbout": "ABOUT",
   "settingsEditProfile": "Edit Profile",
+  "settingsManageFamily": "Manage Family",
   "settingsChangePassword": "Change Password",
   "settingsLanguage": "App Language",
   "settingsTheme": "Display Mode",
@@ -245,5 +248,9 @@
 
   "errorNotFoundTitle": "PAGE NOT FOUND",
   "errorNotFoundSubtitle": "Oops! The page you're looking for doesn't exist or has been moved.",
-  "errorNotFoundAction": "GO BACK HOME"
+  "errorNotFoundAction": "GO BACK HOME",
+  "profileDisableFamilyTitle": "Disable Family Account?",
+  "profileDisableFamilyContent": "This will hide all children profiles and features. Are you sure you want to continue?",
+  "profileDisableConfirm": "DISABLE",
+  "commonCancel": "CANCEL"
 }

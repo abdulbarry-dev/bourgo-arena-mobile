@@ -61,14 +61,18 @@ class BourgoTheme {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primaryNeon,
       brightness: Brightness.light,
-      primary: const Color(0xFF558800), // Slightly deeper for light mode
+      primary: const Color(0xFF558800),
       onPrimary: Colors.white,
-      surface: const Color(0xFFF5F5F5), // Slightly darker background
+      surface: Colors.white,
       onSurface: const Color(0xFF1A1A1A),
-      onSurfaceVariant: const Color(0xFF454545),
-      outline: const Color(0xFFCCCCCC), // Darker outline for visibility
-      surfaceContainer: Colors.white, // Pure white for cards
-      surfaceContainerLow: const Color(0xFFFAFAFA),
+      onSurfaceVariant: const Color(0xFF5A5A5A),
+      outline: const Color(0xFFE0E0E0),
+      outlineVariant: const Color(0xFFF0F0F0),
+      surfaceContainer: const Color(0xFFF7F9FC),
+      surfaceContainerLow: const Color(0xFFFDFDFD),
+      surfaceContainerHigh: const Color(0xFFF1F4F8),
+      surfaceContainerHighest: const Color(0xFFE9EDF2),
+      error: const Color(0xFFD32F2F),
     );
 
     return ThemeData(
@@ -79,11 +83,11 @@ class BourgoTheme {
       textTheme: _getTextTheme(Brightness.light),
       extensions: [
         AppColors(
-          brandPrimaryGhost: const Color(0xFF558800).withValues(alpha: 0.1),
-          brandPrimaryGlow: const Color(0xFF558800).withValues(alpha: 0.25),
+          brandPrimaryGhost: const Color(0xFF558800).withValues(alpha: 0.08),
+          brandPrimaryGlow: const Color(0xFF558800).withValues(alpha: 0.2),
           bgSurface: Colors.white,
-          bgElevated: const Color(0xFFF2F2F2),
-          bgBorder: const Color(0xFFE5E5E5),
+          bgElevated: const Color(0xFFF8F9FA),
+          bgBorder: const Color(0xFFE9ECEF),
         ),
       ],
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -91,6 +95,21 @@ class BourgoTheme {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
           minimumSize: const Size(double.infinity, 52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          minimumSize: const Size(double.infinity, 52),
+          side: BorderSide(color: colorScheme.outline, width: 2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -136,6 +155,24 @@ class BourgoTheme {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
           minimumSize: const Size(double.infinity, 52),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.5,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colorScheme.primary,
+          minimumSize: const Size(double.infinity, 52),
+          side: BorderSide(
+            color: colorScheme.primary.withValues(alpha: 0.5),
+            width: 2,
+          ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

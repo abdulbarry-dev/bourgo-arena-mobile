@@ -15,6 +15,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get tagline => 'Le QG du Sport à Djerba';
 
   @override
+  String get onboardingTitle => 'REPOUSSEZ VOS LIMITES';
+
+  @override
+  String get onboardingSubtitle =>
+      'Découvrez le centre de performance sportive ultime au cœur de Djerba.';
+
+  @override
   String get commonRetry => 'RÉESSAYER';
 
   @override
@@ -519,6 +526,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsEditProfile => 'Modifier le profil';
 
   @override
+  String get settingsManageFamily => 'Gérer la famille';
+
+  @override
   String get settingsChangePassword => 'Changer le mot de passe';
 
   @override
@@ -731,4 +741,17 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get errorNotFoundAction => 'RETOUR À L\'ACCUEIL';
+
+  @override
+  String get profileDisableFamilyTitle => 'Désactiver le compte famille ?';
+
+  @override
+  String get profileDisableFamilyContent =>
+      'Cela masquera tous les profils d\'enfants et les fonctionnalités. Êtes-vous sûr de vouloir continuer ?';
+
+  @override
+  String get profileDisableConfirm => 'DÉSACTIVER';
+
+  @override
+  String get commonCancel => 'ANNULER';
 }

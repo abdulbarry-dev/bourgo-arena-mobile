@@ -2,6 +2,8 @@
   "@@locale": "fr",
   "appName": "Bourgo Arena",
   "tagline": "Le QG du Sport à Djerba",
+  "onboardingTitle": "REPOUSSEZ VOS LIMITES",
+  "onboardingSubtitle": "Découvrez le centre de performance sportive ultime au cœur de Djerba.",
   
   "commonRetry": "RÉESSAYER",
   "commonLoadingError": "Erreur de chargement",
@@ -178,6 +180,7 @@
   "settingsSectionLegal": "LÉGAL",
   "settingsSectionAbout": "À PROPOS",
   "settingsEditProfile": "Modifier le profil",
+  "settingsManageFamily": "Gérer la famille",
   "settingsChangePassword": "Changer le mot de passe",
   "settingsLanguage": "Langue de l'app",
   "settingsTheme": "Mode d'affichage",
@@ -245,5 +248,9 @@
 
   "errorNotFoundTitle": "PAGE INTROUVABLE",
   "errorNotFoundSubtitle": "Oups ! La page que vous cherchez n'existe pas ou a été déplacée.",
-  "errorNotFoundAction": "RETOUR À L'ACCUEIL"
+  "errorNotFoundAction": "RETOUR À L'ACCUEIL",
+  "profileDisableFamilyTitle": "Désactiver le compte famille ?",
+  "profileDisableFamilyContent": "Cela masquera tous les profils d'enfants et les fonctionnalités. Êtes-vous sûr de vouloir continuer ?",
+  "profileDisableConfirm": "DÉSACTIVER",
+  "commonCancel": "ANNULER"
 }

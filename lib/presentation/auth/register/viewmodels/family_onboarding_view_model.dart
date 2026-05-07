@@ -4,11 +4,16 @@ import 'package:flutter/material.dart';
 /// ViewModel for the Family Onboarding screen.
 class FamilyOnboardingViewModel extends ChangeNotifier {
   final List<ChildProfileModel> _members = [];
-  final TextEditingController nameController = TextEditingController();
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController lastNameController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
 
   DateTime? _selectedBirthDate;
   String? _selectedGender;
+  bool _hasFirstNameError = false;
+  bool _hasLastNameError = false;
+  bool _hasGenderError = false;
+  bool _hasBirthDateError = false;
 
   /// Returns the list of added members.
   List<ChildProfileModel> get members => List.unmodifiable(_members);
@@ -18,6 +23,10 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   /// Returns the currently selected gender.
   String? get selectedGender => _selectedGender;
+  bool get hasFirstNameError => _hasFirstNameError;
+  bool get hasLastNameError => _hasLastNameError;
+  bool get hasGenderError => _hasGenderError;
+  bool get hasBirthDateError => _hasBirthDateError;
 
   /// Sets the selected birth date.
   void setBirthDate(DateTime? date) {
@@ -33,31 +42,43 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   /// Adds a new member to the list.
   void addMember() {
-    final name = nameController.text.trim();
-    if (name.isNotEmpty && _selectedBirthDate != null) {
-      // Split name into first and last name if possible,
-      // otherwise use name as first name and empty as last name.
-      final parts = name.split(' ');
-      final firstName = parts[0];
-      final lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+    _hasFirstNameError = firstNameController.text.trim().isEmpty;
+    _hasLastNameError = lastNameController.text.trim().isEmpty;
+    _hasBirthDateError = _selectedBirthDate == null;
+    _hasGenderError = _selectedGender == null;
 
-      _members.add(
-        ChildProfileModel(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          firstName: firstName,
-          lastName: lastName,
-          birthDate: _selectedBirthDate!,
-          gender: _selectedGender,
-        ),
-      );
-
-      // Reset form
-      nameController.clear();
-      birthDateController.clear();
-      _selectedBirthDate = null;
-      _selectedGender = null;
+    if (_hasFirstNameError ||
+        _hasLastNameError ||
+        _hasBirthDateError ||
+        _hasGenderError) {
       notifyListeners();
+      return;
     }
+
+    final firstName = firstNameController.text.trim();
+    final lastName = lastNameController.text.trim();
+
+    _members.add(
+      ChildProfileModel(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        firstName: firstName,
+        lastName: lastName,
+        birthDate: _selectedBirthDate!,
+        gender: _selectedGender,
+      ),
+    );
+
+    // Reset form
+    firstNameController.clear();
+    lastNameController.clear();
+    birthDateController.clear();
+    _selectedBirthDate = null;
+    _selectedGender = null;
+    _hasFirstNameError = false;
+    _hasLastNameError = false;
+    _hasGenderError = false;
+    _hasBirthDateError = false;
+    notifyListeners();
   }
 
   /// Removes a member from the list.
@@ -70,7 +91,8 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
-    nameController.dispose();
+    firstNameController.dispose();
+    lastNameController.dispose();
     birthDateController.dispose();
     super.dispose();
   }

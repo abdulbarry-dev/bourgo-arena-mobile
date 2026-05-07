@@ -15,6 +15,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tagline => 'The Sport HQ in Djerba';
 
   @override
+  String get onboardingTitle => 'PUSH YOUR LIMITS';
+
+  @override
+  String get onboardingSubtitle =>
+      'Experience the ultimate sport performance center in the heart of Djerba.';
+
+  @override
   String get commonRetry => 'RETRY';
 
   @override
@@ -515,6 +522,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsEditProfile => 'Edit Profile';
 
   @override
+  String get settingsManageFamily => 'Manage Family';
+
+  @override
   String get settingsChangePassword => 'Change Password';
 
   @override
@@ -727,4 +737,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorNotFoundAction => 'GO BACK HOME';
+
+  @override
+  String get profileDisableFamilyTitle => 'Disable Family Account?';
+
+  @override
+  String get profileDisableFamilyContent =>
+      'This will hide all children profiles and features. Are you sure you want to continue?';
+
+  @override
+  String get profileDisableConfirm => 'DISABLE';
+
+  @override
+  String get commonCancel => 'CANCEL';
 }

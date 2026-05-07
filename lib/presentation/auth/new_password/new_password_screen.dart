@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/new_password/new_password_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:flutter/material.dart';
@@ -30,77 +31,88 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListenableBuilder(
-        listenable: _viewModel,
-        builder: (context, _) {
-          return SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _viewModel.formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AuthHeader(
-                      title: AppLocalizations.of(context)!.authNewPasswordTitle,
-                      subtitle: AppLocalizations.of(
-                        context,
-                      )!.authNewPasswordSubtitle,
-                    ),
-                    const SizedBox(height: 48),
-                    AuthTextField(
-                      label: AppLocalizations.of(context)!.authNewPasswordLabel,
-                      hint: AppLocalizations.of(context)!.authNewPasswordHint,
-                      leadingIcon: Symbols.lock,
-                      isPassword: true,
-                      controller: _viewModel.passwordController,
-                      validator: (value) => (value?.length ?? 0) < 6
-                          ? AppLocalizations.of(context)!.authPasswordMinLength
-                          : null,
-                    ),
-                    const SizedBox(height: 24),
-                    AuthTextField(
-                      label: AppLocalizations.of(
-                        context,
-                      )!.authConfirmPasswordLabel,
-                      hint: AppLocalizations.of(
-                        context,
-                      )!.authConfirmPasswordHint,
-                      leadingIcon: Symbols.lock,
-                      isPassword: true,
-                      controller: _viewModel.confirmPasswordController,
-                      validator: (value) {
-                        if (value != _viewModel.passwordController.text) {
-                          return AppLocalizations.of(
-                            context,
-                          )!.authPasswordsDoNotMatch;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 48),
-                    ElevatedButton(
-                      onPressed: _viewModel.isLoading
-                          ? null
-                          : () => _viewModel.resetPassword(context),
-                      child: _viewModel.isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.black,
-                              ),
-                            )
-                          : Text(AppLocalizations.of(context)!.authReset),
-                    ),
-                  ],
+    return AuthBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: ListenableBuilder(
+          listenable: _viewModel,
+          builder: (context, _) {
+            return SafeArea(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _viewModel.formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AuthHeader(
+                        title: AppLocalizations.of(
+                          context,
+                        )!.authNewPasswordTitle,
+                        subtitle: AppLocalizations.of(
+                          context,
+                        )!.authNewPasswordSubtitle,
+                      ),
+                      const SizedBox(height: 48),
+                      AuthTextField(
+                        label: AppLocalizations.of(
+                          context,
+                        )!.authNewPasswordLabel,
+                        hint: AppLocalizations.of(context)!.authNewPasswordHint,
+                        leadingIcon: Symbols.lock,
+                        isPassword: true,
+                        controller: _viewModel.passwordController,
+                        validator: (value) => (value?.length ?? 0) < 6
+                            ? AppLocalizations.of(
+                                context,
+                              )!.authPasswordMinLength
+                            : null,
+                      ),
+                      const SizedBox(height: 24),
+                      AuthTextField(
+                        label: AppLocalizations.of(
+                          context,
+                        )!.authConfirmPasswordLabel,
+                        hint: AppLocalizations.of(
+                          context,
+                        )!.authConfirmPasswordHint,
+                        leadingIcon: Symbols.lock,
+                        isPassword: true,
+                        controller: _viewModel.confirmPasswordController,
+                        validator: (value) {
+                          if (value != _viewModel.passwordController.text) {
+                            return AppLocalizations.of(
+                              context,
+                            )!.authPasswordsDoNotMatch;
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 48),
+                      ElevatedButton(
+                        onPressed: _viewModel.isLoading
+                            ? null
+                            : () => _viewModel.resetPassword(context),
+                        child: _viewModel.isLoading
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                ),
+                              )
+                            : Text(AppLocalizations.of(context)!.authReset),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

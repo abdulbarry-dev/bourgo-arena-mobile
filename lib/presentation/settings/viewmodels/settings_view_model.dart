@@ -38,7 +38,10 @@ class SettingsViewModel extends ChangeNotifier {
 
   /// Updates the application's locale.
   Future<void> updateLocale(Locale? newLocale) async {
-    if (newLocale == null || newLocale == _locale) return;
+    if (newLocale == null) return;
+
+    // We only skip if the locale is the same AND it's already been persisted.
+    if (newLocale == _locale && isLanguageSelected) return;
 
     _locale = newLocale;
     // We persist before notifying so that GoRouter redirects see the updated state
