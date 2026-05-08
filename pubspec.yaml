@@ -48,6 +48,7 @@ dependencies:
   get_it: ^9.2.1
 
 dev_dependencies:
+  test: ^1.26.3
   flutter_test:
     sdk: flutter
 

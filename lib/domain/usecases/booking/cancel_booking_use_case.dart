@@ -10,11 +10,6 @@ class CancelBookingUseCase {
 
   /// Executes the cancellation operation.
   Future<Result<void, Failure>> call(String id) async {
-    try {
-      await _repository.cancelReservation(id);
-      return const Success(null);
-    } catch (e) {
-      return FailureResult(ServerFailure('Failed to cancel booking'));
-    }
+    return _repository.cancelReservation(id);
   }
 }
