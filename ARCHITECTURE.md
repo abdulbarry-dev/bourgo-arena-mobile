@@ -26,8 +26,21 @@ Responsible for data retrieval, persistence, and external integrations.
 - **API Clients**: A central `ApiClient` handling base HTTP logic (headers, tokens, error handling).
 - **Services (Transitionary)**: Legacy services (e.g., `AuthService`, `DataService`) that act as state managers or bridges between old UI logic and new Clean Architecture components.
 
+NOTE: During the recent refactor the data layer was hardened to ensure all JSON (de)serialization and network I/O remain confined to DTOs, API clients, and repository implementations. Domain entities no longer expose `fromJson`/`toJson` or `@JsonSerializable` annotations — those belong exclusively to `lib/data/models` and are mapped into `lib/domain/entities` via the mappers.
+
 #### 3. Presentation Layer (UI & State)
 Handles the user interface and reactive state management.
+
+Session persistence & DI changes (refactor summary):
+
+- `SessionRepository` (domain interface) introduced as the single abstract contract for session- and settings-related persistence. It lives in the Domain layer and is injected everywhere repositories or use cases need session data.
+- `LocalSessionRepository` (data implementation) is now the only class that manages `SharedPreferences` access and raw storage keys. All `SharedPreferences.getInstance()` calls were consolidated and moved behind the DI boundary (initialization happens through `locator.dart`).
+- All storage key names are private `static const` inside `LocalSessionRepository`; a private `_sessionKeys` list enumerates all session-scoped keys and is used to implement an atomic `clearSession()` that wipes session state reliably on logout.
+- The former `SettingsRepository` adapter was removed as part of the cleanup pass — settings-use cases were migrated to depend on `SessionRepository` instead of a separate adapter.
+- `ApiAuthRepository` now depends on `SessionRepository` for token persistence and calls `clearSession()` on logout to ensure a complete session wipe.
+- These changes strengthen the unidirectional dependency rule: domain defines the contract, data implements it, and presentation consumes use cases without touching persistence details.
+
+Architectural note: To preserve domain purity, domain entities must not import Flutter (`package:flutter`) types such as `IconData`. Any UI-specific model (for example, a presentation `SearchResult` containing `IconData`) should be kept in the presentation layer or transformed at the mapper boundary into a UI-friendly DTO.
 - **Widgets/Screens**: Flutter UI components built with Material 3.
 - **ViewModels**: Manage screen state and handle user interactions. They are currently being refactored to invoke **Use Cases** instead of services directly.
 - **Common Widgets**: Reusable UI components shared across features (e.g., `BrandLogo`, `AuthBackground`).
