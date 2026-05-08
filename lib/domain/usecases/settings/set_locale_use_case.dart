@@ -1,3 +1,5 @@
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -9,5 +11,6 @@ class SetLocaleUseCase {
   const SetLocaleUseCase(this._repository);
 
   /// Executes the use case.
-  Future<void> call(Locale locale) async => _repository.setLocale(locale);
+  Future<Result<void, Failure>> call(Locale locale) =>
+      _repository.setLocale(locale);
 }

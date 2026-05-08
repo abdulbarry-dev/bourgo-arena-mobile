@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
@@ -16,8 +17,8 @@ class ApiAuthRepository implements AuthRepository {
   ApiAuthRepository(this._apiClient);
 
   @override
-  Future<Result<User, Failure>> login(String email, String password) async {
-    try {
+  Future<Result<User, Failure>> login(String email, String password) {
+    return executeApiCall(() async {
       final response =
           await _apiClient.post('/auth/login', {
                 'email': email,
@@ -36,22 +37,20 @@ class ApiAuthRepository implements AuthRepository {
 
       _authStateController.add(user);
       return Success(user);
-    } catch (e) {
-      return FailureResult(ServerFailure('Login failed: ${e.toString()}'));
-    }
+    });
   }
 
   @override
-  Future<Result<void, Failure>> logout() async {
-    try {
-      await _apiClient.post('/auth/logout', {});
-      return Success(null);
-    } catch (e) {
-      return FailureResult(ServerFailure('Logout failed: ${e.toString()}'));
-    } finally {
-      _apiClient.setToken(null);
-      _authStateController.add(null);
-    }
+  Future<Result<void, Failure>> logout() {
+    return executeApiCall(() async {
+      try {
+        await _apiClient.post('/auth/logout', {});
+        return const Success(null);
+      } finally {
+        _apiClient.setToken(null);
+        _authStateController.add(null);
+      }
+    });
   }
 
   @override
@@ -62,8 +61,8 @@ class ApiAuthRepository implements AuthRepository {
     required String phone,
     required String password,
     bool isFamilyAccount = false,
-  }) async {
-    try {
+  }) {
+    return executeApiCall(() async {
       await _apiClient.post('/auth/register', {
         'name': '$firstName $lastName',
         'email': email,
@@ -72,25 +71,21 @@ class ApiAuthRepository implements AuthRepository {
         'password_confirmation': password, // Ideally passed from UI
         'is_family_account': isFamilyAccount,
       });
-      return Success(null);
-    } catch (e) {
-      return FailureResult(ServerFailure('Registration failed: ${e.toString()}'));
-    }
+      return const Success(null);
+    });
   }
 
   @override
-  Future<Result<void, Failure>> sendOtp(String identifier) async {
-    try {
+  Future<Result<void, Failure>> sendOtp(String identifier) {
+    return executeApiCall(() async {
       await _apiClient.post('/auth/send-otp', {'identifier': identifier});
-      return Success(null);
-    } catch (e) {
-      return FailureResult(ServerFailure('Send OTP failed: ${e.toString()}'));
-    }
+      return const Success(null);
+    });
   }
 
   @override
-  Future<Result<bool, Failure>> verifyOtp(String identifier, String otp) async {
-    try {
+  Future<Result<bool, Failure>> verifyOtp(String identifier, String otp) {
+    return executeApiCall(() async {
       final response =
           await _apiClient.post('/auth/verify-otp', {
                 'identifier': identifier,
@@ -98,24 +93,20 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
       return Success(response['success'] == true);
-    } catch (e) {
-      return FailureResult(ServerFailure('Verify OTP failed: ${e.toString()}'));
-    }
+    });
   }
 
   @override
-  Future<Result<void, Failure>> requestFamilyAccountOtp() async {
-    try {
+  Future<Result<void, Failure>> requestFamilyAccountOtp() {
+    return executeApiCall(() async {
       await _apiClient.post('/auth/request-family-otp', {});
-      return Success(null);
-    } catch (e) {
-      return FailureResult(ServerFailure('Request family OTP failed: ${e.toString()}'));
-    }
+      return const Success(null);
+    });
   }
 
   @override
-  Future<Result<void, Failure>> completeRegistration(User user) async {
-    try {
+  Future<Result<void, Failure>> completeRegistration(User user) {
+    return executeApiCall(() async {
       await _apiClient.post('/auth/complete-registration', {
         'name': '${user.firstName} ${user.lastName}',
         'email': user.email,
@@ -123,35 +114,29 @@ class ApiAuthRepository implements AuthRepository {
         'is_parent_account': user.isParentAccount,
       });
       _authStateController.add(user);
-      return Success(null);
-    } catch (e) {
-      return FailureResult(
-        ServerFailure('Complete registration failed: ${e.toString()}'),
-      );
-    }
+      return const Success(null);
+    });
   }
 
   @override
   Future<Result<void, Failure>> updatePassword({
     required String currentPassword,
     required String newPassword,
-  }) async {
-    try {
+  }) {
+    return executeApiCall(() async {
       await _apiClient.put('/user/password', {
         'current_password': currentPassword,
         'new_password': newPassword,
         'new_password_confirmation': newPassword,
       });
-      return Success(null);
-    } catch (e) {
-      return FailureResult(ServerFailure('Password update failed: ${e.toString()}'));
-    }
+      return const Success(null);
+    });
   }
 
   @override
-  Future<String?> getToken() async {
+  Future<Result<String?, Failure>> getToken() async {
     // In a production app, this would be retrieved from secure storage (e.g. flutter_secure_storage)
-    return null;
+    return const Success(null);
   }
 
   @override

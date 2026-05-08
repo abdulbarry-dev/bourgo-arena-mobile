@@ -36,7 +36,7 @@ abstract interface class AuthRepository {
   });
 
   /// Retrieves the current auth token, if any.
-  Future<String?> getToken();
+  Future<Result<String?, Failure>> getToken();
 
   /// Completes the registration process and signs the user in.
   Future<Result<void, Failure>> completeRegistration(User user);

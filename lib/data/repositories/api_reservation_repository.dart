@@ -1,11 +1,11 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/reservation_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
-import 'dart:developer' as developer;
 
 /// Laravel API implementation of [ReservationRepository].
 class ApiReservationRepository implements ReservationRepository {
@@ -14,8 +14,8 @@ class ApiReservationRepository implements ReservationRepository {
   ApiReservationRepository(this._apiClient);
 
   @override
-  Future<Result<List<Reservation>, Failure>> getReservations() async {
-    try {
+  Future<Result<List<Reservation>, Failure>> getReservations() {
+    return executeApiCall(() async {
       final response = await _apiClient.get('/reservations') as List<dynamic>;
       final entities = response
           .map(
@@ -25,40 +25,29 @@ class ApiReservationRepository implements ReservationRepository {
           )
           .toList();
       return Result.success(entities);
-    } catch (e, stack) {
-      developer.log('Error fetching reservations', error: e, stackTrace: stack);
-      return Result.failure(ServerFailure(e.toString()));
-    }
+    });
   }
 
   @override
   Future<Result<Reservation, Failure>> makeReservation(
     Reservation reservation,
-  ) async {
-    try {
+  ) {
+    return executeApiCall(() async {
       final model = ReservationMapper.fromEntity(reservation);
       final response = await _apiClient.post('/reservations', model.toJson());
       return Result.success(
-        ReservationMapper.toEntity(ReservationModel.fromJson(response)),
+        ReservationMapper.toEntity(
+          ReservationModel.fromJson(response as Map<String, dynamic>),
+        ),
       );
-    } catch (e, stack) {
-      developer.log('Error making reservation', error: e, stackTrace: stack);
-      return Result.failure(ServerFailure(e.toString()));
-    }
+    });
   }
 
   @override
-  Future<Result<void, Failure>> cancelReservation(String id) async {
-    try {
+  Future<Result<void, Failure>> cancelReservation(String id) {
+    return executeApiCall(() async {
       await _apiClient.delete('/reservations/$id');
       return Result.success(null);
-    } catch (e, stack) {
-      developer.log(
-        'Error cancelling reservation: $id',
-        error: e,
-        stackTrace: stack,
-      );
-      return Result.failure(ServerFailure(e.toString()));
-    }
+    });
   }
 }

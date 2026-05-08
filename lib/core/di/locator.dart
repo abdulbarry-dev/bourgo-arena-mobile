@@ -105,17 +105,19 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => GetLocaleUseCase(locator()));
   locator.registerLazySingleton(() => SetLocaleUseCase(locator()));
   locator.registerLazySingleton(() => IsLanguageSelectedUseCase(locator()));
-  locator
-      .registerLazySingleton(() => GetNotificationsEnabledUseCase(locator()));
-  locator
-      .registerLazySingleton(() => SetNotificationsEnabledUseCase(locator()));
+  locator.registerLazySingleton(
+    () => GetNotificationsEnabledUseCase(locator()),
+  );
+  locator.registerLazySingleton(
+    () => SetNotificationsEnabledUseCase(locator()),
+  );
 
   // State Notifiers
   locator.registerLazySingleton(() => AuthStateNotifier(locator()));
 
-  // ViewModels
-  locator.registerLazySingleton(
-    () => SettingsViewModel(
+  // ViewModels — registered as async so initialize() is awaited at startup.
+  locator.registerSingletonAsync<SettingsViewModel>(() async {
+    final vm = SettingsViewModel(
       locator(),
       locator(),
       locator(),
@@ -123,6 +125,11 @@ Future<void> initLocator() async {
       locator(),
       locator(),
       locator(),
-    ),
-  );
+    );
+    await vm.initialize();
+    return vm;
+  });
+
+  // Wait for all async singletons before the app starts.
+  await locator.allReady();
 }

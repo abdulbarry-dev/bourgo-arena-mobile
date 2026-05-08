@@ -1,3 +1,5 @@
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 
@@ -9,5 +11,5 @@ class GetThemeModeUseCase {
   const GetThemeModeUseCase(this._repository);
 
   /// Executes the use case.
-  ThemeMode call() => _repository.getThemeMode();
+  Future<Result<ThemeMode, Failure>> call() => _repository.getThemeMode();
 }

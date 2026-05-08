@@ -1,25 +1,27 @@
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:flutter/material.dart';
 
 /// Repository interface for managing application settings.
-abstract class SettingsRepository {
+abstract interface class SettingsRepository {
   /// Retrieves the persisted [ThemeMode].
-  ThemeMode getThemeMode();
+  Future<Result<ThemeMode, Failure>> getThemeMode();
 
   /// Persists the [ThemeMode].
-  Future<void> setThemeMode(ThemeMode mode);
+  Future<Result<void, Failure>> setThemeMode(ThemeMode mode);
 
   /// Retrieves the persisted [Locale].
-  Locale getLocale();
+  Future<Result<Locale, Failure>> getLocale();
 
   /// Checks if the user has explicitly selected a language.
-  bool isLanguageSelected();
+  Future<Result<bool, Failure>> isLanguageSelected();
 
   /// Persists the [Locale].
-  Future<void> setLocale(Locale locale);
+  Future<Result<void, Failure>> setLocale(Locale locale);
 
   /// Retrieves whether notifications are enabled.
-  bool areNotificationsEnabled();
+  Future<Result<bool, Failure>> areNotificationsEnabled();
 
   /// Persists notification preference.
-  Future<void> setNotificationsEnabled(bool enabled);
+  Future<Result<void, Failure>> setNotificationsEnabled(bool enabled);
 }
