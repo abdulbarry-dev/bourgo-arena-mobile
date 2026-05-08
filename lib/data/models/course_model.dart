@@ -1,10 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'course.g.dart';
+part 'course_model.g.dart';
 
 /// Model representing a group course or training session.
 @JsonSerializable(fieldRename: FieldRename.snake)
-class Course {
+class CourseModel {
   /// Unique identifier.
   final String id;
 
@@ -35,8 +35,8 @@ class Course {
   /// Material symbol icon name.
   final String icon;
 
-  /// Creates a new [Course] instance.
-  const Course({
+  /// Creates a new [CourseModel] instance.
+  const CourseModel({
     required this.id,
     required this.title,
     required this.instructor,
@@ -49,8 +49,9 @@ class Course {
     required this.icon,
   });
 
-  factory Course.fromJson(Map<String, dynamic> json) => _$CourseFromJson(json);
-  Map<String, dynamic> toJson() => _$CourseToJson(this);
+  factory CourseModel.fromJson(Map<String, dynamic> json) =>
+      _$CourseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$CourseModelToJson(this);
 
   /// Returns true if the course is full.
   bool get isFull => enrolled >= capacity;

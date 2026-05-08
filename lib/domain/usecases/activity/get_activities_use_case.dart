@@ -11,11 +11,6 @@ class GetActivitiesUseCase {
 
   /// Executes the operation to fetch activities.
   Future<Result<List<Activity>, Failure>> call() async {
-    try {
-      final activities = await _repository.getActivities();
-      return Success(activities);
-    } catch (e) {
-      return FailureResult(ServerFailure('Failed to fetch activities: $e'));
-    }
+    return _repository.getActivities();
   }
 }

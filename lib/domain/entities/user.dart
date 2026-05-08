@@ -58,6 +58,38 @@ class User {
     this.children = const [],
   });
 
+  /// Creates a copy of this [User] but with the given fields replaced.
+  User copyWith({
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? phone,
+    String? avatarUrl,
+    int? loyaltyPoints,
+    String? subscriptionLevel,
+    String? subscriptionExpiry,
+    int? totalCheckIns,
+    DateTime? birthDate,
+    bool? isParentAccount,
+    List<ChildProfile>? children,
+  }) {
+    return User(
+      id: id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      email: email ?? this.email,
+      phone: phone ?? this.phone,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      loyaltyPoints: loyaltyPoints ?? this.loyaltyPoints,
+      subscriptionLevel: subscriptionLevel ?? this.subscriptionLevel,
+      subscriptionExpiry: subscriptionExpiry ?? this.subscriptionExpiry,
+      totalCheckIns: totalCheckIns ?? this.totalCheckIns,
+      birthDate: birthDate ?? this.birthDate,
+      isParentAccount: isParentAccount ?? this.isParentAccount,
+      children: children ?? this.children,
+    );
+  }
+
   /// Returns the full name of the user.
   String get name => '$firstName $lastName';
 }

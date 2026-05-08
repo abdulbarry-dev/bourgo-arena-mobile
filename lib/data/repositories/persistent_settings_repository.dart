@@ -1,17 +1,19 @@
+import 'package:bourgo_arena_mobile/domain/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// A service that handles persisting and retrieving app settings.
-class SettingsService {
+/// Implementation of [SettingsRepository] using [SharedPreferences].
+class PersistentSettingsRepository implements SettingsRepository {
   static const String _themeKey = 'settings_theme_mode';
   static const String _localeKey = 'settings_locale';
   static const String _notificationsKey = 'settings_notifications_enabled';
 
   final SharedPreferences _prefs;
 
-  SettingsService(this._prefs);
+  /// Creates a new [PersistentSettingsRepository].
+  PersistentSettingsRepository(this._prefs);
 
-  /// Retrieves the persisted [ThemeMode].
+  @override
   ThemeMode getThemeMode() {
     final String? themeValue = _prefs.getString(_themeKey);
     if (themeValue == null) return ThemeMode.system;
@@ -22,34 +24,34 @@ class SettingsService {
     );
   }
 
-  /// Persists the [ThemeMode].
+  @override
   Future<void> setThemeMode(ThemeMode mode) async {
     await _prefs.setString(_themeKey, mode.name);
   }
 
-  /// Retrieves the persisted [Locale].
+  @override
   Locale getLocale() {
     final String? localeCode = _prefs.getString(_localeKey);
     if (localeCode == null) return const Locale('en');
     return Locale(localeCode);
   }
 
-  /// Checks if the user has explicitly selected a language.
+  @override
   bool isLanguageSelected() {
     return _prefs.containsKey(_localeKey);
   }
 
-  /// Persists the [Locale].
+  @override
   Future<void> setLocale(Locale locale) async {
     await _prefs.setString(_localeKey, locale.languageCode);
   }
 
-  /// Retrieves whether notifications are enabled.
+  @override
   bool areNotificationsEnabled() {
     return _prefs.getBool(_notificationsKey) ?? true;
   }
 
-  /// Persists notification preference.
+  @override
   Future<void> setNotificationsEnabled(bool enabled) async {
     await _prefs.setBool(_notificationsKey, enabled);
   }

@@ -1,39 +1,32 @@
-import 'package:bourgo_arena_mobile/data/models/course.dart';
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart' as entity;
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the Home screen.
 class HomeViewModel extends ChangeNotifier {
-  final ActivityService _activityService;
-  final DataService _dataService;
+  final GetActivitiesUseCase _getActivitiesUseCase;
+  final GetCoursesUseCase _getCoursesUseCase;
 
   HomeViewModel({
-    required ActivityService activityService,
-    required DataService dataService,
-  }) : _activityService = activityService,
-       _dataService = dataService {
-    _activityService.addListener(notifyListeners);
-  }
-
-  @override
-  void dispose() {
-    _activityService.removeListener(notifyListeners);
-    super.dispose();
-  }
+    required GetActivitiesUseCase getActivitiesUseCase,
+    required GetCoursesUseCase getCoursesUseCase,
+  }) : _getActivitiesUseCase = getActivitiesUseCase,
+       _getCoursesUseCase = getCoursesUseCase;
 
   int _currentIndex = 0;
   int get currentIndex => _currentIndex;
 
   bool _isLoading = false;
-  bool get isLoading => _isLoading || _activityService.isLoading;
+  bool get isLoading => _isLoading;
 
-  List<Activity> get activities => _activityService.activities;
+  List<Activity> _activities = [];
+  List<Activity> get activities => _activities;
 
-  List<Course> _todayCourses = [];
-  List<Course> get todayCourses => _todayCourses;
+  List<entity.Course> _todayCourses = [];
+  List<entity.Course> get todayCourses => _todayCourses;
 
   void setTab(int index) {
     _currentIndex = index;
@@ -47,16 +40,25 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Load activities via ActivityService (Domain Entities)
-      await _activityService.fetchActivities();
+      // Load activities via Use Case
+      final activitiesResult = await _getActivitiesUseCase();
+      activitiesResult.when(
+        success: (data) => _activities = data,
+        failure: (failure) => developer.log('Error loading activities: $failure'),
+      );
 
-      // Load courses via DataService (for now)
-      final allCourses = await _dataService.getCourses();
-      final today = DateTime.now().weekday;
-      _todayCourses = allCourses.where((c) => c.dayOfWeek == today).toList();
+      // Load courses via Use Case
+      final coursesResult = await _getCoursesUseCase();
+      coursesResult.when(
+        success: (data) {
+          final today = DateTime.now().weekday;
+          _todayCourses = data.where((c) => c.dayOfWeek == today).toList();
+        },
+        failure: (failure) => developer.log('Error loading courses: $failure'),
+      );
 
       developer.log(
-        'Home Data Loaded: ${activities.length} activities, ${_todayCourses.length} courses for day $today',
+        'Home Data Loaded: ${_activities.length} activities, ${_todayCourses.length} courses',
       );
     } catch (e, stack) {
       developer.log('Error loading home data: $e', error: e, stackTrace: stack);

@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'course.dart';
+part of 'course_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-Course _$CourseFromJson(Map<String, dynamic> json) => Course(
+CourseModel _$CourseModelFromJson(Map<String, dynamic> json) => CourseModel(
   id: json['id'] as String,
   title: json['title'] as String,
   instructor: json['instructor'] as String,
@@ -19,15 +19,16 @@ Course _$CourseFromJson(Map<String, dynamic> json) => Course(
   icon: json['icon'] as String,
 );
 
-Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
-  'id': instance.id,
-  'title': instance.title,
-  'instructor': instance.instructor,
-  'start_time': instance.startTime,
-  'end_time': instance.endTime,
-  'day_of_week': instance.dayOfWeek,
-  'category': instance.category,
-  'capacity': instance.capacity,
-  'enrolled': instance.enrolled,
-  'icon': instance.icon,
-};
+Map<String, dynamic> _$CourseModelToJson(CourseModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'instructor': instance.instructor,
+      'start_time': instance.startTime,
+      'end_time': instance.endTime,
+      'day_of_week': instance.dayOfWeek,
+      'category': instance.category,
+      'capacity': instance.capacity,
+      'enrolled': instance.enrolled,
+      'icon': instance.icon,
+    };

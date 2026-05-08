@@ -1,13 +1,15 @@
-import 'package:bourgo_arena_mobile/data/mappers/activity_mapper.dart';
-import 'package:bourgo_arena_mobile/data/models/activity_model.dart';
-import 'package:bourgo_arena_mobile/data/models/reservation.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Activities screen.
 class ActivitiesViewModel extends ChangeNotifier {
-  final DataService _dataService;
+  final GetActivitiesUseCase _getActivitiesUseCase;
+  final GetUserBookingsUseCase _getUserBookingsUseCase;
 
   List<Activity> _activities = [];
   List<Reservation> _reservations = [];
@@ -15,8 +17,11 @@ class ActivitiesViewModel extends ChangeNotifier {
   String? _error;
 
   /// Creates a new [ActivitiesViewModel] instance.
-  ActivitiesViewModel({required DataService dataService})
-    : _dataService = dataService;
+  ActivitiesViewModel({
+    required GetActivitiesUseCase getActivitiesUseCase,
+    required GetUserBookingsUseCase getUserBookingsUseCase,
+  }) : _getActivitiesUseCase = getActivitiesUseCase,
+       _getUserBookingsUseCase = getUserBookingsUseCase;
 
   /// List of all activities.
   List<Activity> get activities => _activities;
@@ -38,11 +43,22 @@ class ActivitiesViewModel extends ChangeNotifier {
 
     try {
       final results = await Future.wait([
-        _dataService.getActivities(),
-        _dataService.getReservations(),
+        _getActivitiesUseCase(),
+        _getUserBookingsUseCase(),
       ]);
-      _activities = (results[0] as List<ActivityModel>).toEntityList();
-      _reservations = results[1] as List<Reservation>;
+
+      final activitiesResult = results[0] as Result<List<Activity>, Failure>;
+      final bookingsResult = results[1] as Result<List<Reservation>, Failure>;
+
+      activitiesResult.when(
+        success: (data) => _activities = data,
+        failure: (failure) => _error = 'activities_loading_failed',
+      );
+
+      bookingsResult.when(
+        success: (data) => _reservations = data,
+        failure: (failure) => _error = 'bookings_loading_failed',
+      );
     } catch (e) {
       _error = 'loading_failed';
     } finally {

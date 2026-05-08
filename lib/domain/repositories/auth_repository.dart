@@ -29,6 +29,12 @@ abstract interface class AuthRepository {
   /// Signs out the current user.
   Future<Result<void, Failure>> logout();
 
+  /// Updates the user's password.
+  Future<Result<void, Failure>> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
   /// Retrieves the current auth token, if any.
   Future<String?> getToken();
 

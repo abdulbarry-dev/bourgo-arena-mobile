@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
@@ -20,7 +21,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = ProfileViewModel(dataService: locator<DataService>());
+    _viewModel = ProfileViewModel(
+      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+      logoutUseCase: locator<LogoutUseCase>(),
+    );
   }
 
   @override
@@ -30,7 +34,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        final profile = _viewModel.profile;
+        final profile = _viewModel.user;
 
         return Scaffold(
           appBar: AppBar(

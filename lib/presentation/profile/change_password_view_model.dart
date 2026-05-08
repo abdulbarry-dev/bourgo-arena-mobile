@@ -1,14 +1,14 @@
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/update_password_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Change Password screen.
 class ChangePasswordViewModel extends ChangeNotifier {
-  final DataService _dataService;
+  final UpdatePasswordUseCase _updatePasswordUseCase;
 
   bool _isSaving = false;
 
-  ChangePasswordViewModel({required DataService dataService})
-    : _dataService = dataService;
+  ChangePasswordViewModel({required UpdatePasswordUseCase updatePasswordUseCase})
+    : _updatePasswordUseCase = updatePasswordUseCase;
 
   bool get isSaving => _isSaving;
 
@@ -21,8 +21,11 @@ class ChangePasswordViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _dataService.updatePassword(currentPassword, newPassword);
-      return true;
+      final result = await _updatePasswordUseCase(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+      return result.isSuccess;
     } catch (e) {
       return false;
     } finally {

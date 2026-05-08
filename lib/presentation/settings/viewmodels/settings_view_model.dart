@@ -1,18 +1,39 @@
-import 'package:bourgo_arena_mobile/data/services/settings_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/get_notifications_enabled_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/get_theme_mode_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/is_language_selected_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for managing application-wide settings.
 class SettingsViewModel extends ChangeNotifier {
-  final SettingsService _settingsService;
+  final GetThemeModeUseCase _getThemeModeUseCase;
+  final SetThemeModeUseCase _setThemeModeUseCase;
+  final GetLocaleUseCase _getLocaleUseCase;
+  final SetLocaleUseCase _setLocaleUseCase;
+  final IsLanguageSelectedUseCase _isLanguageSelectedUseCase;
+  final GetNotificationsEnabledUseCase _getNotificationsEnabledUseCase;
+  final SetNotificationsEnabledUseCase _setNotificationsEnabledUseCase;
 
   late ThemeMode _themeMode;
   late Locale _locale;
   late bool _notificationsEnabled;
 
-  SettingsViewModel(this._settingsService) {
-    _themeMode = _settingsService.getThemeMode();
-    _locale = _settingsService.getLocale();
-    _notificationsEnabled = _settingsService.areNotificationsEnabled();
+  /// Creates a new [SettingsViewModel].
+  SettingsViewModel(
+    this._getThemeModeUseCase,
+    this._setThemeModeUseCase,
+    this._getLocaleUseCase,
+    this._setLocaleUseCase,
+    this._isLanguageSelectedUseCase,
+    this._getNotificationsEnabledUseCase,
+    this._setNotificationsEnabledUseCase,
+  ) {
+    _themeMode = _getThemeModeUseCase();
+    _locale = _getLocaleUseCase();
+    _notificationsEnabled = _getNotificationsEnabledUseCase();
   }
 
   /// The current [ThemeMode].
@@ -22,7 +43,7 @@ class SettingsViewModel extends ChangeNotifier {
   Locale get locale => _locale;
 
   /// Whether the user has explicitly selected a language.
-  bool get isLanguageSelected => _settingsService.isLanguageSelected();
+  bool get isLanguageSelected => _isLanguageSelectedUseCase();
 
   /// Whether push notifications are enabled.
   bool get notificationsEnabled => _notificationsEnabled;
@@ -33,7 +54,7 @@ class SettingsViewModel extends ChangeNotifier {
 
     _themeMode = newThemeMode;
     notifyListeners();
-    await _settingsService.setThemeMode(newThemeMode);
+    await _setThemeModeUseCase(newThemeMode);
   }
 
   /// Updates the application's locale.
@@ -46,7 +67,7 @@ class SettingsViewModel extends ChangeNotifier {
     _locale = newLocale;
     // We persist before notifying so that GoRouter redirects see the updated state
     // in SharedPreferences, preventing a redirection loop.
-    await _settingsService.setLocale(newLocale);
+    await _setLocaleUseCase(newLocale);
     notifyListeners();
   }
 
@@ -56,6 +77,6 @@ class SettingsViewModel extends ChangeNotifier {
 
     _notificationsEnabled = value;
     notifyListeners();
-    await _settingsService.setNotificationsEnabled(value);
+    await _setNotificationsEnabledUseCase(value);
   }
 }

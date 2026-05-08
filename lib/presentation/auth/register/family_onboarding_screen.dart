@@ -55,7 +55,7 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
       '/verification-method',
       extra: {
         ...widget.registrationData,
-        'familyMembers': _viewModel.members.map((m) => m.toJson()).toList(),
+        'familyMembers': _viewModel.members,
       },
     );
   }

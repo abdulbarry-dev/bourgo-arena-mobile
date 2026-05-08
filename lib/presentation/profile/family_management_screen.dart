@@ -1,13 +1,13 @@
-import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
-
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -28,8 +28,8 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
   void initState() {
     super.initState();
     _viewModel = FamilyManagementViewModel(
-      dataService: locator<DataService>(),
-
+      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+      updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
       verifyOtpUseCase: locator<VerifyOtpUseCase>(),
       requestFamilyAccountOtpUseCase: locator<RequestFamilyAccountOtpUseCase>(),
     );
@@ -121,9 +121,9 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
           children: [
             Text(
               l10n.profileVerifyFamilySubtitle(
-                _viewModel.profile?.phone.isNotEmpty == true
-                    ? _viewModel.profile!.phone
-                    : _viewModel.profile?.email ?? '',
+                _viewModel.user?.phone.isNotEmpty == true
+                    ? _viewModel.user!.phone
+                    : _viewModel.user?.email ?? '',
               ),
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -206,8 +206,8 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final profile = _viewModel.profile;
-          if (profile == null) {
+          final user = _viewModel.user;
+          if (user == null) {
             return Center(child: Text(l10n.commonErrorOccurred));
           }
 
@@ -226,15 +226,15 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                   child: Column(
                     children: [
                       FamilyAccountToggle(
-                        value: profile.isParentAccount,
+                        value: user.isParentAccount,
                         onChanged: _toggleFamilyAccount,
                       ),
-                      if (profile.isParentAccount) ...[
+                      if (user.isParentAccount) ...[
                         const SizedBox(height: 24),
                         const Divider(),
                         const SizedBox(height: 24),
                         _ChildrenSection(
-                          children: profile.children,
+                          children: user.children,
                           viewModel: _viewModel,
                           onSelectBirthDate: _selectChildBirthDate,
                         ),
@@ -252,7 +252,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
 }
 
 class _ChildrenSection extends StatelessWidget {
-  final List<ChildProfileModel> children;
+  final List<ChildProfile> children;
   final FamilyManagementViewModel viewModel;
   final VoidCallback onSelectBirthDate;
 

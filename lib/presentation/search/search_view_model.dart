@@ -1,5 +1,5 @@
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/search_result.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -7,16 +7,16 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// ViewModel for the Global Search screen.
 class SearchViewModel extends ChangeNotifier {
-  final ActivityService _activityService;
-  final DataService _dataService;
+  final GetActivitiesUseCase _getActivitiesUseCase;
+  final GetCoursesUseCase _getCoursesUseCase;
   final AppLocalizations _l10n;
 
   SearchViewModel({
-    required ActivityService activityService,
-    required DataService dataService,
+    required GetActivitiesUseCase getActivitiesUseCase,
+    required GetCoursesUseCase getCoursesUseCase,
     required AppLocalizations l10n,
-  }) : _activityService = activityService,
-       _dataService = dataService,
+  }) : _getActivitiesUseCase = getActivitiesUseCase,
+       _getCoursesUseCase = getCoursesUseCase,
        _l10n = l10n;
 
   String _query = '';
@@ -44,44 +44,54 @@ class SearchViewModel extends ChangeNotifier {
       final List<SearchResult> allResults = [];
 
       // 1. Search Activities
-      final activities = _activityService.activities;
-      final activityMatches = activities.where(
-        (a) =>
-            a.title.toLowerCase().contains(query.toLowerCase()) ||
-            a.category.toLowerCase().contains(query.toLowerCase()),
-      );
+      final activitiesResult = await _getActivitiesUseCase();
+      activitiesResult.when(
+        success: (activities) {
+          final activityMatches = activities.where(
+            (a) =>
+                a.title.toLowerCase().contains(query.toLowerCase()) ||
+                a.category.toLowerCase().contains(query.toLowerCase()),
+          );
 
-      allResults.addAll(
-        activityMatches.map(
-          (a) => SearchResult(
-            title: a.title,
-            subtitle: a.category,
-            type: SearchResultType.activity,
-            icon: Symbols.sports_soccer,
-            route: '/booking',
-            extra: a,
-          ),
-        ),
+          allResults.addAll(
+            activityMatches.map(
+              (a) => SearchResult(
+                title: a.title,
+                subtitle: a.category,
+                type: SearchResultType.activity,
+                icon: Symbols.sports_soccer,
+                route: '/booking',
+                extra: a,
+              ),
+            ),
+          );
+        },
+        failure: (failure) => null,
       );
 
       // 2. Search Courses
-      final courses = await _dataService.getCourses();
-      final courseMatches = courses.where(
-        (c) =>
-            c.title.toLowerCase().contains(query.toLowerCase()) ||
-            c.instructor.toLowerCase().contains(query.toLowerCase()),
-      );
+      final coursesResult = await _getCoursesUseCase();
+      coursesResult.when(
+        success: (courses) {
+          final courseMatches = courses.where(
+            (c) =>
+                c.title.toLowerCase().contains(query.toLowerCase()) ||
+                c.instructor.toLowerCase().contains(query.toLowerCase()),
+          );
 
-      allResults.addAll(
-        courseMatches.map(
-          (c) => SearchResult(
-            title: c.title,
-            subtitle: '${c.instructor} • ${c.startTime}',
-            type: SearchResultType.course,
-            icon: Symbols.calendar_month,
-            route: '/planning',
-          ),
-        ),
+          allResults.addAll(
+            courseMatches.map(
+              (c) => SearchResult(
+                title: c.title,
+                subtitle: '${c.instructor} • ${c.startTime}',
+                type: SearchResultType.course,
+                icon: Symbols.calendar_month,
+                route: '/planning',
+              ),
+            ),
+          );
+        },
+        failure: (failure) => null,
       );
 
       // 3. Search Settings & Navigation

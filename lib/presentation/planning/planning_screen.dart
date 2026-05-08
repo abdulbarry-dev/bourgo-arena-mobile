@@ -1,5 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
@@ -22,7 +22,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = PlanningViewModel(dataService: locator<DataService>());
+    _viewModel = PlanningViewModel(
+      getCoursesUseCase: locator<GetCoursesUseCase>(),
+    );
   }
 
   @override

@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
@@ -29,7 +29,6 @@ import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_scree
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/onboarding/language_selection_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
-import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 
@@ -40,7 +39,6 @@ import 'package:go_router/go_router.dart';
 GoRouter createRouter(
   SettingsViewModel settingsViewModel,
   AuthStateNotifier authStateNotifier,
-  ActivityService activityService,
 ) => GoRouter(
   initialLocation: '/',
   errorBuilder: (context, state) => NotFoundScreen(error: state.error),
@@ -154,7 +152,6 @@ GoRouter createRouter(
         final activity = state.extra as Activity?;
         return BookingFlowScreen(
           initialActivity: activity,
-          activityService: activityService,
         );
       },
     ),

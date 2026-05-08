@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/data/models/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';

@@ -1,29 +1,37 @@
-import 'package:bourgo_arena_mobile/data/models/user_profile.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the Edit Profile screen.
 class EditProfileViewModel extends ChangeNotifier {
-  final DataService _dataService;
+  final GetUserProfileUseCase _getUserProfileUseCase;
+  final UpdateUserProfileUseCase _updateUserProfileUseCase;
 
-  UserProfile? _profile;
+  User? _user;
   bool _isLoading = true;
   bool _isSaving = false;
 
   EditProfileViewModel({
-    required DataService dataService,
-  }) : _dataService = dataService {
+    required GetUserProfileUseCase getUserProfileUseCase,
+    required UpdateUserProfileUseCase updateUserProfileUseCase,
+  }) : _getUserProfileUseCase = getUserProfileUseCase,
+       _updateUserProfileUseCase = updateUserProfileUseCase {
     _loadProfile();
   }
 
-  UserProfile? get profile => _profile;
+  User? get user => _user;
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
 
   Future<void> _loadProfile() async {
     try {
-      _profile = await _dataService.getUserProfile();
+      final result = await _getUserProfileUseCase();
+      result.when(
+        success: (data) => _user = data,
+        failure: (failure) => developer.log('Error loading profile: $failure'),
+      );
     } catch (e, stackTrace) {
       developer.log('Error loading profile', error: e, stackTrace: stackTrace);
     } finally {
@@ -40,22 +48,27 @@ class EditProfileViewModel extends ChangeNotifier {
     required String phone,
     DateTime? birthDate,
   }) async {
-    if (_profile == null) return false;
+    if (_user == null) return false;
 
     _isSaving = true;
     notifyListeners();
 
     try {
-      final updatedProfile = _profile!.copyWith(
+      final updatedUser = _user!.copyWith(
         firstName: firstName,
         lastName: lastName,
         email: email,
         phone: phone,
         birthDate: birthDate,
       );
-      await _dataService.updateProfile(updatedProfile);
-      _profile = updatedProfile;
-      return true;
+      final result = await _updateUserProfileUseCase(updatedUser);
+      return result.when(
+        success: (data) {
+          _user = data;
+          return true;
+        },
+        failure: (failure) => false,
+      );
     } catch (e) {
       return false;
     } finally {

@@ -1,5 +1,6 @@
-import 'package:bourgo_arena_mobile/data/models/user_profile.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -22,7 +23,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = ProfileViewModel(dataService: locator<DataService>());
+    _viewModel = ProfileViewModel(
+      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+      logoutUseCase: locator<LogoutUseCase>(),
+    );
   }
 
   @override
@@ -36,8 +40,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        final profile = _viewModel.profile;
-        if (profile == null) {
+        final user = _viewModel.user;
+        if (user == null) {
           return Scaffold(
             body: Center(
               child: Text(AppLocalizations.of(context)!.commonLoadingError),
@@ -48,13 +52,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return Scaffold(
           body: CustomScrollView(
             slivers: [
-              _buildAppBar(context, profile),
+              _buildAppBar(context, user),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
-                      _StatsRow(profile: profile),
+                      _StatsRow(user: user),
                       const SizedBox(height: 32),
                       _ProfileMenu(
                         onTapAbonnement: () => context.push('/subscription'),
@@ -76,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildAppBar(BuildContext context, UserProfile profile) {
+  Widget _buildAppBar(BuildContext context, User user) {
     final theme = Theme.of(context);
 
     return SliverAppBar(
@@ -105,14 +109,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 40),
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(profile.avatarUrl),
+                  backgroundImage: NetworkImage(user.avatarUrl),
                   backgroundColor: theme.colorScheme.primary.withValues(
                     alpha: 0.2,
                   ),
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '${profile.firstName} ${profile.lastName}'.toUpperCase(),
+                  '${user.firstName} ${user.lastName}'.toUpperCase(),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontFamily: AppConstants.displayFontFamily,
                     letterSpacing: 1,
@@ -129,7 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    profile.subscriptionLevel,
+                    user.subscriptionLevel,
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -147,9 +151,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _StatsRow extends StatelessWidget {
-  final UserProfile profile;
+  final User user;
 
-  const _StatsRow({required this.profile});
+  const _StatsRow({required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -169,13 +173,13 @@ class _StatsRow extends StatelessWidget {
         children: [
           _StatItem(
             label: AppLocalizations.of(context)!.profilePoints,
-            value: profile.loyaltyPoints.toString(),
+            value: user.loyaltyPoints.toString(),
             icon: Symbols.stars,
           ),
           Container(width: 1, height: 40, color: theme.colorScheme.outline),
           _StatItem(
             label: AppLocalizations.of(context)!.profileCheckins,
-            value: profile.totalCheckIns.toString(),
+            value: user.totalCheckIns.toString(),
             icon: Symbols.qr_code_scanner,
           ),
         ],

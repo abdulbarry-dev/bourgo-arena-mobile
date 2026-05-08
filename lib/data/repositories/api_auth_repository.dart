@@ -125,7 +125,26 @@ class ApiAuthRepository implements AuthRepository {
       _authStateController.add(user);
       return Success(null);
     } catch (e) {
-      return FailureResult(ServerFailure('Complete registration failed: ${e.toString()}'));
+      return FailureResult(
+        ServerFailure('Complete registration failed: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      await _apiClient.put('/user/password', {
+        'current_password': currentPassword,
+        'new_password': newPassword,
+        'new_password_confirmation': newPassword,
+      });
+      return Success(null);
+    } catch (e) {
+      return FailureResult(ServerFailure('Password update failed: ${e.toString()}'));
     }
   }
 

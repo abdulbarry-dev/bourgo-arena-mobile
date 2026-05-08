@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -56,7 +57,9 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           subscriptionExpiry: 'N/A',
           totalCheckIns: 0,
           isParentAccount: widget.registrationData['isParentAccount'] ?? false,
-          children: const [],
+          children:
+              (widget.registrationData['familyMembers'] as List<ChildProfile>?) ??
+              const [],
         );
 
         final completeRegistrationUseCase = locator<CompleteRegistrationUseCase>();

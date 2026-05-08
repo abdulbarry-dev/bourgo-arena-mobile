@@ -1,14 +1,11 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
-import 'package:bourgo_arena_mobile/data/services/settings_service.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,13 +13,9 @@ Future<void> main() async {
   // Initialize Dependencies
   await initLocator();
 
-  final prefs = await SharedPreferences.getInstance();
-  final settingsService = SettingsService(prefs);
-  final settingsViewModel = SettingsViewModel(settingsService);
-
   runApp(
     BourgoArenaApp(
-      settingsViewModel: settingsViewModel,
+      settingsViewModel: locator<SettingsViewModel>(),
       authStateNotifier: locator<AuthStateNotifier>(),
     ),
   );
@@ -53,7 +46,6 @@ class _BourgoArenaAppState extends State<BourgoArenaApp> {
     _router = createRouter(
       widget.settingsViewModel,
       widget.authStateNotifier,
-      locator<ActivityService>(),
     );
   }
 

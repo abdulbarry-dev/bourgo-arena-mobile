@@ -7,6 +7,13 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 sealed class Result<S, F extends Failure> {
   const Result();
 
+  /// Standard success factory.
+  static Result<S, F> success<S, F extends Failure>(S data) => Success<S, F>(data);
+
+  /// Standard failure factory.
+  static Result<S, F> failure<S, F extends Failure>(F failure) =>
+      FailureResult<S, F>(failure);
+
   /// Functional fold to handle success and failure paths.
   R fold<R>({
     required R Function(F failure) onFailure,
@@ -19,6 +26,25 @@ sealed class Result<S, F extends Failure> {
     }
     throw StateError('Invalid state');
   }
+
+  /// Pattern matching for Result.
+  R when<R>({
+    required R Function(S data) success,
+    required R Function(F failure) failure,
+  }) {
+    if (this is Success<S, F>) {
+      return success((this as Success<S, F>).data);
+    } else if (this is FailureResult<S, F>) {
+      return failure((this as FailureResult<S, F>).failure);
+    }
+    throw StateError('Invalid state');
+  }
+
+  /// Returns true if this is a [Success].
+  bool get isSuccess => this is Success<S, F>;
+
+  /// Returns true if this is a [FailureResult].
+  bool get isFailure => this is FailureResult<S, F>;
 }
 
 /// Represents a successful operation with data of type [S].

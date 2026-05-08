@@ -11,11 +11,6 @@ class GetUserBookingsUseCase {
 
   /// Executes the operation to fetch user bookings.
   Future<Result<List<Reservation>, Failure>> call() async {
-    try {
-      final reservations = await _repository.getReservations();
-      return Success(reservations);
-    } catch (e) {
-      return FailureResult(ServerFailure('Failed to fetch user bookings: $e'));
-    }
+    return _repository.getReservations();
   }
 }

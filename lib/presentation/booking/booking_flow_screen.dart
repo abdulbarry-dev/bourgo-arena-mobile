@@ -1,5 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/payment_step.dart';
@@ -12,12 +14,9 @@ import 'package:flutter/material.dart';
 class BookingFlowScreen extends StatefulWidget {
   /// Optional activity to start the booking flow with.
   final Activity? initialActivity;
-  final ActivityService activityService;
-
   const BookingFlowScreen({
     super.key,
     this.initialActivity,
-    required this.activityService,
   });
 
   @override
@@ -31,7 +30,8 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
   void initState() {
     super.initState();
     _viewModel = BookingViewModel(
-      activityService: widget.activityService,
+      getActivitiesUseCase: locator<GetActivitiesUseCase>(),
+      getTimeSlotsUseCase: locator<GetTimeSlotsUseCase>(),
       initialActivity: widget.initialActivity,
     );
   }

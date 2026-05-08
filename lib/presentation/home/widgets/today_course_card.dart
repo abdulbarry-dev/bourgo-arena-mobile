@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/data/models/course.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
