@@ -1,6 +1,9 @@
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/reservation_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation_model.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
 
@@ -11,26 +14,40 @@ class ApiReservationRepository implements ReservationRepository {
   ApiReservationRepository(this._apiClient);
 
   @override
-  Future<List<Reservation>> getReservations() async {
-    final response = await _apiClient.get('/reservations') as List<dynamic>;
-    return response
-        .map(
-          (json) => ReservationMapper.toEntity(
-            ReservationModel.fromJson(json as Map<String, dynamic>),
-          ),
-        )
-        .toList();
+  Future<Result<List<Reservation>, Failure>> getReservations() {
+    return executeApiCall(() async {
+      final response = await _apiClient.get('/reservations') as List<dynamic>;
+      final entities = response
+          .map(
+            (json) => ReservationMapper.toEntity(
+              ReservationModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(entities);
+    });
   }
 
   @override
-  Future<Reservation> makeReservation(Reservation reservation) async {
-    final model = ReservationMapper.fromEntity(reservation);
-    final response = await _apiClient.post('/reservations', model.toJson());
-    return ReservationMapper.toEntity(ReservationModel.fromJson(response));
+  Future<Result<Reservation, Failure>> makeReservation(
+    Reservation reservation,
+  ) {
+    return executeApiCall(() async {
+      final model = ReservationMapper.fromEntity(reservation);
+      final response = await _apiClient.post('/reservations', model.toJson());
+      return Result.success(
+        ReservationMapper.toEntity(
+          ReservationModel.fromJson(response as Map<String, dynamic>),
+        ),
+      );
+    });
   }
 
   @override
-  Future<void> cancelReservation(String id) async {
-    await _apiClient.delete('/reservations/$id');
+  Future<Result<void, Failure>> cancelReservation(String id) {
+    return executeApiCall(() async {
+      await _apiClient.delete('/reservations/$id');
+      return Result.success(null);
+    });
   }
 }

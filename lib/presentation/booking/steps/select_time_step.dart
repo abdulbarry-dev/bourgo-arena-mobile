@@ -23,7 +23,7 @@ class SelectTimeStep extends StatelessWidget {
         _BottomActionBar(
           label: AppLocalizations.of(context)!.bookingConfirm,
           onPressed: viewModel.selectedSlot != null ? viewModel.nextStep : null,
-          price: viewModel.selectedActivity?.price ?? 0,
+          price: viewModel.selectedActivity?.basePrice ?? 0,
         ),
       ],
     );

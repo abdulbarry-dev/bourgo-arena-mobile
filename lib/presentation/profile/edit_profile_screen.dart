@@ -1,6 +1,6 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_view_model.dart';
@@ -31,8 +31,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     _viewModel = EditProfileViewModel(
-      dataService: locator<DataService>(),
-      authService: locator<AuthService>(),
+      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+      updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
     );
     _viewModel.addListener(_onViewModelChange);
   }
@@ -51,14 +51,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _onViewModelChange() {
     if (!_viewModel.isLoading &&
-        _viewModel.profile != null &&
+        _viewModel.user != null &&
         _firstNameController.text.isEmpty) {
-      _firstNameController.text = _viewModel.profile!.firstName;
-      _lastNameController.text = _viewModel.profile!.lastName;
-      _emailController.text = _viewModel.profile!.email;
-      _phoneController.text = _viewModel.profile!.phone;
-      if (_viewModel.profile!.birthDate != null) {
-        _selectedBirthDate = _viewModel.profile!.birthDate;
+      _firstNameController.text = _viewModel.user!.firstName;
+      _lastNameController.text = _viewModel.user!.lastName;
+      _emailController.text = _viewModel.user!.email;
+      _phoneController.text = _viewModel.user!.phone;
+      if (_viewModel.user!.birthDate != null) {
+        _selectedBirthDate = _viewModel.user!.birthDate;
         _birthDateController.text = DateFormat.yMMMd().format(
           _selectedBirthDate!,
         );
@@ -132,7 +132,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final profile = _viewModel.profile!;
+          final user = _viewModel.user!;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -141,7 +141,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _AvatarSection(avatarUrl: profile.avatarUrl),
+                  _AvatarSection(avatarUrl: user.avatarUrl),
                   const SizedBox(height: 32),
                   Row(
                     children: [

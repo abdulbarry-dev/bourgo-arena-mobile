@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 
 /// A central client for making HTTP requests to the Laravel backend.
 class ApiClient {
@@ -16,41 +19,67 @@ class ApiClient {
   }
 
   /// Sends a GET request to the specified [path].
-  Future<Map<String, dynamic>> get(String path) async {
-    final response = await _client.get(
-      Uri.parse('$baseUrl$path'),
-      headers: _headers,
-    );
-    return _handleResponse(response);
+  Future<dynamic> get(String path) async {
+    try {
+      final response = await _client
+          .get(Uri.parse('$baseUrl$path'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    } on SocketException catch (e) {
+      throw NetworkException(e.message);
+    } on TimeoutException catch (e) {
+      throw NetworkException(e.message ?? 'Request timed out');
+    }
   }
 
   /// Sends a POST request to the specified [path] with [body].
-  Future<Map<String, dynamic>> post(String path, dynamic body) async {
-    final response = await _client.post(
-      Uri.parse('$baseUrl$path'),
-      headers: _headers,
-      body: jsonEncode(body),
-    );
-    return _handleResponse(response);
+  Future<dynamic> post(String path, dynamic body) async {
+    try {
+      final response = await _client
+          .post(
+            Uri.parse('$baseUrl$path'),
+            headers: _headers,
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    } on SocketException catch (e) {
+      throw NetworkException(e.message);
+    } on TimeoutException catch (e) {
+      throw NetworkException(e.message ?? 'Request timed out');
+    }
   }
 
   /// Sends a PUT request to the specified [path] with [body].
-  Future<Map<String, dynamic>> put(String path, dynamic body) async {
-    final response = await _client.put(
-      Uri.parse('$baseUrl$path'),
-      headers: _headers,
-      body: jsonEncode(body),
-    );
-    return _handleResponse(response);
+  Future<dynamic> put(String path, dynamic body) async {
+    try {
+      final response = await _client
+          .put(
+            Uri.parse('$baseUrl$path'),
+            headers: _headers,
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
+      return _handleResponse(response);
+    } on SocketException catch (e) {
+      throw NetworkException(e.message);
+    } on TimeoutException catch (e) {
+      throw NetworkException(e.message ?? 'Request timed out');
+    }
   }
 
   /// Sends a DELETE request to the specified [path].
   Future<void> delete(String path) async {
-    final response = await _client.delete(
-      Uri.parse('$baseUrl$path'),
-      headers: _headers,
-    );
-    _handleResponse(response);
+    try {
+      final response = await _client
+          .delete(Uri.parse('$baseUrl$path'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
+      _handleResponse(response);
+    } on SocketException catch (e) {
+      throw NetworkException(e.message);
+    } on TimeoutException catch (e) {
+      throw NetworkException(e.message ?? 'Request timed out');
+    }
   }
 
   Map<String, String> get _headers {
@@ -64,13 +93,23 @@ class ApiClient {
     return headers;
   }
 
-  Map<String, dynamic> _handleResponse(http.Response response) {
+  dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      if (response.body.isEmpty) return {};
-      return jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.body.isEmpty) return null;
+      return jsonDecode(response.body);
     } else {
-      // TODO: Implement custom exception handling
-      throw Exception('API Error: ${response.statusCode} ${response.body}');
+      final message = 'API Error: ${response.statusCode} ${response.body}';
+      switch (response.statusCode) {
+        case 401:
+        case 403:
+          throw AuthException(message);
+        case 404:
+          throw NotFoundException(message);
+        case 422:
+          throw ValidationException(message);
+        default:
+          throw ServerException(message);
+      }
     }
   }
 }

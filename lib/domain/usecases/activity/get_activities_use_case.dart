@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 
@@ -9,12 +10,7 @@ class GetActivitiesUseCase {
   const GetActivitiesUseCase(this._repository);
 
   /// Executes the operation to fetch activities.
-  Future<Result<List<Activity>>> call() async {
-    try {
-      final activities = await _repository.getActivities();
-      return Success(activities);
-    } catch (e) {
-      return Failure('Failed to fetch activities', e);
-    }
+  Future<Result<List<Activity>, Failure>> call() async {
+    return _repository.getActivities();
   }
 }

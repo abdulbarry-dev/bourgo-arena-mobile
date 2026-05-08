@@ -7,14 +7,13 @@ part 'user_profile_model.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class UserProfileModel {
   final String id;
-  final String firstName;
-  final String lastName;
+  final String name;
   final String email;
   final String phone;
-  final String avatarUrl;
+  final String? avatarUrl;
   final int loyaltyPoints;
   final String subscriptionLevel;
-  final String subscriptionExpiry;
+  final String? subscriptionExpiry;
   final int totalCheckIns;
   final DateTime? birthDate;
   final bool isParentAccount;
@@ -22,14 +21,13 @@ class UserProfileModel {
 
   const UserProfileModel({
     required this.id,
-    required this.firstName,
-    required this.lastName,
+    required this.name,
     required this.email,
     required this.phone,
-    required this.avatarUrl,
+    this.avatarUrl,
     required this.loyaltyPoints,
     required this.subscriptionLevel,
-    required this.subscriptionExpiry,
+    this.subscriptionExpiry,
     required this.totalCheckIns,
     this.birthDate,
     this.isParentAccount = false,

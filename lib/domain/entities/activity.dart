@@ -10,7 +10,7 @@ class Activity {
   final String category;
 
   /// Hourly price.
-  final double price;
+  final double basePrice;
 
   /// Currency code.
   final String currency;
@@ -27,16 +27,24 @@ class Activity {
   /// List of key features or amenities.
   final List<String> features;
 
+  /// Average rating
+  final double rating;
+
+  /// Number of reviews
+  final int reviewCount;
+
   /// Creates a new [Activity] instance.
   const Activity({
     required this.id,
     required this.title,
     required this.category,
-    required this.price,
+    required this.basePrice,
     required this.currency,
     required this.imageUrl,
     required this.icon,
     required this.description,
     required this.features,
+    this.rating = 0.0,
+    this.reviewCount = 0,
   });
 }

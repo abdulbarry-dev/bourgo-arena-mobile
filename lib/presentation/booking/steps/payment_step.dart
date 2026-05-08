@@ -40,7 +40,7 @@ class PaymentStep extends StatelessWidget {
             '/booking-success',
             extra: viewModel.selectedActivity,
           ),
-          price: viewModel.selectedActivity?.price ?? 0,
+          price: viewModel.selectedActivity?.basePrice ?? 0,
         ),
       ],
     );
@@ -117,7 +117,7 @@ class _SummaryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      activity?.title ?? '',
+                      '${activity?.basePrice.toStringAsFixed(2) ?? '0.00'} ${activity?.currency ?? ''}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,

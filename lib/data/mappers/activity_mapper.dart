@@ -9,12 +9,14 @@ class ActivityMapper {
       id: model.id,
       title: model.title,
       category: model.category,
-      price: model.price,
+      basePrice: model.basePrice,
       currency: model.currency,
       imageUrl: model.imageUrl,
       icon: model.icon,
       description: model.description,
       features: model.features,
+      rating: model.rating,
+      reviewCount: model.reviewCount,
     );
   }
 
@@ -24,12 +26,14 @@ class ActivityMapper {
       id: entity.id,
       title: entity.title,
       category: entity.category,
-      price: entity.price,
+      basePrice: entity.basePrice,
       currency: entity.currency,
       imageUrl: entity.imageUrl,
       icon: entity.icon,
       description: entity.description,
       features: entity.features,
+      rating: entity.rating,
+      reviewCount: entity.reviewCount,
     );
   }
 }

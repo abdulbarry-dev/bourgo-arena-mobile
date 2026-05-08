@@ -1,7 +1,7 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
@@ -29,8 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _viewModel = HomeViewModel(
-      activityService: locator<ActivityService>(),
-      dataService: locator<DataService>(),
+      getActivitiesUseCase: locator<GetActivitiesUseCase>(),
+      getCoursesUseCase: locator<GetCoursesUseCase>(),
     );
     _viewModel.loadHomeData();
   }
@@ -62,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const BrandLogo(size: 32),
+                const BrandLogo(size: 32, isPremium: true),
                 const SizedBox(width: 12),
                 Text(
                   AppLocalizations.of(context)!.appName.toUpperCase(),

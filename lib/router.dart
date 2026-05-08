@@ -1,5 +1,5 @@
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/auth_service.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
@@ -29,6 +29,8 @@ import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_scree
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/onboarding/language_selection_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -36,12 +38,11 @@ import 'package:go_router/go_router.dart';
 /// App routing configuration using GoRouter.
 GoRouter createRouter(
   SettingsViewModel settingsViewModel,
-  AuthService authService,
-  ActivityService activityService,
+  AuthStateNotifier authStateNotifier,
 ) => GoRouter(
   initialLocation: '/',
   errorBuilder: (context, state) => NotFoundScreen(error: state.error),
-  refreshListenable: Listenable.merge([authService, settingsViewModel]),
+  refreshListenable: Listenable.merge([authStateNotifier, settingsViewModel]),
   redirect: (context, state) {
     // 1. Force Language Selection if not set
     if (!settingsViewModel.isLanguageSelected) {
@@ -56,7 +57,7 @@ GoRouter createRouter(
     }
 
     // 3. Auth Redirection
-    final bool isAuthenticated = authService.isAuthenticated;
+    final bool isAuthenticated = authStateNotifier.isAuthenticated;
     final bool isAuthRoute =
         state.matchedLocation == '/login' ||
         state.matchedLocation == '/register' ||
@@ -88,11 +89,13 @@ GoRouter createRouter(
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
     GoRoute(
       path: '/login',
-      builder: (context, state) => LoginScreen(authService: authService),
+      builder: (context, state) =>
+          LoginScreen(loginUseCase: locator<LoginUseCase>()),
     ),
     GoRoute(
       path: '/register',
-      builder: (context, state) => const RegisterScreen(),
+      builder: (context, state) =>
+          RegisterScreen(registerUseCase: locator<RegisterUseCase>()),
     ),
     GoRoute(
       path: '/otp',
@@ -145,10 +148,7 @@ GoRouter createRouter(
       path: '/booking',
       builder: (context, state) {
         final activity = state.extra as Activity?;
-        return BookingFlowScreen(
-          initialActivity: activity,
-          activityService: activityService,
-        );
+        return BookingFlowScreen(initialActivity: activity);
       },
     ),
     GoRoute(

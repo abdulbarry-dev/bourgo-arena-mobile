@@ -1,9 +1,9 @@
-import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Family Onboarding screen.
 class FamilyOnboardingViewModel extends ChangeNotifier {
-  final List<ChildProfileModel> _members = [];
+  final List<ChildProfile> _members = [];
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
@@ -16,7 +16,7 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
   bool _hasBirthDateError = false;
 
   /// Returns the list of added members.
-  List<ChildProfileModel> get members => List.unmodifiable(_members);
+  List<ChildProfile> get members => List.unmodifiable(_members);
 
   /// Returns the currently selected birth date.
   DateTime? get selectedBirthDate => _selectedBirthDate;
@@ -59,7 +59,7 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
     final lastName = lastNameController.text.trim();
 
     _members.add(
-      ChildProfileModel(
+      ChildProfile(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         firstName: firstName,
         lastName: lastName,

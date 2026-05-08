@@ -1,101 +1,149 @@
 import 'dart:async';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 
 /// Laravel API implementation of [AuthRepository].
 class ApiAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
+  final SessionRepository _sessionRepository;
   final StreamController<User?> _authStateController =
       StreamController<User?>.broadcast();
 
-  ApiAuthRepository(this._apiClient);
+  ApiAuthRepository(this._apiClient, this._sessionRepository);
 
   @override
-  Future<User> login(String email, String password) async {
-    final response = await _apiClient.post('/auth/login', {
-      'email': email,
-      'password': password,
+  Future<Result<User, Failure>> login(String email, String password) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post('/auth/login', {
+                'email': email,
+                'password': password,
+              })
+              as Map<String, dynamic>;
+
+      final token = response['token'] as String;
+      _apiClient.setToken(token);
+
+      // Persist the token to local session storage
+      await _sessionRepository.saveAuthToken(token);
+
+      // Fetch user profile after login
+      final userResponse =
+          await _apiClient.get('/user/profile') as Map<String, dynamic>;
+      final userModel = UserProfileModel.fromJson(userResponse);
+      final user = UserMapper.toEntity(userModel);
+
+      _authStateController.add(user);
+      return Success(user);
     });
-
-    final token = response['token'] as String;
-    _apiClient.setToken(token);
-
-    // Fetch user profile after login
-    final userResponse = await _apiClient.get('/user/profile');
-    final userModel = UserProfileModel.fromJson(userResponse);
-    final user = UserMapper.toEntity(userModel);
-
-    _authStateController.add(user);
-    return user;
   }
 
   @override
-  Future<void> logout() async {
-    await _apiClient.post('/auth/logout', {});
-    _apiClient.setToken(null);
-    _authStateController.add(null);
+  Future<Result<void, Failure>> logout() {
+    return executeApiCall(() async {
+      try {
+        await _apiClient.post('/auth/logout', {});
+        return const Success(null);
+      } finally {
+        _apiClient.setToken(null);
+        // Clear the persisted session (including the token)
+        await _sessionRepository.clearSession();
+        _authStateController.add(null);
+      }
+    });
   }
 
   @override
-  Future<void> register({
+  Future<Result<void, Failure>> register({
     required String firstName,
     required String lastName,
     required String email,
     required String phone,
     required String password,
     bool isFamilyAccount = false,
-  }) async {
-    await _apiClient.post('/auth/register', {
-      'first_name': firstName,
-      'last_name': lastName,
-      'email': email,
-      'phone': phone,
-      'password': password,
-      'is_family_account': isFamilyAccount,
+  }) {
+    return executeApiCall(() async {
+      await _apiClient.post('/auth/register', {
+        'name': '$firstName $lastName',
+        'email': email,
+        'phone': phone,
+        'password': password,
+        'password_confirmation': password, // Ideally passed from UI
+        'is_family_account': isFamilyAccount,
+      });
+      return const Success(null);
     });
   }
 
   @override
-  Future<void> sendOtp(String identifier) async {
-    await _apiClient.post('/auth/send-otp', {'identifier': identifier});
-  }
-
-  @override
-  Future<bool> verifyOtp(String identifier, String otp) async {
-    final response = await _apiClient.post('/auth/verify-otp', {
-      'identifier': identifier,
-      'otp': otp,
+  Future<Result<void, Failure>> sendOtp(String identifier) {
+    return executeApiCall(() async {
+      await _apiClient.post('/auth/send-otp', {'identifier': identifier});
+      return const Success(null);
     });
-    return response['success'] == true;
   }
 
   @override
-  Future<void> requestFamilyAccountOtp() async {
-    await _apiClient.post('/auth/request-family-otp', {});
-  }
-
-  @override
-  Future<void> completeRegistration(User user) async {
-    // This would typically be a multi-part form or a complex JSON object
-    // depending on the backend requirements for profile completion.
-    await _apiClient.post('/auth/complete-registration', {
-      'first_name': user.firstName,
-      'last_name': user.lastName,
-      'email': user.email,
-      'phone': user.phone,
-      'is_parent_account': user.isParentAccount,
-      // Add other fields as needed by the API
+  Future<Result<bool, Failure>> verifyOtp(String identifier, String otp) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post('/auth/verify-otp', {
+                'identifier': identifier,
+                'otp': otp,
+              })
+              as Map<String, dynamic>;
+      return Success(response['success'] == true);
     });
-    _authStateController.add(user);
   }
 
   @override
-  Future<String?> getToken() async {
-    // In a real app, this might come from secure storage
-    return null;
+  Future<Result<void, Failure>> requestFamilyAccountOtp() {
+    return executeApiCall(() async {
+      await _apiClient.post('/auth/request-family-otp', {});
+      return const Success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> completeRegistration(User user) {
+    return executeApiCall(() async {
+      await _apiClient.post('/auth/complete-registration', {
+        'name': '${user.firstName} ${user.lastName}',
+        'email': user.email,
+        'phone': user.phone,
+        'is_parent_account': user.isParentAccount,
+      });
+      _authStateController.add(user);
+      return const Success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) {
+    return executeApiCall(() async {
+      await _apiClient.put('/user/password', {
+        'current_password': currentPassword,
+        'new_password': newPassword,
+        'new_password_confirmation': newPassword,
+      });
+      return const Success(null);
+    });
+  }
+
+  @override
+  Future<Result<String?, Failure>> getToken() async {
+    // Retrieve the persisted auth token from local session storage
+    return _sessionRepository.getAuthToken();
   }
 
   @override

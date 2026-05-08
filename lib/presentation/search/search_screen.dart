@@ -1,6 +1,6 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/data/services/activity_service.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/search_result.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/search/search_view_model.dart';
@@ -25,8 +25,8 @@ class _SearchScreenState extends State<SearchScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     _viewModel ??= SearchViewModel(
-      activityService: locator<ActivityService>(),
-      dataService: locator<DataService>(),
+      getActivitiesUseCase: locator<GetActivitiesUseCase>(),
+      getCoursesUseCase: locator<GetCoursesUseCase>(),
       l10n: AppLocalizations.of(context)!,
     );
   }
@@ -139,7 +139,11 @@ class _SearchResultTile extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
         ),
-        child: Icon(result.icon, size: 20, color: theme.colorScheme.primary),
+        child: Icon(
+          _iconForKey(result.iconKey),
+          size: 20,
+          color: theme.colorScheme.primary,
+        ),
       ),
       title: Text(
         result.title,
@@ -162,6 +166,23 @@ class _SearchResultTile extends StatelessWidget {
         }
       },
     );
+  }
+
+  IconData _iconForKey(String key) {
+    const Map<String, IconData> iconMap = {
+      'sports_soccer': Symbols.sports_soccer,
+      'calendar_month': Symbols.calendar_month,
+      'person': Symbols.person,
+      'lock': Symbols.lock,
+      'history': Symbols.history,
+      'language': Symbols.language,
+      'gavel': Symbols.gavel,
+      'description': Symbols.description,
+      'search': Symbols.search,
+      'search_off': Symbols.search_off,
+    };
+
+    return iconMap[key] ?? Symbols.help; // fallback icon
   }
 }
 

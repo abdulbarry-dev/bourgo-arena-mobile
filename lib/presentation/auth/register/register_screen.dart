@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/viewmodels/register_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -11,7 +12,9 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// The registration screen for Bourgo Arena.
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final RegisterUseCase registerUseCase;
+
+  const RegisterScreen({super.key, required this.registerUseCase});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -23,7 +26,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = RegisterViewModel();
+    _viewModel = RegisterViewModel(widget.registerUseCase);
   }
 
   @override

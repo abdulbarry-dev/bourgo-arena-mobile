@@ -31,8 +31,9 @@ class OnboardingScreen extends StatelessWidget {
                       // Brand Logo
                       const Center(
                         child: BrandLogo(
-                          size: 140,
+                          size: 160,
                           useVertical: true,
+                          isPremium: true,
                           heroTag: 'app_logo',
                         ),
                       ),

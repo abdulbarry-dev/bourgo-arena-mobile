@@ -1,6 +1,8 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+
 /// Use case for logging out the current user.
 class LogoutUseCase {
   final AuthRepository _repository;
@@ -8,12 +10,7 @@ class LogoutUseCase {
   const LogoutUseCase(this._repository);
 
   /// Executes the logout operation.
-  Future<Result<void>> call() async {
-    try {
-      await _repository.logout();
-      return const Success(null);
-    } catch (e) {
-      return Failure('Logout failed', e);
-    }
+  Future<Result<void, Failure>> call() async {
+    return _repository.logout();
   }
 }

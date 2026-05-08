@@ -1,11 +1,11 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
-import 'package:bourgo_arena_mobile/data/models/course.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Planning (Course Schedule) screen.
 class PlanningViewModel extends ChangeNotifier {
-  final DataService _dataService;
+  final GetCoursesUseCase _getCoursesUseCase;
 
   List<Course> _allCourses = [];
   List<Course> _filteredCourses = [];
@@ -26,8 +26,8 @@ class PlanningViewModel extends ChangeNotifier {
   String get selectedCategory => _selectedCategory;
 
   /// Creates a new [PlanningViewModel] instance.
-  PlanningViewModel({required DataService dataService})
-    : _dataService = dataService {
+  PlanningViewModel({required GetCoursesUseCase getCoursesUseCase})
+    : _getCoursesUseCase = getCoursesUseCase {
     loadCourses();
   }
 
@@ -37,8 +37,16 @@ class PlanningViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _allCourses = await _dataService.getCourses();
-      _filter();
+      final result = await _getCoursesUseCase();
+      result.when(
+        success: (data) {
+          _allCourses = data;
+          _filter();
+        },
+        failure: (failure) {
+          // Handle error
+        },
+      );
     } catch (e) {
       // Handle error
     } finally {

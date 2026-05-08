@@ -1,8 +1,11 @@
-import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
-import 'package:bourgo_arena_mobile/data/services/data_service.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
-import 'package:flutter/material.dart';
+import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
+    as entity;
+import 'package:bourgo_arena_mobile/presentation/notifications/notifications_view_model.dart';
+import 'package:flutter/material.dart' hide Notification;
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -15,60 +18,57 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final DataService _dataService = DataService();
-  List<NotificationModel>? _notifications;
-  bool _isLoading = true;
+  late final NotificationsViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _loadNotifications();
-  }
-
-  Future<void> _loadNotifications() async {
-    try {
-      final data = await _dataService.getNotifications();
-      setState(() {
-        _notifications = data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() => _isLoading = false);
-    }
+    _viewModel = NotificationsViewModel(
+      getNotificationsUseCase: locator<GetNotificationsUseCase>(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.notificationsTitle),
-        backgroundColor: theme.colorScheme.surface,
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: Text(
-              AppLocalizations.of(context)!.notificationsMarkAllRead,
-              style: TextStyle(color: theme.colorScheme.primary, fontSize: 12),
-            ),
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(AppLocalizations.of(context)!.notificationsTitle),
+            backgroundColor: theme.colorScheme.surface,
+            actions: [
+              TextButton(
+                onPressed: _viewModel.markAllAsRead,
+                child: Text(
+                  AppLocalizations.of(context)!.notificationsMarkAllRead,
+                  style: TextStyle(
+                    color: theme.colorScheme.primary,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : (_notifications?.isEmpty ?? true)
-          ? _buildEmptyState()
-          : ListView.separated(
-              padding: const EdgeInsets.all(24),
-              itemCount: _notifications?.length ?? 0,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final notification = _notifications?[index];
-                if (notification == null) return const SizedBox.shrink();
-                return _NotificationItem(notification: notification);
-              },
-            ),
+          body: _viewModel.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : (_viewModel.notifications?.isEmpty ?? true)
+              ? _buildEmptyState()
+              : ListView.separated(
+                  padding: const EdgeInsets.all(24),
+                  itemCount: _viewModel.notifications?.length ?? 0,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    final notification = _viewModel.notifications?[index];
+                    if (notification == null) return const SizedBox.shrink();
+                    return _NotificationItem(notification: notification);
+                  },
+                ),
+        );
+      },
     );
   }
 
@@ -82,7 +82,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 }
 
 class _NotificationItem extends StatelessWidget {
-  final NotificationModel notification;
+  final entity.Notification notification;
 
   const _NotificationItem({required this.notification});
 
@@ -164,7 +164,7 @@ class _NotificationItem extends StatelessWidget {
                   DateFormat(
                     'dd MMM, HH:mm',
                     Localizations.localeOf(context).toString(),
-                  ).format(DateTime.parse(notification.timestamp)),
+                  ).format(notification.timestamp),
                   style: TextStyle(
                     color: theme.colorScheme.onSurfaceVariant.withValues(
                       alpha: 0.6,
