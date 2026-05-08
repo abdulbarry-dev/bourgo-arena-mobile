@@ -71,7 +71,7 @@ Implemented via Flutter's `ChangeNotifier`, `ValueNotifier`, and `ListenableBuil
 Encapsulates a single business action into a dedicated class. This makes the code self-documenting and testable in isolation.
 
 ### 5. Result Pattern (Standard)
-The intention is to have all asynchronous operations return a `Result<T>` object to force explicit error handling.
+The enforced standard is that all asynchronous operations return a `Result<T>` object to force explicit error handling. The project defines a `Failure` sealed class used to represent domain and infrastructure errors in a structured, type-safe manner.
 
 ### 6. Adapter / Mapper Pattern
 Explicit mappers transform raw API data into clean domain entities, isolating the app from backend schema changes.
@@ -95,7 +95,7 @@ lib/
 │   ├── mappers/         # DTO-to-Entity converters
 │   ├── models/          # @JsonSerializable DTOs
 │   ├── repositories/    # Concrete repository implementations (API)
-│   └── services/        # Logic services and bridge facades
+│   
 ├── domain/              # Pure business logic and interfaces
 │   ├── entities/        # Pure business objects
 │   ├── repositories/    # Abstract interfaces
@@ -139,7 +139,7 @@ lib/
 
 1. **User action** in a Screen.
 2. **ViewModel method** is called.
-3. **Use Case** is invoked (or Service during transition).
+3. **Use Case** is invoked.
 4. **Repository** provides data (mapped from DTO to Entity).
 5. **UI update** triggered via `notifyListeners()`.
 

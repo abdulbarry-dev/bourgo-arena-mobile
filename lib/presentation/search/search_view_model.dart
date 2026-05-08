@@ -3,7 +3,6 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.
 import 'package:bourgo_arena_mobile/domain/entities/search_result.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 
 /// ViewModel for the Global Search screen.
 class SearchViewModel extends ChangeNotifier {
@@ -59,7 +58,7 @@ class SearchViewModel extends ChangeNotifier {
                 title: a.title,
                 subtitle: a.category,
                 type: SearchResultType.activity,
-                icon: Symbols.sports_soccer,
+                iconKey: 'sports_soccer',
                 route: '/booking',
                 extra: a,
               ),
@@ -85,7 +84,7 @@ class SearchViewModel extends ChangeNotifier {
                 title: c.title,
                 subtitle: '${c.instructor} • ${c.startTime}',
                 type: SearchResultType.course,
-                icon: Symbols.calendar_month,
+                iconKey: 'calendar_month',
                 route: '/planning',
               ),
             ),
@@ -113,42 +112,42 @@ class SearchViewModel extends ChangeNotifier {
         title: _l10n.settingsEditProfile,
         subtitle: _l10n.settingsSectionAccount,
         type: SearchResultType.setting,
-        icon: Symbols.person,
+        iconKey: 'person',
         route: '/edit-profile',
       ),
       SearchResult(
         title: _l10n.settingsChangePassword,
         subtitle: _l10n.settingsSectionAccount,
         type: SearchResultType.setting,
-        icon: Symbols.lock,
+        iconKey: 'lock',
         route: '/change-password',
       ),
       SearchResult(
         title: _l10n.profileHistory,
         subtitle: _l10n.settingsSectionAccount,
         type: SearchResultType.setting,
-        icon: Symbols.history,
+        iconKey: 'history',
         route: '/history',
       ),
       SearchResult(
         title: _l10n.settingsLanguage,
         subtitle: _l10n.settingsSectionPreferences,
         type: SearchResultType.setting,
-        icon: Symbols.language,
+        iconKey: 'language',
         route: '/settings',
       ),
       SearchResult(
         title: _l10n.settingsPrivacy,
         subtitle: _l10n.settingsSectionLegal,
         type: SearchResultType.setting,
-        icon: Symbols.gavel,
+        iconKey: 'gavel',
         route: '/privacy',
       ),
       SearchResult(
         title: _l10n.settingsTerms,
         subtitle: _l10n.settingsSectionLegal,
         type: SearchResultType.setting,
-        icon: Symbols.description,
+        iconKey: 'description',
         route: '/terms',
       ),
     ];

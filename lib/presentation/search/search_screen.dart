@@ -139,7 +139,11 @@ class _SearchResultTile extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerHighest,
           shape: BoxShape.circle,
         ),
-        child: Icon(result.icon, size: 20, color: theme.colorScheme.primary),
+        child: Icon(
+          _iconForKey(result.iconKey),
+          size: 20,
+          color: theme.colorScheme.primary,
+        ),
       ),
       title: Text(
         result.title,
@@ -162,6 +166,23 @@ class _SearchResultTile extends StatelessWidget {
         }
       },
     );
+  }
+
+  IconData _iconForKey(String key) {
+    const Map<String, IconData> iconMap = {
+      'sports_soccer': Symbols.sports_soccer,
+      'calendar_month': Symbols.calendar_month,
+      'person': Symbols.person,
+      'lock': Symbols.lock,
+      'history': Symbols.history,
+      'language': Symbols.language,
+      'gavel': Symbols.gavel,
+      'description': Symbols.description,
+      'search': Symbols.search,
+      'search_off': Symbols.search_off,
+    };
+
+    return iconMap[key] ?? Symbols.help; // fallback icon
   }
 }
 
