@@ -6,8 +6,8 @@ import 'package:bourgo_arena_mobile/data/repositories/api_course_repository.dart
 import 'package:bourgo_arena_mobile/data/repositories/api_notification_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_reservation_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_user_repository.dart';
-import 'package:bourgo_arena_mobile/data/repositories/persistent_settings_repository.dart';
-import 'package:bourgo_arena_mobile/domain/repositories/settings_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/local_session_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -49,7 +49,11 @@ final locator = GetIt.instance;
 Future<void> initLocator() async {
   // External
   final sharedPrefs = await SharedPreferences.getInstance();
-  locator.registerLazySingleton<SharedPreferences>(() => sharedPrefs);
+
+  // Local Session Repository — the single source for all SharedPreferences access.
+  locator.registerLazySingleton<SessionRepository>(
+    () => LocalSessionRepository(sharedPrefs),
+  );
 
   // Networking
   final httpClient = http.Client();
@@ -58,7 +62,7 @@ Future<void> initLocator() async {
 
   // Repositories
   locator.registerLazySingleton<AuthRepository>(
-    () => ApiAuthRepository(locator<ApiClient>()),
+    () => ApiAuthRepository(locator<ApiClient>(), locator<SessionRepository>()),
   );
   locator.registerLazySingleton<ActivityRepository>(
     () => ApiActivityRepository(locator<ApiClient>()),
@@ -75,9 +79,7 @@ Future<void> initLocator() async {
   locator.registerLazySingleton<NotificationRepository>(
     () => ApiNotificationRepository(locator<ApiClient>()),
   );
-  locator.registerLazySingleton<SettingsRepository>(
-    () => PersistentSettingsRepository(locator<SharedPreferences>()),
-  );
+  // SettingsRepository adapter removed — consumers should use SessionRepository directly.
 
   // Use Cases
   locator.registerLazySingleton(() => LoginUseCase(locator()));

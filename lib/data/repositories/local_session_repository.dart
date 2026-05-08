@@ -1,0 +1,181 @@
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+/// Local implementation of [SessionRepository] using [SharedPreferences].
+///
+/// This is the single authoritative source for all local persistence in the app.
+/// All storage keys are private constants here; no raw key strings may appear
+/// elsewhere in the codebase.
+///
+/// The [clearSession] method performs an atomic wipe of all session-scoped keys.
+/// Every new session field MUST be added to [_sessionKeys] — this is a hard rule.
+class LocalSessionRepository implements SessionRepository {
+  // =========== Storage Keys (Private) ===========
+  // Auth Session
+  static const String _authTokenKey = 'auth_token';
+
+  // Theme Preference
+  static const String _themeKey = 'settings_theme_mode';
+
+  // Locale & Onboarding
+  static const String _localeKey = 'settings_locale';
+  static const String _languageSelectedKey = 'settings_language_selected';
+
+  // Notification Preference
+  static const String _notificationsKey = 'settings_notifications_enabled';
+
+  /// All session-scoped keys that should be wiped atomically by [clearSession].
+  /// This list is the source of truth for session-wide data; every session field
+  /// added in the future MUST be added here.
+  static const List<String> _sessionKeys = [_authTokenKey];
+
+  final SharedPreferences _prefs;
+
+  /// Creates a new [LocalSessionRepository].
+  LocalSessionRepository(this._prefs);
+
+  // =========== Auth Session ===========
+
+  @override
+  Future<Result<String?, Failure>> getAuthToken() async {
+    try {
+      final token = _prefs.getString(_authTokenKey);
+      return Success(token);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to retrieve auth token: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> saveAuthToken(String token) async {
+    try {
+      await _prefs.setString(_authTokenKey, token);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save auth token: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> clearSession() async {
+    try {
+      for (final key in _sessionKeys) {
+        await _prefs.remove(key);
+      }
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to clear session: ${e.toString()}'),
+      );
+    }
+  }
+
+  // =========== Theme Preference ===========
+
+  @override
+  Future<Result<ThemeMode, Failure>> getThemeMode() async {
+    try {
+      final String? themeValue = _prefs.getString(_themeKey);
+      if (themeValue == null) return const Success(ThemeMode.system);
+
+      final mode = ThemeMode.values.firstWhere(
+        (e) => e.name == themeValue,
+        orElse: () => ThemeMode.system,
+      );
+      return Success(mode);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to load theme mode: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setThemeMode(ThemeMode mode) async {
+    try {
+      await _prefs.setString(_themeKey, mode.name);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save theme mode: ${e.toString()}'),
+      );
+    }
+  }
+
+  // =========== Locale & Onboarding ===========
+
+  @override
+  Future<Result<Locale, Failure>> getLocale() async {
+    try {
+      final String? localeCode = _prefs.getString(_localeKey);
+      if (localeCode == null) return const Success(Locale('en'));
+      return Success(Locale(localeCode));
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to load locale: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setLocale(Locale locale) async {
+    try {
+      await _prefs.setString(_localeKey, locale.languageCode);
+      // Explicitly mark language as selected when a locale is set.
+      await _prefs.setBool(_languageSelectedKey, true);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save locale: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> isLanguageSelected() async {
+    try {
+      // Legacy fallback: if a locale is persisted, consider the language selected.
+      // For new installs, the explicit flag is set when setLocale is called.
+      final hasLocale = _prefs.containsKey(_localeKey);
+      final isSelected = _prefs.getBool(_languageSelectedKey) ?? hasLocale;
+      return Success(isSelected);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to check language selection: ${e.toString()}'),
+      );
+    }
+  }
+
+  // =========== Notification Preference ===========
+
+  @override
+  Future<Result<bool, Failure>> areNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool(_notificationsKey) ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to load notification settings: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setNotificationsEnabled(bool enabled) async {
+    try {
+      await _prefs.setBool(_notificationsKey, enabled);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save notification settings: ${e.toString()}'),
+      );
+    }
+  }
+}

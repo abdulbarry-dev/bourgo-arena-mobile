@@ -7,14 +7,16 @@ import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 
 /// Laravel API implementation of [AuthRepository].
 class ApiAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
+  final SessionRepository _sessionRepository;
   final StreamController<User?> _authStateController =
       StreamController<User?>.broadcast();
 
-  ApiAuthRepository(this._apiClient);
+  ApiAuthRepository(this._apiClient, this._sessionRepository);
 
   @override
   Future<Result<User, Failure>> login(String email, String password) {
@@ -28,6 +30,9 @@ class ApiAuthRepository implements AuthRepository {
 
       final token = response['token'] as String;
       _apiClient.setToken(token);
+
+      // Persist the token to local session storage
+      await _sessionRepository.saveAuthToken(token);
 
       // Fetch user profile after login
       final userResponse =
@@ -48,6 +53,8 @@ class ApiAuthRepository implements AuthRepository {
         return const Success(null);
       } finally {
         _apiClient.setToken(null);
+        // Clear the persisted session (including the token)
+        await _sessionRepository.clearSession();
         _authStateController.add(null);
       }
     });
@@ -135,8 +142,8 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<Result<String?, Failure>> getToken() async {
-    // In a production app, this would be retrieved from secure storage (e.g. flutter_secure_storage)
-    return const Success(null);
+    // Retrieve the persisted auth token from local session storage
+    return _sessionRepository.getAuthToken();
   }
 
   @override
