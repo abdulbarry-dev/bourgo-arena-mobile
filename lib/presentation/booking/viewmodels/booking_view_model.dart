@@ -141,7 +141,7 @@ class BookingViewModel extends ChangeNotifier {
       developer.log(
         'BookingViewModel: Loading slots for activity: ${activity.id}',
       );
-      
+
       final result = await _getTimeSlotsUseCase(activity.id);
       result.when(
         success: (slots) {

@@ -21,10 +21,9 @@ class ApiClient {
   /// Sends a GET request to the specified [path].
   Future<dynamic> get(String path) async {
     try {
-      final response = await _client.get(
-        Uri.parse('$baseUrl$path'),
-        headers: _headers,
-      ).timeout(const Duration(seconds: 15));
+      final response = await _client
+          .get(Uri.parse('$baseUrl$path'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
       return _handleResponse(response);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
@@ -36,11 +35,13 @@ class ApiClient {
   /// Sends a POST request to the specified [path] with [body].
   Future<dynamic> post(String path, dynamic body) async {
     try {
-      final response = await _client.post(
-        Uri.parse('$baseUrl$path'),
-        headers: _headers,
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _client
+          .post(
+            Uri.parse('$baseUrl$path'),
+            headers: _headers,
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
       return _handleResponse(response);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
@@ -52,11 +53,13 @@ class ApiClient {
   /// Sends a PUT request to the specified [path] with [body].
   Future<dynamic> put(String path, dynamic body) async {
     try {
-      final response = await _client.put(
-        Uri.parse('$baseUrl$path'),
-        headers: _headers,
-        body: jsonEncode(body),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _client
+          .put(
+            Uri.parse('$baseUrl$path'),
+            headers: _headers,
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 15));
       return _handleResponse(response);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
@@ -68,10 +71,9 @@ class ApiClient {
   /// Sends a DELETE request to the specified [path].
   Future<void> delete(String path) async {
     try {
-      final response = await _client.delete(
-        Uri.parse('$baseUrl$path'),
-        headers: _headers,
-      ).timeout(const Duration(seconds: 15));
+      final response = await _client
+          .delete(Uri.parse('$baseUrl$path'), headers: _headers)
+          .timeout(const Duration(seconds: 15));
       _handleResponse(response);
     } on SocketException catch (e) {
       throw NetworkException(e.message);

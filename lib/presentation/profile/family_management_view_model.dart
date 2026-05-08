@@ -125,14 +125,16 @@ class FamilyManagementViewModel extends ChangeNotifier {
         if (success) {
           final updatedUser = _user!.copyWith(isParentAccount: true);
           final updateResult = await _updateUserProfileUseCase(updatedUser);
-          
+
           updateResult.when(
             success: (user) {
               _user = user;
               _isOtpSent = false;
             },
             failure: (failure) {
-              developer.log('Failed to update parent status: ${failure.message}');
+              developer.log(
+                'Failed to update parent status: ${failure.message}',
+              );
             },
           );
         }
@@ -152,10 +154,7 @@ class FamilyManagementViewModel extends ChangeNotifier {
   Future<bool> disableFamilyAccount() async {
     if (_user == null) return false;
 
-    final updatedUser = _user!.copyWith(
-      isParentAccount: false,
-      children: [],
-    );
+    final updatedUser = _user!.copyWith(isParentAccount: false, children: []);
 
     final result = await _updateUserProfileUseCase(updatedUser);
     return result.fold(
@@ -238,7 +237,9 @@ class FamilyManagementViewModel extends ChangeNotifier {
   Future<bool> removeChild(String childId) async {
     if (_user == null) return false;
 
-    final updatedChildren = _user!.children.where((c) => c.id != childId).toList();
+    final updatedChildren = _user!.children
+        .where((c) => c.id != childId)
+        .toList();
     final updatedUser = _user!.copyWith(children: updatedChildren);
 
     final result = await _updateUserProfileUseCase(updatedUser);

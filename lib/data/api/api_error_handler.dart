@@ -4,7 +4,9 @@ import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'dart:developer' as developer;
 
 /// Executes an API call and automatically maps exceptions to the correct [Failure] subclass.
-Future<Result<T, Failure>> executeApiCall<T>(Future<Result<T, Failure>> Function() call) async {
+Future<Result<T, Failure>> executeApiCall<T>(
+  Future<Result<T, Failure>> Function() call,
+) async {
   try {
     return await call();
   } on AuthException catch (e) {

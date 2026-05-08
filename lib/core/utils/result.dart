@@ -8,7 +8,8 @@ sealed class Result<S, F extends Failure> {
   const Result();
 
   /// Standard success factory.
-  static Result<S, F> success<S, F extends Failure>(S data) => Success<S, F>(data);
+  static Result<S, F> success<S, F extends Failure>(S data) =>
+      Success<S, F>(data);
 
   /// Standard failure factory.
   static Result<S, F> failure<S, F extends Failure>(F failure) =>

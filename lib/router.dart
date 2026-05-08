@@ -89,15 +89,13 @@ GoRouter createRouter(
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
     GoRoute(
       path: '/login',
-      builder: (context, state) => LoginScreen(
-        loginUseCase: locator<LoginUseCase>(),
-      ),
+      builder: (context, state) =>
+          LoginScreen(loginUseCase: locator<LoginUseCase>()),
     ),
     GoRoute(
       path: '/register',
-      builder: (context, state) => RegisterScreen(
-        registerUseCase: locator<RegisterUseCase>(),
-      ),
+      builder: (context, state) =>
+          RegisterScreen(registerUseCase: locator<RegisterUseCase>()),
     ),
     GoRoute(
       path: '/otp',
@@ -150,9 +148,7 @@ GoRouter createRouter(
       path: '/booking',
       builder: (context, state) {
         final activity = state.extra as Activity?;
-        return BookingFlowScreen(
-          initialActivity: activity,
-        );
+        return BookingFlowScreen(initialActivity: activity);
       },
     ),
     GoRoute(

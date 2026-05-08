@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
-import 'package:bourgo_arena_mobile/domain/entities/notification.dart' as entity;
+import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
+    as entity;
 
 /// Mapper to convert between [NotificationModel] and [entity.Notification].
 class NotificationMapper {

@@ -2,7 +2,8 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
-import 'package:bourgo_arena_mobile/domain/entities/notification.dart' as entity;
+import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
+    as entity;
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_view_model.dart';
 import 'package:flutter/material.dart' hide Notification;
 import 'package:intl/intl.dart';
@@ -58,7 +59,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               : ListView.separated(
                   padding: const EdgeInsets.all(24),
                   itemCount: _viewModel.notifications?.length ?? 0,
-                  separatorBuilder: (context, index) => const SizedBox(height: 16),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     final notification = _viewModel.notifications?[index];
                     if (notification == null) return const SizedBox.shrink();

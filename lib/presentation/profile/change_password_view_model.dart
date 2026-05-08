@@ -7,8 +7,9 @@ class ChangePasswordViewModel extends ChangeNotifier {
 
   bool _isSaving = false;
 
-  ChangePasswordViewModel({required UpdatePasswordUseCase updatePasswordUseCase})
-    : _updatePasswordUseCase = updatePasswordUseCase;
+  ChangePasswordViewModel({
+    required UpdatePasswordUseCase updatePasswordUseCase,
+  }) : _updatePasswordUseCase = updatePasswordUseCase;
 
   bool get isSaving => _isSaving;
 

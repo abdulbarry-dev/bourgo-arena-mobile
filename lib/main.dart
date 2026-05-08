@@ -43,10 +43,7 @@ class _BourgoArenaAppState extends State<BourgoArenaApp> {
   @override
   void initState() {
     super.initState();
-    _router = createRouter(
-      widget.settingsViewModel,
-      widget.authStateNotifier,
-    );
+    _router = createRouter(widget.settingsViewModel, widget.authStateNotifier);
   }
 
   @override

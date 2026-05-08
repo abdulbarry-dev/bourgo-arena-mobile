@@ -58,11 +58,13 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           totalCheckIns: 0,
           isParentAccount: widget.registrationData['isParentAccount'] ?? false,
           children:
-              (widget.registrationData['familyMembers'] as List<ChildProfile>?) ??
+              (widget.registrationData['familyMembers']
+                  as List<ChildProfile>?) ??
               const [],
         );
 
-        final completeRegistrationUseCase = locator<CompleteRegistrationUseCase>();
+        final completeRegistrationUseCase =
+            locator<CompleteRegistrationUseCase>();
         final result = await completeRegistrationUseCase(user);
 
         result.fold(

@@ -14,10 +14,7 @@ import 'package:flutter/material.dart';
 class BookingFlowScreen extends StatefulWidget {
   /// Optional activity to start the booking flow with.
   final Activity? initialActivity;
-  const BookingFlowScreen({
-    super.key,
-    this.initialActivity,
-  });
+  const BookingFlowScreen({super.key, this.initialActivity});
 
   @override
   State<BookingFlowScreen> createState() => _BookingFlowScreenState();

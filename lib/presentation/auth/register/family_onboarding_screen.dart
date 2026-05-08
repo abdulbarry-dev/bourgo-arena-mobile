@@ -53,10 +53,7 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
   void _onContinue() {
     context.push(
       '/verification-method',
-      extra: {
-        ...widget.registrationData,
-        'familyMembers': _viewModel.members,
-      },
+      extra: {...widget.registrationData, 'familyMembers': _viewModel.members},
     );
   }
 

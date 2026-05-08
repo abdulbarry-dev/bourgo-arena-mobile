@@ -44,7 +44,8 @@ class HomeViewModel extends ChangeNotifier {
       final activitiesResult = await _getActivitiesUseCase();
       activitiesResult.when(
         success: (data) => _activities = data,
-        failure: (failure) => developer.log('Error loading activities: $failure'),
+        failure: (failure) =>
+            developer.log('Error loading activities: $failure'),
       );
 
       // Load courses via Use Case

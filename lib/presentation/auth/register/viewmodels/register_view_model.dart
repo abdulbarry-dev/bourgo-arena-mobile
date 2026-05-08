@@ -74,9 +74,9 @@ class RegisterViewModel extends ChangeNotifier {
             }
           },
           onFailure: (failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(failure.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(failure.message)));
           },
         );
       }

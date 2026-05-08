@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
-import 'package:bourgo_arena_mobile/domain/entities/notification.dart' as entity;
+import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
+    as entity;
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
 import 'package:flutter/material.dart';
 
