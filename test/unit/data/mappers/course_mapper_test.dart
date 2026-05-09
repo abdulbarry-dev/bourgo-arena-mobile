@@ -34,6 +34,17 @@ void main() {
       expect(mapped.remainingSpots, 0);
     });
 
+    test('correctly calculates remaining spots and fullness', () {
+      final dto = testCourseModel(capacity: 10, enrolled: 4);
+
+      final mapped = CourseMapper.toEntity(dto);
+
+      expect(mapped.capacity, 10);
+      expect(mapped.enrolled, 4);
+      expect(mapped.isFull, isFalse);
+      expect(mapped.remainingSpots, 6);
+    });
+
     test('preserves the icon field exactly', () {
       final dto = testCourseModel(icon: 'self_improvement');
 
@@ -63,6 +74,16 @@ void main() {
       expect(course.remainingSpots, 9);
       expect(dto.capacity, course.capacity);
       expect(dto.enrolled, course.enrolled);
+    });
+
+    test('toEntityList converts a list of DTOs', () {
+      final dtos = [testCourseModel(id: 'c1'), testCourseModel(id: 'c2')];
+
+      final entities = dtos.toEntityList();
+
+      expect(entities.length, 2);
+      expect(entities[0].id, 'c1');
+      expect(entities[1].id, 'c2');
     });
   });
 }

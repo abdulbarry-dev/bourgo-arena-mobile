@@ -45,6 +45,7 @@ void main() {
         name: 'SingleName',
         avatarUrl: null,
         subscriptionExpiry: null,
+        birthDate: null,
         children: const [],
       );
 
@@ -54,6 +55,7 @@ void main() {
       expect(entity.lastName, '');
       expect(entity.avatarUrl, '');
       expect(entity.subscriptionExpiry, '');
+      expect(entity.birthDate, isNull);
       expect(entity.children, isEmpty);
     });
 
@@ -64,6 +66,14 @@ void main() {
 
       expect(entity.firstName, 'Mary');
       expect(entity.lastName, 'Jane Watson');
+    });
+
+    test('maps isParentAccount correctly', () {
+      final dto = testUserProfileModel(isParentAccount: true);
+
+      final entity = UserMapper.toEntity(dto);
+
+      expect(entity.isParentAccount, isTrue);
     });
 
     test('maps an entity back to the DTO with the renamed name field', () {

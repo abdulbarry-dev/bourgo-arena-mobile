@@ -51,5 +51,18 @@ void main() {
       expect(dto.id, notification.id);
       expect(dto.timestamp, notification.timestamp.toIso8601String());
     });
+
+    test('toEntityList converts a list of DTOs', () {
+      final dtos = [
+        testNotificationModel(id: 'n1'),
+        testNotificationModel(id: 'n2'),
+      ];
+
+      final entities = dtos.toEntityList();
+
+      expect(entities.length, 2);
+      expect(entities[0].id, 'n1');
+      expect(entities[1].id, 'n2');
+    });
   });
 }

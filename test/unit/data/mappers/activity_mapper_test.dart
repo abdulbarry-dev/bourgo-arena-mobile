@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/data/mappers/activity_mapper.dart';
+import 'package:bourgo_arena_mobile/data/models/activity_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:test/test.dart';
 
@@ -38,6 +39,25 @@ void main() {
       expect(entity.reviewCount, 0);
     });
 
+    test('uses model defaults when values are not explicitly provided', () {
+      const dto = ActivityModel(
+        id: 'default-1',
+        title: 'Default Activity',
+        category: 'Test',
+        basePrice: 10.0,
+        currency: 'USD',
+        imageUrl: '',
+        icon: '',
+        description: '',
+        features: [],
+      );
+
+      final entity = ActivityMapper.toEntity(dto);
+
+      expect(entity.rating, 0.0);
+      expect(entity.reviewCount, 0);
+    });
+
     test('preserves renamed backend fields unchanged', () {
       final dto = testActivityModel(icon: 'sports_tennis');
 
@@ -66,6 +86,16 @@ void main() {
       expect(dto.id, entity.id);
       expect(dto.icon, entity.icon);
       expect(dto.features, entity.features);
+    });
+
+    test('toEntityList converts a list of DTOs', () {
+      final dtos = [testActivityModel(id: 'a1'), testActivityModel(id: 'a2')];
+
+      final entities = dtos.toEntityList();
+
+      expect(entities.length, 2);
+      expect(entities[0].id, 'a1');
+      expect(entities[1].id, 'a2');
     });
   });
 }

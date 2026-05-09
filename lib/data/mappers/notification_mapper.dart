@@ -28,3 +28,10 @@ class NotificationMapper {
     );
   }
 }
+
+/// Extension for convenient mapping of [NotificationModel] list.
+extension NotificationModelListX on List<NotificationModel> {
+  /// Converts a list of [NotificationModel] to a list of [entity.Notification].
+  List<entity.Notification> toEntityList() =>
+      map(NotificationMapper.toEntity).toList();
+}

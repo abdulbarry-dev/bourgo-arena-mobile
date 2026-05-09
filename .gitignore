@@ -79,3 +79,4 @@ ios/.symlinks/
 .env
 .env.*
 coverage/
+artifacts/

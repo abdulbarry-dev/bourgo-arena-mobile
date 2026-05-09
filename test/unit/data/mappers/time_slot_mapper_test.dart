@@ -40,5 +40,18 @@ void main() {
       expect(dto.time, slot.time);
       expect(dto.available, slot.available);
     });
+
+    test('toEntityList converts a list of DTOs', () {
+      final dtos = [
+        testTimeSlotModel(time: '08:00'),
+        testTimeSlotModel(time: '09:00'),
+      ];
+
+      final entities = dtos.toEntityList();
+
+      expect(entities.length, 2);
+      expect(entities[0].time, '08:00');
+      expect(entities[1].time, '09:00');
+    });
   });
 }

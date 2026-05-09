@@ -59,5 +59,18 @@ void main() {
       expect(dto.id, reservation.id);
       expect(dto.qrCode, reservation.qrCode);
     });
+
+    test('toEntityList converts a list of DTOs', () {
+      final dtos = [
+        testReservationModel(id: 'r1'),
+        testReservationModel(id: 'r2'),
+      ];
+
+      final entities = dtos.toEntityList();
+
+      expect(entities.length, 2);
+      expect(entities[0].id, 'r1');
+      expect(entities[1].id, 'r2');
+    });
   });
 }
