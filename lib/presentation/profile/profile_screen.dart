@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -25,6 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     super.initState();
     _viewModel = ProfileViewModel(
       getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+      updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
       logoutUseCase: locator<LogoutUseCase>(),
     );
   }
@@ -70,7 +72,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onTapSettings: () => context.push('/settings'),
                       ),
                       const SizedBox(height: 32),
-                      _LogoutButton(),
+                      _LogoutButton(
+                        onLogout: () async {
+                          await _viewModel.logout();
+                          if (context.mounted) {
+                            context.go('/login');
+                          }
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -322,10 +331,14 @@ class _MenuItem extends StatelessWidget {
 }
 
 class _LogoutButton extends StatelessWidget {
+  final VoidCallback onLogout;
+
+  const _LogoutButton({required this.onLogout});
+
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      onPressed: () => context.go('/login'),
+      onPressed: onLogout,
       child: Text(
         AppLocalizations.of(context)?.profileLogout ?? 'Log out',
         style: const TextStyle(

@@ -1,248 +1,191 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 
-import '../../unit/data/repositories/repository_test_fixtures.dart';
+class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
-class MockGetProfile extends Mock implements GetUserProfileUseCase {}
+class MockUpdateUserProfileUseCase extends Mock
+    implements UpdateUserProfileUseCase {}
 
-class MockLogout extends Mock implements LogoutUseCase {}
+class MockLogoutUseCase extends Mock implements LogoutUseCase {}
 
 void main() {
-  late MockGetProfile mockGetProfile;
-  late MockLogout mockLogout;
+  late MockGetUserProfileUseCase mockGetUserProfileUseCase;
+  late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
+  late MockLogoutUseCase mockLogoutUseCase;
 
-  setUp(() async {
-    mockGetProfile = MockGetProfile();
-    mockLogout = MockLogout();
+  final tUser = User(
+    id: '1',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john@example.com',
+    phone: '123456789',
+    avatarUrl: 'https://example.com/avatar.png',
+    loyaltyPoints: 100,
+    subscriptionLevel: 'GOLD',
+    subscriptionExpiry: '2025-12-31',
+    totalCheckIns: 10,
+    isParentAccount: false,
+    children: [],
+  );
 
+  setUp(() {
+    mockGetUserProfileUseCase = MockGetUserProfileUseCase();
+    mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
+    mockLogoutUseCase = MockLogoutUseCase();
+
+    locator.registerFactory<GetUserProfileUseCase>(
+      () => mockGetUserProfileUseCase,
+    );
+    locator.registerFactory<UpdateUserProfileUseCase>(
+      () => mockUpdateUserProfileUseCase,
+    );
+    locator.registerFactory<LogoutUseCase>(() => mockLogoutUseCase);
+  });
+
+  tearDown(() async {
     await locator.reset();
-    locator.registerLazySingleton<GetUserProfileUseCase>(() => mockGetProfile);
-    locator.registerLazySingleton<LogoutUseCase>(() => mockLogout);
   });
 
-  setUpAll(() {
-    HttpOverrides.global = _FakeHttpOverrides();
-  });
-
-  tearDownAll(() {
-    HttpOverrides.global = null;
-  });
-
-  testWidgets('initial render shows user name when profile loads', (
+  testWidgets('ProfileScreen renders user information correctly', (
     tester,
   ) async {
-    final user = testUserEntity(firstName: 'Jamie', lastName: 'Rivera');
-    when(() => mockGetProfile()).thenAnswer((_) async => Success(user));
+    mockNetworkImagesFor(() async {
+      // Arrange
+      when(
+        () => mockGetUserProfileUseCase(),
+      ).thenAnswer((_) async => Success(tUser));
 
-    await tester.pumpWidget(_buildApp(const ProfileScreen()));
-    await tester.pump(const Duration(milliseconds: 500));
+      // Act
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
+      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
 
-    expect(find.textContaining('JAMIE'), findsOneWidget);
+      // Assert
+      expect(find.text('JOHN DOE'), findsOneWidget);
+      expect(find.text('GOLD'), findsOneWidget);
+      expect(find.text('100'), findsOneWidget); // Loyalty points
+      expect(find.text('10'), findsOneWidget); // Total check-ins
+    });
   });
 
-  testWidgets('loading state shows CircularProgressIndicator', (tester) async {
-    final completer = Completer<Result<User, Failure>>();
-    when(() => mockGetProfile()).thenAnswer((_) => completer.future);
+  testWidgets('ProfileScreen shows loading indicator while loading profile', (
+    tester,
+  ) async {
+    mockNetworkImagesFor(() async {
+      // Arrange
+      final completer = Completer<Result<User, Failure>>();
+      when(
+        () => mockGetUserProfileUseCase(),
+      ).thenAnswer((_) => completer.future);
 
-    await tester.pumpWidget(_buildApp(const ProfileScreen()));
-    await tester.pump();
+      // Act
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
+      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pump(); // Start building and call initState
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      // Assert
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    completer.complete(Success(testUserEntity()));
-    await tester.pump(const Duration(milliseconds: 500));
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+      // Complete loading
+      completer.complete(Success(tUser));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+      expect(find.text('JOHN DOE'), findsOneWidget);
+    });
   });
 
-  testWidgets('error state displays loading error message', (tester) async {
-    when(
-      () => mockGetProfile(),
-    ).thenAnswer((_) async => FailureResult(ServerFailure('boom')));
+  testWidgets('ProfileScreen shows error message on failure', (tester) async {
+    mockNetworkImagesFor(() async {
+      // Arrange
+      when(() => mockGetUserProfileUseCase()).thenAnswer(
+        (_) async => const FailureResult(ServerFailure('Failed to load')),
+      );
 
-    await tester.pumpWidget(_buildApp(const ProfileScreen()));
-    await tester.pump(const Duration(milliseconds: 500));
+      // Act
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+        ],
+      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
 
-    final l10n = AppLocalizations.of(
-      tester.element(find.byType(ProfileScreen)),
-    )!;
-    expect(find.text(l10n.commonLoadingError), findsOneWidget);
+      // Assert
+      // Currently, ProfileScreen shows 'Loading error' (fallback) if user is null
+      expect(find.text('Loading error'), findsOneWidget);
+    });
   });
 
-  testWidgets('logout button is present and tappable', (tester) async {
-    when(
-      () => mockGetProfile(),
-    ).thenAnswer((_) async => Success(testUserEntity()));
+  testWidgets('Logout button triggers logout flow', (tester) async {
+    mockNetworkImagesFor(() async {
+      // Set larger surface size for logout button visibility
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() => tester.view.resetPhysicalSize());
+      addTearDown(() => tester.view.resetDevicePixelRatio());
 
-    await tester.pumpWidget(_buildApp(const ProfileScreen()));
-    await tester.pump(const Duration(milliseconds: 500));
+      // Arrange
+      when(
+        () => mockGetUserProfileUseCase(),
+      ).thenAnswer((_) async => Success(tUser));
+      when(
+        () => mockLogoutUseCase(),
+      ).thenAnswer((_) async => const Success(null));
 
-    final l10n = AppLocalizations.of(
-      tester.element(find.byType(ProfileScreen)),
-    )!;
-    final logoutButton = find.widgetWithText(TextButton, l10n.profileLogout);
-    expect(logoutButton, findsOneWidget);
+      // Act
+      final router = GoRouter(
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/login',
+            builder: (context, state) => const Scaffold(body: Text('Login')),
+          ),
+        ],
+      );
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpAndSettle();
 
-    await tester.tap(logoutButton);
-    await tester.pump();
+      final logoutButton = find.text('Log out');
+      expect(logoutButton, findsOneWidget);
 
-    expect(find.byType(ProfileScreen), findsOneWidget);
+      await tester.tap(logoutButton);
+      await tester.pump();
+
+      // Assert
+      verify(() => mockLogoutUseCase()).called(1);
+    });
   });
 }
-
-Widget _buildApp(Widget home) {
-  return MaterialApp(
-    locale: AppLocalizations.supportedLocales.first,
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
-    supportedLocales: AppLocalizations.supportedLocales,
-    home: home,
-  );
-}
-
-class _FakeHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) => _FakeHttpClient();
-}
-
-class _FakeHttpClient extends Fake implements HttpClient {
-  @override
-  bool autoUncompress = true;
-
-  @override
-  Future<HttpClientRequest> getUrl(Uri url) async => _FakeHttpRequest();
-
-  @override
-  Future<HttpClientRequest> openUrl(String method, Uri url) async =>
-      _FakeHttpRequest();
-}
-
-class _FakeHttpRequest extends Fake implements HttpClientRequest {
-  @override
-  Encoding get encoding => utf8;
-
-  @override
-  set encoding(Encoding value) {}
-
-  @override
-  Future<HttpClientResponse> close() async {
-    return _FakeHttpResponse.fromBytes(_transparentPngBytes);
-  }
-}
-
-class _FakeHttpHeaders extends Fake implements HttpHeaders {}
-
-class _FakeHttpResponse extends Fake implements HttpClientResponse {
-  _FakeHttpResponse.fromBytes(this._bytes);
-
-  final List<int> _bytes;
-
-  @override
-  int get statusCode => 200;
-
-  @override
-  int get contentLength => _bytes.length;
-
-  @override
-  HttpClientResponseCompressionState get compressionState =>
-      HttpClientResponseCompressionState.notCompressed;
-
-  @override
-  HttpHeaders get headers => _FakeHttpHeaders();
-
-  @override
-  StreamSubscription<List<int>> listen(
-    void Function(List<int>)? onData, {
-    Function? onError,
-    void Function()? onDone,
-    bool? cancelOnError,
-  }) {
-    return Stream<List<int>>.fromIterable([_bytes]).listen(
-      onData,
-      onError: onError,
-      onDone: onDone,
-      cancelOnError: cancelOnError ?? false,
-    );
-  }
-}
-
-const List<int> _transparentPngBytes = <int>[
-  137,
-  80,
-  78,
-  71,
-  13,
-  10,
-  26,
-  10,
-  0,
-  0,
-  0,
-  13,
-  73,
-  72,
-  68,
-  82,
-  0,
-  0,
-  0,
-  1,
-  0,
-  0,
-  0,
-  1,
-  8,
-  6,
-  0,
-  0,
-  0,
-  31,
-  21,
-  196,
-  137,
-  0,
-  0,
-  0,
-  12,
-  73,
-  68,
-  65,
-  84,
-  8,
-  153,
-  99,
-  0,
-  1,
-  0,
-  0,
-  5,
-  0,
-  1,
-  13,
-  10,
-  44,
-  90,
-  0,
-  0,
-  0,
-  0,
-  73,
-  69,
-  78,
-  68,
-  174,
-  66,
-  96,
-  130,
-];

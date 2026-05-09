@@ -36,7 +36,9 @@ void main() {
     tester,
   ) async {
     final user = testUserEntity();
-      when(() => mockLoginUseCase(any(), any())).thenAnswer((_) async => Success(user));
+    when(
+      () => mockLoginUseCase(any(), any()),
+    ).thenAnswer((_) async => Success(user));
 
     // set controller values
     viewModel.identifierController.text = 'alex@example.com';
@@ -67,8 +69,9 @@ void main() {
   });
 
   testWidgets('shows SnackBar with failure message on failure', (tester) async {
-    when(() => mockLoginUseCase(any(), any()))
-          .thenAnswer((_) async => FailureResult(AuthFailure('bad')));
+    when(
+      () => mockLoginUseCase(any(), any()),
+    ).thenAnswer((_) async => FailureResult(AuthFailure('bad')));
 
     viewModel.identifierController.text = 'alex@example.com';
     viewModel.passwordController.text = 'wrong';
