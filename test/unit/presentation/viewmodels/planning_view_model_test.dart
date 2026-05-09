@@ -55,13 +55,11 @@ void main() {
   setUp(() {
     mockGetCourses = MockGetCoursesUseCase();
 
-    when(() => mockGetCourses()).thenAnswer(
-      (_) async => Result.success(testCourses),
-    );
+    when(
+      () => mockGetCourses(),
+    ).thenAnswer((_) async => Result.success(testCourses));
 
-    viewModel = PlanningViewModel(
-      getCoursesUseCase: mockGetCourses,
-    );
+    viewModel = PlanningViewModel(getCoursesUseCase: mockGetCourses);
   });
 
   group('PlanningViewModel', () {
@@ -88,7 +86,9 @@ void main() {
 
       viewModel.selectCategory(AppConstants.planningCategoryAcademy);
 
-      check(viewModel.selectedCategory).equals(AppConstants.planningCategoryAcademy);
+      check(
+        viewModel.selectedCategory,
+      ).equals(AppConstants.planningCategoryAcademy);
       check(viewModel.courses).has((l) => l.length, 'length').equals(1);
       check(viewModel.courses.first.title).equals('Football');
     });

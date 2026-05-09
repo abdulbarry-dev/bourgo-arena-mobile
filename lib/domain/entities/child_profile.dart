@@ -48,4 +48,25 @@ class ChildProfile {
 
   /// Returns the full name of the child.
   String get name => '$firstName $lastName';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChildProfile &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          firstName == other.firstName &&
+          lastName == other.lastName &&
+          birthDate == other.birthDate &&
+          gender == other.gender &&
+          avatarUrl == other.avatarUrl;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      firstName.hashCode ^
+      lastName.hashCode ^
+      birthDate.hashCode ^
+      gender.hashCode ^
+      avatarUrl.hashCode;
 }

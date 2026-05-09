@@ -13,12 +13,21 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class _MockGetThemeMode extends Mock implements GetThemeModeUseCase {}
+
 class _MockSetThemeMode extends Mock implements SetThemeModeUseCase {}
+
 class _MockGetLocale extends Mock implements GetLocaleUseCase {}
+
 class _MockSetLocale extends Mock implements SetLocaleUseCase {}
-class _MockIsLanguageSelected extends Mock implements IsLanguageSelectedUseCase {}
-class _MockGetNotificationsEnabled extends Mock implements GetNotificationsEnabledUseCase {}
-class _MockSetNotificationsEnabled extends Mock implements SetNotificationsEnabledUseCase {}
+
+class _MockIsLanguageSelected extends Mock
+    implements IsLanguageSelectedUseCase {}
+
+class _MockGetNotificationsEnabled extends Mock
+    implements GetNotificationsEnabledUseCase {}
+
+class _MockSetNotificationsEnabled extends Mock
+    implements SetNotificationsEnabledUseCase {}
 
 void main() {
   setUpAll(() {
@@ -44,14 +53,26 @@ void main() {
     mockGetNotif = _MockGetNotificationsEnabled();
     mockSetNotif = _MockSetNotificationsEnabled();
 
-    when(() => mockGetTheme()).thenAnswer((_) async => Result.success(ThemeMode.system));
-    when(() => mockGetLocale()).thenAnswer((_) async => Result.success(const Locale('en')));
+    when(
+      () => mockGetTheme(),
+    ).thenAnswer((_) async => Result.success(ThemeMode.system));
+    when(
+      () => mockGetLocale(),
+    ).thenAnswer((_) async => Result.success(const Locale('en')));
     when(() => mockGetNotif()).thenAnswer((_) async => Result.success(true));
-    when(() => mockIsLangSelected()).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockIsLangSelected(),
+    ).thenAnswer((_) async => Result.success(true));
 
-    when(() => mockSetTheme(any())).thenAnswer((_) async => Result.success(null));
-    when(() => mockSetLocale(any())).thenAnswer((_) async => Result.success(null));
-    when(() => mockSetNotif(any())).thenAnswer((_) async => Result.success(null));
+    when(
+      () => mockSetTheme(any()),
+    ).thenAnswer((_) async => Result.success(null));
+    when(
+      () => mockSetLocale(any()),
+    ).thenAnswer((_) async => Result.success(null));
+    when(
+      () => mockSetNotif(any()),
+    ).thenAnswer((_) async => Result.success(null));
 
     viewModel = SettingsViewModel(
       mockGetTheme,
@@ -84,10 +105,18 @@ void main() {
     });
 
     test('initialize handles failures and keeps defaults', () async {
-      when(() => mockGetTheme()).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(() => mockGetLocale()).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(() => mockGetNotif()).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(() => mockIsLangSelected()).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
+      when(
+        () => mockGetTheme(),
+      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
+      when(
+        () => mockGetLocale(),
+      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
+      when(
+        () => mockGetNotif(),
+      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
+      when(
+        () => mockIsLangSelected(),
+      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
 
       var notifyCount = 0;
       viewModel.addListener(() => notifyCount += 1);
@@ -113,19 +142,24 @@ void main() {
       verify(() => mockSetTheme(ThemeMode.dark)).called(1);
     });
 
-    test('updateLocale persists then notifies and marks language selected', () async {
-      when(() => mockSetLocale(const Locale('fr'))).thenAnswer((_) async => Result.success(null));
+    test(
+      'updateLocale persists then notifies and marks language selected',
+      () async {
+        when(
+          () => mockSetLocale(const Locale('fr')),
+        ).thenAnswer((_) async => Result.success(null));
 
-      var notifyCount = 0;
-      viewModel.addListener(() => notifyCount += 1);
+        var notifyCount = 0;
+        viewModel.addListener(() => notifyCount += 1);
 
-      await viewModel.updateLocale(const Locale('fr'));
+        await viewModel.updateLocale(const Locale('fr'));
 
-      expect(viewModel.locale, const Locale('fr'));
-      expect(viewModel.isLanguageSelected, isTrue);
-      expect(notifyCount, 1);
-      verify(() => mockSetLocale(const Locale('fr'))).called(1);
-    });
+        expect(viewModel.locale, const Locale('fr'));
+        expect(viewModel.isLanguageSelected, isTrue);
+        expect(notifyCount, 1);
+        verify(() => mockSetLocale(const Locale('fr'))).called(1);
+      },
+    );
 
     test('toggleNotifications updates and calls use case', () async {
       var notifyCount = 0;

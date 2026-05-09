@@ -61,8 +61,9 @@ void main() {
       expect(find.text('YOGA BASICS'), findsOneWidget);
     });
 
-    testWidgets('shows loading indicator when isLoading is true',
-        (tester) async {
+    testWidgets('shows loading indicator when isLoading is true', (
+      tester,
+    ) async {
       when(() => mockViewModel.isLoading).thenReturn(true);
       when(() => mockViewModel.courses).thenReturn([]);
 
@@ -72,8 +73,9 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('tapping a day chip calls selectDay on ViewModel',
-        (tester) async {
+    testWidgets('tapping a day chip calls selectDay on ViewModel', (
+      tester,
+    ) async {
       when(() => mockViewModel.selectDay(any())).thenReturn(null);
 
       await tester.pumpWidget(buildSubject());

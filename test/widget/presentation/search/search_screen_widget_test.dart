@@ -40,7 +40,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/',
-          builder: (_, __) => SearchScreen(viewModel: mockViewModel),
+          builder: (context, state) => SearchScreen(viewModel: mockViewModel),
         ),
       ],
     );
@@ -76,8 +76,9 @@ void main() {
       expect(find.text('Yoga Basics'), findsOneWidget);
     });
 
-    testWidgets('typing in search field calls search on ViewModel',
-        (tester) async {
+    testWidgets('typing in search field calls search on ViewModel', (
+      tester,
+    ) async {
       when(() => mockViewModel.search(any())).thenAnswer((_) async {});
 
       await tester.pumpWidget(buildSubject());

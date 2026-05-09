@@ -49,4 +49,33 @@ class Course {
 
   /// Returns the number of remaining spots.
   int get remainingSpots => capacity - enrolled;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Course &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          instructor == other.instructor &&
+          startTime == other.startTime &&
+          endTime == other.endTime &&
+          dayOfWeek == other.dayOfWeek &&
+          category == other.category &&
+          capacity == other.capacity &&
+          enrolled == other.enrolled &&
+          icon == other.icon;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      title.hashCode ^
+      instructor.hashCode ^
+      startTime.hashCode ^
+      endTime.hashCode ^
+      dayOfWeek.hashCode ^
+      category.hashCode ^
+      capacity.hashCode ^
+      enrolled.hashCode ^
+      icon.hashCode;
 }

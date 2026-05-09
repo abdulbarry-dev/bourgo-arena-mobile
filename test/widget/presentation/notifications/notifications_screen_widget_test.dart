@@ -56,8 +56,9 @@ void main() {
       expect(find.text('Booking Confirmed'), findsOneWidget);
     });
 
-    testWidgets('shows loading indicator when isLoading is true',
-        (tester) async {
+    testWidgets('shows loading indicator when isLoading is true', (
+      tester,
+    ) async {
       when(() => mockViewModel.isLoading).thenReturn(true);
       when(() => mockViewModel.notifications).thenReturn(null);
 
@@ -67,8 +68,9 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('tapping mark-all-as-read calls ViewModel method',
-        (tester) async {
+    testWidgets('tapping mark-all-as-read calls ViewModel method', (
+      tester,
+    ) async {
       when(() => mockViewModel.markAllAsRead()).thenAnswer((_) async {});
 
       await tester.pumpWidget(buildSubject());

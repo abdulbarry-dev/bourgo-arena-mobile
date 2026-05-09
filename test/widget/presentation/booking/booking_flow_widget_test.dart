@@ -62,8 +62,9 @@ void main() {
     when(() => mockViewModel.selectedActivity).thenReturn(null);
     when(() => mockViewModel.selectedDate).thenReturn(DateTime(2024, 1, 1));
     when(() => mockViewModel.selectedSlot).thenReturn(null);
-    when(() => mockViewModel.paymentMethod)
-        .thenReturn(AppConstants.paymentMethodCardId);
+    when(
+      () => mockViewModel.paymentMethod,
+    ).thenReturn(AppConstants.paymentMethodCardId);
 
     when(() => mockViewModel.addListener(any())).thenAnswer((invocation) {
       listener = invocation.positionalArguments[0] as VoidCallback;
@@ -88,8 +89,9 @@ void main() {
   }
 
   group('BookingFlowScreen Widget Tests', () {
-    testWidgets('Step 1: shows activity list and handles selection',
-        (tester) async {
+    testWidgets('Step 1: shows activity list and handles selection', (
+      tester,
+    ) async {
       when(() => mockViewModel.currentStep).thenReturn(0);
       when(() => mockViewModel.activities).thenReturn([testActivity]);
 
@@ -103,8 +105,9 @@ void main() {
       verify(() => mockViewModel.selectActivity(testActivity)).called(1);
     });
 
-    testWidgets('Step 2: shows time slots and handles navigation',
-        (tester) async {
+    testWidgets('Step 2: shows time slots and handles navigation', (
+      tester,
+    ) async {
       when(() => mockViewModel.currentStep).thenReturn(1);
       when(() => mockViewModel.selectedActivity).thenReturn(testActivity);
       when(() => mockViewModel.availableSlots).thenReturn([testSlot]);
@@ -134,16 +137,19 @@ void main() {
       verify(() => mockViewModel.nextStep()).called(1);
     });
 
-    testWidgets('Step 3: shows confirmation summary and handles payment',
-        (tester) async {
+    testWidgets('Step 3: shows confirmation summary and handles payment', (
+      tester,
+    ) async {
       when(() => mockViewModel.currentStep).thenReturn(2);
       when(() => mockViewModel.selectedActivity).thenReturn(testActivity);
       when(() => mockViewModel.selectedSlot).thenReturn(testSlot);
-      when(() => mockViewModel.paymentMethod)
-          .thenReturn(AppConstants.paymentMethodCardId);
+      when(
+        () => mockViewModel.paymentMethod,
+      ).thenReturn(AppConstants.paymentMethodCardId);
       when(() => mockViewModel.makeReservation()).thenAnswer((_) async => true);
-      when(() => mockGoRouter.push(any<String>(), extra: any(named: 'extra')))
-          .thenAnswer((_) async => null);
+      when(
+        () => mockGoRouter.push(any<String>(), extra: any(named: 'extra')),
+      ).thenAnswer((_) async => null);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
@@ -159,8 +165,9 @@ void main() {
 
       // Wait for navigation
       await tester.pumpAndSettle();
-      verify(() => mockGoRouter.push('/booking-success', extra: testActivity))
-          .called(1);
+      verify(
+        () => mockGoRouter.push('/booking-success', extra: testActivity),
+      ).called(1);
     });
 
     testWidgets('shows loading spinner when isLoading is true', (tester) async {
@@ -242,4 +249,5 @@ class _FakeHttpResponse extends Fake implements HttpClientResponse {
 }
 
 final List<int> _transparentPngBytes = base64Decode(
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
+);

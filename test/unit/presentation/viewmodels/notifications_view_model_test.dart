@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/entities/notification.dart' as entity;
+import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
+    as entity;
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_view_model.dart';
 import 'package:checks/checks.dart';
@@ -38,9 +39,9 @@ void main() {
 
   group('NotificationsViewModel', () {
     test('loadNotifications populates list on success', () async {
-      when(() => mockGetNotifications()).thenAnswer(
-        (_) async => Result.success(testNotifications),
-      );
+      when(
+        () => mockGetNotifications(),
+      ).thenAnswer((_) async => Result.success(testNotifications));
 
       final viewModel = NotificationsViewModel(
         getNotificationsUseCase: mockGetNotifications,
@@ -50,32 +51,34 @@ void main() {
       await Future.delayed(Duration.zero);
 
       check(viewModel.isLoading).isFalse();
-      check(viewModel.notifications)
-          .isNotNull()
-          .has((l) => l.length, 'length')
-          .equals(2);
+      check(
+        viewModel.notifications,
+      ).isNotNull().has((l) => l.length, 'length').equals(2);
       verify(() => mockGetNotifications()).called(1);
     });
 
-    test('loadNotifications keeps list null and stops loading on failure', () async {
-      when(() => mockGetNotifications()).thenAnswer(
-        (_) async => FailureResult(const ServerFailure('Network error')),
-      );
+    test(
+      'loadNotifications keeps list null and stops loading on failure',
+      () async {
+        when(() => mockGetNotifications()).thenAnswer(
+          (_) async => FailureResult(const ServerFailure('Network error')),
+        );
 
-      final viewModel = NotificationsViewModel(
-        getNotificationsUseCase: mockGetNotifications,
-      );
+        final viewModel = NotificationsViewModel(
+          getNotificationsUseCase: mockGetNotifications,
+        );
 
-      await Future.delayed(Duration.zero);
+        await Future.delayed(Duration.zero);
 
-      check(viewModel.isLoading).isFalse();
-      check(viewModel.notifications).isNull();
-    });
+        check(viewModel.isLoading).isFalse();
+        check(viewModel.notifications).isNull();
+      },
+    );
 
     test('markAllAsRead sets every notification to read', () async {
-      when(() => mockGetNotifications()).thenAnswer(
-        (_) async => Result.success(testNotifications),
-      );
+      when(
+        () => mockGetNotifications(),
+      ).thenAnswer((_) async => Result.success(testNotifications));
 
       final viewModel = NotificationsViewModel(
         getNotificationsUseCase: mockGetNotifications,

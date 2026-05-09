@@ -11,7 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
+
 class MockGetCoursesUseCase extends Mock implements GetCoursesUseCase {}
+
 class MockAppLocalizations extends Mock implements AppLocalizations {}
 
 void main() {
@@ -65,9 +67,13 @@ void main() {
     mockGetCourses = MockGetCoursesUseCase();
     mockL10n = MockAppLocalizations();
 
-    when(() => mockGetActivities()).thenAnswer((_) async => Result.success(testActivities));
-    when(() => mockGetCourses()).thenAnswer((_) async => Result.success(testCourses));
-    
+    when(
+      () => mockGetActivities(),
+    ).thenAnswer((_) async => Result.success(testActivities));
+    when(
+      () => mockGetCourses(),
+    ).thenAnswer((_) async => Result.success(testCourses));
+
     // Mock some localization strings
     when(() => mockL10n.settingsEditProfile).thenReturn('Edit Profile');
     when(() => mockL10n.settingsSectionAccount).thenReturn('Account');

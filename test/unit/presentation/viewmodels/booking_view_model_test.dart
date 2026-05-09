@@ -16,11 +16,11 @@ class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 
 class MockGetTimeSlotsUseCase extends Mock implements GetTimeSlotsUseCase {}
 
-class MockGetUserBookingsUseCase extends Mock implements GetUserBookingsUseCase {
-}
+class MockGetUserBookingsUseCase extends Mock
+    implements GetUserBookingsUseCase {}
 
-class MockMakeReservationUseCase extends Mock implements MakeReservationUseCase {
-}
+class MockMakeReservationUseCase extends Mock
+    implements MakeReservationUseCase {}
 
 class MockCancelBookingUseCase extends Mock implements CancelBookingUseCase {}
 
@@ -46,9 +46,7 @@ void main() {
     ),
   ];
 
-  final tTimeSlots = [
-    const TimeSlot(time: '18:00', available: true),
-  ];
+  final tTimeSlots = [const TimeSlot(time: '18:00', available: true)];
 
   final tReservations = [
     const Reservation(
@@ -104,7 +102,7 @@ void main() {
     ).thenAnswer((_) async => Result.success(tReservations.first));
     when(
       () => mockCancelBookingUseCase(any()),
-    ).thenAnswer((_) async => const Result.success(null));
+    ).thenAnswer((_) async => Result.success(null));
   });
 
   BookingViewModel createViewModel({Activity? initialActivity}) {
@@ -173,7 +171,9 @@ void main() {
       await viewModel.cancelBooking('res-1');
 
       verify(() => mockCancelBookingUseCase('res-1')).called(1);
-      verify(() => mockGetUserBookingsUseCase()).called(2); // init + after cancel
+      verify(
+        () => mockGetUserBookingsUseCase(),
+      ).called(2); // init + after cancel
     });
 
     test('loadUserBookings failure sets error', () async {

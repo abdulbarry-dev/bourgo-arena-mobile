@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 /// Pure domain entity representing a membership subscription plan.
 class Subscription {
   /// Unique identifier.
@@ -23,4 +25,25 @@ class Subscription {
     required this.benefits,
     required this.durationMonths,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Subscription &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          price == other.price &&
+          _listEquality.equals(benefits, other.benefits) &&
+          durationMonths == other.durationMonths;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      price.hashCode ^
+      _listEquality.hash(benefits) ^
+      durationMonths.hashCode;
+
+  static const _listEquality = ListEquality<String>();
 }

@@ -21,11 +21,7 @@ class BookingFlowScreen extends StatefulWidget {
   /// Optional ViewModel for testing purposes.
   final BookingViewModel? viewModel;
 
-  const BookingFlowScreen({
-    super.key,
-    this.initialActivity,
-    this.viewModel,
-  });
+  const BookingFlowScreen({super.key, this.initialActivity, this.viewModel});
 
   @override
   State<BookingFlowScreen> createState() => _BookingFlowScreenState();
@@ -37,7 +33,8 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = widget.viewModel ??
+    _viewModel =
+        widget.viewModel ??
         BookingViewModel(
           getActivitiesUseCase: locator<GetActivitiesUseCase>(),
           getTimeSlotsUseCase: locator<GetTimeSlotsUseCase>(),

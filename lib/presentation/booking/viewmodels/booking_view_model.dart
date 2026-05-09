@@ -190,8 +190,9 @@ class BookingViewModel extends ChangeNotifier {
       activityTitle: activity.category,
       date: _selectedDate.toIso8601String().split('T')[0],
       time: slot.time,
-      duration:
-          activity.id == 'padel-1' ? '90 min' : '60 min', // Mock logic for demo
+      duration: activity.id == 'padel-1'
+          ? '90 min'
+          : '60 min', // Mock logic for demo
       price: activity.basePrice,
       status: 'confirmed',
       paymentStatus: 'paid',

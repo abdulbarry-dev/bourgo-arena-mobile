@@ -4,9 +4,11 @@ import 'package:bourgo_arena_mobile/presentation/notifications/notifications_vie
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:bourgo_arena_mobile/domain/entities/notification.dart' as entity;
+import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
+    as entity;
 
-class MockNotificationsViewModel extends Mock implements NotificationsViewModel {}
+class MockNotificationsViewModel extends Mock
+    implements NotificationsViewModel {}
 
 void main() {
   late MockNotificationsViewModel mockViewModel;

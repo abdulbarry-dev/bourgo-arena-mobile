@@ -25,7 +25,8 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _viewModel ??= widget.viewModel ??
+    _viewModel ??=
+        widget.viewModel ??
         SearchViewModel(
           getActivitiesUseCase: locator<GetActivitiesUseCase>(),
           getCoursesUseCase: locator<GetCoursesUseCase>(),

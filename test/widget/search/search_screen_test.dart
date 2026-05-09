@@ -42,7 +42,9 @@ void main() {
     verify(() => mockViewModel.search('Yo')).called(1);
   });
 
-  testWidgets('shows no results placeholder when query set and empty results', (tester) async {
+  testWidgets('shows no results placeholder when query set and empty results', (
+    tester,
+  ) async {
     when(() => mockViewModel.query).thenReturn('abc');
     when(() => mockViewModel.isSearching).thenReturn(false);
     when(() => mockViewModel.results).thenReturn([]);

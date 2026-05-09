@@ -23,10 +23,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = widget.viewModel ??
-        PlanningViewModel(
-          getCoursesUseCase: locator<GetCoursesUseCase>(),
-        );
+    _viewModel =
+        widget.viewModel ??
+        PlanningViewModel(getCoursesUseCase: locator<GetCoursesUseCase>());
   }
 
   @override

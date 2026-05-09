@@ -24,7 +24,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = widget.viewModel ??
+    _viewModel =
+        widget.viewModel ??
         NotificationsViewModel(
           getNotificationsUseCase: locator<GetNotificationsUseCase>(),
         );

@@ -22,4 +22,25 @@ class SearchResult {
     required this.route,
     this.extra,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SearchResult &&
+          runtimeType == other.runtimeType &&
+          title == other.title &&
+          subtitle == other.subtitle &&
+          type == other.type &&
+          iconKey == other.iconKey &&
+          route == other.route &&
+          extra == other.extra;
+
+  @override
+  int get hashCode =>
+      title.hashCode ^
+      subtitle.hashCode ^
+      type.hashCode ^
+      iconKey.hashCode ^
+      route.hashCode ^
+      extra.hashCode;
 }

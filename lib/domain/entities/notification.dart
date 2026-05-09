@@ -46,4 +46,25 @@ class Notification {
       isRead: isRead ?? this.isRead,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Notification &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          message == other.message &&
+          timestamp == other.timestamp &&
+          type == other.type &&
+          isRead == other.isRead;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      title.hashCode ^
+      message.hashCode ^
+      timestamp.hashCode ^
+      type.hashCode ^
+      isRead.hashCode;
 }

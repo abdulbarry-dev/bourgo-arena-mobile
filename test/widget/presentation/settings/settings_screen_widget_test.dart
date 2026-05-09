@@ -7,8 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
-class _MockSettingsViewModel extends Mock
-    implements SettingsViewModel {}
+class _MockSettingsViewModel extends Mock implements SettingsViewModel {}
 
 void main() {
   late _MockSettingsViewModel mockViewModel;
@@ -38,7 +37,7 @@ void main() {
       routes: [
         GoRoute(
           path: '/',
-          builder: (_, __) => SettingsScreen(viewModel: mockViewModel),
+          builder: (context, state) => SettingsScreen(viewModel: mockViewModel),
         ),
       ],
     );
@@ -67,7 +66,9 @@ void main() {
       expect(find.byType(Switch), findsOneWidget);
     });
 
-    testWidgets('notifications switch reflects ViewModel state', (tester) async {
+    testWidgets('notifications switch reflects ViewModel state', (
+      tester,
+    ) async {
       when(() => mockViewModel.notificationsEnabled).thenReturn(false);
 
       await tester.pumpWidget(buildSubject());
@@ -77,11 +78,12 @@ void main() {
       expect(switchWidget.value, isFalse);
     });
 
-    testWidgets('tapping notifications switch calls toggleNotifications',
-        (tester) async {
-      when(() => mockViewModel.toggleNotifications(any())).thenAnswer(
-        (_) async {},
-      );
+    testWidgets('tapping notifications switch calls toggleNotifications', (
+      tester,
+    ) async {
+      when(
+        () => mockViewModel.toggleNotifications(any()),
+      ).thenAnswer((_) async {});
 
       await tester.pumpWidget(buildSubject());
       await tester.pumpAndSettle();
