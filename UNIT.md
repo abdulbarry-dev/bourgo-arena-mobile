@@ -1,76 +1,121 @@
-UNIT Tests — Project Test Layer
-================================
+UNIT Tests — Current State (auto-generated)
+=========================================
 
-Purpose
--------
-This document records the project's current unit and widget testing conventions, what has been implemented, and how to run tests locally. It is a living document and reflects the current state of the test layer as of the latest commits.
+**Overview**
+- **Total test files:** 43
+- **Unit test files:** 39
+- **Widget test files:** 3
+- **Other test files:** 1
+- **Total test cases (last run):** 190
+- **Last full run (flutter test --reporter=expanded):** 00:12 +190: All tests passed!
 
-Summary of Recent Changes
--------------------------
-- Repository tests: Completed.
-  - Files added under `test/unit/data/repositories/`:
-    - `api_activity_repository_test.dart`
-    - `api_course_repository_test.dart`
-    - `api_notification_repository_test.dart`
-    - `api_reservation_repository_test.dart`
-    - `api_user_repository_test.dart`
-  - Existing repository test files were adjusted for resilient assertions and correct imports:
-    - `api_auth_repository_test.dart` (improved auth-state stream matcher)
-    - `local_session_repository_test.dart` (added missing `Result` import)
-  - All repository tests pass locally: `flutter test test/unit/data/repositories`.
+**Test Tree (files)**
+- [test/unit/data/mappers/activity_mapper_test.dart](test/unit/data/mappers/activity_mapper_test.dart)
+- [test/unit/data/mappers/course_mapper_test.dart](test/unit/data/mappers/course_mapper_test.dart)
+- [test/unit/data/mappers/mapper_test_fixtures.dart](test/unit/data/mappers/mapper_test_fixtures.dart)
+- [test/unit/data/mappers/notification_mapper_test.dart](test/unit/data/mappers/notification_mapper_test.dart)
+- [test/unit/data/mappers/reservation_mapper_test.dart](test/unit/data/mappers/reservation_mapper_test.dart)
+- [test/unit/data/mappers/time_slot_mapper_test.dart](test/unit/data/mappers/time_slot_mapper_test.dart)
+- [test/unit/data/mappers/user_mapper_test.dart](test/unit/data/mappers/user_mapper_test.dart)
+- [test/unit/data/repositories/api_activity_repository_test.dart](test/unit/data/repositories/api_activity_repository_test.dart)
+- [test/unit/data/repositories/api_auth_repository_test.dart](test/unit/data/repositories/api_auth_repository_test.dart)
+- [test/unit/data/repositories/api_course_repository_test.dart](test/unit/data/repositories/api_course_repository_test.dart)
+- [test/unit/data/repositories/api_notification_repository_test.dart](test/unit/data/repositories/api_notification_repository_test.dart)
+- [test/unit/data/repositories/api_reservation_repository_test.dart](test/unit/data/repositories/api_reservation_repository_test.dart)
+- [test/unit/data/repositories/api_user_repository_test.dart](test/unit/data/repositories/api_user_repository_test.dart)
+- [test/unit/data/repositories/local_session_repository_test.dart](test/unit/data/repositories/local_session_repository_test.dart)
+- [test/unit/data/repositories/repository_test_fixtures.dart](test/unit/data/repositories/repository_test_fixtures.dart)
+- [test/unit/domain/usecases/activity/get_activities_use_case_test.dart](test/unit/domain/usecases/activity/get_activities_use_case_test.dart)
+- [test/unit/domain/usecases/activity/get_time_slots_use_case_test.dart](test/unit/domain/usecases/activity/get_time_slots_use_case_test.dart)
+- [test/unit/domain/usecases/auth/complete_registration_use_case_test.dart](test/unit/domain/usecases/auth/complete_registration_use_case_test.dart)
+- [test/unit/domain/usecases/auth/login_use_case_test.dart](test/unit/domain/usecases/auth/login_use_case_test.dart)
+- [test/unit/domain/usecases/auth/logout_use_case_test.dart](test/unit/domain/usecases/auth/logout_use_case_test.dart)
+- [test/unit/domain/usecases/auth/register_use_case_test.dart](test/unit/domain/usecases/auth/register_use_case_test.dart)
+- [test/unit/domain/usecases/auth/request_family_account_otp_use_case_test.dart](test/unit/domain/usecases/auth/request_family_account_otp_use_case_test.dart)
+- [test/unit/domain/usecases/auth/send_otp_use_case_test.dart](test/unit/domain/usecases/auth/send_otp_use_case_test.dart)
+- [test/unit/domain/usecases/auth/update_password_use_case_test.dart](test/unit/domain/usecases/auth/update_password_use_case_test.dart)
+- [test/unit/domain/usecases/auth/verify_otp_use_case_test.dart](test/unit/domain/usecases/auth/verify_otp_use_case_test.dart)
+- [test/unit/domain/usecases/booking/cancel_booking_use_case_test.dart](test/unit/domain/usecases/booking/cancel_booking_use_case_test.dart)
+- [test/unit/domain/usecases/booking/get_user_bookings_use_case_test.dart](test/unit/domain/usecases/booking/get_user_bookings_use_case_test.dart)
+- [test/unit/domain/usecases/booking/make_reservation_use_case_test.dart](test/unit/domain/usecases/booking/make_reservation_use_case_test.dart)
+- [test/unit/domain/usecases/course/get_courses_use_case_test.dart](test/unit/domain/usecases/course/get_courses_use_case_test.dart)
+- [test/unit/domain/usecases/notification/get_notifications_use_case_test.dart](test/unit/domain/usecases/notification/get_notifications_use_case_test.dart)
+- [test/unit/domain/usecases/settings/get_locale_use_case_test.dart](test/unit/domain/usecases/settings/get_locale_use_case_test.dart)
+- [test/unit/domain/usecases/settings/get_notifications_enabled_use_case_test.dart](test/unit/domain/usecases/settings/get_notifications_enabled_use_case_test.dart)
+- [test/unit/domain/usecases/settings/is_language_selected_use_case_test.dart](test/unit/domain/usecases/settings/is_language_selected_use_case_test.dart)
+- [test/unit/domain/usecases/settings/set_locale_use_case_test.dart](test/unit/domain/usecases/settings/set_locale_use_case_test.dart)
+- [test/unit/domain/usecases/settings/set_notifications_enabled_use_case_test.dart](test/unit/domain/usecases/settings/set_notifications_enabled_use_case_test.dart)
+- [test/unit/domain/usecases/usecase_test_fixtures.dart](test/unit/domain/usecases/usecase_test_fixtures.dart)
+- [test/unit/domain/usecases/user/get_user_profile_use_case_test.dart](test/unit/domain/usecases/user/get_user_profile_use_case_test.dart)
+- [test/unit/domain/usecases/user/update_user_profile_use_case_test.dart](test/unit/domain/usecases/user/update_user_profile_use_case_test.dart)
+- [test/unit/presentation/viewmodels/login_view_model_test.dart](test/unit/presentation/viewmodels/login_view_model_test.dart)
+- [test/widget/auth/login_screen_test.dart](test/widget/auth/login_screen_test.dart)
+- [test/widget/home/home_screen_test.dart](test/widget/home/home_screen_test.dart)
+- [test/widget/profile/profile_screen_test.dart](test/widget/profile/profile_screen_test.dart)
+- [test/widget_test.dart](test/widget_test.dart)
 
-- ViewModel tests: Started.
-  - `LoginViewModel` unit tests added (pure-Dart + flutter_test harness where needed):
-    - `test/unit/presentation/viewmodels/login_view_model_test.dart`
-  - Tests cover: invalid form handling (no call), successful login flow (use case invoked, loading state), and failure path (SnackBar shows failure message).
+**By Layer (classes / groups & exact test names)**
 
-- Widget tests: Scaffolded and prepared for the login screen.
-  - `test/widget/auth/login_screen_test.dart` created as a scaffold to exercise UI interactions and SnackBar assertions.
-  - Next steps: implement end-to-end widget interactions using mocked ViewModels and the DI `locator` reset pattern where necessary.
+Data — Mappers
+- `ActivityMapper`: see [test/unit/data/mappers/activity_mapper_test.dart](test/unit/data/mappers/activity_mapper_test.dart) (group: `ActivityMapper`).
+- `CourseMapper`: see [test/unit/data/mappers/course_mapper_test.dart](test/unit/data/mappers/course_mapper_test.dart) (group: `CourseMapper`).
+- `NotificationMapper`: see [test/unit/data/mappers/notification_mapper_test.dart](test/unit/data/mappers/notification_mapper_test.dart) (group: `NotificationMapper`).
+- `ReservationMapper`: see [test/unit/data/mappers/reservation_mapper_test.dart](test/unit/data/mappers/reservation_mapper_test.dart) (group: `ReservationMapper`).
+- `TimeSlotMapper`: see [test/unit/data/mappers/time_slot_mapper_test.dart](test/unit/data/mappers/time_slot_mapper_test.dart) (group: `TimeSlotMapper`).
+- `UserMapper`: see [test/unit/data/mappers/user_mapper_test.dart](test/unit/data/mappers/user_mapper_test.dart) (group: `UserMapper`).
 
-Conventions & Guidelines
-------------------------
-- Unit tests (domain + data layers): use `package:test` and `mocktail` for mocking. Keep them pure Dart when possible (no Flutter bindings).
-- ViewModel tests: use `flutter_test` (widget binding) but avoid pumping full widgets when the logic is pure; mock UseCases with `mocktail`.
-- Widget tests: use `flutter_test` + real `WidgetTester`. Inject mocked dependencies via `locator.reset()` and `locator.registerFactory()` when the screen uses global DI.
-- Test fixtures: reusable helpers live in `test/unit/data/repositories/repository_test_fixtures.dart`.
+Data — Repositories
+- `ApiActivityRepository`: groups in [test/unit/data/repositories/api_activity_repository_test.dart](test/unit/data/repositories/api_activity_repository_test.dart) — `ApiActivityRepository`, `getActivities`, `getActivityById`, `getTimeSlots`.
+- `ApiAuthRepository`: groups in [test/unit/data/repositories/api_auth_repository_test.dart](test/unit/data/repositories/api_auth_repository_test.dart) — `ApiAuthRepository`, `login`, `logout`, `register`, `sendOtp`, `verifyOtp`, `requestFamilyAccountOtp`, `completeRegistration`, `updatePassword`, `getToken`.
+- `ApiCourseRepository`: [test/unit/data/repositories/api_course_repository_test.dart](test/unit/data/repositories/api_course_repository_test.dart) (group: `ApiCourseRepository`).
+- `ApiNotificationRepository`: [test/unit/data/repositories/api_notification_repository_test.dart](test/unit/data/repositories/api_notification_repository_test.dart) (group: `ApiNotificationRepository`).
+- `ApiReservationRepository`: [test/unit/data/repositories/api_reservation_repository_test.dart](test/unit/data/repositories/api_reservation_repository_test.dart) (groups: `ApiReservationRepository`, `getReservations`, `makeReservation`, `cancelReservation`).
+- `ApiUserRepository`: [test/unit/data/repositories/api_user_repository_test.dart](test/unit/data/repositories/api_user_repository_test.dart) (groups: `ApiUserRepository`, `getUserProfile`, `updateUserProfile`).
+- `LocalSessionRepository`: [test/unit/data/repositories/local_session_repository_test.dart](test/unit/data/repositories/local_session_repository_test.dart) (groups: `LocalSessionRepository`, `auth token storage`, `theme preferences`, `locale and onboarding`, `notification preferences`).
 
-How to run tests
-----------------
-- Run repository tests:
+Domain — Use Cases
+- Each use case has a dedicated unit test under `test/unit/domain/usecases/...`. Examples:
+  - `GetCoursesUseCase`: see [test/unit/domain/usecases/course/get_courses_use_case_test.dart](test/unit/domain/usecases/course/get_courses_use_case_test.dart) (test names: "GetCoursesUseCase returns the course list on success", "GetCoursesUseCase propagates repository failures unchanged", "GetCoursesUseCase returns empty lists unchanged").
+  - Settings use cases: see `test/unit/domain/usecases/settings/` (multiple groups: `GetLocaleUseCase`, `GetNotificationsEnabledUseCase`, `IsLanguageSelectedUseCase`, `SetLocaleUseCase`, `SetNotificationsEnabledUseCase`).
+  - User use cases: `GetUserProfileUseCase`, `UpdateUserProfileUseCase` (see corresponding files).
 
-```bash
-flutter test test/unit/data/repositories
-```
+Presentation — ViewModels & Widgets
+- `LoginViewModel` unit tests (three exact tests):
+  - [test/unit/presentation/viewmodels/login_view_model_test.dart](test/unit/presentation/viewmodels/login_view_model_test.dart)
+  - Tests: `does not call use case when form is not valid`; `calls use case and leaves isLoading false on success`; `shows SnackBar with failure message on failure`.
+- Widget tests (examples):
+  - [test/widget/auth/login_screen_test.dart](test/widget/auth/login_screen_test.dart)
+    - Tests: `login button disabled when form invalid`; `calls login use case on valid form`; `shows SnackBar on failure`.
+  - [test/widget/home/home_screen_test.dart](test/widget/home/home_screen_test.dart)
+    - Tests: `initial render shows key UI elements`; `loading state shows CircularProgressIndicator`; `when use cases return failure, empty lists are shown`.
+  - [test/widget/profile/profile_screen_test.dart](test/widget/profile/profile_screen_test.dart)
+    - Tests: `initial render shows user name when profile loads`; `loading state shows CircularProgressIndicator`; `error state displays loading error message`; `logout button is present and tappable`.
 
-- Run ViewModel tests:
+**Mocks & Shared Fixtures**
+- Shared fixtures:
+  - [test/unit/data/mappers/mapper_test_fixtures.dart](test/unit/data/mappers/mapper_test_fixtures.dart)
+  - [test/unit/data/repositories/repository_test_fixtures.dart](test/unit/data/repositories/repository_test_fixtures.dart)
+  - [test/unit/domain/usecases/usecase_test_fixtures.dart](test/unit/domain/usecases/usecase_test_fixtures.dart)
+- Common mock classes are declared across tests (examples): `MockApiClient`, `MockSessionRepository`, `MockActivityRepository`, `MockAuthRepository`, `MockReservationRepository`, `MockCourseRepository`, `MockNotificationRepository`, `MockUserRepository`, `MockLoginUseCase`, `MockGetActivities`, `MockGetCourses`, `MockGetProfile`, `MockLogout`, `MockSettingsViewModel`, `MockAuthStateNotifier`.
 
-```bash
-flutter test test/unit/presentation/viewmodels
-```
+**How to run (commands)**
+- Run full suite: `flutter test --reporter=expanded` (captures expanded output and final summary line shown above).
+- Run with coverage: `flutter test --coverage` then `genhtml coverage/lcov.info -o coverage/html` (requires `lcov` / `genhtml`).
+- Run a single file: `flutter test <path-to-test-file>` (e.g. `flutter test test/widget/profile/profile_screen_test.dart`).
 
-- Run widget tests (login scaffold):
+**Coverage gaps / priorities**
+- Overall line coverage (last run): ~24.2% (coverage/lcov.info generated previously).
+- Highest-priority gaps (low or 0% coverage) — recommended focus:
+  - Presentation layer: many viewmodels and state notifiers are untested (e.g. settings, profile, booking, search viewmodels). Start by adding pure-Dart ViewModel tests.
+  - `lib/data/api/api_client.dart` and related API plumbing: add unit tests or integration-style mocks for request/response mapping.
+  - Domain entities with low coverage (user, child_profile, notification, time_slot) — add entity edge-case tests and mappers.
 
-```bash
-flutter test test/widget/auth/login_screen_test.dart
-```
+**Conventions (brief)**
+- Prefer pure-Dart tests for domain + data layers (`package:test`). Use `flutter_test` only when widget bindings or `WidgetTester` are needed.
+- Reset DI between widget tests: `await locator.reset()` in `setUp()` and re-register mocks.
+- For widget tests that load `NetworkImage`, set `HttpOverrides.global` to a fake HttpClient that returns a 1x1 PNG (see existing widget tests for an example).
 
-- Run full test suite with coverage:
-
-```bash
-flutter test --coverage
-genhtml coverage/lcov.info -o coverage/html
-```
-
-Next Actions
-------------
-1. Complete ViewModel tests across other ViewModels (start with `RegisterViewModel`, `ProfileViewModel`, `BookingViewModel`).
-2. Implement widget tests for key screens (Login, Booking flow, Profile), mocking ViewModels and stabilizing navigation.
-3. Run coverage and produce a gap analysis to prioritize missing tests.
-
-Notes
------
-- Keep domain entities Flutter-free (no `IconData`, `ThemeMode` etc.) in pure-Dart unit tests.
-- Reuse `repository_test_fixtures.dart` for consistent test data across repository tests.
-
-If anything above is out-of-date or you'd like a different format (JSON checklist, or a shorter README-style entry), tell me and I'll update it.
+If you'd like, I can now:
+- commit this updated `UNIT.md`,
+- expand the per-file test lists to include every single test name (I can parse each test file and extract all `test()`/`testWidgets()` strings), or
+- start adding tests for the highest-priority coverage gaps. Which would you prefer next?

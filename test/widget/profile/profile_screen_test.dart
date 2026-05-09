@@ -68,26 +68,30 @@ void main() {
   });
 
   testWidgets('error state displays loading error message', (tester) async {
-    when(() => mockGetProfile()).thenAnswer(
-      (_) async => FailureResult(ServerFailure('boom')),
-    );
+    when(
+      () => mockGetProfile(),
+    ).thenAnswer((_) async => FailureResult(ServerFailure('boom')));
 
     await tester.pumpWidget(_buildApp(const ProfileScreen()));
     await tester.pump(const Duration(milliseconds: 500));
 
-    final l10n = AppLocalizations.of(tester.element(find.byType(ProfileScreen)))!;
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(ProfileScreen)),
+    )!;
     expect(find.text(l10n.commonLoadingError), findsOneWidget);
   });
 
   testWidgets('logout button is present and tappable', (tester) async {
-    when(() => mockGetProfile()).thenAnswer(
-      (_) async => Success(testUserEntity()),
-    );
+    when(
+      () => mockGetProfile(),
+    ).thenAnswer((_) async => Success(testUserEntity()));
 
     await tester.pumpWidget(_buildApp(const ProfileScreen()));
     await tester.pump(const Duration(milliseconds: 500));
 
-    final l10n = AppLocalizations.of(tester.element(find.byType(ProfileScreen)))!;
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(ProfileScreen)),
+    )!;
     final logoutButton = find.widgetWithText(TextButton, l10n.profileLogout);
     expect(logoutButton, findsOneWidget);
 
@@ -113,6 +117,7 @@ class _FakeHttpOverrides extends HttpOverrides {
 }
 
 class _FakeHttpClient extends Fake implements HttpClient {
+  @override
   bool autoUncompress = true;
 
   @override

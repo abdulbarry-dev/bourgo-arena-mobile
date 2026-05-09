@@ -44,12 +44,12 @@ void main() {
   });
 
   testWidgets('initial render shows key UI elements', (tester) async {
-    when(() => mockActivities()).thenAnswer(
-      (_) async => Success([testActivityEntity()]),
-    );
-    when(() => mockCourses()).thenAnswer(
-      (_) async => Success([testCourseEntity()]),
-    );
+    when(
+      () => mockActivities(),
+    ).thenAnswer((_) async => Success([testActivityEntity()]));
+    when(
+      () => mockCourses(),
+    ).thenAnswer((_) async => Success([testCourseEntity()]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(milliseconds: 500));
@@ -62,9 +62,8 @@ void main() {
     final activitiesCompleter = Completer<Result<List<Activity>, Failure>>();
     when(() => mockActivities()).thenAnswer((_) => activitiesCompleter.future);
     when(() => mockCourses()).thenAnswer(
-      (_) async => Success([
-        testCourseEntity(dayOfWeek: DateTime.now().weekday),
-      ]),
+      (_) async =>
+          Success([testCourseEntity(dayOfWeek: DateTime.now().weekday)]),
     );
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
@@ -80,12 +79,12 @@ void main() {
   testWidgets('when use cases return failure, empty lists are shown', (
     tester,
   ) async {
-    when(() => mockActivities()).thenAnswer(
-      (_) async => FailureResult(NetworkFailure('offline')),
-    );
-    when(() => mockCourses()).thenAnswer(
-      (_) async => FailureResult(ServerFailure('error')),
-    );
+    when(
+      () => mockActivities(),
+    ).thenAnswer((_) async => FailureResult(NetworkFailure('offline')));
+    when(
+      () => mockCourses(),
+    ).thenAnswer((_) async => FailureResult(ServerFailure('error')));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(milliseconds: 500));
@@ -109,6 +108,7 @@ class _FakeHttpOverrides extends HttpOverrides {
 }
 
 class _FakeHttpClient extends Fake implements HttpClient {
+  @override
   bool autoUncompress = true;
 
   @override

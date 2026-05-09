@@ -78,3 +78,4 @@ ios/.symlinks/
 # Environment files
 .env
 .env.*
+coverage/

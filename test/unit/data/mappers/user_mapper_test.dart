@@ -1,6 +1,4 @@
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
-import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
-import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:test/test.dart';

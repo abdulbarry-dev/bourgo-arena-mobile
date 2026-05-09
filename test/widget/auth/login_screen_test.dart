@@ -18,17 +18,13 @@ void main() {
   });
 
   setUpAll(() {
-    final binding =
-        TestWidgetsFlutterBinding.ensureInitialized()
-            as TestWidgetsFlutterBinding;
+    final binding = TestWidgetsFlutterBinding.ensureInitialized();
     binding.window.physicalSizeTestValue = const Size(800, 1200);
     binding.window.devicePixelRatioTestValue = 1.0;
   });
 
   tearDownAll(() {
-    final binding =
-        TestWidgetsFlutterBinding.ensureInitialized()
-            as TestWidgetsFlutterBinding;
+    final binding = TestWidgetsFlutterBinding.ensureInitialized();
     binding.window.clearPhysicalSizeTestValue();
     binding.window.clearDevicePixelRatioTestValue();
   });
