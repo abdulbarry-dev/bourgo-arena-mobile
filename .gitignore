@@ -80,3 +80,8 @@ ios/.symlinks/
 .env.*
 coverage/
 artifacts/
+full_coverage_list.txt
+coverage_summary.txt
+test_run_output.txt
+test_output.txt
+test_output_2.txt
