@@ -36,10 +36,15 @@ class PaymentStep extends StatelessWidget {
           ),
         ),
         _BottomPayButton(
-          onPressed: () => context.push(
-            '/booking-success',
-            extra: viewModel.selectedActivity,
-          ),
+          onPressed: () async {
+            final success = await viewModel.makeReservation();
+            if (success && context.mounted) {
+              context.push(
+                '/booking-success',
+                extra: viewModel.selectedActivity,
+              );
+            }
+          },
           price: viewModel.selectedActivity?.basePrice ?? 0,
         ),
       ],

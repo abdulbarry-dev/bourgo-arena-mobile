@@ -27,6 +27,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_
 import 'package:bourgo_arena_mobile/domain/usecases/auth/update_password_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
@@ -95,6 +96,7 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => GetActivitiesUseCase(locator()));
   locator.registerLazySingleton(() => GetTimeSlotsUseCase(locator()));
   locator.registerLazySingleton(() => GetUserBookingsUseCase(locator()));
+  locator.registerLazySingleton(() => MakeReservationUseCase(locator()));
   locator.registerLazySingleton(() => CancelBookingUseCase(locator()));
   locator.registerLazySingleton(() => GetCoursesUseCase(locator()));
   locator.registerLazySingleton(() => GetNotificationsUseCase(locator()));
