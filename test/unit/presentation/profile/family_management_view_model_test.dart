@@ -1,6 +1,4 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
-import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import '../../data/repositories/repository_test_fixtures.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
@@ -12,9 +10,14 @@ import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
-class MockUpdateUserProfileUseCase extends Mock implements UpdateUserProfileUseCase {}
+
+class MockUpdateUserProfileUseCase extends Mock
+    implements UpdateUserProfileUseCase {}
+
 class MockVerifyOtpUseCase extends Mock implements VerifyOtpUseCase {}
-class MockRequestFamilyAccountOtpUseCase extends Mock implements RequestFamilyAccountOtpUseCase {}
+
+class MockRequestFamilyAccountOtpUseCase extends Mock
+    implements RequestFamilyAccountOtpUseCase {}
 
 void main() {
   late FamilyManagementViewModel viewModel;
@@ -30,8 +33,10 @@ void main() {
     mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockRequestFamilyAccountOtpUseCase = MockRequestFamilyAccountOtpUseCase();
-    
-    when(() => mockGetUserProfileUseCase()).thenAnswer((_) async => Result.success(testUser));
+
+    when(
+      () => mockGetUserProfileUseCase(),
+    ).thenAnswer((_) async => Result.success(testUser));
     registerFallbackValue(testUser);
 
     viewModel = FamilyManagementViewModel(
@@ -51,7 +56,9 @@ void main() {
 
     test('requestFamilyAccountOtp success', () async {
       await Future.delayed(Duration.zero);
-      when(() => mockRequestFamilyAccountOtpUseCase()).thenAnswer((_) async => Result.success(null));
+      when(
+        () => mockRequestFamilyAccountOtpUseCase(),
+      ).thenAnswer((_) async => Result.success(null));
 
       final result = await viewModel.requestFamilyAccountOtp();
 
@@ -61,21 +68,27 @@ void main() {
 
     test('verifyFamilyAccountOtp success', () async {
       await Future.delayed(Duration.zero);
-      when(() => mockVerifyOtpUseCase(any(), any())).thenAnswer((_) async => Result.success(true));
-      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer((_) async => Result.success(testUser.copyWith(isParentAccount: true)));
+      when(
+        () => mockVerifyOtpUseCase(any(), any()),
+      ).thenAnswer((_) async => Result.success(true));
+      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
+        (_) async => Result.success(testUser.copyWith(isParentAccount: true)),
+      );
 
       final result = await viewModel.verifyFamilyAccountOtp('123456');
 
       check(result).isTrue();
-      check(viewModel.user).isNotNull().has((u) => u.isParentAccount, 'isParentAccount').isTrue();
+      check(
+        viewModel.user,
+      ).isNotNull().has((u) => u.isParentAccount, 'isParentAccount').isTrue();
       check(viewModel.isOtpSent).isFalse();
     });
 
     test('addChildFromForm validation', () async {
       await Future.delayed(Duration.zero);
-      
+
       final result = await viewModel.addChildFromForm();
-      
+
       check(result).isFalse();
       check(viewModel.hasChildFirstNameError).isTrue();
       check(viewModel.hasChildLastNameError).isTrue();
@@ -85,14 +98,19 @@ void main() {
 
     test('addChildFromForm success', () async {
       await Future.delayed(Duration.zero);
-      
+
       viewModel.childFirstNameController.text = 'Junior';
       viewModel.childLastNameController.text = 'Doe';
       viewModel.setChildGender('Male');
       viewModel.setChildBirthDate(DateTime(2015));
 
-      final updatedUser = testUser.copyWith(isParentAccount: true, children: []); // simplified
-      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer((_) async => Result.success(updatedUser));
+      final updatedUser = testUser.copyWith(
+        isParentAccount: true,
+        children: [],
+      ); // simplified
+      when(
+        () => mockUpdateUserProfileUseCase(any()),
+      ).thenAnswer((_) async => Result.success(updatedUser));
 
       final result = await viewModel.addChildFromForm();
 

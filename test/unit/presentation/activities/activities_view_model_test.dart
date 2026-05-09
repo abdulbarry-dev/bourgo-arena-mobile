@@ -1,7 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
-import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import '../../data/repositories/repository_test_fixtures.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
@@ -11,7 +9,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
 
 class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
-class MockGetUserBookingsUseCase extends Mock implements GetUserBookingsUseCase {}
+
+class MockGetUserBookingsUseCase extends Mock
+    implements GetUserBookingsUseCase {}
 
 void main() {
   late ActivitiesViewModel viewModel;
@@ -39,8 +39,12 @@ void main() {
       final activities = [testActivityEntity(id: '1')];
       final reservations = [testReservationEntity(id: 'r1', activityId: '1')];
 
-      when(() => mockGetActivitiesUseCase()).thenAnswer((_) async => Success(activities));
-      when(() => mockGetUserBookingsUseCase()).thenAnswer((_) async => Success(reservations));
+      when(
+        () => mockGetActivitiesUseCase(),
+      ).thenAnswer((_) async => Success(activities));
+      when(
+        () => mockGetUserBookingsUseCase(),
+      ).thenAnswer((_) async => Success(reservations));
 
       await viewModel.loadData();
 
@@ -51,8 +55,12 @@ void main() {
     });
 
     test('loadData handles partial failure (activities)', () async {
-      when(() => mockGetActivitiesUseCase()).thenAnswer((_) async => FailureResult(Failure.server('fail')));
-      when(() => mockGetUserBookingsUseCase()).thenAnswer((_) async => Success([]));
+      when(
+        () => mockGetActivitiesUseCase(),
+      ).thenAnswer((_) async => FailureResult(Failure.server('fail')));
+      when(
+        () => mockGetUserBookingsUseCase(),
+      ).thenAnswer((_) async => Success([]));
 
       await viewModel.loadData();
 
@@ -60,8 +68,12 @@ void main() {
     });
 
     test('loadData handles partial failure (bookings)', () async {
-      when(() => mockGetActivitiesUseCase()).thenAnswer((_) async => Success([]));
-      when(() => mockGetUserBookingsUseCase()).thenAnswer((_) async => FailureResult(Failure.server('fail')));
+      when(
+        () => mockGetActivitiesUseCase(),
+      ).thenAnswer((_) async => Success([]));
+      when(
+        () => mockGetUserBookingsUseCase(),
+      ).thenAnswer((_) async => FailureResult(Failure.server('fail')));
 
       await viewModel.loadData();
 
