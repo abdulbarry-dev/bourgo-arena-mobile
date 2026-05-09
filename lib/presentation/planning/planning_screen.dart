@@ -10,7 +10,8 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// The course planning/schedule screen.
 class PlanningScreen extends StatefulWidget {
-  const PlanningScreen({super.key});
+  final PlanningViewModel? viewModel;
+  const PlanningScreen({super.key, this.viewModel});
 
   @override
   State<PlanningScreen> createState() => _PlanningScreenState();
@@ -22,9 +23,10 @@ class _PlanningScreenState extends State<PlanningScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = PlanningViewModel(
-      getCoursesUseCase: locator<GetCoursesUseCase>(),
-    );
+    _viewModel = widget.viewModel ??
+        PlanningViewModel(
+          getCoursesUseCase: locator<GetCoursesUseCase>(),
+        );
   }
 
   @override

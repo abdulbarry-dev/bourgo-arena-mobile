@@ -10,7 +10,8 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen for global application search.
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final SearchViewModel? viewModel;
+  const SearchScreen({super.key, this.viewModel});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -24,11 +25,12 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _viewModel ??= SearchViewModel(
-      getActivitiesUseCase: locator<GetActivitiesUseCase>(),
-      getCoursesUseCase: locator<GetCoursesUseCase>(),
-      l10n: AppLocalizations.of(context)!,
-    );
+    _viewModel ??= widget.viewModel ??
+        SearchViewModel(
+          getActivitiesUseCase: locator<GetActivitiesUseCase>(),
+          getCoursesUseCase: locator<GetCoursesUseCase>(),
+          l10n: AppLocalizations.of(context)!,
+        );
   }
 
   @override

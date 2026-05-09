@@ -1,9 +1,13 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_flow_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
@@ -16,9 +20,37 @@ class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 
 class MockGetTimeSlotsUseCase extends Mock implements GetTimeSlotsUseCase {}
 
+class MockGetUserBookingsUseCase extends Mock
+    implements GetUserBookingsUseCase {}
+
+class MockMakeReservationUseCase extends Mock
+    implements MakeReservationUseCase {}
+
+class MockCancelBookingUseCase extends Mock implements CancelBookingUseCase {}
+
 void main() {
+  setUpAll(() {
+    registerFallbackValue(
+      const Reservation(
+        id: 'fallback',
+        activityId: 'fallback-activity',
+        activityTitle: 'Fallback',
+        date: '2026-01-01',
+        time: '00:00',
+        duration: '60 min',
+        price: 0,
+        status: 'confirmed',
+        paymentStatus: 'paid',
+        qrCode: 'fallback-qr',
+      ),
+    );
+  });
+
   late MockGetActivitiesUseCase mockGetActivitiesUseCase;
   late MockGetTimeSlotsUseCase mockGetTimeSlotsUseCase;
+  late MockGetUserBookingsUseCase mockGetUserBookingsUseCase;
+  late MockMakeReservationUseCase mockMakeReservationUseCase;
+  late MockCancelBookingUseCase mockCancelBookingUseCase;
 
   final tActivities = [
     const Activity(
@@ -53,11 +85,23 @@ void main() {
   setUp(() {
     mockGetActivitiesUseCase = MockGetActivitiesUseCase();
     mockGetTimeSlotsUseCase = MockGetTimeSlotsUseCase();
+    mockGetUserBookingsUseCase = MockGetUserBookingsUseCase();
+    mockMakeReservationUseCase = MockMakeReservationUseCase();
+    mockCancelBookingUseCase = MockCancelBookingUseCase();
 
     locator.registerFactory<GetActivitiesUseCase>(
       () => mockGetActivitiesUseCase,
     );
     locator.registerFactory<GetTimeSlotsUseCase>(() => mockGetTimeSlotsUseCase);
+    locator.registerFactory<GetUserBookingsUseCase>(
+      () => mockGetUserBookingsUseCase,
+    );
+    locator.registerFactory<MakeReservationUseCase>(
+      () => mockMakeReservationUseCase,
+    );
+    locator.registerFactory<CancelBookingUseCase>(
+      () => mockCancelBookingUseCase,
+    );
 
     when(
       () => mockGetActivitiesUseCase(),
@@ -65,6 +109,28 @@ void main() {
     when(
       () => mockGetTimeSlotsUseCase(any()),
     ).thenAnswer((_) async => Result.success(tTimeSlots));
+    when(
+      () => mockGetUserBookingsUseCase(),
+    ).thenAnswer((_) async => Result.success(<Reservation>[]));
+    when(() => mockMakeReservationUseCase(any())).thenAnswer(
+      (_) async => Result.success(
+        const Reservation(
+          id: 'r1',
+          activityId: '1',
+          activityTitle: 'Soccer',
+          date: '2026-01-01',
+          time: '18:00',
+          duration: '60 min',
+          price: 50,
+          status: 'confirmed',
+          paymentStatus: 'paid',
+          qrCode: 'qr',
+        ),
+      ),
+    );
+    when(
+      () => mockCancelBookingUseCase(any()),
+    ).thenAnswer((_) async => Result.success(null));
   });
 
   tearDown(() async {
