@@ -17,19 +17,15 @@ void main() {
     mockLoginUseCase = MockLoginUseCase();
   });
 
-  setUpAll(() {
-    final binding = TestWidgetsFlutterBinding.ensureInitialized();
-    binding.window.physicalSizeTestValue = const Size(800, 1200);
-    binding.window.devicePixelRatioTestValue = 1.0;
-  });
-
-  tearDownAll(() {
-    final binding = TestWidgetsFlutterBinding.ensureInitialized();
-    binding.window.clearPhysicalSizeTestValue();
-    binding.window.clearDevicePixelRatioTestValue();
-  });
+  Future<void> setupScreenSize(WidgetTester tester) async {
+    tester.view.physicalSize = const Size(800, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  }
 
   testWidgets('login button disabled when form invalid', (tester) async {
+    await setupScreenSize(tester);
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -61,6 +57,7 @@ void main() {
   });
 
   testWidgets('calls login use case on valid form', (tester) async {
+    await setupScreenSize(tester);
     final user = testUserEntity();
     when(
       () => mockLoginUseCase(any(), any()),
@@ -96,6 +93,7 @@ void main() {
   });
 
   testWidgets('shows SnackBar on failure', (tester) async {
+    await setupScreenSize(tester);
     when(
       () => mockLoginUseCase(any(), any()),
     ).thenAnswer((_) async => FailureResult(AuthFailure('bad')));

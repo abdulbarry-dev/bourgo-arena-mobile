@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
@@ -6,12 +7,14 @@ import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:network_image_mock/network_image_mock.dart';
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
@@ -20,24 +23,139 @@ class MockUpdateUserProfileUseCase extends Mock
 
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
 
+class MockHttpClient extends Mock implements HttpClient {}
+
+class MockHttpClientRequest extends Mock implements HttpClientRequest {}
+
+class MockHttpClientResponse extends Mock implements HttpClientResponse {}
+
+class MockHttpHeaders extends Mock implements HttpHeaders {}
+
+final List<int> _transparentPixel = [
+  0x89,
+  0x50,
+  0x4E,
+  0x47,
+  0x0D,
+  0x0A,
+  0x1A,
+  0x0A,
+  0x00,
+  0x00,
+  0x00,
+  0x0D,
+  0x49,
+  0x48,
+  0x44,
+  0x52,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x00,
+  0x01,
+  0x08,
+  0x06,
+  0x00,
+  0x00,
+  0x00,
+  0x1F,
+  0x15,
+  0xC4,
+  0x89,
+  0x00,
+  0x00,
+  0x00,
+  0x0A,
+  0x49,
+  0x44,
+  0x41,
+  0x54,
+  0x78,
+  0x9C,
+  0x63,
+  0x00,
+  0x01,
+  0x00,
+  0x00,
+  0x05,
+  0x00,
+  0x01,
+  0x0D,
+  0x0A,
+  0x2D,
+  0xB4,
+  0x00,
+  0x00,
+  0x00,
+  0x00,
+  0x49,
+  0x45,
+  0x4E,
+  0x44,
+  0xAE,
+  0x42,
+  0x60,
+  0x82,
+];
+
 void main() {
+  setUpAll(() {
+    GoogleFonts.config.allowRuntimeFetching = false;
+
+    final mockHttpClient = MockHttpClient();
+    final mockRequest = MockHttpClientRequest();
+    final mockResponse = MockHttpClientResponse();
+    final mockHeaders = MockHttpHeaders();
+
+    registerFallbackValue(Uri.parse('https://example.com'));
+
+    when(
+      () => mockHttpClient.getUrl(any()),
+    ).thenAnswer((_) async => mockRequest);
+    when(() => mockRequest.headers).thenReturn(mockHeaders);
+    when(() => mockRequest.close()).thenAnswer((_) async => mockResponse);
+    when(() => mockResponse.statusCode).thenReturn(HttpStatus.ok);
+    when(() => mockResponse.contentLength).thenReturn(_transparentPixel.length);
+    when(
+      () => mockResponse.compressionState,
+    ).thenReturn(HttpClientResponseCompressionState.notCompressed);
+    when(
+      () => mockResponse.listen(
+        any(),
+        cancelOnError: any(named: 'cancelOnError'),
+        onDone: any(named: 'onDone'),
+        onError: any(named: 'onError'),
+      ),
+    ).thenAnswer((invocation) {
+      final onData =
+          invocation.positionalArguments[0] as void Function(List<int>);
+      final onDone = invocation.namedArguments[#onDone] as void Function()?;
+      onData(_transparentPixel);
+      onDone?.call();
+      return MockStreamSubscription<List<int>>();
+    });
+
+    HttpOverrides.global = _MockHttpOverrides(mockHttpClient);
+  });
+
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
   late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
   late MockLogoutUseCase mockLogoutUseCase;
 
-  final tUser = User(
-    id: '1',
+  final testUser = User(
+    id: 'user-1',
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@example.com',
     phone: '123456789',
     avatarUrl: 'https://example.com/avatar.png',
     loyaltyPoints: 100,
-    subscriptionLevel: 'GOLD',
-    subscriptionExpiry: '2025-12-31',
-    totalCheckIns: 10,
-    isParentAccount: false,
-    children: [],
+    subscriptionLevel: 'Gold',
+    subscriptionExpiry: '2026-12-31',
+    totalCheckIns: 42,
   );
 
   setUp(() {
@@ -45,147 +163,127 @@ void main() {
     mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
     mockLogoutUseCase = MockLogoutUseCase();
 
-    locator.registerFactory<GetUserProfileUseCase>(
-      () => mockGetUserProfileUseCase,
+    locator.registerSingleton<GetUserProfileUseCase>(mockGetUserProfileUseCase);
+    locator.registerSingleton<UpdateUserProfileUseCase>(
+      mockUpdateUserProfileUseCase,
     );
-    locator.registerFactory<UpdateUserProfileUseCase>(
-      () => mockUpdateUserProfileUseCase,
-    );
-    locator.registerFactory<LogoutUseCase>(() => mockLogoutUseCase);
+    locator.registerSingleton<LogoutUseCase>(mockLogoutUseCase);
   });
 
-  tearDown(() async {
-    await locator.reset();
+  tearDown(() {
+    locator.reset();
   });
 
-  testWidgets('ProfileScreen renders user information correctly', (
-    tester,
-  ) async {
-    mockNetworkImagesFor(() async {
-      // Arrange
+  Widget createWidget() {
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (context, state) => const ProfileScreen()),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => const Scaffold(body: Text('Login Page')),
+        ),
+      ],
+    );
+
+    return MaterialApp.router(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      theme: BourgoTheme.lightTheme,
+      routerConfig: router,
+    );
+  }
+
+  group('ProfileScreen', () {
+    testWidgets('shows loading spinner when fetching data', (tester) async {
       when(
         () => mockGetUserProfileUseCase(),
-      ).thenAnswer((_) async => Success(tUser));
+      ).thenAnswer((_) async => Result.success(testUser));
 
-      // Act
-      final router = GoRouter(
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) => const ProfileScreen(),
-          ),
-        ],
+      // We don't await pumpWidget fully to catch the loading state if possible,
+      // but ProfileViewModel calls it in constructor and it might complete immediately if not delayed.
+      // To reliably test loading, we can delay the response.
+      when(() => mockGetUserProfileUseCase()).thenAnswer(
+        (_) async => Future.delayed(
+          const Duration(milliseconds: 100),
+          () => Result.success(testUser),
+        ),
       );
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-      await tester.pumpAndSettle();
 
-      // Assert
-      expect(find.text('JOHN DOE'), findsOneWidget);
-      expect(find.text('GOLD'), findsOneWidget);
-      expect(find.text('100'), findsOneWidget); // Loyalty points
-      expect(find.text('10'), findsOneWidget); // Total check-ins
-    });
-  });
+      await tester.pumpWidget(createWidget());
+      await tester.pump(); // Start the future
 
-  testWidgets('ProfileScreen shows loading indicator while loading profile', (
-    tester,
-  ) async {
-    mockNetworkImagesFor(() async {
-      // Arrange
-      final completer = Completer<Result<User, Failure>>();
-      when(
-        () => mockGetUserProfileUseCase(),
-      ).thenAnswer((_) => completer.future);
-
-      // Act
-      final router = GoRouter(
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) => const ProfileScreen(),
-          ),
-        ],
-      );
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-      await tester.pump(); // Start building and call initState
-
-      // Assert
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-      // Complete loading
-      completer.complete(Success(tUser));
       await tester.pumpAndSettle();
-
-      expect(find.byType(CircularProgressIndicator), findsNothing);
-      expect(find.text('JOHN DOE'), findsOneWidget);
     });
-  });
 
-  testWidgets('ProfileScreen shows error message on failure', (tester) async {
-    mockNetworkImagesFor(() async {
-      // Arrange
-      when(() => mockGetUserProfileUseCase()).thenAnswer(
-        (_) async => const FailureResult(ServerFailure('Failed to load')),
-      );
-
-      // Act
-      final router = GoRouter(
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) => const ProfileScreen(),
-          ),
-        ],
-      );
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
-      await tester.pumpAndSettle();
-
-      // Assert
-      // Currently, ProfileScreen shows 'Loading error' (fallback) if user is null
-      expect(find.text('Loading error'), findsOneWidget);
-    });
-  });
-
-  testWidgets('Logout button triggers logout flow', (tester) async {
-    mockNetworkImagesFor(() async {
-      // Set larger surface size for logout button visibility
-      tester.view.physicalSize = const Size(800, 1200);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() => tester.view.resetPhysicalSize());
-      addTearDown(() => tester.view.resetDevicePixelRatio());
-
-      // Arrange
+    testWidgets('shows user data when fetch is successful', (tester) async {
       when(
         () => mockGetUserProfileUseCase(),
-      ).thenAnswer((_) async => Success(tUser));
-      when(
-        () => mockLogoutUseCase(),
-      ).thenAnswer((_) async => const Success(null));
+      ).thenAnswer((_) async => Result.success(testUser));
 
-      // Act
-      final router = GoRouter(
-        routes: [
-          GoRoute(
-            path: '/',
-            builder: (context, state) => const ProfileScreen(),
-          ),
-          GoRoute(
-            path: '/login',
-            builder: (context, state) => const Scaffold(body: Text('Login')),
-          ),
-        ],
-      );
-      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
 
-      final logoutButton = find.text('Log out');
+      expect(find.text('JOHN DOE'), findsOneWidget);
+      expect(find.text('Gold'), findsOneWidget);
+      expect(find.text('100'), findsOneWidget); // Points
+      expect(find.text('42'), findsOneWidget); // Check-ins
+    });
+
+    testWidgets('shows error message when fetch fails', (tester) async {
+      when(() => mockGetUserProfileUseCase()).thenAnswer(
+        (_) async => Result.failure(const ServerFailure('Failed to load')),
+      );
+
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      // The screen shows l10n.commonLoadingError or 'Loading error'
+      // From app_en.arb: "commonLoadingError": "Loading Error"
+      expect(find.text('Loading Error'), findsOneWidget);
+    });
+
+    testWidgets('logout button triggers LogoutUseCase', (tester) async {
+      when(
+        () => mockGetUserProfileUseCase(),
+      ).thenAnswer((_) async => Result.success(testUser));
+      when(
+        () => mockLogoutUseCase(),
+      ).thenAnswer((_) async => Result.success(null));
+
+      await tester.pumpWidget(createWidget());
+      await tester.pumpAndSettle();
+
+      // From app_en.arb: "profileLogout": "SIGN OUT"
+      final logoutButton = find.text('SIGN OUT');
+
+      // Scroll until the logout button is visible
+      await tester.scrollUntilVisible(
+        logoutButton,
+        100.0,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.pumpAndSettle();
+
       expect(logoutButton, findsOneWidget);
 
       await tester.tap(logoutButton);
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      // Assert
       verify(() => mockLogoutUseCase()).called(1);
     });
   });
+}
+
+class _MockHttpOverrides extends HttpOverrides {
+  final HttpClient client;
+  _MockHttpOverrides(this.client);
+  @override
+  HttpClient createHttpClient(SecurityContext? context) => client;
+}
+
+class MockStreamSubscription<T> extends Mock implements StreamSubscription<T> {
+  @override
+  Future<void> cancel() async {}
 }

@@ -1,6 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 /// ViewModel for the Registration screen.
 class RegisterViewModel extends ChangeNotifier {
@@ -25,6 +24,9 @@ class RegisterViewModel extends ChangeNotifier {
 
   RegisterViewModel(this._registerUseCase);
 
+  String? _errorMessage;
+  String? get errorMessage => _errorMessage;
+
   void setBirthDate(DateTime? date) {
     _selectedBirthDate = date;
     notifyListeners();
@@ -40,9 +42,13 @@ class RegisterViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> register(BuildContext context) async {
+  Future<void> register({
+    required void Function(Map<String, dynamic> data) onSuccess,
+  }) async {
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
+      _errorMessage = null;
+      notifyListeners();
 
       final result = await _registerUseCase(
         firstName: firstNameController.text,
@@ -55,31 +61,22 @@ class RegisterViewModel extends ChangeNotifier {
 
       setLoading(false);
 
-      if (context.mounted) {
-        result.fold(
-          onSuccess: (_) {
-            // Prepare data for the next onboarding/verification screen
-            final registrationData = {
-              'firstName': firstNameController.text,
-              'lastName': lastNameController.text,
-              'email': emailController.text,
-              'phone': phoneController.text,
-              'isParentAccount': _isParentAccount,
-            };
-
-            if (_isParentAccount) {
-              context.push('/family-onboarding', extra: registrationData);
-            } else {
-              context.push('/verification-method', extra: registrationData);
-            }
-          },
-          onFailure: (failure) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(failure.message)));
-          },
-        );
-      }
+      result.fold(
+        onSuccess: (_) {
+          final registrationData = {
+            'firstName': firstNameController.text,
+            'lastName': lastNameController.text,
+            'email': emailController.text,
+            'phone': phoneController.text,
+            'isParentAccount': _isParentAccount,
+          };
+          onSuccess(registrationData);
+        },
+        onFailure: (failure) {
+          _errorMessage = failure.message;
+          notifyListeners();
+        },
+      );
     }
   }
 

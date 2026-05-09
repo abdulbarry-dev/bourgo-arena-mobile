@@ -27,12 +27,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void initState() {
     super.initState();
     _viewModel = RegisterViewModel(widget.registerUseCase);
+    _viewModel.addListener(_onViewModelChanged);
   }
 
   @override
   void dispose() {
+    _viewModel.removeListener(_onViewModelChanged);
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onViewModelChanged() {
+    if (_viewModel.errorMessage != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
+    }
+  }
+
+  void _onRegister() {
+    _viewModel.register(
+      onSuccess: (data) {
+        if (data['isParentAccount'] as bool) {
+          context.push('/family-onboarding', extra: data);
+        } else {
+          context.push('/verification-method', extra: data);
+        }
+      },
+    );
   }
 
   Future<void> _selectBirthDate() async {
@@ -154,9 +176,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       const SizedBox(height: 32),
                       ElevatedButton(
-                        onPressed: _viewModel.isLoading
-                            ? null
-                            : () => _viewModel.register(context),
+                        onPressed: _viewModel.isLoading ? null : _onRegister,
                         child: _viewModel.isLoading
                             ? SizedBox(
                                 height: 20,

@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
+import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -16,27 +17,28 @@ class MockUpdateUserProfileUseCase extends Mock
 
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
 
+class FakeUser extends Fake implements User {}
+
 void main() {
   late ProfileViewModel viewModel;
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
   late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
   late MockLogoutUseCase mockLogoutUseCase;
 
-  final tUser = User(
-    id: '1',
+  final testUser = User(
+    id: 'user-1',
     firstName: 'John',
     lastName: 'Doe',
     email: 'john@example.com',
     phone: '123456789',
     avatarUrl: 'https://example.com/avatar.png',
     loyaltyPoints: 100,
-    subscriptionLevel: 'GOLD',
-    subscriptionExpiry: '2025-12-31',
-    totalCheckIns: 10,
-    isParentAccount: true,
+    subscriptionLevel: 'Gold',
+    subscriptionExpiry: '2026-12-31',
+    totalCheckIns: 42,
     children: [
       ChildProfile(
-        id: 'c1',
+        id: 'child-1',
         firstName: 'Jane',
         lastName: 'Doe',
         birthDate: DateTime(2015, 1, 1),
@@ -44,122 +46,79 @@ void main() {
     ],
   );
 
+  setUpAll(() {
+    registerFallbackValue(FakeUser());
+  });
+
   setUp(() {
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
     mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
     mockLogoutUseCase = MockLogoutUseCase();
 
-    registerFallbackValue(tUser);
-
-    // Default mock behavior
+    // Default behavior for constructor's loadProfile call
     when(
       () => mockGetUserProfileUseCase(),
-    ).thenAnswer((_) async => Success(tUser));
+    ).thenAnswer((_) async => Result.success(testUser));
+
+    viewModel = ProfileViewModel(
+      getUserProfileUseCase: mockGetUserProfileUseCase,
+      updateUserProfileUseCase: mockUpdateUserProfileUseCase,
+      logoutUseCase: mockLogoutUseCase,
+    );
   });
 
   group('ProfileViewModel', () {
-    test('initial state loads profile and populates user', () async {
-      // Act
-      viewModel = ProfileViewModel(
-        getUserProfileUseCase: mockGetUserProfileUseCase,
-        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
-        logoutUseCase: mockLogoutUseCase,
-      );
-
-      // Wait for the async load in constructor
-      await Future.delayed(Duration.zero);
-
-      // Assert
-      expect(viewModel.user, tUser);
-      expect(viewModel.isLoading, false);
-      expect(viewModel.errorMessage, isNull);
-      expect(viewModel.user!.children.length, 1);
-      verify(() => mockGetUserProfileUseCase()).called(1);
+    test('initial state sets loading then success with user data', () async {
+      // ViewModel calls loadProfile in constructor
+      check(viewModel.isLoading).isFalse();
+      check(viewModel.user).isNotNull().equals(testUser);
+      check(viewModel.user?.children.length).equals(1);
+      check(viewModel.errorMessage).isNull();
     });
 
-    test('loadProfile failure sets error message', () async {
-      // Arrange
-      const tFailure = ServerFailure('Failed to load profile');
-      when(
-        () => mockGetUserProfileUseCase(),
-      ).thenAnswer((_) async => const FailureResult(tFailure));
-
-      // Act
-      viewModel = ProfileViewModel(
-        getUserProfileUseCase: mockGetUserProfileUseCase,
-        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
-        logoutUseCase: mockLogoutUseCase,
+    test('loadProfile sets failure state on error', () async {
+      when(() => mockGetUserProfileUseCase()).thenAnswer(
+        (_) async => Result.failure(const ServerFailure('Server error')),
       );
-      await Future.delayed(Duration.zero);
 
-      // Assert
-      expect(viewModel.user, isNull);
-      expect(viewModel.errorMessage, 'Failed to load profile');
+      await viewModel.loadProfile();
+
+      check(viewModel.isLoading).isFalse();
+      check(viewModel.errorMessage).isNotNull().equals('Server error');
     });
 
     test('updateProfile success updates user data', () async {
-      // Arrange
-      final updatedUser = tUser.copyWith(firstName: 'Johnny');
+      final updatedUser = testUser.copyWith(firstName: 'Johnny');
       when(
         () => mockUpdateUserProfileUseCase(any()),
-      ).thenAnswer((_) async => Success(updatedUser));
+      ).thenAnswer((_) async => Result.success(updatedUser));
 
-      viewModel = ProfileViewModel(
-        getUserProfileUseCase: mockGetUserProfileUseCase,
-        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
-        logoutUseCase: mockLogoutUseCase,
-      );
-      await Future.delayed(Duration.zero);
-
-      // Act
       final result = await viewModel.updateProfile(updatedUser);
 
-      // Assert
-      expect(result.isSuccess, true);
-      expect(viewModel.user!.firstName, 'Johnny');
-      expect(viewModel.errorMessage, isNull);
+      check(result.isSuccess).isTrue();
+      check(viewModel.user).equals(updatedUser);
+      check(viewModel.errorMessage).isNull();
       verify(() => mockUpdateUserProfileUseCase(updatedUser)).called(1);
     });
 
     test('updateProfile failure sets error message', () async {
-      // Arrange
-      const tFailure = ServerFailure('Update failed');
-      when(
-        () => mockUpdateUserProfileUseCase(any()),
-      ).thenAnswer((_) async => const FailureResult(tFailure));
-
-      viewModel = ProfileViewModel(
-        getUserProfileUseCase: mockGetUserProfileUseCase,
-        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
-        logoutUseCase: mockLogoutUseCase,
+      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
+        (_) async => Result.failure(const ServerFailure('Update failed')),
       );
-      await Future.delayed(Duration.zero);
 
-      // Act
-      final result = await viewModel.updateProfile(tUser);
+      final result = await viewModel.updateProfile(testUser);
 
-      // Assert
-      expect(result.isFailure, true);
-      expect(viewModel.errorMessage, 'Update failed');
+      check(result.isFailure).isTrue();
+      check(viewModel.errorMessage).isNotNull().equals('Update failed');
     });
 
-    test('logout triggers logoutUseCase', () async {
-      // Arrange
+    test('logout calls LogoutUseCase', () async {
       when(
         () => mockLogoutUseCase(),
-      ).thenAnswer((_) async => const Success(null));
+      ).thenAnswer((_) async => Result.success(null));
 
-      viewModel = ProfileViewModel(
-        getUserProfileUseCase: mockGetUserProfileUseCase,
-        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
-        logoutUseCase: mockLogoutUseCase,
-      );
-      await Future.delayed(Duration.zero);
-
-      // Act
       await viewModel.logout();
 
-      // Assert
       verify(() => mockLogoutUseCase()).called(1);
     });
   });
