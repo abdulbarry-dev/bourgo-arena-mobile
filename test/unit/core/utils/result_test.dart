@@ -1,79 +1,43 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:checks/checks.dart';
+import 'package:test/test.dart';
 
 void main() {
-  group('Result', () {
-    const successData = 'success_data';
-    const failure = ServerFailure('error_message');
+  test('Success holds value and fold/when call success branch', () {
+    final r = Result<int, Failure>.success(42);
+    expect(r.isSuccess, isTrue);
+    expect(r.isFailure, isFalse);
 
-    test('Success state holds data and identifies correctly', () {
-      final result = Result<String, Failure>.success(successData);
+    final folded = r.fold(onFailure: (f) => -1, onSuccess: (v) => v + 1);
+    expect(folded, 43);
 
-      check(result.isSuccess).isTrue();
-      check(result.isFailure).isFalse();
-      
-      result.when(
-        success: (data) => check(data).equals(successData),
-        failure: (f) => fail('Should not be failure'),
-      );
-    });
+    final whened = r.when(success: (v) => 'ok$v', failure: (f) => 'bad');
+    expect(whened, startsWith('ok'));
+  });
 
-    test('Failure state holds failure and identifies correctly', () {
-      final result = Result<String, Failure>.failure(failure);
+  test('FailureResult holds failure and fold/when call failure branch', () {
+    final ex = ServerFailure('err');
+    final r = Result<int, Failure>.failure(ex);
+    expect(r.isSuccess, isFalse);
+    expect(r.isFailure, isTrue);
 
-      check(result.isSuccess).isFalse();
-      check(result.isFailure).isTrue();
+    final folded = r.fold(
+      onFailure: (f) => 'f:${f.message}',
+      onSuccess: (_) => 'ok',
+    );
+    expect(folded, contains('err'));
 
-      result.when(
-        success: (data) => fail('Should not be success'),
-        failure: (f) => check(f).equals(failure),
-      );
-    });
+    final whened = r.when(success: (_) => 1, failure: (f) => 2);
+    expect(whened, 2);
+  });
 
-    test('fold handles success path', () {
-      final result = Result<String, Failure>.success(successData);
-
-      final output = result.fold(
-        onSuccess: (data) => data.toUpperCase(),
-        onFailure: (f) => 'failed',
-      );
-
-      check(output).equals(successData.toUpperCase());
-    });
-
-    test('fold handles failure path', () {
-      final result = Result<String, Failure>.failure(failure);
-
-      final output = result.fold(
-        onSuccess: (data) => data,
-        onFailure: (f) => f.message,
-      );
-
-      check(output).equals(failure.message);
-    });
-    
-    test('when handles success path', () {
-      final result = Result<String, Failure>.success(successData);
-
-      final output = result.when(
-        success: (data) => 'success',
-        failure: (f) => 'failure',
-      );
-
-      check(output).equals('success');
-    });
-
-    test('when handles failure path', () {
-      final result = Result<String, Failure>.failure(failure);
-
-      final output = result.when(
-        success: (data) => 'success',
-        failure: (f) => 'failure',
-      );
-
-      check(output).equals('failure');
-    });
+  test('chaining via fold works correctly', () {
+    final r = Result<String, Failure>.success('a');
+    final next = r.fold(
+      onFailure: (f) => Result<String, Failure>.success('fail'),
+      onSuccess: (v) => Result<String, Failure>.success(v + 'b'),
+    );
+    expect(next.isSuccess, isTrue);
+    expect((next as Success).data, 'ab');
   });
 }
