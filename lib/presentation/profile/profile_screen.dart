@@ -31,6 +31,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
@@ -44,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (user == null) {
           return Scaffold(
             body: Center(
-              child: Text(AppLocalizations.of(context)!.commonLoadingError),
+              child: Text(l10n?.commonLoadingError ?? 'Loading error'),
             ),
           );
         }
@@ -172,13 +174,13 @@ class _StatsRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _StatItem(
-            label: AppLocalizations.of(context)!.profilePoints,
+            label: AppLocalizations.of(context)?.profilePoints ?? 'Points',
             value: user.loyaltyPoints.toString(),
             icon: Symbols.stars,
           ),
           Container(width: 1, height: 40, color: theme.colorScheme.outline),
           _StatItem(
-            label: AppLocalizations.of(context)!.profileCheckins,
+            label: AppLocalizations.of(context)?.profileCheckins ?? 'Check-ins',
             value: user.totalCheckIns.toString(),
             icon: Symbols.qr_code_scanner,
           ),
@@ -243,25 +245,29 @@ class _ProfileMenu extends StatelessWidget {
       children: [
         _MenuItem(
           icon: Symbols.card_membership,
-          label: AppLocalizations.of(context)!.profileMySubscription,
+          label:
+              AppLocalizations.of(context)?.profileMySubscription ??
+              'My subscription',
           onTap: onTapAbonnement,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.history,
-          label: AppLocalizations.of(context)!.profileHistory,
+          label: AppLocalizations.of(context)?.profileHistory ?? 'History',
           onTap: onTapHistorique,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.notifications,
-          label: AppLocalizations.of(context)!.profileNotifications,
+          label:
+              AppLocalizations.of(context)?.profileNotifications ??
+              'Notifications',
           onTap: onTapNotifications,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.settings,
-          label: AppLocalizations.of(context)!.profileSettings,
+          label: AppLocalizations.of(context)?.profileSettings ?? 'Settings',
           onTap: onTapSettings,
         ),
       ],
@@ -321,7 +327,7 @@ class _LogoutButton extends StatelessWidget {
     return TextButton(
       onPressed: () => context.go('/login'),
       child: Text(
-        AppLocalizations.of(context)!.profileLogout,
+        AppLocalizations.of(context)?.profileLogout ?? 'Log out',
         style: const TextStyle(
           color: Colors.redAccent,
           fontWeight: FontWeight.bold,
