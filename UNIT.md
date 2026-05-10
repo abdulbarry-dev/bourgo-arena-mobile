@@ -1,179 +1,1520 @@
-# Unit Testing Report
+Overview
 
-This document provides a comprehensive overview of the testing state for the Bourgo Arena Mobile project. It is updated automatically to reflect the current test coverage and suite health.
+- total files: 94
+- total test cases: 404
+- global coverage:   lines......: 56.5% (3304 of 5844 lines)
+- coverage per layer:
+  - Data: 0.0% (0/509)
+  - Domain: 0.0% (0/209)
+  - Presentation: 0.0% (0/2281)
+- testing stack: mocktail,flutter_test
 
-## Overview
+Full test file tree
 
-- **Total Test Files:** 70 (54 Unit / 15 Widget / 1 Other)
-- **Total Individual Test Cases:** 328
-- **Global Line Coverage:** 52.2%
-- **Coverage by Layer:**
-  - **Data Layer:** 84.8%
-  - **Domain Layer:** 69.3%
-  - **Core Layer:** 50.3%
-  - **Presentation Layer:** 49.2%
-- **Testing Stack:** Flutter Test, Mocktail, Checks
+test/test_utils.dart
+test/unit/core/di/locator_test.dart
+test/unit/core/utils/result_test.dart
+test/unit/data/api/api_client_test.dart
+test/unit/data/api/api_error_handler_test.dart
+test/unit/data/mappers/activity_mapper_test.dart
+test/unit/data/mappers/course_mapper_test.dart
+test/unit/data/mappers/mapper_test_fixtures.dart
+test/unit/data/mappers/notification_mapper_test.dart
+test/unit/data/mappers/reservation_mapper_test.dart
+test/unit/data/mappers/time_slot_mapper_test.dart
+test/unit/data/mappers/user_mapper_test.dart
+test/unit/data/models/activity_model_test.dart
+test/unit/data/models/child_profile_model_test.dart
+test/unit/data/models/course_model_test.dart
+test/unit/data/models/notification_model_test.dart
+test/unit/data/models/reservation_model_test.dart
+test/unit/data/models/time_slot_model_test.dart
+test/unit/data/models/user_profile_model_test.dart
+test/unit/data/repositories/api_activity_repository_test.dart
+test/unit/data/repositories/api_auth_repository_test.dart
+test/unit/data/repositories/api_course_repository_test.dart
+test/unit/data/repositories/api_notification_repository_test.dart
+test/unit/data/repositories/api_reservation_repository_test.dart
+test/unit/data/repositories/api_user_repository_test.dart
+test/unit/data/repositories/local_session_repository_test.dart
+test/unit/data/repositories/repository_test_fixtures.dart
+test/unit/domain/core/failure_test.dart
+test/unit/domain/entities/entity_test.dart
+test/unit/domain/usecases/activity/get_activities_use_case_test.dart
+test/unit/domain/usecases/activity/get_time_slots_use_case_test.dart
+test/unit/domain/usecases/auth/complete_registration_use_case_test.dart
+test/unit/domain/usecases/auth/login_use_case_test.dart
+test/unit/domain/usecases/auth/logout_use_case_test.dart
+test/unit/domain/usecases/auth/register_use_case_test.dart
+test/unit/domain/usecases/auth/request_family_account_otp_use_case_test.dart
+test/unit/domain/usecases/auth/send_otp_use_case_test.dart
+test/unit/domain/usecases/auth/update_password_use_case_test.dart
+test/unit/domain/usecases/auth/verify_otp_use_case_test.dart
+test/unit/domain/usecases/booking/cancel_booking_use_case_test.dart
+test/unit/domain/usecases/booking/get_user_bookings_use_case_test.dart
+test/unit/domain/usecases/booking/make_reservation_use_case_test.dart
+test/unit/domain/usecases/course/get_courses_use_case_test.dart
+test/unit/domain/usecases/notification/get_notifications_use_case_test.dart
+test/unit/domain/usecases/settings/get_locale_use_case_test.dart
+test/unit/domain/usecases/settings/get_notifications_enabled_use_case_test.dart
+test/unit/domain/usecases/settings/is_language_selected_use_case_test.dart
+test/unit/domain/usecases/settings/set_locale_use_case_test.dart
+test/unit/domain/usecases/settings/set_notifications_enabled_use_case_test.dart
+test/unit/domain/usecases/usecase_test_fixtures.dart
+test/unit/domain/usecases/user/get_user_profile_use_case_test.dart
+test/unit/domain/usecases/user/update_user_profile_use_case_test.dart
+test/unit/presentation/activities/activities_view_model_test.dart
+test/unit/presentation/auth/auth_state_notifier_test.dart
+test/unit/presentation/auth/forgot_password/forgot_password_view_model_test.dart
+test/unit/presentation/auth/login/login_view_model_test.dart
+test/unit/presentation/auth/otp/otp_view_model_test.dart
+test/unit/presentation/auth/register/register_view_model_test.dart
+test/unit/presentation/booking/booking_view_model_test.dart
+test/unit/presentation/home/home_view_model_test.dart
+test/unit/presentation/notifications/notifications_view_model_test.dart
+test/unit/presentation/planning/planning_view_model_test.dart
+test/unit/presentation/profile/family_management_view_model_test.dart
+test/unit/presentation/profile/profile_view_model_test.dart
+test/unit/presentation/search/search_view_model_test.dart
+test/unit/presentation/settings/settings_view_model_test.dart
+test/unit/presentation/viewmodels/activities_view_model_test.dart
+test/unit/presentation/viewmodels/auth_state_notifier_test.dart
+test/unit/presentation/viewmodels/booking_view_model_test.dart
+test/unit/presentation/viewmodels/change_password_view_model_test.dart
+test/unit/presentation/viewmodels/edit_profile_view_model_test.dart
+test/unit/presentation/viewmodels/family_management_view_model_test.dart
+test/unit/presentation/viewmodels/family_onboarding_view_model_test.dart
+test/unit/presentation/viewmodels/forgot_password_view_model_test.dart
+test/unit/presentation/viewmodels/home_view_model_test.dart
+test/unit/presentation/viewmodels/new_password_view_model_test.dart
+test/unit/presentation/viewmodels/notifications_view_model_test.dart
+test/unit/presentation/viewmodels/planning_view_model_test.dart
+test/unit/presentation/viewmodels/profile_view_model_test.dart
+test/unit/presentation/viewmodels/search_view_model_test.dart
+test/widget/auth/login_screen_test.dart
+test/widget/auth/otp_screen_test.dart
+test/widget/auth/register_screen_test.dart
+test/widget/home/home_screen_test.dart
+test/widget/notifications/notifications_screen_test.dart
+test/widget/planning/planning_screen_test.dart
+test/widget/presentation/booking/booking_flow_widget_test.dart
+test/widget/presentation/notifications/notifications_screen_widget_test.dart
+test/widget/presentation/planning/planning_screen_widget_test.dart
+test/widget/presentation/search/search_screen_widget_test.dart
+test/widget/presentation/settings/settings_screen_widget_test.dart
+test/widget/profile/profile_screen_test.dart
+test/widget/settings/settings_screen_test.dart
+test/widget_test.dart
 
----
+Coverage per folder
 
-## Data Layer Detail
+- lib/ 0.0% (0/60) 🔴
+- lib/core/di/ 0.0% (0/53) 🔴
+- lib/core/theme/ 0.0% (0/58) 🔴
+- lib/core/utils/ 0.0% (0/15) 🔴
+- total files: 77
+- total test cases: 350
+- global coverage:   lines......: 53.6% (3135 of 5844 lines)
+- lib/data/repositories/ 0.0% (0/149) 🔴
+- lib/domain/core/ 0.0% (0/15) 🔴
+- lib/domain/entities/ 0.0% (0/126) 🔴
+- lib/domain/usecases/activity/ 0.0% (0/6) 🔴
+- lib/domain/usecases/auth/ 0.0% (0/24) 🔴
+- lib/domain/usecases/booking/ 0.0% (0/9) 🔴
+- lib/domain/usecases/course/ 0.0% (0/3) 🔴
+- lib/domain/usecases/notification/ 0.0% (0/3) 🔴
+- lib/domain/usecases/settings/ 0.0% (0/17) 🔴
+- lib/domain/usecases/user/ 0.0% (0/6) 🔴
+- lib/l10n/ 0.0% (0/119) 🔴
+- lib/presentation/ 0.0% (0/2281) 🔴
 
-The data layer handles API communication, data mapping, and local persistence. It maintains the highest coverage in the project due to its critical role in data integrity.
+What is tested layer by layer
 
-### [COVERED]
-- [activity_mapper.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/mappers/activity_mapper.dart)
-- [course_mapper.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/mappers/course_mapper.dart)
-- [notification_mapper.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/mappers/notification_mapper.dart)
-- [reservation_mapper.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/mappers/reservation_mapper.dart)
-- [time_slot_mapper.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/mappers/time_slot_mapper.dart)
-- [user_mapper.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/mappers/user_mapper.dart)
-- [activity_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/models/activity_model.dart)
-- [child_profile_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/models/child_profile_model.dart)
-- [course_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/models/course_model.dart)
-- [notification_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/models/notification_model.dart)
-- [reservation_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/models/reservation_model.dart)
-- [time_slot_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/models/time_slot_model.dart)
-- [user_profile_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/models/user_profile_model.dart)
-- [api_activity_repository.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/repositories/api_activity_repository.dart)
-- [api_auth_repository.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/repositories/api_auth_repository.dart)
-- [api_course_repository.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/repositories/api_course_repository.dart)
-- [api_notification_repository.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/repositories/api_notification_repository.dart)
-- [api_reservation_repository.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/repositories/api_reservation_repository.dart)
-- [api_user_repository.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/repositories/api_user_repository.dart)
+### Domain
+- Failure [UNTESTED]
+  - test files:
+    - test/unit/domain/core/failure_test.dart
+  - groups:
+    - test/unit/domain/core/failure_test.dart :: Failure
+    - test/unit/domain/core/failure_test.dart :: Failure.unexpected
+- NetworkFailure [UNTESTED]
+  - test files:
+    - test/unit/domain/core/failure_test.dart
+  - groups:
+    - test/unit/domain/core/failure_test.dart :: Failure
+    - test/unit/domain/core/failure_test.dart :: Failure.unexpected
+- AuthFailure [UNTESTED]
+  - test files:
+    - test/unit/domain/core/failure_test.dart
+  - groups:
+    - test/unit/domain/core/failure_test.dart :: Failure
+    - test/unit/domain/core/failure_test.dart :: Failure.unexpected
+- ServerFailure [UNTESTED]
+  - test files:
+    - test/unit/domain/core/failure_test.dart
+  - groups:
+    - test/unit/domain/core/failure_test.dart :: Failure
+    - test/unit/domain/core/failure_test.dart :: Failure.unexpected
+- NotFoundFailure [UNTESTED]
+  - test files:
+    - test/unit/domain/core/failure_test.dart
+  - groups:
+    - test/unit/domain/core/failure_test.dart :: Failure
+    - test/unit/domain/core/failure_test.dart :: Failure.unexpected
+- CacheFailure [UNTESTED]
+  - test files:
+    - test/unit/domain/core/failure_test.dart
+  - groups:
+    - test/unit/domain/core/failure_test.dart :: Failure
+    - test/unit/domain/core/failure_test.dart :: Failure.unexpected
+- ValidationFailure [UNTESTED]
+  - test files:
+    - test/unit/domain/core/failure_test.dart
+  - groups:
+    - test/unit/domain/core/failure_test.dart :: Failure
+    - test/unit/domain/core/failure_test.dart :: Failure.unexpected
+- Activity [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ChildProfile [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- Course [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- Notification [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- Reservation [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SearchResultType [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SearchResult [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- Subscription [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- TimeSlot [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- User [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- GetActivitiesUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/activity/get_activities_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/activity/get_activities_use_case_test.dart :: GetActivitiesUseCase
+- GetTimeSlotsUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/activity/get_time_slots_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/activity/get_time_slots_use_case_test.dart :: GetTimeSlotsUseCase
+- CompleteRegistrationUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/complete_registration_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/complete_registration_use_case_test.dart :: CompleteRegistrationUseCase
+- LoginUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/login_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/login_use_case_test.dart :: LoginUseCase
+- LogoutUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/logout_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/logout_use_case_test.dart :: LogoutUseCase
+- RegisterUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/register_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/register_use_case_test.dart :: RegisterUseCase
+- RequestFamilyAccountOtpUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/request_family_account_otp_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/request_family_account_otp_use_case_test.dart :: RequestFamilyAccountOtpUseCase
+- SendOtpUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/send_otp_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/send_otp_use_case_test.dart :: SendOtpUseCase
+- UpdatePasswordUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/update_password_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/update_password_use_case_test.dart :: UpdatePasswordUseCase
+- VerifyOtpUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/auth/verify_otp_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/auth/verify_otp_use_case_test.dart :: VerifyOtpUseCase
+- CancelBookingUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/booking/cancel_booking_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/booking/cancel_booking_use_case_test.dart :: CancelBookingUseCase
+- GetUserBookingsUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/booking/get_user_bookings_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/booking/get_user_bookings_use_case_test.dart :: GetUserBookingsUseCase
+- MakeReservationUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/booking/make_reservation_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/booking/make_reservation_use_case_test.dart :: MakeReservationUseCase
+- GetCoursesUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/course/get_courses_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/course/get_courses_use_case_test.dart :: GetCoursesUseCase
+- GetNotificationsUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/notification/get_notifications_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/notification/get_notifications_use_case_test.dart :: GetNotificationsUseCase
+- GetLocaleUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/settings/get_locale_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/settings/get_locale_use_case_test.dart :: GetLocaleUseCase
+    - test/unit/domain/usecases/settings/get_locale_use_case_test.dart :: GetThemeModeUseCase
+- GetNotificationsEnabledUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/settings/get_notifications_enabled_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/settings/get_notifications_enabled_use_case_test.dart :: GetNotificationsEnabledUseCase
+- GetThemeModeUseCase [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- IsLanguageSelectedUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/settings/is_language_selected_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/settings/is_language_selected_use_case_test.dart :: IsLanguageSelectedUseCase
+- SetLocaleUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/settings/set_locale_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/settings/set_locale_use_case_test.dart :: SetLocaleUseCase
+    - test/unit/domain/usecases/settings/set_locale_use_case_test.dart :: SetThemeModeUseCase
+- SetNotificationsEnabledUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/settings/set_notifications_enabled_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/settings/set_notifications_enabled_use_case_test.dart :: SetNotificationsEnabledUseCase
+- SetThemeModeUseCase [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- GetUserProfileUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/user/get_user_profile_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/user/get_user_profile_use_case_test.dart :: GetUserProfileUseCase
+- UpdateUserProfileUseCase [UNTESTED]
+  - test files:
+    - test/unit/domain/usecases/user/update_user_profile_use_case_test.dart
+  - groups:
+    - test/unit/domain/usecases/user/update_user_profile_use_case_test.dart :: UpdateUserProfileUseCase
 
-### [UNTESTED]
-- [api_error_handler.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/api/api_error_handler.dart) (71.4%)
-- [api_exceptions.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/api/api_exceptions.dart) (62.5%)
-- [api_client.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/api/api_client.dart) (57.8%)
-- [local_session_repository.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/data/repositories/local_session_repository.dart) (55.8%)
+### Data
+- ApiClient [UNTESTED]
+  - test files:
+    - test/unit/data/api/api_client_test.dart
+  - groups:
+    - test/unit/data/api/api_client_test.dart :: (no group() found)
+- ApiException [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ServerException [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- AuthException [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- NotFoundException [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- NetworkException [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ValidationException [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ActivityMapper [UNTESTED]
+  - test files:
+    - test/unit/data/mappers/activity_mapper_test.dart
+  - groups:
+    - test/unit/data/mappers/activity_mapper_test.dart :: ActivityMapper
+- CourseMapper [UNTESTED]
+  - test files:
+    - test/unit/data/mappers/course_mapper_test.dart
+  - groups:
+    - test/unit/data/mappers/course_mapper_test.dart :: CourseMapper
+- NotificationMapper [UNTESTED]
+  - test files:
+    - test/unit/data/mappers/notification_mapper_test.dart
+  - groups:
+    - test/unit/data/mappers/notification_mapper_test.dart :: NotificationMapper
+- ReservationMapper [UNTESTED]
+  - test files:
+    - test/unit/data/mappers/reservation_mapper_test.dart
+  - groups:
+    - test/unit/data/mappers/reservation_mapper_test.dart :: ReservationMapper
+- TimeSlotMapper [UNTESTED]
+  - test files:
+    - test/unit/data/mappers/time_slot_mapper_test.dart
+  - groups:
+    - test/unit/data/mappers/time_slot_mapper_test.dart :: TimeSlotMapper
+- UserMapper [UNTESTED]
+  - test files:
+    - test/unit/data/mappers/user_mapper_test.dart
+  - groups:
+    - test/unit/data/mappers/user_mapper_test.dart :: UserMapper
+- ChildMapper [UNTESTED]
+  - test files:
+    - test/unit/data/mappers/user_mapper_test.dart
+  - groups:
+    - test/unit/data/mappers/user_mapper_test.dart :: UserMapper
+- ActivityModel [UNTESTED]
+  - test files:
+    - test/unit/data/models/activity_model_test.dart
+  - groups:
+    - test/unit/data/models/activity_model_test.dart :: ActivityModel
+- ChildProfileModel [UNTESTED]
+  - test files:
+    - test/unit/data/models/child_profile_model_test.dart
+  - groups:
+    - test/unit/data/models/child_profile_model_test.dart :: ChildProfileModel
+- CourseModel [UNTESTED]
+  - test files:
+    - test/unit/data/models/course_model_test.dart
+  - groups:
+    - test/unit/data/models/course_model_test.dart :: CourseModel
+- NotificationModel [UNTESTED]
+  - test files:
+    - test/unit/data/models/notification_model_test.dart
+  - groups:
+    - test/unit/data/models/notification_model_test.dart :: NotificationModel
+- ReservationModel [UNTESTED]
+  - test files:
+    - test/unit/data/models/reservation_model_test.dart
+  - groups:
+    - test/unit/data/models/reservation_model_test.dart :: ReservationModel
+- TimeSlotModel [UNTESTED]
+  - test files:
+    - test/unit/data/models/time_slot_model_test.dart
+  - groups:
+    - test/unit/data/models/time_slot_model_test.dart :: TimeSlotModel
+- UserProfileModel [UNTESTED]
+  - test files:
+    - test/unit/data/models/user_profile_model_test.dart
+  - groups:
+    - test/unit/data/models/user_profile_model_test.dart :: UserProfileModel
+- ApiActivityRepository [UNTESTED]
+  - test files:
+    - test/unit/data/repositories/api_activity_repository_test.dart
+  - groups:
+    - test/unit/data/repositories/api_activity_repository_test.dart :: ApiActivityRepository
+    - test/unit/data/repositories/api_activity_repository_test.dart :: getActivities
+    - test/unit/data/repositories/api_activity_repository_test.dart :: getActivityById
+    - test/unit/data/repositories/api_activity_repository_test.dart :: getTimeSlots
+- ApiAuthRepository [UNTESTED]
+  - test files:
+    - test/unit/data/repositories/api_auth_repository_test.dart
+  - groups:
+    - test/unit/data/repositories/api_auth_repository_test.dart :: ApiAuthRepository
+    - test/unit/data/repositories/api_auth_repository_test.dart :: completeRegistration
+    - test/unit/data/repositories/api_auth_repository_test.dart :: getToken
+    - test/unit/data/repositories/api_auth_repository_test.dart :: login
+    - test/unit/data/repositories/api_auth_repository_test.dart :: logout
+    - test/unit/data/repositories/api_auth_repository_test.dart :: register
+    - test/unit/data/repositories/api_auth_repository_test.dart :: requestFamilyAccountOtp
+    - test/unit/data/repositories/api_auth_repository_test.dart :: sendOtp
+    - test/unit/data/repositories/api_auth_repository_test.dart :: updatePassword
+    - test/unit/data/repositories/api_auth_repository_test.dart :: verifyOtp
+- ApiCourseRepository [UNTESTED]
+  - test files:
+    - test/unit/data/repositories/api_course_repository_test.dart
+  - groups:
+    - test/unit/data/repositories/api_course_repository_test.dart :: ApiCourseRepository
+- ApiNotificationRepository [UNTESTED]
+  - test files:
+    - test/unit/data/repositories/api_notification_repository_test.dart
+  - groups:
+    - test/unit/data/repositories/api_notification_repository_test.dart :: ApiNotificationRepository
+- ApiReservationRepository [UNTESTED]
+  - test files:
+    - test/unit/data/repositories/api_reservation_repository_test.dart
+  - groups:
+    - test/unit/data/repositories/api_reservation_repository_test.dart :: ApiReservationRepository
+    - test/unit/data/repositories/api_reservation_repository_test.dart :: cancelReservation
+    - test/unit/data/repositories/api_reservation_repository_test.dart :: getReservations
+    - test/unit/data/repositories/api_reservation_repository_test.dart :: makeReservation
+- ApiUserRepository [UNTESTED]
+  - test files:
+    - test/unit/data/repositories/api_user_repository_test.dart
+  - groups:
+    - test/unit/data/repositories/api_user_repository_test.dart :: ApiUserRepository
+    - test/unit/data/repositories/api_user_repository_test.dart :: getUserProfile
+    - test/unit/data/repositories/api_user_repository_test.dart :: updateUserProfile
+- LocalSessionRepository [UNTESTED]
+  - test files:
+    - test/unit/data/repositories/local_session_repository_test.dart
+  - groups:
+    - test/unit/data/repositories/local_session_repository_test.dart :: auth token storage
+    - test/unit/data/repositories/local_session_repository_test.dart :: locale and onboarding
+    - test/unit/data/repositories/local_session_repository_test.dart :: LocalSessionRepository
+    - test/unit/data/repositories/local_session_repository_test.dart :: notification preferences
+    - test/unit/data/repositories/local_session_repository_test.dart :: theme preferences
 
----
+### Presentation
+- ActivitiesScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ActivitiesScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ActivitiesTab [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ReservationsTab [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ActivitiesViewModel
+  - test files:
+    - test/unit/presentation/activities/activities_view_model_test.dart
+    - test/unit/presentation/viewmodels/activities_view_model_test.dart
+  - groups:
+    - test/unit/presentation/activities/activities_view_model_test.dart :: ActivitiesViewModel
+    - test/unit/presentation/viewmodels/activities_view_model_test.dart :: (no group() found)
+- ReservationCard
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _StatusBadge
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- AuthStateNotifier [UNTESTED]
+  - test files:
+    - test/unit/presentation/auth/auth_state_notifier_test.dart
+    - test/unit/presentation/viewmodels/auth_state_notifier_test.dart
+  - groups:
+    - test/unit/presentation/auth/auth_state_notifier_test.dart :: AuthStateNotifier
+    - test/unit/presentation/viewmodels/auth_state_notifier_test.dart :: (no group() found)
+- ForgotPasswordScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ForgotPasswordScreenState
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ForgotPasswordViewModel
+  - test files:
+    - test/unit/presentation/auth/forgot_password/forgot_password_view_model_test.dart
+    - test/unit/presentation/viewmodels/forgot_password_view_model_test.dart
+  - groups:
+    - test/unit/presentation/auth/forgot_password/forgot_password_view_model_test.dart :: ForgotPasswordViewModel
+    - test/unit/presentation/viewmodels/forgot_password_view_model_test.dart :: (no group() found)
+- LoginScreen [UNTESTED]
+  - test files:
+    - test/widget/auth/login_screen_test.dart
+  - groups:
+    - test/widget/auth/login_screen_test.dart :: (no group() found)
+- _LoginScreenState [UNTESTED]
+  - test files:
+    - test/widget/auth/login_screen_test.dart
+  - groups:
+    - test/widget/auth/login_screen_test.dart :: (no group() found)
+- LoginViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/auth/login/login_view_model_test.dart
+  - groups:
+    - test/unit/presentation/auth/login/login_view_model_test.dart :: (no group() found)
+- NewPasswordScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _NewPasswordScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- NewPasswordViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/viewmodels/new_password_view_model_test.dart
+  - groups:
+    - test/unit/presentation/viewmodels/new_password_view_model_test.dart :: (no group() found)
+- OtpScreen [UNTESTED]
+  - test files:
+    - test/widget/auth/otp_screen_test.dart
+  - groups:
+    - test/widget/auth/otp_screen_test.dart :: OtpScreen -
+- _OtpScreenState [UNTESTED]
+  - test files:
+    - test/widget/auth/otp_screen_test.dart
+  - groups:
+    - test/widget/auth/otp_screen_test.dart :: OtpScreen -
+- OtpViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/auth/otp/otp_view_model_test.dart
+  - groups:
+    - test/unit/presentation/auth/otp/otp_view_model_test.dart :: OtpViewModel -
+- AccountSetupScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- FamilyOnboardingScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _FamilyOnboardingScreenState
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _MembersList
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- PinSetupScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _PinSetupScreenState
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _PinIndicator
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _NumericKeypad
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _KeypadButton
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- RegisterScreen [UNTESTED]
+  - test files:
+    - test/widget/auth/register_screen_test.dart
+  - groups:
+    - test/widget/auth/register_screen_test.dart :: RegisterScreen -
+- _RegisterScreenState [UNTESTED]
+  - test files:
+    - test/widget/auth/register_screen_test.dart
+  - groups:
+    - test/widget/auth/register_screen_test.dart :: RegisterScreen -
+- VerificationMethodScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _MethodCard
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- FamilyOnboardingViewModel
+  - test files:
+    - test/unit/presentation/viewmodels/family_onboarding_view_model_test.dart
+  - groups:
+    - test/unit/presentation/viewmodels/family_onboarding_view_model_test.dart :: (no group() found)
+- RegisterViewModel
+  - test files:
+    - test/unit/presentation/auth/register/register_view_model_test.dart
+  - groups:
+    - test/unit/presentation/auth/register/register_view_model_test.dart :: RegisterViewModel -
+- AuthBackground [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _GridPainter [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- AuthHeader [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- AuthTextField [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _AuthTextFieldState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- BookingFlowScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _BookingFlowScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- BookingSuccessScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _DetailItem
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- PaymentStep [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _SectionTitle [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _SummaryCard [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _SummaryRow [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _PaymentMethodSelector [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _PaymentOption [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _BottomPayButton [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SelectSportStep [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SelectTimeStep [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _DatePicker [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _TimeGrid [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _BottomActionBar [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- BookingViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/booking/booking_view_model_test.dart
+    - test/unit/presentation/viewmodels/booking_view_model_test.dart
+  - groups:
+    - test/unit/presentation/booking/booking_view_model_test.dart :: BookingViewModel
+    - test/unit/presentation/viewmodels/booking_view_model_test.dart :: BookingViewModel
+- ProgressStepper [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _StepCircle [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _StepLine [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- EmptyState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- EmptyStateScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- NoResultsScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- NotFoundScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _IconBadge
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- OfflineScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- BrandLogo [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- FamilyMemberCard [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- FamilyAccountToggle [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- FamilyMemberForm [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _GenderButton [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- HomeScreen [UNTESTED]
+  - test files:
+    - test/widget/home/home_screen_test.dart
+  - groups:
+    - test/widget/home/home_screen_test.dart :: (no group() found)
+- _HomeScreenState [UNTESTED]
+  - test files:
+    - test/widget/home/home_screen_test.dart
+  - groups:
+    - test/widget/home/home_screen_test.dart :: (no group() found)
+- HomeViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/home/home_view_model_test.dart
+    - test/unit/presentation/viewmodels/home_view_model_test.dart
+  - groups:
+    - test/unit/presentation/home/home_view_model_test.dart :: HomeViewModel
+    - test/unit/presentation/home/home_view_model_test.dart :: HomeViewModel fallback day coverage
+    - test/unit/presentation/viewmodels/home_view_model_test.dart :: (no group() found)
+- ActivityCard [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- TickerStrip [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _TickerStripState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- TodayCourseCard [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- MainLayout
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _MainLayoutState
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- NotificationsScreen [UNTESTED]
+  - test files:
+    - test/widget/notifications/notifications_screen_test.dart
+  - groups:
+    - test/widget/notifications/notifications_screen_test.dart :: (no group() found)
+- _NotificationsScreenState [UNTESTED]
+  - test files:
+    - test/widget/notifications/notifications_screen_test.dart
+  - groups:
+    - test/widget/notifications/notifications_screen_test.dart :: (no group() found)
+- _NotificationItem [UNTESTED]
+  - test files:
+    - test/widget/notifications/notifications_screen_test.dart
+  - groups:
+    - test/widget/notifications/notifications_screen_test.dart :: (no group() found)
+- NotificationsViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/notifications/notifications_view_model_test.dart
+    - test/unit/presentation/viewmodels/notifications_view_model_test.dart
+  - groups:
+    - test/unit/presentation/notifications/notifications_view_model_test.dart :: NotificationsViewModel
+    - test/unit/presentation/viewmodels/notifications_view_model_test.dart :: NotificationsViewModel
+- LanguageSelectionScreen
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _LanguageSelectionScreenState
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _LanguageOption
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- OnboardingScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- OnboardingViewModel
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- PlanningScreen [UNTESTED]
+  - test files:
+    - test/widget/planning/planning_screen_test.dart
+  - groups:
+    - test/widget/planning/planning_screen_test.dart :: (no group() found)
+- _PlanningScreenState [UNTESTED]
+  - test files:
+    - test/widget/planning/planning_screen_test.dart
+  - groups:
+    - test/widget/planning/planning_screen_test.dart :: (no group() found)
+- _DaySelector [UNTESTED]
+  - test files:
+    - test/widget/planning/planning_screen_test.dart
+  - groups:
+    - test/widget/planning/planning_screen_test.dart :: (no group() found)
+- _CourseList [UNTESTED]
+  - test files:
+    - test/widget/planning/planning_screen_test.dart
+  - groups:
+    - test/widget/planning/planning_screen_test.dart :: (no group() found)
+- PlanningViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/planning/planning_view_model_test.dart
+    - test/unit/presentation/viewmodels/planning_view_model_test.dart
+  - groups:
+    - test/unit/presentation/planning/planning_view_model_test.dart :: PlanningViewModel
+    - test/unit/presentation/viewmodels/planning_view_model_test.dart :: (no group() found)
+- CourseCard [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _TimeColumn [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _CategoryBadge [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ActionButton [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ChangePasswordScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ChangePasswordScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ChangePasswordViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/viewmodels/change_password_view_model_test.dart
+  - groups:
+    - test/unit/presentation/viewmodels/change_password_view_model_test.dart :: (no group() found)
+- EditProfileScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _EditProfileScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _AvatarSection [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- EditProfileViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/viewmodels/edit_profile_view_model_test.dart
+  - groups:
+    - test/unit/presentation/viewmodels/edit_profile_view_model_test.dart :: (no group() found)
+- FamilyManagementScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _FamilyManagementScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ChildrenSection [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- FamilyManagementViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/profile/family_management_view_model_test.dart
+    - test/unit/presentation/viewmodels/family_management_view_model_test.dart
+  - groups:
+    - test/unit/presentation/profile/family_management_view_model_test.dart :: FamilyManagementViewModel
+    - test/unit/presentation/viewmodels/family_management_view_model_test.dart :: (no group() found)
+- HistoryScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _HistoryScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _AccessTab [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _AccessMethodTile [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _CheckinHistoryList [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _HistoryTab [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- ProfileScreen [UNTESTED]
+  - test files:
+    - test/widget/profile/profile_screen_test.dart
+  - groups:
+    - test/widget/profile/profile_screen_test.dart :: ProfileScreen
+- _ProfileScreenState [UNTESTED]
+  - test files:
+    - test/widget/profile/profile_screen_test.dart
+  - groups:
+    - test/widget/profile/profile_screen_test.dart :: ProfileScreen
+- _StatsRow [UNTESTED]
+  - test files:
+    - test/widget/profile/profile_screen_test.dart
+  - groups:
+    - test/widget/profile/profile_screen_test.dart :: ProfileScreen
+- _StatItem [UNTESTED]
+  - test files:
+    - test/widget/profile/profile_screen_test.dart
+  - groups:
+    - test/widget/profile/profile_screen_test.dart :: ProfileScreen
+- _ProfileMenu [UNTESTED]
+  - test files:
+    - test/widget/profile/profile_screen_test.dart
+  - groups:
+    - test/widget/profile/profile_screen_test.dart :: ProfileScreen
+- _MenuItem [UNTESTED]
+  - test files:
+    - test/widget/profile/profile_screen_test.dart
+  - groups:
+    - test/widget/profile/profile_screen_test.dart :: ProfileScreen
+- _LogoutButton [UNTESTED]
+  - test files:
+    - test/widget/profile/profile_screen_test.dart
+  - groups:
+    - test/widget/profile/profile_screen_test.dart :: ProfileScreen
+- ProfileViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/profile/profile_view_model_test.dart
+    - test/unit/presentation/viewmodels/profile_view_model_test.dart
+  - groups:
+    - test/unit/presentation/profile/profile_view_model_test.dart :: ProfileViewModel
+    - test/unit/presentation/viewmodels/profile_view_model_test.dart :: (no group() found)
+- SubscriptionScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _SubscriptionScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _ActivePlanCard [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _BenefitItem [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SearchScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _SearchScreenState [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _SearchResultTile [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _RecentSearchesPlaceholder [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _NoResultsPlaceholder [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SearchViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/search/search_view_model_test.dart
+    - test/unit/presentation/viewmodels/search_view_model_test.dart
+  - groups:
+    - test/unit/presentation/search/search_view_model_test.dart :: SearchViewModel
+    - test/unit/presentation/viewmodels/search_view_model_test.dart :: (no group() found)
+- PrivacyPolicyScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _Section [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SettingsScreen [UNTESTED]
+  - test files:
+    - test/widget/settings/settings_screen_test.dart
+  - groups:
+    - test/widget/settings/settings_screen_test.dart :: SettingsScreen
+- _SettingsSection [UNTESTED]
+  - test files:
+    - test/widget/settings/settings_screen_test.dart
+  - groups:
+    - test/widget/settings/settings_screen_test.dart :: SettingsScreen
+- _SettingsTile [UNTESTED]
+  - test files:
+    - test/widget/settings/settings_screen_test.dart
+  - groups:
+    - test/widget/settings/settings_screen_test.dart :: SettingsScreen
+- _SettingsSwitchTile [UNTESTED]
+  - test files:
+    - test/widget/settings/settings_screen_test.dart
+  - groups:
+    - test/widget/settings/settings_screen_test.dart :: SettingsScreen
+- TermsOfServiceScreen [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- _Section [UNTESTED]
+  - test files:
+    - (none found)
+  - groups:
+    - (none found)
+- SettingsViewModel [UNTESTED]
+  - test files:
+    - test/unit/presentation/settings/settings_view_model_test.dart
+  - groups:
+    - test/unit/presentation/settings/settings_view_model_test.dart :: SettingsViewModel
 
-## Domain Layer Detail
 
-The domain layer contains pure business logic, entities, and use cases. It is independent of any infrastructure.
+Mocking strategy
 
-### [COVERED]
-- [failure.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/core/failure.dart)
-- [activity.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/activity.dart)
-- [get_activities_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/activity/get_activities_use_case.dart)
-- [get_time_slots_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/activity/get_time_slots_use_case.dart)
-- [complete_registration_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/complete_registration_use_case.dart)
-- [login_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/login_use_case.dart)
-- [logout_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/logout_use_case.dart)
-- [register_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/register_use_case.dart)
-- [request_family_account_otp_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/request_family_account_otp_use_case.dart)
-- [send_otp_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/send_otp_use_case.dart)
-- [update_password_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/update_password_use_case.dart)
-- [verify_otp_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/auth/verify_otp_use_case.dart)
-- [cancel_booking_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/booking/cancel_booking_use_case.dart)
-- [get_user_bookings_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/booking/get_user_bookings_use_case.dart)
-- [make_reservation_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/booking/make_reservation_use_case.dart)
-- [get_courses_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/course/get_courses_use_case.dart)
-- [get_notifications_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/notification/get_notifications_use_case.dart)
-- [get_locale_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/settings/get_locale_use_case.dart)
-- [get_notifications_enabled_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/settings/get_notifications_enabled_use_case.dart)
-- [get_theme_mode_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/settings/get_theme_mode_use_case.dart)
-- [is_language_selected_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/settings/is_language_selected_use_case.dart)
-- [set_locale_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/settings/set_locale_use_case.dart)
-- [set_notifications_enabled_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/settings/set_notifications_enabled_use_case.dart)
-- [set_theme_mode_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/settings/set_theme_mode_use_case.dart)
-- [get_user_profile_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/user/get_user_profile_use_case.dart)
-- [update_user_profile_use_case.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/usecases/user/update_user_profile_use_case.dart)
+- MockActivityRepository
+  - used in: test/unit/domain/usecases/activity/get_activities_use_case_test.dart,test/unit/domain/usecases/activity/get_time_slots_use_case_test.dart
+- MockApiClient
+  - used in: test/unit/data/repositories/api_activity_repository_test.dart,test/unit/data/repositories/api_auth_repository_test.dart,test/unit/data/repositories/api_course_repository_test.dart,test/unit/data/repositories/api_notification_repository_test.dart,test/unit/data/repositories/api_reservation_repository_test.dart,test/unit/data/repositories/api_user_repository_test.dart
+- MockAppLocalizations
+  - used in: test/unit/presentation/search/search_view_model_test.dart
+- MockAuthRepository
+  - used in: test/unit/domain/usecases/auth/complete_registration_use_case_test.dart,test/unit/domain/usecases/auth/login_use_case_test.dart,test/unit/domain/usecases/auth/logout_use_case_test.dart,test/unit/domain/usecases/auth/register_use_case_test.dart,test/unit/domain/usecases/auth/request_family_account_otp_use_case_test.dart,test/unit/domain/usecases/auth/send_otp_use_case_test.dart,test/unit/domain/usecases/auth/update_password_use_case_test.dart,test/unit/domain/usecases/auth/verify_otp_use_case_test.dart,test/unit/presentation/auth/auth_state_notifier_test.dart,test/unit/presentation/viewmodels/auth_state_notifier_test.dart
+- MockAuthStateNotifier
+  - used in: test/widget_test.dart
+- MockBookingViewModel
+  - used in: test/widget/presentation/booking/booking_flow_widget_test.dart
+- MockCancelBookingUseCase
+  - used in: test/unit/presentation/booking/booking_view_model_test.dart,test/unit/presentation/viewmodels/booking_view_model_test.dart
+- MockCourseRepository
+  - used in: test/unit/domain/usecases/course/get_courses_use_case_test.dart
+- MockGetActivities
+  - used in: test/unit/presentation/viewmodels/activities_view_model_test.dart,test/unit/presentation/viewmodels/home_view_model_test.dart,test/unit/presentation/viewmodels/search_view_model_test.dart,test/widget/home/home_screen_test.dart
+- MockGetActivitiesUseCase
+  - used in: test/unit/presentation/activities/activities_view_model_test.dart,test/unit/presentation/booking/booking_view_model_test.dart,test/unit/presentation/search/search_view_model_test.dart,test/unit/presentation/viewmodels/booking_view_model_test.dart
+- MockGetCourses
+  - used in: test/unit/presentation/viewmodels/home_view_model_test.dart,test/unit/presentation/viewmodels/planning_view_model_test.dart,test/unit/presentation/viewmodels/search_view_model_test.dart,test/widget/home/home_screen_test.dart
+- MockGetCoursesUseCase
+  - used in: test/unit/presentation/planning/planning_view_model_test.dart,test/unit/presentation/search/search_view_model_test.dart
+- MockGetTimeSlotsUseCase
+  - used in: test/unit/presentation/booking/booking_view_model_test.dart,test/unit/presentation/viewmodels/booking_view_model_test.dart
+- MockGetUserBookings
+  - used in: test/unit/presentation/viewmodels/activities_view_model_test.dart
+- MockGetUserBookingsUseCase
+  - used in: test/unit/presentation/activities/activities_view_model_test.dart,test/unit/presentation/booking/booking_view_model_test.dart,test/unit/presentation/viewmodels/booking_view_model_test.dart
+- MockGetUserProfileUseCase
+  - used in: test/unit/presentation/profile/family_management_view_model_test.dart,test/unit/presentation/profile/profile_view_model_test.dart,test/unit/presentation/viewmodels/profile_view_model_test.dart,test/widget/profile/profile_screen_test.dart
+- MockGetUser
+  - used in: test/unit/presentation/viewmodels/edit_profile_view_model_test.dart,test/unit/presentation/viewmodels/family_management_view_model_test.dart
+- MockGoRouter
+  - used in: test/widget/presentation/booking/booking_flow_widget_test.dart
+- MockHttpClientRequest
+  - used in: test/widget/profile/profile_screen_test.dart
+- MockHttpClientResponse
+  - used in: test/widget/profile/profile_screen_test.dart
+- MockHttpClient
+  - used in: test/unit/data/api/api_client_test.dart,test/widget/profile/profile_screen_test.dart
+- MockHttpHeaders
+  - used in: test/widget/profile/profile_screen_test.dart
+- MockLoginUseCase
+  - used in: test/unit/presentation/auth/login/login_view_model_test.dart,test/widget/auth/login_screen_test.dart
+- MockLogoutUseCase
+  - used in: test/unit/presentation/profile/profile_view_model_test.dart,test/unit/presentation/viewmodels/profile_view_model_test.dart,test/widget/profile/profile_screen_test.dart
+- MockMakeReservationUseCase
+  - used in: test/unit/presentation/booking/booking_view_model_test.dart,test/unit/presentation/viewmodels/booking_view_model_test.dart
+- MockNotificationRepository
+  - used in: test/unit/domain/usecases/notification/get_notifications_use_case_test.dart
+- MockNotificationsViewModel
+  - used in: test/widget/notifications/notifications_screen_test.dart
+- MockPlanningViewModel
+  - used in: test/widget/planning/planning_screen_test.dart
+- MockRegisterUseCase
+  - used in: test/unit/presentation/auth/register/register_view_model_test.dart,test/widget/auth/register_screen_test.dart
+- MockRequestFamilyAccountOtpUseCase
+  - used in: test/unit/presentation/profile/family_management_view_model_test.dart
+- MockRequestOtp
+  - used in: test/unit/presentation/viewmodels/family_management_view_model_test.dart
+- MockReservationRepository
+  - used in: test/unit/domain/usecases/booking/cancel_booking_use_case_test.dart,test/unit/domain/usecases/booking/get_user_bookings_use_case_test.dart,test/unit/domain/usecases/booking/make_reservation_use_case_test.dart
+- MockSendOtpUseCase
+  - used in: test/unit/presentation/auth/otp/otp_view_model_test.dart,test/widget/auth/otp_screen_test.dart
+- MockSessionRepository
+  - used in: test/unit/data/repositories/api_auth_repository_test.dart,test/unit/domain/usecases/settings/get_locale_use_case_test.dart,test/unit/domain/usecases/settings/get_notifications_enabled_use_case_test.dart,test/unit/domain/usecases/settings/is_language_selected_use_case_test.dart,test/unit/domain/usecases/settings/set_locale_use_case_test.dart,test/unit/domain/usecases/settings/set_notifications_enabled_use_case_test.dart
+- MockSettingsViewModel
+  - used in: test/widget/settings/settings_screen_test.dart,test/widget_test.dart
+- MockSharedPreferences
+  - used in: test/unit/data/repositories/local_session_repository_test.dart
+- MockStreamSubscription
+  - used in: test/widget/profile/profile_screen_test.dart
+- MockUpdatePasswordUseCase
+  - used in: test/unit/presentation/viewmodels/change_password_view_model_test.dart
+- MockUpdateUserProfileUseCase
+  - used in: test/unit/presentation/profile/family_management_view_model_test.dart,test/unit/presentation/profile/profile_view_model_test.dart,test/unit/presentation/viewmodels/profile_view_model_test.dart,test/widget/profile/profile_screen_test.dart
+- MockUpdateUser
+  - used in: test/unit/presentation/viewmodels/edit_profile_view_model_test.dart,test/unit/presentation/viewmodels/family_management_view_model_test.dart
+- MockUserRepository
+  - used in: test/unit/domain/usecases/user/get_user_profile_use_case_test.dart,test/unit/domain/usecases/user/update_user_profile_use_case_test.dart
+- MockVerifyOtp
+  - used in: test/unit/presentation/viewmodels/family_management_view_model_test.dart
+- MockVerifyOtpUseCase
+  - used in: test/unit/presentation/auth/otp/otp_view_model_test.dart,test/unit/presentation/profile/family_management_view_model_test.dart,test/widget/auth/otp_screen_test.dart
 
-### [UNTESTED]
-- [user.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/user.dart) (97.9%)
-- [child_profile.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/child_profile.dart) (96.2%)
-- [subscription.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/subscription.dart) (60.0%)
-- [notification.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/notification.dart) (32.0%)
-- [time_slot.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/time_slot.dart) (25.0%)
-- [course.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/course.dart) (14.8%)
-- [search_result.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/search_result.dart) (11.8%)
-- [reservation.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/domain/entities/reservation.dart) (8.0%)
+How to run
 
----
+- full suite: flutter test --reporter=expanded
+- per layer:
+  - domain: flutter test test/unit/domain
+  - data: flutter test test/unit/data
+  - presentation: flutter test test/unit/presentation
+  - widget: flutter test test/widget
+- single file: flutter test test/unit/core/utils/result_test.dart
+- single test by name: flutter test --plain-name "GetActivitiesUseCase returns the activity list on success"
+- with coverage: flutter test --coverage
+- coverage summary (use this instead of lcov --list): flutter test --coverage && lcov --summary coverage/lcov.info
 
-## Core Layer Detail
+Remaining gaps
 
-The core layer includes shared utilities, dependency injection, and theme configurations.
+- files below 80%:
+  - lib/core/di/locator.dart 0.0%
+  - lib/core/theme/bourgo_theme.dart 0.0%
+  - lib/core/utils/result.dart 0.0%
+  - lib/data/api/api_client.dart 0.0%
+  - lib/data/api/api_error_handler.dart 0.0%
+  - lib/data/api/api_exceptions.dart 0.0%
+  - lib/data/mappers/activity_mapper.dart 0.0%
+  - lib/data/mappers/course_mapper.dart 0.0%
+  - lib/data/mappers/notification_mapper.dart 0.0%
+  - lib/data/mappers/reservation_mapper.dart 0.0%
+  - lib/data/mappers/time_slot_mapper.dart 0.0%
+  - lib/data/mappers/user_mapper.dart 0.0%
+  - lib/data/models/activity_model.dart 0.0%
+  - lib/data/models/activity_model.g.dart 0.0%
+  - lib/data/models/child_profile_model.dart 0.0%
+  - lib/data/models/child_profile_model.g.dart 0.0%
+  - lib/data/models/course_model.dart 0.0%
+  - lib/data/models/course_model.g.dart 0.0%
+  - lib/data/models/notification_model.dart 0.0%
+  - lib/data/models/notification_model.g.dart 0.0%
+  - lib/data/models/reservation_model.dart 0.0%
+  - lib/data/models/reservation_model.g.dart 0.0%
+  - lib/data/models/time_slot_model.dart 0.0%
+  - lib/data/models/time_slot_model.g.dart 0.0%
+  - lib/data/models/user_profile_model.dart 0.0%
+  - lib/data/models/user_profile_model.g.dart 0.0%
+  - lib/data/repositories/api_activity_repository.dart 0.0%
+  - lib/data/repositories/api_auth_repository.dart 0.0%
+  - lib/data/repositories/api_course_repository.dart 0.0%
+  - lib/data/repositories/api_notification_repository.dart 0.0%
+  - lib/data/repositories/api_reservation_repository.dart 0.0%
+  - lib/data/repositories/api_user_repository.dart 0.0%
+  - lib/data/repositories/local_session_repository.dart 0.0%
+  - lib/domain/core/failure.dart 0.0%
+  - lib/domain/entities/activity.dart 0.0%
+  - lib/domain/entities/child_profile.dart 0.0%
+  - lib/domain/entities/course.dart 0.0%
+  - lib/domain/entities/notification.dart 0.0%
+  - lib/domain/entities/reservation.dart 0.0%
+  - lib/domain/entities/search_result.dart 0.0%
+  - lib/domain/entities/subscription.dart 0.0%
+  - lib/domain/entities/time_slot.dart 0.0%
+  - lib/domain/entities/user.dart 0.0%
+  - lib/domain/usecases/activity/get_activities_use_case.dart 0.0%
+  - lib/domain/usecases/activity/get_time_slots_use_case.dart 0.0%
+  - lib/domain/usecases/auth/complete_registration_use_case.dart 0.0%
+  - lib/domain/usecases/auth/login_use_case.dart 0.0%
+  - lib/domain/usecases/auth/logout_use_case.dart 0.0%
+  - lib/domain/usecases/auth/register_use_case.dart 0.0%
+  - lib/domain/usecases/auth/request_family_account_otp_use_case.dart 0.0%
+  - lib/domain/usecases/auth/send_otp_use_case.dart 0.0%
+  - lib/domain/usecases/auth/update_password_use_case.dart 0.0%
+  - lib/domain/usecases/auth/verify_otp_use_case.dart 0.0%
+  - lib/domain/usecases/booking/cancel_booking_use_case.dart 0.0%
+  - lib/domain/usecases/booking/get_user_bookings_use_case.dart 0.0%
+  - lib/domain/usecases/booking/make_reservation_use_case.dart 0.0%
+  - lib/domain/usecases/course/get_courses_use_case.dart 0.0%
+  - lib/domain/usecases/notification/get_notifications_use_case.dart 0.0%
+  - lib/domain/usecases/settings/get_locale_use_case.dart 0.0%
+  - lib/domain/usecases/settings/get_notifications_enabled_use_case.dart 0.0%
+  - lib/domain/usecases/settings/get_theme_mode_use_case.dart 0.0%
+  - lib/domain/usecases/settings/is_language_selected_use_case.dart 0.0%
+  - lib/domain/usecases/settings/set_locale_use_case.dart 0.0%
+  - lib/domain/usecases/settings/set_notifications_enabled_use_case.dart 0.0%
+  - lib/domain/usecases/settings/set_theme_mode_use_case.dart 0.0%
+  - lib/domain/usecases/user/get_user_profile_use_case.dart 0.0%
+  - lib/domain/usecases/user/update_user_profile_use_case.dart 0.0%
+  - lib/l10n/app_localizations.dart 0.0%
+  - lib/l10n/app_localizations_en.dart 0.0%
+  - lib/l10n/app_localizations_fr.dart 0.0%
+  - lib/main.dart 0.0%
+  - lib/presentation/activities/activities_screen.dart 0.0%
+  - lib/presentation/activities/viewmodels/...vities_view_model.dart 0.0%
+  - lib/presentation/auth/auth_state_notifier.dart 0.0%
+  - lib/presentation/auth/forgot_password/f...ssword_view_model.dart 0.0%
+  - lib/presentation/auth/forgot_password/f...t_password_screen.dart 0.0%
+  - lib/presentation/auth/login/login_screen.dart 0.0%
+  - lib/presentation/auth/login/viewmodels/login_view_model.dart 0.0%
+  - lib/presentation/auth/new_password/new_password_screen.dart 0.0%
+  - lib/presentation/auth/new_password/new_password_view_model.dart 0.0%
+  - lib/presentation/auth/otp/otp_screen.dart 0.0%
+  - lib/presentation/auth/otp/otp_view_model.dart 0.0%
+  - lib/presentation/auth/register/register_screen.dart 0.0%
+  - lib/presentation/auth/register/viewmode...arding_view_model.dart 0.0%
+  - lib/presentation/auth/register/viewmode...gister_view_model.dart 0.0%
+  - lib/presentation/auth/widgets/auth_background.dart 0.0%
+  - lib/presentation/auth/widgets/auth_header.dart 0.0%
+  - lib/presentation/auth/widgets/auth_text_field.dart 0.0%
+  - lib/presentation/booking/booking_flow_screen.dart 0.0%
+  - lib/presentation/booking/steps/payment_step.dart 0.0%
+  - lib/presentation/booking/steps/select_sport_step.dart 0.0%
+  - lib/presentation/booking/steps/select_time_step.dart 0.0%
+  - lib/presentation/booking/viewmodels/booking_view_model.dart 0.0%
+  - lib/presentation/booking/widgets/progress_stepper.dart 0.0%
+  - lib/presentation/common/empty_state.dart 0.0%
+  - lib/presentation/common/offline_screen.dart 0.0%
+  - lib/presentation/common/widgets/brand_logo.dart 0.0%
+  - lib/presentation/common/widgets/family_member_widgets.dart 0.0%
+  - lib/presentation/home/home_screen.dart 0.0%
+  - lib/presentation/home/home_view_model.dart 0.0%
+  - lib/presentation/home/widgets/activity_card.dart 0.0%
+  - lib/presentation/home/widgets/ticker_strip.dart 0.0%
+  - lib/presentation/home/widgets/today_course_card.dart 0.0%
+  - lib/presentation/notifications/notifications_screen.dart 0.0%
+  - lib/presentation/notifications/notifications_view_model.dart 0.0%
+  - lib/presentation/onboarding/onboarding_screen.dart 0.0%
+  - lib/presentation/planning/planning_screen.dart 0.0%
+  - lib/presentation/planning/planning_view_model.dart 0.0%
+  - lib/presentation/planning/widgets/course_card.dart 0.0%
+  - lib/presentation/profile/change_password_screen.dart 0.0%
+  - lib/presentation/profile/change_password_view_model.dart 0.0%
+  - lib/presentation/profile/edit_profile_screen.dart 0.0%
+  - lib/presentation/profile/edit_profile_view_model.dart 0.0%
+  - lib/presentation/profile/family_management_screen.dart 0.0%
+  - lib/presentation/profile/family_management_view_model.dart 0.0%
+  - lib/presentation/profile/history_screen.dart 0.0%
+  - lib/presentation/profile/profile_screen.dart 0.0%
+  - lib/presentation/profile/profile_view_model.dart 0.0%
+  - lib/presentation/profile/subscription_screen.dart 0.0%
+  - lib/presentation/search/search_screen.dart 0.0%
+  - lib/presentation/search/search_view_model.dart 0.0%
+  - lib/presentation/settings/privacy_policy_screen.dart 0.0%
+  - lib/presentation/settings/settings_screen.dart 0.0%
+  - lib/presentation/settings/terms_of_service_screen.dart 0.0%
+  - lib/presentation/settings/viewmodels/settings_view_model.dart 0.0%
+  - lib/router.dart 0.0%
+- test files with fewer than 3 cases:
+  - test/test_utils.dart (0 test() calls)
+  - test/unit/core/di/locator_test.dart (2 test() calls)
+  - test/unit/data/api/api_client_test.dart (2 test() calls)
+  - test/unit/data/mappers/mapper_test_fixtures.dart (0 test() calls)
+  - test/unit/data/models/activity_model_test.dart (2 test() calls)
+  - test/unit/data/models/child_profile_model_test.dart (2 test() calls)
+  - test/unit/data/models/notification_model_test.dart (1 test() calls)
+  - test/unit/data/models/reservation_model_test.dart (1 test() calls)
+  - test/unit/data/models/time_slot_model_test.dart (2 test() calls)
+  - test/unit/data/repositories/repository_test_fixtures.dart (0 test() calls)
+  - test/unit/domain/usecases/usecase_test_fixtures.dart (0 test() calls)
+  - test/unit/presentation/auth/forgot_password/forgot_password_view_model_test.dart (2 test() calls)
+  - test/unit/presentation/auth/login/login_view_model_test.dart (0 test() calls)
+  - test/unit/presentation/auth/register/register_view_model_test.dart (0 test() calls)
+  - test/unit/presentation/viewmodels/auth_state_notifier_test.dart (1 test() calls)
+  - test/widget/auth/login_screen_test.dart (0 test() calls)
+  - test/widget/auth/otp_screen_test.dart (0 test() calls)
+  - test/widget/auth/register_screen_test.dart (0 test() calls)
+  - test/widget/home/home_screen_test.dart (0 test() calls)
+  - test/widget/notifications/notifications_screen_test.dart (0 test() calls)
+  - test/widget/planning/planning_screen_test.dart (0 test() calls)
+  - test/widget/presentation/booking/booking_flow_widget_test.dart (0 test() calls)
+  - test/widget/presentation/notifications/notifications_screen_widget_test.dart (0 test() calls)
+  - test/widget/presentation/planning/planning_screen_widget_test.dart (0 test() calls)
+  - test/widget/presentation/search/search_screen_widget_test.dart (0 test() calls)
+  - test/widget/presentation/settings/settings_screen_widget_test.dart (0 test() calls)
+  - test/widget/profile/profile_screen_test.dart (0 test() calls)
+  - test/widget/settings/settings_screen_test.dart (0 test() calls)
+  - test/widget_test.dart (0 test() calls)
 
-### [COVERED]
-*No files in the core layer have reached 100% coverage.*
+Conventions
 
-### [UNTESTED]
-- [result.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/core/utils/result.dart) (90.5%)
-- [bourgo_theme.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/core/theme/bourgo_theme.dart) (77.3%)
-- [locator.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/core/di/locator.dart) (1.7%)
+- naming: use *_test.dart and mirror source path under test/unit or test/widget
+- structure: keep arrange-act-assert and group related scenarios with group()
+- forbidden: flaky timing assertions, hidden network calls, fixture imports in generated files, and unchecked async expectations
 
----
-
-## Presentation Layer Detail
-
-The presentation layer includes view models, screens, and widgets. Coverage here reflects the extent of widget and view model testing.
-
-### [COVERED]
-- [login_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/login/viewmodels/login_view_model.dart)
-- [otp_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/otp/otp_view_model.dart)
-- [auth_background.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/widgets/auth_background.dart)
-- [progress_stepper.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/booking/widgets/progress_stepper.dart)
-- [activity_card.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/home/widgets/activity_card.dart)
-- [ticker_strip.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/home/widgets/ticker_strip.dart)
-- [notifications_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/notifications/notifications_view_model.dart)
-- [settings_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/settings/viewmodels/settings_view_model.dart)
-
-### [UNTESTED]
-- [otp_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/otp/otp_screen.dart) (99.0%)
-- [booking_flow_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/booking/booking_flow_screen.dart) (97.8%)
-- [select_time_step.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/booking/steps/select_time_step.dart) (97.1%)
-- [planning_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/planning/planning_view_model.dart) (96.8%)
-- [today_course_card.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/home/widgets/today_course_card.dart) (96.4%)
-- [profile_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/profile_screen.dart) (96.3%)
-- [auth_text_field.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/widgets/auth_text_field.dart) (96.1%)
-- [auth_header.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/widgets/auth_header.dart) (96.0%)
-- [course_card.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/planning/widgets/course_card.dart) (95.4%)
-- [onboarding_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/onboarding/onboarding_screen.dart) (94.9%)
-- [payment_step.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/booking/steps/payment_step.dart) (94.8%)
-- [search_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/search/search_view_model.dart) (94.5%)
-- [profile_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/profile_view_model.dart) (94.4%)
-- [home_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/home/home_screen.dart) (93.3%)
-- [notifications_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/notifications/notifications_screen.dart) (93.3%)
-- [login_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/login/login_screen.dart) (92.3%)
-- [register_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/register/viewmodels/register_view_model.dart) (91.5%)
-- [select_sport_step.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/booking/steps/select_sport_step.dart) (88.9%)
-- [search_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/search/search_screen.dart) (88.0%)
-- [register_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/register/register_screen.dart) (84.7%)
-- [home_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/home/home_view_model.dart) (82.1%)
-- [empty_state.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/common/empty_state.dart) (81.8%)
-- [booking_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/booking/viewmodels/booking_view_model.dart) (77.9%)
-- [settings_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/settings/settings_screen.dart) (77.4%)
-- [brand_logo.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/common/widgets/brand_logo.dart) (75.0%)
-- [planning_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/planning/planning_screen.dart) (70.0%)
-- [family_member_widgets.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/common/widgets/family_member_widgets.dart) (16.7%)
-- [offline_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/common/offline_screen.dart) (3.7%)
-- [privacy_policy_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/settings/privacy_policy_screen.dart) (3.2%)
-- [terms_of_service_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/settings/terms_of_service_screen.dart) (3.2%)
-- [forgot_password_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/forgot_password/forgot_password_screen.dart) (2.4%)
-- [new_password_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/new_password/new_password_screen.dart) (1.9%)
-- [history_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/history_screen.dart) (1.4%)
-- [activities_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/activities/activities_screen.dart) (1.2%)
-- [subscription_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/subscription_screen.dart) (1.1%)
-- [change_password_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/change_password_screen.dart) (1.0%)
-- [edit_profile_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/edit_profile_screen.dart) (0.9%)
-- [family_management_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/family_management_screen.dart) (0.6%)
-- [auth_state_notifier.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/auth_state_notifier.dart) (0.0%)
-- [activities_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/activities/viewmodels/activities_view_model.dart) (0.0%)
-- [reservation_card.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/activities/widgets/reservation_card.dart) (0.0%)
-- [main_layout.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/main_layout.dart) (0.0%)
-- [forgot_password_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/forgot_password/forgot_password_view_model.dart) (0.0%)
-- [new_password_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/new_password/new_password_view_model.dart) (0.0%)
-- [account_setup_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/register/account_setup_screen.dart) (0.0%)
-- [family_onboarding_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/register/family_onboarding_screen.dart) (0.0%)
-- [family_onboarding_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/register/viewmodels/family_onboarding_view_model.dart) (0.0%)
-- [pin_setup_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/register/pin_setup_screen.dart) (0.0%)
-- [verification_method_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/auth/register/verification_method_screen.dart) (0.0%)
-- [booking_success_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/booking/booking_success_screen.dart) (0.0%)
-- [not_found_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/common/not_found_screen.dart) (0.0%)
-- [language_selection_screen.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/onboarding/language_selection_screen.dart) (0.0%)
-- [change_password_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/change_password_view_model.dart) (0.0%)
-- [edit_profile_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/edit_profile_view_model.dart) (0.0%)
-- [family_management_view_model.dart](file:///home/vortex/Desktop/Projects/bourgo-arena-mobile/lib/presentation/profile/family_management_view_model.dart) (0.0%)
+Last updated: May 9, 2026
+Test run result: 01:17 +404: All tests passed!
+Coverage:
+Summary coverage rate:
+  lines......: 56.5% (3304 of 5844 lines)
+  functions..: no data found
+  branches...: no data found

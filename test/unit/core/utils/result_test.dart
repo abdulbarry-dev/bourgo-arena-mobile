@@ -35,7 +35,7 @@ void main() {
     final r = Result<String, Failure>.success('a');
     final next = r.fold(
       onFailure: (f) => Result<String, Failure>.success('fail'),
-      onSuccess: (v) => Result<String, Failure>.success(v + 'b'),
+      onSuccess: (v) => Result<String, Failure>.success('${v}b'),
     );
     expect(next.isSuccess, isTrue);
     expect((next as Success).data, 'ab');
