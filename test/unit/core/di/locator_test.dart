@@ -34,7 +34,7 @@ void main() {
       check(locator.isRegistered<ApiClient>()).isTrue();
       check(locator.isRegistered<AuthRepository>()).isTrue();
       check(locator.isRegistered<AuthStateNotifier>()).isTrue();
-      
+
       // Verify singleton behavior
       final instance1 = locator<AuthRepository>();
       final instance2 = locator<AuthRepository>();
@@ -43,7 +43,7 @@ void main() {
 
     test('All use cases are registered', () async {
       await initLocator();
-      
+
       // Checking a subset of use cases to verify the registrations in locator.dart
       check(locator.isRegistered<LoginUseCase>()).isTrue();
       check(locator.isRegistered<LogoutUseCase>()).isTrue();
@@ -52,4 +52,3 @@ void main() {
     });
   });
 }
-

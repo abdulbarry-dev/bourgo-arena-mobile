@@ -18,7 +18,7 @@ class NotificationModel {
   final String timestamp;
 
   /// Type of notification (booking, promotion, system).
-  final String type;
+  final String? type;
 
   /// Whether the notification has been read.
   final bool isRead;
@@ -29,7 +29,7 @@ class NotificationModel {
     required this.title,
     required this.message,
     required this.timestamp,
-    required this.type,
+    this.type,
     required this.isRead,
   });
 

@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:checks/checks.dart';
 
 void main() {
   group('NotificationModel', () {
@@ -16,12 +17,29 @@ void main() {
       final json = model.toJson();
       final fromJson = NotificationModel.fromJson(json);
 
-      expect(fromJson.id, model.id);
-      expect(fromJson.title, model.title);
-      expect(fromJson.message, model.message);
-      expect(fromJson.timestamp, model.timestamp);
-      expect(fromJson.type, model.type);
-      expect(fromJson.isRead, model.isRead);
+      check(fromJson.id).equals(model.id);
+      check(fromJson.title).equals(model.title);
+      check(fromJson.message).equals(model.message);
+      check(fromJson.timestamp).equals(model.timestamp);
+      check(fromJson.type).equals(model.type);
+      check(fromJson.isRead).equals(model.isRead);
+    });
+
+    test('fromJson should handle null optional fields', () {
+      final json = {
+        'id': 'notif-2',
+        'title': 'No Type',
+        'message': 'Message without type',
+        'timestamp': '2026-05-09T11:00:00Z',
+        'type': null,
+        'is_read': true,
+      };
+
+      final model = NotificationModel.fromJson(json);
+
+      check(model.type).isNull();
+      check(model.id).equals('notif-2');
+      check(model.isRead).isTrue();
     });
   });
 }

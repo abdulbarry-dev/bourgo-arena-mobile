@@ -12,12 +12,16 @@ class PlanningViewModel extends ChangeNotifier {
   bool _isLoading = false;
   int _selectedDay = 1; // Monday by default
   String _selectedCategory = AppConstants.planningCategoryAll;
+  String? _errorMessage;
 
   /// List of courses filtered by the selected day and category.
   List<Course> get courses => _filteredCourses;
 
   /// Whether data is currently being loaded.
   bool get isLoading => _isLoading;
+
+  /// Any error message from loading.
+  String? get errorMessage => _errorMessage;
 
   /// Currently selected day of the week (1-7).
   int get selectedDay => _selectedDay;
@@ -34,6 +38,7 @@ class PlanningViewModel extends ChangeNotifier {
   /// Loads courses from the data service.
   Future<void> loadCourses() async {
     _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -44,11 +49,13 @@ class PlanningViewModel extends ChangeNotifier {
           _filter();
         },
         failure: (failure) {
-          // Handle error
+          _errorMessage = failure.message;
+          _allCourses = [];
+          _filter();
         },
       );
     } catch (e) {
-      // Handle error
+      _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();

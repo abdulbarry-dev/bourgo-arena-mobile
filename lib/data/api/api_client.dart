@@ -27,6 +27,8 @@ class ApiClient {
       return _handleResponse(response);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
+    } on http.ClientException catch (e) {
+      throw NetworkException(e.message);
     } on TimeoutException catch (e) {
       throw NetworkException(e.message ?? 'Request timed out');
     }
@@ -44,6 +46,8 @@ class ApiClient {
           .timeout(const Duration(seconds: 15));
       return _handleResponse(response);
     } on SocketException catch (e) {
+      throw NetworkException(e.message);
+    } on http.ClientException catch (e) {
       throw NetworkException(e.message);
     } on TimeoutException catch (e) {
       throw NetworkException(e.message ?? 'Request timed out');
@@ -63,6 +67,8 @@ class ApiClient {
       return _handleResponse(response);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
+    } on http.ClientException catch (e) {
+      throw NetworkException(e.message);
     } on TimeoutException catch (e) {
       throw NetworkException(e.message ?? 'Request timed out');
     }
@@ -76,6 +82,8 @@ class ApiClient {
           .timeout(const Duration(seconds: 15));
       _handleResponse(response);
     } on SocketException catch (e) {
+      throw NetworkException(e.message);
+    } on http.ClientException catch (e) {
       throw NetworkException(e.message);
     } on TimeoutException catch (e) {
       throw NetworkException(e.message ?? 'Request timed out');

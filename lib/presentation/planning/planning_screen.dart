@@ -52,6 +52,15 @@ class _PlanningScreenState extends State<PlanningScreen> {
               Expanded(
                 child: _viewModel.isLoading
                     ? const Center(child: CircularProgressIndicator())
+                    : _viewModel.errorMessage != null
+                    ? Center(
+                        child: Text(
+                          _viewModel.errorMessage!,
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            color: theme.colorScheme.error,
+                          ),
+                        ),
+                      )
                     : _CourseList(viewModel: _viewModel),
               ),
             ],

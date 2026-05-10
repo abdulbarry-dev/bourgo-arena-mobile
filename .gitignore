@@ -93,3 +93,8 @@ coverage_summary_final.txt
 test_file_list_final.txt
 test_run_final.txt
 Makefile
+coverage_summary_clean.txt
+test_count_per_file.txt
+test_names_export.txt
+test_run_clean.txt
+thin_test_files.txt

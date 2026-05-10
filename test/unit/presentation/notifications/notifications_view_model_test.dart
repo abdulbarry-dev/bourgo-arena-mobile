@@ -91,9 +91,9 @@ void main() {
       check(allRead).isTrue();
     });
     test('markAllAsRead does nothing if notifications are null', () async {
-      when(() => mockGetNotifications()).thenAnswer(
-        (_) async => FailureResult(const ServerFailure('Error')),
-      );
+      when(
+        () => mockGetNotifications(),
+      ).thenAnswer((_) async => FailureResult(const ServerFailure('Error')));
 
       final viewModel = NotificationsViewModel(
         getNotificationsUseCase: mockGetNotifications,

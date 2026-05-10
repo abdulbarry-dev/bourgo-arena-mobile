@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
@@ -100,6 +101,48 @@ void main() {
       viewModel.selectCategory(AppConstants.planningCategoryAll);
 
       check(viewModel.courses).has((l) => l.length, 'length').equals(2);
+    });
+
+    test(
+      'loadCourses with empty list results in empty courses state',
+      () async {
+        when(
+          () => mockGetCourses(),
+        ).thenAnswer((_) async => Result.success([]));
+
+        await viewModel.loadCourses();
+
+        check(viewModel.isLoading).isFalse();
+        check(viewModel.courses).isEmpty();
+      },
+    );
+
+    test(
+      'selectCategory with no matching courses results in empty courses state',
+      () async {
+        await Future.delayed(Duration.zero);
+
+        // Fitness is only on Tuesday (day 2) in test data.
+        // Monday (day 1) is selected by default.
+        viewModel.selectCategory(AppConstants.planningCategoryFitness);
+
+        check(
+          viewModel.selectedCategory,
+        ).equals(AppConstants.planningCategoryFitness);
+        check(viewModel.courses).isEmpty();
+      },
+    );
+
+    test('loadCourses sets failure state on error', () async {
+      when(() => mockGetCourses()).thenAnswer(
+        (_) async => Result.failure(const ServerFailure('Load failed')),
+      );
+
+      await viewModel.loadCourses();
+
+      check(viewModel.isLoading).isFalse();
+      check(viewModel.errorMessage).isNotNull().equals('Load failed');
+      check(viewModel.courses).isEmpty();
     });
   });
 }

@@ -19,6 +19,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   Future<void> login(BuildContext context) async {
+    if (_isLoading) return;
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
 

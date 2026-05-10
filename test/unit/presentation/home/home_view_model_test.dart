@@ -86,23 +86,25 @@ void main() {
       check(listenerCalled).isTrue();
     });
 
-    test('loadHomeData success populates activities and today courses',
-        () async {
-      when(
-        () => mockGetActivities(),
-      ).thenAnswer((_) async => Result.success(testActivities));
-      when(
-        () => mockGetCourses(),
-      ).thenAnswer((_) async => Result.success(testCourses));
+    test(
+      'loadHomeData success populates activities and today courses',
+      () async {
+        when(
+          () => mockGetActivities(),
+        ).thenAnswer((_) async => Result.success(testActivities));
+        when(
+          () => mockGetCourses(),
+        ).thenAnswer((_) async => Result.success(testCourses));
 
-      await viewModel.loadHomeData();
+        await viewModel.loadHomeData();
 
-      check(viewModel.isLoading).isFalse();
-      check(viewModel.activities).deepEquals(testActivities);
-      // Only one course matches today's weekday
-      check(viewModel.todayCourses).length.equals(1);
-      check(viewModel.todayCourses.first.id).equals('c1');
-    });
+        check(viewModel.isLoading).isFalse();
+        check(viewModel.activities).deepEquals(testActivities);
+        // Only one course matches today's weekday
+        check(viewModel.todayCourses).length.equals(1);
+        check(viewModel.todayCourses.first.id).equals('c1');
+      },
+    );
 
     test('loadHomeData failure handles errors gracefully', () async {
       when(
@@ -129,36 +131,43 @@ void main() {
       check(viewModel.activities).isEmpty();
       check(viewModel.todayCourses).isEmpty();
     });
-   group('HomeViewModel fallback day coverage', () {
-      test('correctly filters courses for current day when weekday is 7', () async {
-        // Mock current day as Sunday (7)
-        final sundayCourse = entity.Course(
-          id: 'sunday',
-          title: 'Sunday Yoga',
-          instructor: 'Sarah',
-          startTime: '10:00',
-          endTime: '11:00',
-          dayOfWeek: 7,
-          category: 'Yoga',
-          capacity: 10,
-          enrolled: 10,
-          icon: 'self_improvement',
-        );
-        
-        when(() => mockGetActivities()).thenAnswer((_) async => Result.success([]));
-        when(() => mockGetCourses()).thenAnswer((_) async => Result.success([sundayCourse]));
+    group('HomeViewModel fallback day coverage', () {
+      test(
+        'correctly filters courses for current day when weekday is 7',
+        () async {
+          // Mock current day as Sunday (7)
+          final sundayCourse = entity.Course(
+            id: 'sunday',
+            title: 'Sunday Yoga',
+            instructor: 'Sarah',
+            startTime: '10:00',
+            endTime: '11:00',
+            dayOfWeek: 7,
+            category: 'Yoga',
+            capacity: 10,
+            enrolled: 10,
+            icon: 'self_improvement',
+          );
 
-        // We can't easily mock DateTime.now() without a wrapper, 
-        // so we check if the logic matches whatever today is.
-        await viewModel.loadHomeData();
-        
-        final today = DateTime.now().weekday;
-        if (today == 7) {
-          check(viewModel.todayCourses).length.equals(1);
-        } else {
-          check(viewModel.todayCourses).isEmpty();
-        }
-      });
+          when(
+            () => mockGetActivities(),
+          ).thenAnswer((_) async => Result.success([]));
+          when(
+            () => mockGetCourses(),
+          ).thenAnswer((_) async => Result.success([sundayCourse]));
+
+          // We can't easily mock DateTime.now() without a wrapper,
+          // so we check if the logic matches whatever today is.
+          await viewModel.loadHomeData();
+
+          final today = DateTime.now().weekday;
+          if (today == 7) {
+            check(viewModel.todayCourses).length.equals(1);
+          } else {
+            check(viewModel.todayCourses).isEmpty();
+          }
+        },
+      );
     });
   });
 }

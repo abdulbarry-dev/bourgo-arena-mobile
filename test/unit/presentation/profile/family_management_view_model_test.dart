@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import '../../data/repositories/repository_test_fixtures.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
@@ -116,6 +117,111 @@ void main() {
 
       check(result).isTrue();
       check(viewModel.childFirstNameController.text).equals(''); // cleared
+    });
+
+    test(
+      'requestFamilyAccountOtp failure sets error message and does not change OTP state',
+      () async {
+        when(
+          () => mockRequestFamilyAccountOtpUseCase(),
+        ).thenAnswer((_) async => Result.failure(AuthFailure('OTP failed')));
+
+        final result = await viewModel.requestFamilyAccountOtp();
+
+        check(result).isFalse();
+        check(viewModel.errorMessage).equals('OTP failed');
+        check(viewModel.isOtpSent).isFalse();
+      },
+    );
+
+    test(
+      'verifyFamilyAccountOtp failure sets error message and does not proceed',
+      () async {
+        when(
+          () => mockVerifyOtpUseCase(any(), any()),
+        ).thenAnswer((_) async => Result.failure(AuthFailure('Verify failed')));
+
+        final initialIsParent = viewModel.user?.isParentAccount;
+        final result = await viewModel.verifyFamilyAccountOtp('123456');
+
+        check(result).isFalse();
+        check(viewModel.errorMessage).equals('Verify failed');
+        check(viewModel.user?.isParentAccount).equals(initialIsParent);
+      },
+    );
+
+    test(
+      'addChildFromForm failure sets error message and does not add to list',
+      () async {
+        when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
+          (_) async => Result.failure(ServerFailure('Add child failed')),
+        );
+
+        viewModel.childFirstNameController.text = 'Junior';
+        viewModel.childLastNameController.text = 'Doe';
+        viewModel.setChildGender('male');
+        viewModel.setChildBirthDate(DateTime(2020, 1, 1));
+
+        final initialCount = viewModel.user?.children.length ?? 0;
+        final result = await viewModel.addChildFromForm();
+
+        check(result).isFalse();
+        check(viewModel.errorMessage).equals('Add child failed');
+        check(viewModel.user?.children.length).equals(initialCount);
+      },
+    );
+
+    test('removeChild success removes member from list', () async {
+      final child = testChildEntity(id: 'child-1');
+      final userWithChild = testUserEntity(children: [child]);
+      when(
+        () => mockGetUserProfileUseCase(),
+      ).thenAnswer((_) async => Result.success(userWithChild));
+
+      viewModel = FamilyManagementViewModel(
+        getUserProfileUseCase: mockGetUserProfileUseCase,
+        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
+        verifyOtpUseCase: mockVerifyOtpUseCase,
+        requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
+      );
+      await Future.delayed(Duration.zero);
+
+      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
+        (_) async => Result.success(userWithChild.copyWith(children: [])),
+      );
+
+      viewModel.setErrorMessage('old error');
+      final result = await viewModel.removeChild('child-1');
+
+      check(result).isTrue();
+      check(viewModel.user?.children.length).equals(0);
+      check(viewModel.errorMessage).isNull();
+    });
+
+    test('removeChild failure sets error and list unchanged', () async {
+      final child = testChildEntity(id: 'child-1');
+      final userWithChild = testUserEntity(children: [child]);
+      when(
+        () => mockGetUserProfileUseCase(),
+      ).thenAnswer((_) async => Result.success(userWithChild));
+
+      viewModel = FamilyManagementViewModel(
+        getUserProfileUseCase: mockGetUserProfileUseCase,
+        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
+        verifyOtpUseCase: mockVerifyOtpUseCase,
+        requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
+      );
+      await Future.delayed(Duration.zero);
+
+      when(
+        () => mockUpdateUserProfileUseCase(any()),
+      ).thenAnswer((_) async => Result.failure(ServerFailure('Remove failed')));
+
+      final result = await viewModel.removeChild('child-1');
+
+      check(result).isFalse();
+      check(viewModel.errorMessage).equals('Remove failed');
+      check(viewModel.user?.children.length).equals(1);
     });
   });
 }

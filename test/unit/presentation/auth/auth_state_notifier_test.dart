@@ -17,10 +17,11 @@ void main() {
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     authStreamController = StreamController<User?>();
-    
-    when(() => mockAuthRepository.onAuthStateChanged)
-        .thenAnswer((_) => authStreamController.stream);
-        
+
+    when(
+      () => mockAuthRepository.onAuthStateChanged,
+    ).thenAnswer((_) => authStreamController.stream);
+
     notifier = AuthStateNotifier(mockAuthRepository);
   });
 
@@ -44,7 +45,7 @@ void main() {
       );
 
       authStreamController.add(user);
-      
+
       // Wait for stream event
       await Future.delayed(Duration.zero);
 
@@ -54,7 +55,7 @@ void main() {
 
     test('updates state to unauthenticated when stream emits null', () async {
       authStreamController.add(null);
-      
+
       await Future.delayed(Duration.zero);
 
       check(notifier.currentUser).isNull();

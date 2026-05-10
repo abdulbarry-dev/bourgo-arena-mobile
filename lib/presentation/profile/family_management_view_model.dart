@@ -30,6 +30,7 @@ class FamilyManagementViewModel extends ChangeNotifier {
   bool _hasChildLastNameError = false;
   bool _hasChildGenderError = false;
   bool _hasChildBirthDateError = false;
+  String? _errorMessage;
 
   /// Creates a new [FamilyManagementViewModel] instance.
   FamilyManagementViewModel({
@@ -74,6 +75,15 @@ class FamilyManagementViewModel extends ChangeNotifier {
   /// Whether the child's birth date has an error.
   bool get hasChildBirthDateError => _hasChildBirthDateError;
 
+  /// Last error message encountered.
+  String? get errorMessage => _errorMessage;
+
+  /// Sets the error message manually.
+  void setErrorMessage(String? message) {
+    _errorMessage = message;
+    notifyListeners();
+  }
+
   Future<void> _loadProfile() async {
     _isLoading = true;
     notifyListeners();
@@ -102,10 +112,15 @@ class FamilyManagementViewModel extends ChangeNotifier {
     return result.fold(
       onSuccess: (_) {
         _isOtpSent = true;
+        _errorMessage = null;
         notifyListeners();
         return true;
       },
-      onFailure: (_) => false,
+      onFailure: (failure) {
+        _errorMessage = failure.message;
+        notifyListeners();
+        return false;
+      },
     );
   }
 
@@ -142,7 +157,8 @@ class FamilyManagementViewModel extends ChangeNotifier {
         notifyListeners();
         return success;
       },
-      onFailure: (_) {
+      onFailure: (failure) {
+        _errorMessage = failure.message;
         _isVerifyingOtp = false;
         notifyListeners();
         return false;
@@ -150,7 +166,6 @@ class FamilyManagementViewModel extends ChangeNotifier {
     );
   }
 
-  /// Disables family account features.
   Future<bool> disableFamilyAccount() async {
     if (_user == null) return false;
 
@@ -160,10 +175,15 @@ class FamilyManagementViewModel extends ChangeNotifier {
     return result.fold(
       onSuccess: (user) {
         _user = user;
+        _errorMessage = null;
         notifyListeners();
         return true;
       },
-      onFailure: (_) => false,
+      onFailure: (failure) {
+        _errorMessage = failure.message;
+        notifyListeners();
+        return false;
+      },
     );
   }
 
@@ -226,14 +246,18 @@ class FamilyManagementViewModel extends ChangeNotifier {
     return result.fold(
       onSuccess: (user) {
         _user = user;
+        _errorMessage = null;
         clearChildForm();
         return true;
       },
-      onFailure: (_) => false,
+      onFailure: (failure) {
+        _errorMessage = failure.message;
+        notifyListeners();
+        return false;
+      },
     );
   }
 
-  /// Removes a child profile.
   Future<bool> removeChild(String childId) async {
     if (_user == null) return false;
 
@@ -246,10 +270,15 @@ class FamilyManagementViewModel extends ChangeNotifier {
     return result.fold(
       onSuccess: (user) {
         _user = user;
+        _errorMessage = null;
         notifyListeners();
         return true;
       },
-      onFailure: (_) => false,
+      onFailure: (failure) {
+        _errorMessage = failure.message;
+        notifyListeners();
+        return false;
+      },
     );
   }
 

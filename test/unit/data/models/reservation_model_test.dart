@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/data/models/reservation_model.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:checks/checks.dart';
 
 void main() {
   group('ReservationModel', () {
@@ -20,16 +21,36 @@ void main() {
       final json = model.toJson();
       final fromJson = ReservationModel.fromJson(json);
 
-      expect(fromJson.id, model.id);
-      expect(fromJson.activityId, model.activityId);
-      expect(fromJson.activityTitle, model.activityTitle);
-      expect(fromJson.date, model.date);
-      expect(fromJson.time, model.time);
-      expect(fromJson.duration, model.duration);
-      expect(fromJson.price, model.price);
-      expect(fromJson.status, model.status);
-      expect(fromJson.paymentStatus, model.paymentStatus);
-      expect(fromJson.qrCode, model.qrCode);
+      check(fromJson.id).equals(model.id);
+      check(fromJson.activityId).equals(model.activityId);
+      check(fromJson.activityTitle).equals(model.activityTitle);
+      check(fromJson.date).equals(model.date);
+      check(fromJson.time).equals(model.time);
+      check(fromJson.duration).equals(model.duration);
+      check(fromJson.price).equals(model.price);
+      check(fromJson.status).equals(model.status);
+      check(fromJson.paymentStatus).equals(model.paymentStatus);
+      check(fromJson.qrCode).equals(model.qrCode);
+    });
+
+    test('fromJson should handle null optional fields', () {
+      final json = {
+        'id': 'res-2',
+        'activity_id': 'act-2',
+        'activity_title': 'Padel',
+        'date': '2026-05-11',
+        'time': '10:00',
+        'duration': '90 min',
+        'price': 30.0,
+        'status': 'pending',
+        'payment_status': 'pending',
+        'qr_code': null,
+      };
+
+      final model = ReservationModel.fromJson(json);
+
+      check(model.qrCode).isNull();
+      check(model.id).equals('res-2');
     });
   });
 }
