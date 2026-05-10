@@ -94,7 +94,7 @@ void main() {
     await tester.pumpWidget(createWidget());
     await tester.pumpAndSettle();
 
-    check(find.text('Morning Yoga').evaluate()).isNotEmpty();
+    check(find.text('MORNING YOGA').evaluate()).isNotEmpty();
     check(find.text('Alice').evaluate()).isNotEmpty();
   });
 }
