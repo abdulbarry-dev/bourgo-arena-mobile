@@ -1,3 +1,5 @@
+import 'package:collection/collection.dart';
+
 /// Pure domain entity representing a sport activity.
 class Activity {
   /// Unique identifier.
@@ -47,4 +49,37 @@ class Activity {
     this.rating = 0.0,
     this.reviewCount = 0,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Activity &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          title == other.title &&
+          category == other.category &&
+          basePrice == other.basePrice &&
+          currency == other.currency &&
+          imageUrl == other.imageUrl &&
+          icon == other.icon &&
+          description == other.description &&
+          _listEquality.equals(features, other.features) &&
+          rating == other.rating &&
+          reviewCount == other.reviewCount;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      title.hashCode ^
+      category.hashCode ^
+      basePrice.hashCode ^
+      currency.hashCode ^
+      imageUrl.hashCode ^
+      icon.hashCode ^
+      description.hashCode ^
+      _listEquality.hash(features) ^
+      rating.hashCode ^
+      reviewCount.hashCode;
+
+  static const _listEquality = ListEquality<String>();
 }

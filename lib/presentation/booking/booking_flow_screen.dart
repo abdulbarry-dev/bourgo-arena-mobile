@@ -2,6 +2,9 @@ import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/payment_step.dart';
@@ -14,7 +17,11 @@ import 'package:flutter/material.dart';
 class BookingFlowScreen extends StatefulWidget {
   /// Optional activity to start the booking flow with.
   final Activity? initialActivity;
-  const BookingFlowScreen({super.key, this.initialActivity});
+
+  /// Optional ViewModel for testing purposes.
+  final BookingViewModel? viewModel;
+
+  const BookingFlowScreen({super.key, this.initialActivity, this.viewModel});
 
   @override
   State<BookingFlowScreen> createState() => _BookingFlowScreenState();
@@ -26,11 +33,16 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = BookingViewModel(
-      getActivitiesUseCase: locator<GetActivitiesUseCase>(),
-      getTimeSlotsUseCase: locator<GetTimeSlotsUseCase>(),
-      initialActivity: widget.initialActivity,
-    );
+    _viewModel =
+        widget.viewModel ??
+        BookingViewModel(
+          getActivitiesUseCase: locator<GetActivitiesUseCase>(),
+          getTimeSlotsUseCase: locator<GetTimeSlotsUseCase>(),
+          getUserBookingsUseCase: locator<GetUserBookingsUseCase>(),
+          makeReservationUseCase: locator<MakeReservationUseCase>(),
+          cancelBookingUseCase: locator<CancelBookingUseCase>(),
+          initialActivity: widget.initialActivity,
+        );
   }
 
   @override

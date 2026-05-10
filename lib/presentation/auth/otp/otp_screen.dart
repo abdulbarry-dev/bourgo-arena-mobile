@@ -1,3 +1,6 @@
+import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_view_model.dart';
 import 'dart:async';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -10,14 +13,23 @@ import 'package:go_router/go_router.dart';
 class OtpScreen extends StatefulWidget {
   final String? destination;
   final Map<String, dynamic>? registrationData;
+  final VerifyOtpUseCase verifyOtpUseCase;
+  final SendOtpUseCase sendOtpUseCase;
 
-  const OtpScreen({super.key, this.destination, this.registrationData});
+  const OtpScreen({
+    super.key,
+    this.destination,
+    this.registrationData,
+    required this.verifyOtpUseCase,
+    required this.sendOtpUseCase,
+  });
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+  late final OtpViewModel _viewModel;
   final List<TextEditingController> _controllers = List.generate(
     4,
     (_) => TextEditingController(),
@@ -29,12 +41,16 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   void initState() {
     super.initState();
+    _viewModel = OtpViewModel(widget.verifyOtpUseCase, widget.sendOtpUseCase);
+    _viewModel.addListener(_onViewModelChanged);
     _startTimer();
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _viewModel.removeListener(_onViewModelChanged);
+    _viewModel.dispose();
     for (var c in _controllers) {
       c.dispose();
     }
@@ -42,6 +58,43 @@ class _OtpScreenState extends State<OtpScreen> {
       f.dispose();
     }
     super.dispose();
+  }
+
+  void _onViewModelChanged() {
+    if (_viewModel.errorMessage != null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
+    }
+  }
+
+  void _onVerify() {
+    final code = _controllers.map((c) => c.text).join();
+    if (code.length == 4) {
+      _viewModel.verify(
+        identifier: widget.destination ?? '',
+        code: code,
+        onSuccess: () {
+          context.push(
+            '/account-setup',
+            extra:
+                widget.registrationData ??
+                {
+                  'email': widget.destination ?? '',
+                  'phone': '',
+                  'firstName': 'User',
+                  'lastName': '',
+                },
+          );
+        },
+      );
+    }
+  }
+
+  void _onResend() {
+    _viewModel.resend(widget.destination ?? '');
+    setState(() => _timerCount = 60);
+    _startTimer();
   }
 
   void _startTimer() {
@@ -97,10 +150,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 16),
                           child: TextButton(
-                            onPressed: () {
-                              setState(() => _timerCount = 60);
-                              _startTimer();
-                            },
+                            onPressed: _viewModel.isLoading ? null : _onResend,
                             child: Text(
                               l10n.authSendCode,
                               style: TextStyle(
@@ -116,18 +166,14 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  onPressed: () => context.push(
-                    '/account-setup',
-                    extra:
-                        widget.registrationData ??
-                        {
-                          'email': widget.destination ?? '',
-                          'phone': '',
-                          'firstName': 'User',
-                          'lastName': '',
-                        },
-                  ),
-                  child: Text(l10n.authVerify),
+                  onPressed: _viewModel.isLoading ? null : _onVerify,
+                  child: _viewModel.isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(l10n.authVerify),
                 ),
               ],
             ),

@@ -11,7 +11,7 @@ class NotificationMapper {
       title: model.title,
       message: model.message,
       timestamp: DateTime.parse(model.timestamp),
-      type: model.type,
+      type: model.type ?? 'info',
       isRead: model.isRead,
     );
   }
@@ -27,4 +27,11 @@ class NotificationMapper {
       isRead: entity.isRead,
     );
   }
+}
+
+/// Extension for convenient mapping of [NotificationModel] list.
+extension NotificationModelListX on List<NotificationModel> {
+  /// Converts a list of [NotificationModel] to a list of [entity.Notification].
+  List<entity.Notification> toEntityList() =>
+      map(NotificationMapper.toEntity).toList();
 }

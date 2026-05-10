@@ -17,7 +17,7 @@ ReservationModel _$ReservationModelFromJson(Map<String, dynamic> json) =>
       price: (json['price'] as num).toDouble(),
       status: json['status'] as String,
       paymentStatus: json['payment_status'] as String,
-      qrCode: json['qr_code'] as String,
+      qrCode: json['qr_code'] as String?,
     );
 
 Map<String, dynamic> _$ReservationModelToJson(ReservationModel instance) =>

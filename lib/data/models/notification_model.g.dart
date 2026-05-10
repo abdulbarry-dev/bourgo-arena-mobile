@@ -12,7 +12,7 @@ NotificationModel _$NotificationModelFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String,
       message: json['message'] as String,
       timestamp: json['timestamp'] as String,
-      type: json['type'] as String,
+      type: json['type'] as String?,
       isRead: json['is_read'] as bool,
     );
 

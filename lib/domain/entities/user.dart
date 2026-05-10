@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 
 /// Pure domain entity representing a user.
@@ -92,4 +93,41 @@ class User {
 
   /// Returns the full name of the user.
   String get name => '$firstName $lastName';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          firstName == other.firstName &&
+          lastName == other.lastName &&
+          email == other.email &&
+          phone == other.phone &&
+          avatarUrl == other.avatarUrl &&
+          loyaltyPoints == other.loyaltyPoints &&
+          subscriptionLevel == other.subscriptionLevel &&
+          subscriptionExpiry == other.subscriptionExpiry &&
+          totalCheckIns == other.totalCheckIns &&
+          birthDate == other.birthDate &&
+          isParentAccount == other.isParentAccount &&
+          _listEquality.equals(children, other.children);
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      firstName.hashCode ^
+      lastName.hashCode ^
+      email.hashCode ^
+      phone.hashCode ^
+      avatarUrl.hashCode ^
+      loyaltyPoints.hashCode ^
+      subscriptionLevel.hashCode ^
+      subscriptionExpiry.hashCode ^
+      totalCheckIns.hashCode ^
+      birthDate.hashCode ^
+      isParentAccount.hashCode ^
+      _listEquality.hash(children);
+
+  static const _listEquality = ListEquality<ChildProfile>();
 }

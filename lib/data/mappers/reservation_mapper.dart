@@ -15,7 +15,7 @@ class ReservationMapper {
       price: model.price,
       status: model.status,
       paymentStatus: model.paymentStatus,
-      qrCode: model.qrCode,
+      qrCode: model.qrCode ?? '',
     );
   }
 

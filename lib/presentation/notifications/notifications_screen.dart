@@ -11,7 +11,8 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen displaying a list of user notifications.
 class NotificationsScreen extends StatefulWidget {
-  const NotificationsScreen({super.key});
+  final NotificationsViewModel? viewModel;
+  const NotificationsScreen({super.key, this.viewModel});
 
   @override
   State<NotificationsScreen> createState() => _NotificationsScreenState();
@@ -23,9 +24,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = NotificationsViewModel(
-      getNotificationsUseCase: locator<GetNotificationsUseCase>(),
-    );
+    _viewModel =
+        widget.viewModel ??
+        NotificationsViewModel(
+          getNotificationsUseCase: locator<GetNotificationsUseCase>(),
+        );
   }
 
   @override

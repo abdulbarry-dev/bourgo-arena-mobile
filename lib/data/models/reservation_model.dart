@@ -14,7 +14,7 @@ class ReservationModel {
   final double price;
   final String status;
   final String paymentStatus;
-  final String qrCode;
+  final String? qrCode;
 
   const ReservationModel({
     required this.id,
@@ -26,7 +26,7 @@ class ReservationModel {
     required this.price,
     required this.status,
     required this.paymentStatus,
-    required this.qrCode,
+    this.qrCode,
   });
 
   factory ReservationModel.fromJson(Map<String, dynamic> json) =>

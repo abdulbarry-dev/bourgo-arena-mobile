@@ -43,4 +43,33 @@ class Reservation {
     required this.paymentStatus,
     required this.qrCode,
   });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Reservation &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          activityId == other.activityId &&
+          activityTitle == other.activityTitle &&
+          date == other.date &&
+          time == other.time &&
+          duration == other.duration &&
+          price == other.price &&
+          status == other.status &&
+          paymentStatus == other.paymentStatus &&
+          qrCode == other.qrCode;
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      activityId.hashCode ^
+      activityTitle.hashCode ^
+      date.hashCode ^
+      time.hashCode ^
+      duration.hashCode ^
+      price.hashCode ^
+      status.hashCode ^
+      paymentStatus.hashCode ^
+      qrCode.hashCode;
 }

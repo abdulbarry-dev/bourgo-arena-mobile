@@ -31,6 +31,8 @@ import 'package:bourgo_arena_mobile/presentation/onboarding/language_selection_s
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -104,6 +106,8 @@ GoRouter createRouter(
         return OtpScreen(
           destination: data?['destination'] as String?,
           registrationData: data?['registrationData'] as Map<String, dynamic>?,
+          sendOtpUseCase: locator<SendOtpUseCase>(),
+          verifyOtpUseCase: locator<VerifyOtpUseCase>(),
         );
       },
     ),

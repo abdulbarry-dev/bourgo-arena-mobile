@@ -8,12 +8,10 @@ sealed class Result<S, F extends Failure> {
   const Result();
 
   /// Standard success factory.
-  static Result<S, F> success<S, F extends Failure>(S data) =>
-      Success<S, F>(data);
+  factory Result.success(S data) = Success<S, F>;
 
   /// Standard failure factory.
-  static Result<S, F> failure<S, F extends Failure>(F failure) =>
-      FailureResult<S, F>(failure);
+  factory Result.failure(F failure) = FailureResult<S, F>;
 
   /// Functional fold to handle success and failure paths.
   R fold<R>({
