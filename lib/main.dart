@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -12,6 +15,8 @@ Future<void> main() async {
 
   // Initialize Dependencies
   await initLocator();
+
+  unawaited(locator<DeviceTokenRegistrar>().registerIfPossible());
 
   runApp(
     BourgoArenaApp(

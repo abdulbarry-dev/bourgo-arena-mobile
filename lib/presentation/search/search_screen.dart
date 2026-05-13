@@ -1,6 +1,5 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/search/search_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/search_result.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/search/search_view_model.dart';
@@ -28,8 +27,7 @@ class _SearchScreenState extends State<SearchScreen> {
     _viewModel ??=
         widget.viewModel ??
         SearchViewModel(
-          getActivitiesUseCase: locator<GetActivitiesUseCase>(),
-          getCoursesUseCase: locator<GetCoursesUseCase>(),
+          searchUseCase: locator<SearchUseCase>(),
           l10n: AppLocalizations.of(context)!,
         );
   }

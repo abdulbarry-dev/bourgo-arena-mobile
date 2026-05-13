@@ -31,10 +31,10 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   late final OtpViewModel _viewModel;
   final List<TextEditingController> _controllers = List.generate(
-    4,
+    6,
     (_) => TextEditingController(),
   );
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   int _timerCount = 60;
   Timer? _timer;
 
@@ -70,7 +70,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _onVerify() {
     final code = _controllers.map((c) => c.text).join();
-    if (code.length == 4) {
+    if (code.length == 6) {
       _viewModel.verify(
         identifier: widget.destination ?? '',
         code: code,
@@ -133,8 +133,8 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
                 const SizedBox(height: 48),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(4, (index) => _buildOTPField(index)),
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: List.generate(6, (index) => _buildOTPField(index)),
                 ),
                 const SizedBox(height: 48),
                 Center(
@@ -187,8 +187,8 @@ class _OtpScreenState extends State<OtpScreen> {
     final theme = Theme.of(context);
 
     return SizedBox(
-      width: 72,
-      height: 80,
+      width: 56,
+      height: 72,
       child: TextField(
         controller: _controllers[index],
         focusNode: _focusNodes[index],
@@ -203,21 +203,21 @@ class _OtpScreenState extends State<OtpScreen> {
         decoration: InputDecoration(
           counterText: '',
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(
               color: theme.colorScheme.outlineVariant,
               width: 1.5,
             ),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
           ),
           filled: true,
           fillColor: theme.colorScheme.surfaceContainer,
         ),
         onChanged: (value) {
-          if (value.isNotEmpty && index < 3) {
+          if (value.isNotEmpty && index < 5) {
             _focusNodes[index + 1].requestFocus();
           } else if (value.isEmpty && index > 0) {
             _focusNodes[index - 1].requestFocus();

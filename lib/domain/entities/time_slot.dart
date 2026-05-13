@@ -1,5 +1,8 @@
 /// Entity representing an available time slot for booking.
 class TimeSlot {
+  /// Unique identifier for the time slot.
+  final String slotId;
+
   /// Time string (e.g. 18:00).
   final String time;
 
@@ -7,16 +10,21 @@ class TimeSlot {
   final bool available;
 
   /// Creates a new [TimeSlot] instance.
-  const TimeSlot({required this.time, required this.available});
+  const TimeSlot({
+    required this.slotId,
+    required this.time,
+    required this.available,
+  });
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is TimeSlot &&
           runtimeType == other.runtimeType &&
+          slotId == other.slotId &&
           time == other.time &&
           available == other.available;
 
   @override
-  int get hashCode => time.hashCode ^ available.hashCode;
+  int get hashCode => slotId.hashCode ^ time.hashCode ^ available.hashCode;
 }

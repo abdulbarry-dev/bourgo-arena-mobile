@@ -373,7 +373,7 @@ void main() {
       test('returns Success on 200', () async {
         when(
           () => apiClient.post('/auth/verify-otp', any()),
-        ).thenAnswer((_) async => {'success': true});
+        ).thenAnswer((_) async => {'valid': true});
 
         final result = await repository.verifyOtp('alex@example.com', '123456');
 

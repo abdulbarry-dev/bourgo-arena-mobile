@@ -5,7 +5,7 @@ class AppConfig {
   /// The base URL for the production API.
   static const String baseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'https://api.bourgoarena.tn/api',
+    defaultValue: 'https://api.bourgoarena.tn/api/v1',
   );
 
   /// The timeout duration for API requests in milliseconds.

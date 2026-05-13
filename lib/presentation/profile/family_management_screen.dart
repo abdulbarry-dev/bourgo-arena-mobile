@@ -3,6 +3,9 @@ import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_ca
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -32,6 +35,9 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
       updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
       verifyOtpUseCase: locator<VerifyOtpUseCase>(),
       requestFamilyAccountOtpUseCase: locator<RequestFamilyAccountOtpUseCase>(),
+      getChildrenUseCase: locator<GetChildrenUseCase>(),
+      addChildUseCase: locator<AddChildUseCase>(),
+      removeChildUseCase: locator<RemoveChildUseCase>(),
     );
   }
 

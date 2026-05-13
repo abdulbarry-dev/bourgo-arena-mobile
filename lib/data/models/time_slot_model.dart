@@ -5,6 +5,9 @@ part 'time_slot_model.g.dart';
 /// Model representing an available time slot for booking.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class TimeSlotModel {
+  /// Unique identifier for the time slot.
+  final String slotId;
+
   /// Time string (e.g. 18:00).
   final String time;
 
@@ -12,7 +15,11 @@ class TimeSlotModel {
   final bool available;
 
   /// Creates a new [TimeSlotModel] instance.
-  const TimeSlotModel({required this.time, required this.available});
+  const TimeSlotModel({
+    required this.slotId,
+    required this.time,
+    required this.available,
+  });
 
   /// Creates a [TimeSlotModel] from JSON.
   factory TimeSlotModel.fromJson(Map<String, dynamic> json) =>

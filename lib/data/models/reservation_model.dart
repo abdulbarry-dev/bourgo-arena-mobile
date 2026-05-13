@@ -7,6 +7,7 @@ part 'reservation_model.g.dart';
 class ReservationModel {
   final String id;
   final String activityId;
+  final String? activitySlotId;
   final String activityTitle;
   final String date;
   final String time;
@@ -19,6 +20,7 @@ class ReservationModel {
   const ReservationModel({
     required this.id,
     required this.activityId,
+    this.activitySlotId,
     required this.activityTitle,
     required this.date,
     required this.time,

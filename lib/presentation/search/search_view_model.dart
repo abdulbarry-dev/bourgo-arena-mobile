@@ -1,21 +1,17 @@
-import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/search/search_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/search_result.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Global Search screen.
 class SearchViewModel extends ChangeNotifier {
-  final GetActivitiesUseCase _getActivitiesUseCase;
-  final GetCoursesUseCase _getCoursesUseCase;
+  final SearchUseCase _searchUseCase;
   final AppLocalizations _l10n;
 
   SearchViewModel({
-    required GetActivitiesUseCase getActivitiesUseCase,
-    required GetCoursesUseCase getCoursesUseCase,
+    required SearchUseCase searchUseCase,
     required AppLocalizations l10n,
-  }) : _getActivitiesUseCase = getActivitiesUseCase,
-       _getCoursesUseCase = getCoursesUseCase,
+  }) : _searchUseCase = searchUseCase,
        _l10n = l10n;
 
   String _query = '';
@@ -42,58 +38,14 @@ class SearchViewModel extends ChangeNotifier {
     try {
       final List<SearchResult> allResults = [];
 
-      // 1. Search Activities
-      final activitiesResult = await _getActivitiesUseCase();
-      activitiesResult.when(
-        success: (activities) {
-          final activityMatches = activities.where(
-            (a) =>
-                a.title.toLowerCase().contains(query.toLowerCase()) ||
-                a.category.toLowerCase().contains(query.toLowerCase()),
-          );
-
-          allResults.addAll(
-            activityMatches.map(
-              (a) => SearchResult(
-                title: a.title,
-                subtitle: a.category,
-                type: SearchResultType.activity,
-                iconKey: 'sports_soccer',
-                route: '/booking',
-                extra: a,
-              ),
-            ),
-          );
-        },
-        failure: (failure) => null,
+      // 1. Remote Search (Activities, Courses, etc.)
+      final searchResult = await _searchUseCase(query);
+      searchResult.when(
+        success: (results) => allResults.addAll(results),
+        failure: (failure) => null, // Log or handle error if needed
       );
 
-      // 2. Search Courses
-      final coursesResult = await _getCoursesUseCase();
-      coursesResult.when(
-        success: (courses) {
-          final courseMatches = courses.where(
-            (c) =>
-                c.title.toLowerCase().contains(query.toLowerCase()) ||
-                c.instructor.toLowerCase().contains(query.toLowerCase()),
-          );
-
-          allResults.addAll(
-            courseMatches.map(
-              (c) => SearchResult(
-                title: c.title,
-                subtitle: '${c.instructor} • ${c.startTime}',
-                type: SearchResultType.course,
-                iconKey: 'calendar_month',
-                route: '/planning',
-              ),
-            ),
-          );
-        },
-        failure: (failure) => null,
-      );
-
-      // 3. Search Settings & Navigation
+      // 2. Local Search (Settings & Navigation)
       final settingsResults = _searchSettings(query);
       allResults.addAll(settingsResults);
 

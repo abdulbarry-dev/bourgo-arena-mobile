@@ -27,10 +27,18 @@ class LocalSessionRepository implements SessionRepository {
   // Notification Preference
   static const String _notificationsKey = 'settings_notifications_enabled';
 
+  // Device Token
+  static const String _deviceTokenKey = 'device_token';
+  static const String _devicePlatformKey = 'device_platform';
+
   /// All session-scoped keys that should be wiped atomically by [clearSession].
   /// This list is the source of truth for session-wide data; every session field
   /// added in the future MUST be added here.
-  static const List<String> _sessionKeys = [_authTokenKey];
+  static const List<String> _sessionKeys = [
+    _authTokenKey,
+    _deviceTokenKey,
+    _devicePlatformKey,
+  ];
 
   final SharedPreferences _prefs;
 
@@ -175,6 +183,56 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure('Failed to save notification settings: ${e.toString()}'),
+      );
+    }
+  }
+
+  // =========== Device Token ==========
+
+  @override
+  Future<Result<String?, Failure>> getDeviceToken() async {
+    try {
+      final token = _prefs.getString(_deviceTokenKey);
+      return Success(token);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to retrieve device token: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> saveDeviceToken(String token) async {
+    try {
+      await _prefs.setString(_deviceTokenKey, token);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save device token: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<String?, Failure>> getDevicePlatform() async {
+    try {
+      final platform = _prefs.getString(_devicePlatformKey);
+      return Success(platform);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to retrieve device platform: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> saveDevicePlatform(String platform) async {
+    try {
+      await _prefs.setString(_devicePlatformKey, platform);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save device platform: ${e.toString()}'),
       );
     }
   }

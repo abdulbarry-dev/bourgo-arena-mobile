@@ -102,11 +102,21 @@ class ApiClient {
   }
 
   dynamic _handleResponse(http.Response response) {
-    if (response.statusCode >= 200 && response.statusCode < 300) {
-      if (response.body.isEmpty) return null;
-      return jsonDecode(response.body);
+    final Map<String, dynamic> body = response.body.isNotEmpty
+        ? jsonDecode(response.body) as Map<String, dynamic>
+        : {};
+
+    final bool success =
+        body['success'] ??
+        (response.statusCode >= 200 && response.statusCode < 300);
+
+    if (success) {
+      return body['data'];
     } else {
-      final message = 'API Error: ${response.statusCode} ${response.body}';
+      final String message =
+          body['message'] ??
+          'API Error: ${response.statusCode} ${response.body}';
+
       switch (response.statusCode) {
         case 401:
         case 403:

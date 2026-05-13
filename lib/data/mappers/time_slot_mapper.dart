@@ -5,12 +5,17 @@ import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart' as entity;
 class TimeSlotMapper {
   /// Converts [TimeSlotModel] model to [entity.TimeSlot] entity.
   static entity.TimeSlot toEntity(TimeSlotModel model) {
-    return entity.TimeSlot(time: model.time, available: model.available);
+    return entity.TimeSlot(
+      slotId: model.slotId,
+      time: model.time,
+      available: model.available,
+    );
   }
 
   /// Converts [entity.TimeSlot] entity to [TimeSlotModel] model.
   static TimeSlotModel fromEntity(entity.TimeSlot domainEntity) {
     return TimeSlotModel(
+      slotId: domainEntity.slotId,
       time: domainEntity.time,
       available: domainEntity.available,
     );

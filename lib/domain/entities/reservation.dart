@@ -6,6 +6,9 @@ class Reservation {
   /// ID of the booked activity.
   final String activityId;
 
+  /// ID of the booked activity time slot.
+  final String? activitySlotId;
+
   /// Display title of the activity.
   final String activityTitle;
 
@@ -34,6 +37,7 @@ class Reservation {
   const Reservation({
     required this.id,
     required this.activityId,
+    this.activitySlotId,
     required this.activityTitle,
     required this.date,
     required this.time,
@@ -51,6 +55,7 @@ class Reservation {
           runtimeType == other.runtimeType &&
           id == other.id &&
           activityId == other.activityId &&
+          activitySlotId == other.activitySlotId &&
           activityTitle == other.activityTitle &&
           date == other.date &&
           time == other.time &&
@@ -64,6 +69,7 @@ class Reservation {
   int get hashCode =>
       id.hashCode ^
       activityId.hashCode ^
+      activitySlotId.hashCode ^
       activityTitle.hashCode ^
       date.hashCode ^
       time.hashCode ^

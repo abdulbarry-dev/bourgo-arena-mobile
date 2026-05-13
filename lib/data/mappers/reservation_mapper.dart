@@ -8,6 +8,7 @@ class ReservationMapper {
     return Reservation(
       id: model.id,
       activityId: model.activityId,
+      activitySlotId: model.activitySlotId,
       activityTitle: model.activityTitle,
       date: model.date,
       time: model.time,
@@ -24,6 +25,7 @@ class ReservationMapper {
     return ReservationModel(
       id: entity.id,
       activityId: entity.activityId,
+      activitySlotId: entity.activitySlotId,
       activityTitle: entity.activityTitle,
       date: entity.date,
       time: entity.time,

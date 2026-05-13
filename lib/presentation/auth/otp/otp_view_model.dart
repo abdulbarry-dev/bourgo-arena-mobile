@@ -26,7 +26,7 @@ class OtpViewModel extends ChangeNotifier {
     required String code,
     required VoidCallback onSuccess,
   }) async {
-    if (code.length == 4) {
+    if (code.length == 6) {
       setLoading(true);
       _errorMessage = null;
       notifyListeners();

@@ -10,6 +10,7 @@ ReservationModel _$ReservationModelFromJson(Map<String, dynamic> json) =>
     ReservationModel(
       id: json['id'] as String,
       activityId: json['activity_id'] as String,
+      activitySlotId: json['activity_slot_id'] as String?,
       activityTitle: json['activity_title'] as String,
       date: json['date'] as String,
       time: json['time'] as String,
@@ -24,6 +25,7 @@ Map<String, dynamic> _$ReservationModelToJson(ReservationModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'activity_id': instance.activityId,
+      'activity_slot_id': instance.activitySlotId,
       'activity_title': instance.activityTitle,
       'date': instance.date,
       'time': instance.time,

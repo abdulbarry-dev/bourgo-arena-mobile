@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
@@ -9,20 +10,28 @@ import '../../../test_utils.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
+class MockDeviceTokenRegistrar extends Mock implements DeviceTokenRegistrar {}
+
 void main() {
   late AuthStateNotifier notifier;
   late MockAuthRepository mockAuthRepository;
+  late MockDeviceTokenRegistrar mockDeviceTokenRegistrar;
   late StreamController<User?> authStreamController;
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
+    mockDeviceTokenRegistrar = MockDeviceTokenRegistrar();
     authStreamController = StreamController<User?>();
 
     when(
       () => mockAuthRepository.onAuthStateChanged,
     ).thenAnswer((_) => authStreamController.stream);
 
-    notifier = AuthStateNotifier(mockAuthRepository);
+    when(
+      () => mockDeviceTokenRegistrar.registerIfPossible(),
+    ).thenAnswer((_) async {});
+
+    notifier = AuthStateNotifier(mockAuthRepository, mockDeviceTokenRegistrar);
   });
 
   tearDown(() {
@@ -51,6 +60,7 @@ void main() {
 
       check(notifier.currentUser).equals(user);
       check(notifier.isAuthenticated).isTrue();
+      verify(() => mockDeviceTokenRegistrar.registerIfPossible()).called(1);
     });
 
     test('updates state to unauthenticated when stream emits null', () async {
