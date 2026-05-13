@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/is_language_selecte
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for managing application-wide settings.
@@ -17,6 +18,7 @@ class SettingsViewModel extends ChangeNotifier {
   final IsLanguageSelectedUseCase _isLanguageSelectedUseCase;
   final GetNotificationsEnabledUseCase _getNotificationsEnabledUseCase;
   final SetNotificationsEnabledUseCase _setNotificationsEnabledUseCase;
+  final DeviceTokenRegistrar _deviceTokenRegistrar;
 
   ThemeMode _themeMode = ThemeMode.system;
   Locale _locale = const Locale('en');
@@ -34,6 +36,7 @@ class SettingsViewModel extends ChangeNotifier {
     this._isLanguageSelectedUseCase,
     this._getNotificationsEnabledUseCase,
     this._setNotificationsEnabledUseCase,
+    this._deviceTokenRegistrar,
   );
 
   /// The current [ThemeMode].
@@ -111,5 +114,11 @@ class SettingsViewModel extends ChangeNotifier {
     _notificationsEnabled = value;
     notifyListeners();
     await _setNotificationsEnabledUseCase(value);
+
+    if (value) {
+      await _deviceTokenRegistrar.registerIfPossible(
+        requireNotificationsEnabled: false,
+      );
+    }
   }
 }

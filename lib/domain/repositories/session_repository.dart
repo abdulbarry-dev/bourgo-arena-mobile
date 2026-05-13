@@ -46,4 +46,18 @@ abstract interface class SessionRepository {
 
   /// Persists notification preference.
   Future<Result<void, Failure>> setNotificationsEnabled(bool enabled);
+
+  // =========== Device Token ==========
+
+  /// Retrieves the stored device push token, if any.
+  Future<Result<String?, Failure>> getDeviceToken();
+
+  /// Persists the device push token.
+  Future<Result<void, Failure>> saveDeviceToken(String token);
+
+  /// Retrieves the stored device platform, if any.
+  Future<Result<String?, Failure>> getDevicePlatform();
+
+  /// Persists the device platform (e.g. android, ios).
+  Future<Result<void, Failure>> saveDevicePlatform(String platform);
 }

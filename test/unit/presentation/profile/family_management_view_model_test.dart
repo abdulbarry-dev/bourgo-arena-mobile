@@ -5,6 +5,9 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -20,12 +23,21 @@ class MockVerifyOtpUseCase extends Mock implements VerifyOtpUseCase {}
 class MockRequestFamilyAccountOtpUseCase extends Mock
     implements RequestFamilyAccountOtpUseCase {}
 
+class MockGetChildrenUseCase extends Mock implements GetChildrenUseCase {}
+
+class MockAddChildUseCase extends Mock implements AddChildUseCase {}
+
+class MockRemoveChildUseCase extends Mock implements RemoveChildUseCase {}
+
 void main() {
   late FamilyManagementViewModel viewModel;
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
   late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
   late MockVerifyOtpUseCase mockVerifyOtpUseCase;
   late MockRequestFamilyAccountOtpUseCase mockRequestFamilyAccountOtpUseCase;
+  late MockGetChildrenUseCase mockGetChildrenUseCase;
+  late MockAddChildUseCase mockAddChildUseCase;
+  late MockRemoveChildUseCase mockRemoveChildUseCase;
 
   final testUser = testUserEntity(id: '1');
 
@@ -34,10 +46,17 @@ void main() {
     mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockRequestFamilyAccountOtpUseCase = MockRequestFamilyAccountOtpUseCase();
+    mockGetChildrenUseCase = MockGetChildrenUseCase();
+    mockAddChildUseCase = MockAddChildUseCase();
+    mockRemoveChildUseCase = MockRemoveChildUseCase();
 
     when(
       () => mockGetUserProfileUseCase(),
     ).thenAnswer((_) async => Result.success(testUser));
+    when(
+      () => mockGetChildrenUseCase.execute(),
+    ).thenAnswer((_) async => Result.success([]));
+
     registerFallbackValue(testUser);
 
     viewModel = FamilyManagementViewModel(
@@ -45,6 +64,9 @@ void main() {
       updateUserProfileUseCase: mockUpdateUserProfileUseCase,
       verifyOtpUseCase: mockVerifyOtpUseCase,
       requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
+      getChildrenUseCase: mockGetChildrenUseCase,
+      addChildUseCase: mockAddChildUseCase,
+      removeChildUseCase: mockRemoveChildUseCase,
     );
   });
 
@@ -100,23 +122,24 @@ void main() {
     test('addChildFromForm success', () async {
       await Future.delayed(Duration.zero);
 
-      viewModel.childFirstNameController.text = 'Junior';
-      viewModel.childLastNameController.text = 'Doe';
       viewModel.setChildGender('Male');
       viewModel.setChildBirthDate(DateTime(2015));
 
-      final updatedUser = testUser.copyWith(
-        isParentAccount: true,
-        children: [],
-      ); // simplified
+      final newChild = testChildEntity(id: 'child-1');
       when(
-        () => mockUpdateUserProfileUseCase(any()),
-      ).thenAnswer((_) async => Result.success(updatedUser));
+        () => mockAddChildUseCase.execute(
+          firstName: any(named: 'firstName'),
+          lastName: any(named: 'lastName'),
+          birthDate: any(named: 'birthDate'),
+          gender: any(named: 'gender'),
+        ),
+      ).thenAnswer((_) async => Result.success(newChild));
 
       final result = await viewModel.addChildFromForm();
 
       check(result).isTrue();
       check(viewModel.childFirstNameController.text).equals(''); // cleared
+      check(viewModel.user?.children.length).equals(1);
     });
 
     test(
@@ -153,7 +176,14 @@ void main() {
     test(
       'addChildFromForm failure sets error message and does not add to list',
       () async {
-        when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
+        when(
+          () => mockAddChildUseCase.execute(
+            firstName: any(named: 'firstName'),
+            lastName: any(named: 'lastName'),
+            birthDate: any(named: 'birthDate'),
+            gender: any(named: 'gender'),
+          ),
+        ).thenAnswer(
           (_) async => Result.failure(ServerFailure('Add child failed')),
         );
 
@@ -183,12 +213,15 @@ void main() {
         updateUserProfileUseCase: mockUpdateUserProfileUseCase,
         verifyOtpUseCase: mockVerifyOtpUseCase,
         requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
+        getChildrenUseCase: mockGetChildrenUseCase,
+        addChildUseCase: mockAddChildUseCase,
+        removeChildUseCase: mockRemoveChildUseCase,
       );
       await Future.delayed(Duration.zero);
 
-      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
-        (_) async => Result.success(userWithChild.copyWith(children: [])),
-      );
+      when(
+        () => mockRemoveChildUseCase.execute(any()),
+      ).thenAnswer((_) async => Result.success(null));
 
       viewModel.setErrorMessage('old error');
       final result = await viewModel.removeChild('child-1');
@@ -210,11 +243,14 @@ void main() {
         updateUserProfileUseCase: mockUpdateUserProfileUseCase,
         verifyOtpUseCase: mockVerifyOtpUseCase,
         requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
+        getChildrenUseCase: mockGetChildrenUseCase,
+        addChildUseCase: mockAddChildUseCase,
+        removeChildUseCase: mockRemoveChildUseCase,
       );
       await Future.delayed(Duration.zero);
 
       when(
-        () => mockUpdateUserProfileUseCase(any()),
+        () => mockRemoveChildUseCase.execute(any()),
       ).thenAnswer((_) async => Result.failure(ServerFailure('Remove failed')));
 
       final result = await viewModel.removeChild('child-1');

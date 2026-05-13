@@ -1,21 +1,26 @@
 import 'dart:async';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:flutter/foundation.dart';
 
 /// Notifier for listening to authentication state changes.
 class AuthStateNotifier extends ChangeNotifier {
   final AuthRepository _authRepository;
+  final DeviceTokenRegistrar _deviceTokenRegistrar;
   User? _currentUser;
   StreamSubscription<User?>? _authSubscription;
 
-  AuthStateNotifier(this._authRepository) {
+  AuthStateNotifier(this._authRepository, this._deviceTokenRegistrar) {
     _init();
   }
 
   void _init() {
     _authSubscription = _authRepository.onAuthStateChanged.listen((user) {
       _currentUser = user;
+      if (user != null) {
+        unawaited(_deviceTokenRegistrar.registerIfPossible());
+      }
       notifyListeners();
     });
   }

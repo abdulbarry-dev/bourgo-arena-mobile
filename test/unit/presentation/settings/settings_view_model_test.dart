@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/is_language_selecte
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,6 +30,8 @@ class _MockGetNotificationsEnabled extends Mock
 class _MockSetNotificationsEnabled extends Mock
     implements SetNotificationsEnabledUseCase {}
 
+class _MockDeviceTokenRegistrar extends Mock implements DeviceTokenRegistrar {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(ThemeMode.system);
@@ -43,6 +46,7 @@ void main() {
   late _MockIsLanguageSelected mockIsLangSelected;
   late _MockGetNotificationsEnabled mockGetNotif;
   late _MockSetNotificationsEnabled mockSetNotif;
+  late _MockDeviceTokenRegistrar mockDeviceTokenRegistrar;
 
   setUp(() {
     mockGetTheme = _MockGetThemeMode();
@@ -52,6 +56,7 @@ void main() {
     mockIsLangSelected = _MockIsLanguageSelected();
     mockGetNotif = _MockGetNotificationsEnabled();
     mockSetNotif = _MockSetNotificationsEnabled();
+    mockDeviceTokenRegistrar = _MockDeviceTokenRegistrar();
 
     when(
       () => mockGetTheme(),
@@ -73,6 +78,11 @@ void main() {
     when(
       () => mockSetNotif(any()),
     ).thenAnswer((_) async => Result.success(null));
+    when(
+      () => mockDeviceTokenRegistrar.registerIfPossible(
+        requireNotificationsEnabled: any(named: 'requireNotificationsEnabled'),
+      ),
+    ).thenAnswer((_) async {});
 
     viewModel = SettingsViewModel(
       mockGetTheme,
@@ -82,6 +92,7 @@ void main() {
       mockIsLangSelected,
       mockGetNotif,
       mockSetNotif,
+      mockDeviceTokenRegistrar,
     );
   });
 
@@ -170,6 +181,31 @@ void main() {
       expect(viewModel.notificationsEnabled, isFalse);
       expect(notifyCount, 1);
       verify(() => mockSetNotif(false)).called(1);
+      verifyNever(
+        () => mockDeviceTokenRegistrar.registerIfPossible(
+          requireNotificationsEnabled: any(
+            named: 'requireNotificationsEnabled',
+          ),
+        ),
+      );
+    });
+
+    test('toggleNotifications registers token when enabling', () async {
+      var notifyCount = 0;
+      viewModel.addListener(() => notifyCount += 1);
+
+      await viewModel.toggleNotifications(false);
+      await viewModel.toggleNotifications(true);
+
+      expect(viewModel.notificationsEnabled, isTrue);
+      verify(() => mockSetNotif(false)).called(1);
+      verify(() => mockSetNotif(true)).called(1);
+      verify(
+        () => mockDeviceTokenRegistrar.registerIfPossible(
+          requireNotificationsEnabled: false,
+        ),
+      ).called(1);
+      expect(notifyCount, 2);
     });
   });
 }

@@ -1,10 +1,9 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/subscription_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -17,30 +16,29 @@ class SubscriptionScreen extends StatefulWidget {
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
-  late final ProfileViewModel _viewModel;
+  late final SubscriptionViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = ProfileViewModel(
-      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
-      updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
-      logoutUseCase: locator<LogoutUseCase>(),
+    _viewModel = SubscriptionViewModel(
+      getActiveSubscriptionUseCase: locator<GetActiveSubscriptionUseCase>(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        final profile = _viewModel.user;
+        final subscription = _viewModel.subscription;
 
         return Scaffold(
           appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.profileSubscriptionTitle),
+            title: Text(l10n.profileSubscriptionTitle),
             backgroundColor: theme.colorScheme.surface,
           ),
           body: SingleChildScrollView(
@@ -48,10 +46,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _ActivePlanCard(profile: profile),
+                _ActivePlanCard(
+                  subscription: subscription,
+                  fallbackPlanLabel: l10n.profilePlanLabel,
+                  fallbackNextBilling: l10n.profileNextBilling,
+                ),
                 const SizedBox(height: 32),
                 Text(
-                  AppLocalizations.of(context)!.profileAdvantages,
+                  l10n.profileAdvantages,
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.5,
@@ -59,27 +61,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _BenefitItem(
-                  text: AppLocalizations.of(context)!.profileBenefit1,
-                ),
-                _BenefitItem(
-                  text: AppLocalizations.of(context)!.profileBenefit2,
-                ),
-                _BenefitItem(
-                  text: AppLocalizations.of(context)!.profileBenefit3,
-                ),
-                _BenefitItem(
-                  text: AppLocalizations.of(context)!.profileBenefit4,
-                ),
+                ..._buildBenefits(subscription, l10n),
                 const SizedBox(height: 40),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
                   ),
-                  child: Text(
-                    AppLocalizations.of(context)!.profileManageSubscription,
-                  ),
+                  child: Text(l10n.profileManageSubscription),
                 ),
               ],
             ),
@@ -88,12 +77,35 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       },
     );
   }
+
+  List<Widget> _buildBenefits(
+    Subscription? subscription,
+    AppLocalizations l10n,
+  ) {
+    final benefits = subscription?.benefits;
+    if (benefits != null && benefits.isNotEmpty) {
+      return benefits.map((benefit) => _BenefitItem(text: benefit)).toList();
+    }
+
+    return [
+      _BenefitItem(text: l10n.profileBenefit1),
+      _BenefitItem(text: l10n.profileBenefit2),
+      _BenefitItem(text: l10n.profileBenefit3),
+      _BenefitItem(text: l10n.profileBenefit4),
+    ];
+  }
 }
 
 class _ActivePlanCard extends StatelessWidget {
-  final dynamic profile;
+  final Subscription? subscription;
+  final String fallbackPlanLabel;
+  final String fallbackNextBilling;
 
-  const _ActivePlanCard({required this.profile});
+  const _ActivePlanCard({
+    required this.subscription,
+    required this.fallbackPlanLabel,
+    required this.fallbackNextBilling,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,8 +134,7 @@ class _ActivePlanCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                profile?.subscriptionLevel ??
-                    AppLocalizations.of(context)!.profilePlanLabel,
+                subscription?.name ?? fallbackPlanLabel,
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontFamily: AppConstants.displayFontFamily,
                   color: theme.colorScheme.primary,
@@ -138,14 +149,16 @@ class _ActivePlanCard extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            AppLocalizations.of(context)!.profileNextBilling,
+            fallbackNextBilling,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               letterSpacing: 1,
             ),
           ),
           Text(
-            profile?.subscriptionExpiry ?? '...',
+            subscription?.durationMonths != null
+                ? '${subscription!.durationMonths} months'
+                : '...',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),

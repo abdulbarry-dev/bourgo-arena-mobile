@@ -99,7 +99,7 @@ class ApiAuthRepository implements AuthRepository {
                 'otp': otp,
               })
               as Map<String, dynamic>;
-      return Success(response['success'] == true);
+      return Success(response['valid'] == true);
     });
   }
 

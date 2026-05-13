@@ -2,6 +2,9 @@ import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +16,9 @@ class FamilyManagementViewModel extends ChangeNotifier {
   final UpdateUserProfileUseCase _updateUserProfileUseCase;
   final VerifyOtpUseCase _verifyOtpUseCase;
   final RequestFamilyAccountOtpUseCase _requestFamilyAccountOtpUseCase;
+  final GetChildrenUseCase _getChildrenUseCase;
+  final AddChildUseCase _addChildUseCase;
+  final RemoveChildUseCase _removeChildUseCase;
 
   User? _user;
   bool _isLoading = true;
@@ -38,10 +44,16 @@ class FamilyManagementViewModel extends ChangeNotifier {
     required UpdateUserProfileUseCase updateUserProfileUseCase,
     required VerifyOtpUseCase verifyOtpUseCase,
     required RequestFamilyAccountOtpUseCase requestFamilyAccountOtpUseCase,
+    required GetChildrenUseCase getChildrenUseCase,
+    required AddChildUseCase addChildUseCase,
+    required RemoveChildUseCase removeChildUseCase,
   }) : _getUserProfileUseCase = getUserProfileUseCase,
        _updateUserProfileUseCase = updateUserProfileUseCase,
        _verifyOtpUseCase = verifyOtpUseCase,
-       _requestFamilyAccountOtpUseCase = requestFamilyAccountOtpUseCase {
+       _requestFamilyAccountOtpUseCase = requestFamilyAccountOtpUseCase,
+       _getChildrenUseCase = getChildrenUseCase,
+       _addChildUseCase = addChildUseCase,
+       _removeChildUseCase = removeChildUseCase {
     _loadProfile();
   }
 
@@ -90,8 +102,13 @@ class FamilyManagementViewModel extends ChangeNotifier {
 
     final result = await _getUserProfileUseCase();
     result.when(
-      success: (user) {
+      success: (user) async {
         _user = user;
+        // Optionally sync children separately if needed,
+        // though /user/profile should include them.
+        if (user.isParentAccount) {
+          await _refreshChildren();
+        }
       },
       failure: (failure) {
         developer.log(
@@ -102,6 +119,20 @@ class FamilyManagementViewModel extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> _refreshChildren() async {
+    if (_user == null) return;
+
+    final result = await _getChildrenUseCase.execute();
+    result.when(
+      success: (children) {
+        _user = _user!.copyWith(children: children);
+      },
+      failure: (failure) {
+        developer.log('Error refreshing children: ${failure.message}');
+      },
+    );
   }
 
   /// Requests an OTP to enable family account.
@@ -230,22 +261,20 @@ class FamilyManagementViewModel extends ChangeNotifier {
       return false;
     }
 
-    final newChild = ChildProfile(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+    final result = await _addChildUseCase.execute(
       firstName: childFirstNameController.text.trim(),
       lastName: childLastNameController.text.trim(),
       birthDate: _selectedChildBirthDate!,
       gender: _selectedChildGender!,
     );
 
-    final updatedChildren = List<ChildProfile>.from(_user!.children)
-      ..add(newChild);
-    final updatedUser = _user!.copyWith(children: updatedChildren);
-
-    final result = await _updateUserProfileUseCase(updatedUser);
     return result.fold(
-      onSuccess: (user) {
-        _user = user;
+      onSuccess: (newChild) {
+        if (_user != null) {
+          final updatedChildren = List<ChildProfile>.from(_user!.children)
+            ..add(newChild);
+          _user = _user!.copyWith(children: updatedChildren);
+        }
         _errorMessage = null;
         clearChildForm();
         return true;
@@ -261,15 +290,16 @@ class FamilyManagementViewModel extends ChangeNotifier {
   Future<bool> removeChild(String childId) async {
     if (_user == null) return false;
 
-    final updatedChildren = _user!.children
-        .where((c) => c.id != childId)
-        .toList();
-    final updatedUser = _user!.copyWith(children: updatedChildren);
+    final result = await _removeChildUseCase.execute(childId);
 
-    final result = await _updateUserProfileUseCase(updatedUser);
     return result.fold(
-      onSuccess: (user) {
-        _user = user;
+      onSuccess: (_) {
+        if (_user != null) {
+          final updatedChildren = _user!.children
+              .where((c) => c.id != childId)
+              .toList();
+          _user = _user!.copyWith(children: updatedChildren);
+        }
         _errorMessage = null;
         notifyListeners();
         return true;
