@@ -4,8 +4,8 @@ import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 
 /// Interface for authentication operations.
 abstract interface class AuthRepository {
-  /// Signs in a user with [email] and [password].
-  Future<Result<User, Failure>> login(String email, String password);
+  /// Signs in a user with [identifier] (email or phone) and [password].
+  Future<Result<User, Failure>> login(String identifier, String password);
 
   /// Registers a new user.
   Future<Result<void, Failure>> register({
@@ -14,6 +14,8 @@ abstract interface class AuthRepository {
     required String email,
     required String phone,
     required String password,
+    required String gender,
+    required DateTime birthDate,
     bool isFamilyAccount = false,
   });
 
@@ -39,7 +41,20 @@ abstract interface class AuthRepository {
   Future<Result<String?, Failure>> getToken();
 
   /// Completes the registration process and signs the user in.
-  Future<Result<void, Failure>> completeRegistration(User user);
+  Future<Result<void, Failure>> completeRegistration(User user, String pin);
+
+  /// Requests a password reset OTP for the given [identifier].
+  Future<Result<void, Failure>> forgotPassword(String identifier);
+
+  /// Resets the user's password using an [identifier], [otp], and [newPassword].
+  Future<Result<void, Failure>> resetPassword({
+    required String identifier,
+    required String otp,
+    required String newPassword,
+  });
+
+  /// Fetches the profile of the currently authenticated user.
+  Future<Result<User, Failure>> getUserProfile();
 
   /// Stream of authentication state changes.
   Stream<User?> get onAuthStateChanged;

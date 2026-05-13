@@ -31,6 +31,9 @@ class LocalSessionRepository implements SessionRepository {
   static const String _deviceTokenKey = 'device_token';
   static const String _devicePlatformKey = 'device_platform';
 
+  // Remember Me
+  static const String _rememberedIdentifierKey = 'remembered_identifier';
+
   /// All session-scoped keys that should be wiped atomically by [clearSession].
   /// This list is the source of truth for session-wide data; every session field
   /// added in the future MUST be added here.
@@ -233,6 +236,48 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure('Failed to save device platform: ${e.toString()}'),
+      );
+    }
+  }
+
+  // =========== Remember Me ===========
+
+  @override
+  Future<Result<String?, Failure>> getRememberedIdentifier() async {
+    try {
+      final identifier = _prefs.getString(_rememberedIdentifierKey);
+      return Success(identifier);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          'Failed to retrieve remembered identifier: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> saveRememberedIdentifier(
+    String identifier,
+  ) async {
+    try {
+      await _prefs.setString(_rememberedIdentifierKey, identifier);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save remembered identifier: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> clearRememberedIdentifier() async {
+    try {
+      await _prefs.remove(_rememberedIdentifierKey);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to clear remembered identifier: ${e.toString()}'),
       );
     }
   }

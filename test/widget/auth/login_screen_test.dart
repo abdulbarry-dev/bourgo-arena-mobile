@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
@@ -11,10 +12,19 @@ import '../../unit/data/repositories/repository_test_fixtures.dart';
 
 class MockLoginUseCase extends Mock implements LoginUseCase {}
 
+class MockSessionRepository extends Mock implements SessionRepository {}
+
 void main() {
   late MockLoginUseCase mockLoginUseCase;
+  late MockSessionRepository mockSessionRepository;
+
   setUp(() {
     mockLoginUseCase = MockLoginUseCase();
+    mockSessionRepository = MockSessionRepository();
+
+    when(
+      () => mockSessionRepository.getRememberedIdentifier(),
+    ).thenAnswer((_) async => const Success(null));
   });
 
   Future<void> setupScreenSize(WidgetTester tester) async {
@@ -30,7 +40,10 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: LoginScreen(loginUseCase: mockLoginUseCase),
+        home: LoginScreen(
+          loginUseCase: mockLoginUseCase,
+          sessionRepository: mockSessionRepository,
+        ),
       ),
     );
 
@@ -62,12 +75,18 @@ void main() {
     when(
       () => mockLoginUseCase(any(), any()),
     ).thenAnswer((_) async => Success(user));
+    when(
+      () => mockSessionRepository.clearRememberedIdentifier(),
+    ).thenAnswer((_) async => const Success(null));
 
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: LoginScreen(loginUseCase: mockLoginUseCase),
+        home: LoginScreen(
+          loginUseCase: mockLoginUseCase,
+          sessionRepository: mockSessionRepository,
+        ),
       ),
     );
 
@@ -102,7 +121,10 @@ void main() {
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        home: LoginScreen(loginUseCase: mockLoginUseCase),
+        home: LoginScreen(
+          loginUseCase: mockLoginUseCase,
+          sessionRepository: mockSessionRepository,
+        ),
       ),
     );
 

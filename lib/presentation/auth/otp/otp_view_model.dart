@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:flutter/material.dart';
@@ -26,11 +27,12 @@ class OtpViewModel extends ChangeNotifier {
     required String code,
     required VoidCallback onSuccess,
   }) async {
-    if (code.length == 4) {
+    if (code.length == 6) {
       setLoading(true);
       _errorMessage = null;
       notifyListeners();
 
+      developer.log('Verifying OTP: $code for $identifier');
       final result = await _verifyOtpUseCase(identifier, code);
 
       setLoading(false);

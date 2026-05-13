@@ -25,6 +25,20 @@ class AuthStateNotifier extends ChangeNotifier {
     });
   }
 
+  /// Initializes the auth state by fetching the current user profile if a
+  /// token exists.
+  Future<void> initialize() async {
+    final tokenResult = await _authRepository.getToken();
+    final token = tokenResult.fold(
+      onSuccess: (token) => token,
+      onFailure: (_) => null,
+    );
+
+    if (token != null) {
+      await _authRepository.getUserProfile();
+    }
+  }
+
   /// The currently logged-in user.
   User? get currentUser => _currentUser;
 

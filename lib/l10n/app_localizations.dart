@@ -398,6 +398,12 @@ abstract class AppLocalizations {
   /// **'Mot de passe'**
   String get authPasswordLabel;
 
+  /// No description provided for @authRememberMe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se souvenir de moi'**
+  String get authRememberMe;
+
   /// No description provided for @authLoginTitle.
   ///
   /// In fr, this message translates to:

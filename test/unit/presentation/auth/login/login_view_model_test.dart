@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/viewmodels/login_view_model.dart';
 import 'package:flutter/material.dart';
@@ -13,10 +14,13 @@ import '../../../data/repositories/repository_test_fixtures.dart';
 
 class MockLoginUseCase extends Mock implements LoginUseCase {}
 
+class MockSessionRepository extends Mock implements SessionRepository {}
+
 class MockBuildContext extends Mock implements BuildContext {}
 
 void main() {
   late MockLoginUseCase mockLoginUseCase;
+  late MockSessionRepository mockSessionRepository;
   late LoginViewModel viewModel;
 
   setUpAll(() {
@@ -25,7 +29,12 @@ void main() {
 
   setUp(() {
     mockLoginUseCase = MockLoginUseCase();
-    viewModel = LoginViewModel(mockLoginUseCase);
+    mockSessionRepository = MockSessionRepository();
+    viewModel = LoginViewModel(mockLoginUseCase, mockSessionRepository);
+
+    when(
+      () => mockSessionRepository.getRememberedIdentifier(),
+    ).thenAnswer((_) async => const Success(null));
   });
 
   testWidgets('does not call use case when form is not valid', (tester) async {
@@ -48,6 +57,9 @@ void main() {
     when(
       () => mockLoginUseCase(any(), any()),
     ).thenAnswer((_) async => Success(user));
+    when(
+      () => mockSessionRepository.clearRememberedIdentifier(),
+    ).thenAnswer((_) async => const Success(null));
 
     // set controller values
     viewModel.identifierController.text = 'alex@example.com';
@@ -75,6 +87,90 @@ void main() {
 
     verify(() => mockLoginUseCase('alex@example.com', 'secret123')).called(1);
     check(viewModel.isLoading).isFalse();
+  });
+
+  group('Remember Me -', () {
+    test('initialize loads remembered identifier', () async {
+      when(
+        () => mockSessionRepository.getRememberedIdentifier(),
+      ).thenAnswer((_) async => const Success('remembered@example.com'));
+
+      await viewModel.initialize();
+
+      check(
+        viewModel.identifierController.text,
+      ).equals('remembered@example.com');
+      check(viewModel.isRememberMeChecked).isTrue();
+    });
+
+    testWidgets('login saves identifier when remember me is checked', (
+      tester,
+    ) async {
+      final user = testUserEntity();
+      when(
+        () => mockLoginUseCase(any(), any()),
+      ).thenAnswer((_) async => Success(user));
+      when(
+        () => mockSessionRepository.saveRememberedIdentifier(any()),
+      ).thenAnswer((_) async => const Success(null));
+
+      viewModel.identifierController.text = 'alex@example.com';
+      viewModel.passwordController.text = 'password';
+      viewModel.toggleRememberMe(true);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Form(
+              key: viewModel.formKey,
+              child: TextFormField(controller: viewModel.identifierController),
+            ),
+          ),
+        ),
+      );
+
+      final ctx = tester.element(find.byType(Form));
+
+      await viewModel.login(ctx);
+
+      verify(
+        () =>
+            mockSessionRepository.saveRememberedIdentifier('alex@example.com'),
+      ).called(1);
+    });
+
+    testWidgets('login clears identifier when remember me is NOT checked', (
+      tester,
+    ) async {
+      final user = testUserEntity();
+      when(
+        () => mockLoginUseCase(any(), any()),
+      ).thenAnswer((_) async => Success(user));
+      when(
+        () => mockSessionRepository.clearRememberedIdentifier(),
+      ).thenAnswer((_) async => const Success(null));
+
+      viewModel.identifierController.text = 'alex@example.com';
+      viewModel.passwordController.text = 'password';
+      viewModel.toggleRememberMe(false);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Form(
+              key: viewModel.formKey,
+              child: TextFormField(controller: viewModel.identifierController),
+            ),
+          ),
+        ),
+      );
+
+      final ctx = tester.element(find.byType(Form));
+
+      await viewModel.login(ctx);
+
+      verify(() => mockSessionRepository.clearRememberedIdentifier()).called(1);
+    });
   });
 
   testWidgets('shows SnackBar with failure message on failure', (tester) async {
@@ -146,19 +242,6 @@ void main() {
   });
 
   group('LoginViewModel - State Management', () {
-    test('isLoading lifecycle and notifyListeners count', () async {
-      final user = testUserEntity();
-      when(
-        () => mockLoginUseCase(any(), any()),
-      ).thenAnswer((_) async => Success(user));
-
-      viewModel.identifierController.text = 'alex@example.com';
-      viewModel.passwordController.text = 'password';
-
-      // We need to bypass form validation for simple state test or use testWidgets
-      // Let's use testWidgets to ensure form is present
-    });
-
     testWidgets('isLoading lifecycle and notifyListeners count', (
       tester,
     ) async {
@@ -167,6 +250,9 @@ void main() {
       when(
         () => mockLoginUseCase(any(), any()),
       ).thenAnswer((_) => completer.future);
+      when(
+        () => mockSessionRepository.clearRememberedIdentifier(),
+      ).thenAnswer((_) async => const Success(null));
 
       viewModel.identifierController.text = 'alex@example.com';
       viewModel.passwordController.text = 'password';
@@ -205,6 +291,9 @@ void main() {
       when(
         () => mockLoginUseCase(any(), any()),
       ).thenAnswer((_) => completer.future);
+      when(
+        () => mockSessionRepository.clearRememberedIdentifier(),
+      ).thenAnswer((_) async => const Success(null));
 
       viewModel.identifierController.text = 'alex@example.com';
       viewModel.passwordController.text = 'password';

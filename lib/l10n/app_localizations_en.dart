@@ -164,6 +164,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordLabel => 'Password';
 
   @override
+  String get authRememberMe => 'Remember me';
+
+  @override
   String get authLoginTitle => 'Login';
 
   @override

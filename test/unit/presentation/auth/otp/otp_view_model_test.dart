@@ -30,11 +30,13 @@ void main() {
       bool successCalled = false;
       await viewModel.verify(
         identifier: 'test@example.com',
-        code: '1234',
+        code: '123456',
         onSuccess: () => successCalled = true,
       );
 
-      verify(() => mockVerifyOtpUseCase('test@example.com', '1234')).called(1);
+      verify(
+        () => mockVerifyOtpUseCase('test@example.com', '123456'),
+      ).called(1);
       expect(successCalled, isTrue);
       expect(viewModel.isLoading, isFalse);
     });
@@ -46,7 +48,7 @@ void main() {
 
       await viewModel.verify(
         identifier: 'test@example.com',
-        code: '1234',
+        code: '123456',
         onSuccess: () {},
       );
 
@@ -61,7 +63,7 @@ void main() {
 
       await viewModel.verify(
         identifier: 'test@example.com',
-        code: '1234',
+        code: '123456',
         onSuccess: () {},
       );
 

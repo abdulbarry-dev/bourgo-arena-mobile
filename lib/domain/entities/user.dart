@@ -36,6 +36,9 @@ class User {
   /// Birth date of the user.
   final DateTime? birthDate;
 
+  /// Gender of the user.
+  final String? gender;
+
   /// Whether this is a parent account that can manage children.
   final bool isParentAccount;
 
@@ -55,6 +58,7 @@ class User {
     required this.subscriptionExpiry,
     required this.totalCheckIns,
     this.birthDate,
+    this.gender,
     this.isParentAccount = false,
     this.children = const [],
   });
@@ -71,6 +75,7 @@ class User {
     String? subscriptionExpiry,
     int? totalCheckIns,
     DateTime? birthDate,
+    String? gender,
     bool? isParentAccount,
     List<ChildProfile>? children,
   }) {
@@ -86,6 +91,7 @@ class User {
       subscriptionExpiry: subscriptionExpiry ?? this.subscriptionExpiry,
       totalCheckIns: totalCheckIns ?? this.totalCheckIns,
       birthDate: birthDate ?? this.birthDate,
+      gender: gender ?? this.gender,
       isParentAccount: isParentAccount ?? this.isParentAccount,
       children: children ?? this.children,
     );
@@ -110,6 +116,7 @@ class User {
           subscriptionExpiry == other.subscriptionExpiry &&
           totalCheckIns == other.totalCheckIns &&
           birthDate == other.birthDate &&
+          gender == other.gender &&
           isParentAccount == other.isParentAccount &&
           _listEquality.equals(children, other.children);
 
@@ -126,6 +133,7 @@ class User {
       subscriptionExpiry.hashCode ^
       totalCheckIns.hashCode ^
       birthDate.hashCode ^
+      gender.hashCode ^
       isParentAccount.hashCode ^
       _listEquality.hash(children);
 

@@ -167,6 +167,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authPasswordLabel => 'Mot de passe';
 
   @override
+  String get authRememberMe => 'Se souvenir de moi';
+
+  @override
   String get authLoginTitle => 'Connexion';
 
   @override

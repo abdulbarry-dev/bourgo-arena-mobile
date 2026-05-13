@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart'
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/viewmodels/register_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_dropdown.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
@@ -157,6 +158,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         validator: (value) => value?.isEmpty ?? true
                             ? l10n.commonRequiredField
                             : null,
+                      ),
+                      const SizedBox(height: 20),
+                      AuthDropdown<String>(
+                        key: const Key('gender_dropdown'),
+                        label: l10n.authGenderLabel,
+                        hint: l10n.authGenderHint,
+                        leadingIcon: Symbols.person_pin,
+                        value: _viewModel.selectedGender,
+                        items: [
+                          DropdownMenuItem(
+                            value: 'male',
+                            child: Text(l10n.commonGenderMale),
+                          ),
+                          DropdownMenuItem(
+                            value: 'female',
+                            child: Text(l10n.commonGenderFemale),
+                          ),
+                          DropdownMenuItem(
+                            value: 'other',
+                            child: Text(l10n.commonGenderOther),
+                          ),
+                        ],
+                        onChanged: _viewModel.setGender,
+                        validator: (value) =>
+                            value == null ? l10n.commonRequiredField : null,
                       ),
                       const SizedBox(height: 20),
                       AuthTextField(

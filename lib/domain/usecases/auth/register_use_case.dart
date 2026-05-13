@@ -16,6 +16,8 @@ class RegisterUseCase {
     required String email,
     required String phone,
     required String password,
+    required String gender,
+    required DateTime birthDate,
     bool isFamilyAccount = false,
   }) async {
     return _repository.register(
@@ -24,6 +26,8 @@ class RegisterUseCase {
       email: email,
       phone: phone,
       password: password,
+      gender: gender,
+      birthDate: birthDate,
       isFamilyAccount: isFamilyAccount,
     );
   }

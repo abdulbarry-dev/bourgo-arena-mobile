@@ -138,6 +138,32 @@ class AccountSetupScreen extends StatelessWidget {
                   controller: TextEditingController(text: phone),
                   readOnly: true,
                 ),
+                if (registrationData['gender'] != null) ...[
+                  const SizedBox(height: 20),
+                  AuthTextField(
+                    label: 'Gender', // TODO: Add l10n if needed
+                    hint: '',
+                    leadingIcon: Symbols.person,
+                    controller: TextEditingController(
+                      text: registrationData['gender'] as String,
+                    ),
+                    readOnly: true,
+                  ),
+                ],
+                if (registrationData['birthDate'] != null) ...[
+                  const SizedBox(height: 20),
+                  AuthTextField(
+                    label: 'Birth Date', // TODO: Add l10n if needed
+                    hint: '',
+                    leadingIcon: Symbols.calendar_month,
+                    controller: TextEditingController(
+                      text: (registrationData['birthDate'] as DateTime)
+                          .toIso8601String()
+                          .split('T')[0],
+                    ),
+                    readOnly: true,
+                  ),
+                ],
 
                 const SizedBox(height: 32),
 

@@ -50,6 +50,8 @@ void main() {
           email: any(named: 'email'),
           phone: any(named: 'phone'),
           password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
           isFamilyAccount: any(named: 'isFamilyAccount'),
         ),
       );
@@ -66,6 +68,8 @@ void main() {
           email: any(named: 'email'),
           phone: any(named: 'phone'),
           password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
           isFamilyAccount: any(named: 'isFamilyAccount'),
         ),
       ).thenAnswer((_) async => const Success(null));
@@ -75,6 +79,8 @@ void main() {
       viewModel.emailController.text = 'john@example.com';
       viewModel.phoneController.text = '123456789';
       viewModel.passwordController.text = 'password123';
+      viewModel.setGender('male');
+      viewModel.setBirthDate(DateTime.utc(1990, 1, 1));
       viewModel.setParentAccount(true);
 
       // Build a minimal form to satisfy validate()
@@ -106,6 +112,8 @@ void main() {
           email: 'john@example.com',
           phone: '123456789',
           password: 'password123',
+          gender: 'male',
+          birthDate: DateTime.utc(1990, 1, 1),
           isFamilyAccount: true,
         ),
       ).called(1);
@@ -123,6 +131,8 @@ void main() {
           email: any(named: 'email'),
           phone: any(named: 'phone'),
           password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
           isFamilyAccount: any(named: 'isFamilyAccount'),
         ),
       ).thenAnswer(
@@ -130,6 +140,8 @@ void main() {
       );
 
       viewModel.firstNameController.text = 'John';
+      viewModel.setGender('male');
+      viewModel.setBirthDate(DateTime.utc(1990, 1, 1));
 
       await tester.pumpWidget(
         MaterialApp(
@@ -162,11 +174,15 @@ void main() {
           email: any(named: 'email'),
           phone: any(named: 'phone'),
           password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
           isFamilyAccount: any(named: 'isFamilyAccount'),
         ),
       ).thenAnswer((_) => completer.future);
 
       viewModel.firstNameController.text = 'John';
+      viewModel.setGender('male');
+      viewModel.setBirthDate(DateTime.utc(1990, 1, 1));
 
       await tester.pumpWidget(
         MaterialApp(
@@ -202,11 +218,15 @@ void main() {
           email: any(named: 'email'),
           phone: any(named: 'phone'),
           password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
           isFamilyAccount: any(named: 'isFamilyAccount'),
         ),
       ).thenAnswer((_) => completer.future);
 
       viewModel.firstNameController.text = 'John';
+      viewModel.setGender('male');
+      viewModel.setBirthDate(DateTime.utc(1990, 1, 1));
 
       await tester.pumpWidget(
         MaterialApp(

@@ -1,9 +1,11 @@
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Login screen.
 class LoginViewModel extends ChangeNotifier {
   final LoginUseCase _loginUseCase;
+  final SessionRepository _sessionRepository;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController identifierController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -11,7 +13,30 @@ class LoginViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  LoginViewModel(this._loginUseCase);
+  bool _isRememberMeChecked = false;
+  bool get isRememberMeChecked => _isRememberMeChecked;
+
+  LoginViewModel(this._loginUseCase, this._sessionRepository);
+
+  /// Initializes the ViewModel by loading the remembered identifier if any.
+  Future<void> initialize() async {
+    final result = await _sessionRepository.getRememberedIdentifier();
+    result.when(
+      success: (identifier) {
+        if (identifier != null && identifier.isNotEmpty) {
+          identifierController.text = identifier;
+          _isRememberMeChecked = true;
+          notifyListeners();
+        }
+      },
+      failure: (_) {},
+    );
+  }
+
+  void toggleRememberMe(bool? value) {
+    _isRememberMeChecked = value ?? false;
+    notifyListeners();
+  }
 
   void setLoading(bool value) {
     _isLoading = value;
@@ -38,7 +63,14 @@ class LoginViewModel extends ChangeNotifier {
             ).showSnackBar(SnackBar(content: Text(failure.message)));
           }
         },
-        onSuccess: (user) {
+        onSuccess: (user) async {
+          if (_isRememberMeChecked) {
+            await _sessionRepository.saveRememberedIdentifier(
+              identifierController.text,
+            );
+          } else {
+            await _sessionRepository.clearRememberedIdentifier();
+          }
           // Note: GoRouter redirect in router.dart will handle navigation on success
         },
       );

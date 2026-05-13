@@ -16,6 +16,9 @@ class RegisterViewModel extends ChangeNotifier {
   DateTime? _selectedBirthDate;
   DateTime? get selectedBirthDate => _selectedBirthDate;
 
+  String? _selectedGender;
+  String? get selectedGender => _selectedGender;
+
   bool _isParentAccount = false;
   bool get isParentAccount => _isParentAccount;
 
@@ -29,6 +32,11 @@ class RegisterViewModel extends ChangeNotifier {
 
   void setBirthDate(DateTime? date) {
     _selectedBirthDate = date;
+    notifyListeners();
+  }
+
+  void setGender(String? gender) {
+    _selectedGender = gender;
     notifyListeners();
   }
 
@@ -46,6 +54,12 @@ class RegisterViewModel extends ChangeNotifier {
     required void Function(Map<String, dynamic> data) onSuccess,
   }) async {
     if (formKey.currentState?.validate() ?? false) {
+      if (_selectedBirthDate == null || _selectedGender == null) {
+        _errorMessage = "Please complete all fields";
+        notifyListeners();
+        return;
+      }
+
       setLoading(true);
       _errorMessage = null;
       notifyListeners();
@@ -56,6 +70,8 @@ class RegisterViewModel extends ChangeNotifier {
         email: emailController.text,
         phone: phoneController.text,
         password: passwordController.text,
+        gender: _selectedGender!,
+        birthDate: _selectedBirthDate!,
         isFamilyAccount: _isParentAccount,
       );
 
@@ -68,6 +84,8 @@ class RegisterViewModel extends ChangeNotifier {
             'lastName': lastNameController.text,
             'email': emailController.text,
             'phone': phoneController.text,
+            'gender': _selectedGender,
+            'birthDate': _selectedBirthDate,
             'isParentAccount': _isParentAccount,
           };
           onSuccess(registrationData);

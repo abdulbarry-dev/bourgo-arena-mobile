@@ -18,6 +18,7 @@ User testUserEntity({
   String subscriptionExpiry = '2026-12-31',
   int totalCheckIns = 14,
   DateTime? birthDate,
+  String? gender = 'male',
   bool isParentAccount = false,
   List<ChildProfile> children = const [],
 }) {
@@ -33,6 +34,7 @@ User testUserEntity({
     subscriptionExpiry: subscriptionExpiry,
     totalCheckIns: totalCheckIns,
     birthDate: birthDate,
+    gender: gender,
     isParentAccount: isParentAccount,
     children: children,
   );
@@ -169,6 +171,7 @@ Map<String, dynamic> testUserJson({
   String? subscriptionExpiry = '2026-12-31',
   int totalCheckIns = 14,
   DateTime? birthDate,
+  String? gender = 'male',
   bool isParentAccount = false,
   List<Map<String, dynamic>> children = const [],
 }) {
@@ -183,6 +186,7 @@ Map<String, dynamic> testUserJson({
     'subscription_expiry': subscriptionExpiry,
     'total_check_ins': totalCheckIns,
     'birth_date': birthDate?.toIso8601String(),
+    'gender': gender,
     'is_parent_account': isParentAccount,
     'children': children,
   };

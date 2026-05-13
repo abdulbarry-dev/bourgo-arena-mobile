@@ -168,7 +168,11 @@ Future<void> initLocator() async {
   );
 
   // State Notifiers
-  locator.registerLazySingleton(() => AuthStateNotifier(locator(), locator()));
+  locator.registerSingletonAsync<AuthStateNotifier>(() async {
+    final notifier = AuthStateNotifier(locator(), locator());
+    await notifier.initialize();
+    return notifier;
+  });
 
   // ViewModels — registered as async so initialize() is awaited at startup.
   locator.registerSingletonAsync<SettingsViewModel>(() async {

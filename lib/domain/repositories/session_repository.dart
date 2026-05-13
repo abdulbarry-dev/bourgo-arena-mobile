@@ -60,4 +60,15 @@ abstract interface class SessionRepository {
 
   /// Persists the device platform (e.g. android, ios).
   Future<Result<void, Failure>> saveDevicePlatform(String platform);
+
+  // =========== Remember Me ===========
+
+  /// Retrieves the persisted identifier for "Remember Me".
+  Future<Result<String?, Failure>> getRememberedIdentifier();
+
+  /// Persists the identifier for "Remember Me".
+  Future<Result<void, Failure>> saveRememberedIdentifier(String identifier);
+
+  /// Clears the persisted identifier for "Remember Me".
+  Future<Result<void, Failure>> clearRememberedIdentifier();
 }

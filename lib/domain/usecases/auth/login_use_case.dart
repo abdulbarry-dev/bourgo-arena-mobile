@@ -11,7 +11,7 @@ class LoginUseCase {
   const LoginUseCase(this._repository);
 
   /// Executes the login operation.
-  Future<Result<User, Failure>> call(String email, String password) async {
-    return _repository.login(email, password);
+  Future<Result<User, Failure>> call(String identifier, String password) async {
+    return _repository.login(identifier, password);
   }
 }

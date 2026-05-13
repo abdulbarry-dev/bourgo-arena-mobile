@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
@@ -38,6 +39,27 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
 /// App routing configuration using GoRouter.
+/// Extension to safely extract extra data from [GoRouterState].
+extension GoRouterStateExtraX on GoRouterState {
+  /// Safely gets a [Map<String, dynamic>] from extra.
+  Map<String, dynamic> get extraAsMap {
+    final data = extra;
+    if (data is Map<String, dynamic>) {
+      return data;
+    }
+    if (data is String) {
+      return {'destination': data};
+    }
+    return <String, dynamic>{};
+  }
+
+  /// Safely gets an [Activity] from extra.
+  Activity? get extraAsActivity {
+    final data = extra;
+    return data is Activity ? data : null;
+  }
+}
+
 GoRouter createRouter(
   SettingsViewModel settingsViewModel,
   AuthStateNotifier authStateNotifier,
@@ -91,8 +113,10 @@ GoRouter createRouter(
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
     GoRoute(
       path: '/login',
-      builder: (context, state) =>
-          LoginScreen(loginUseCase: locator<LoginUseCase>()),
+      builder: (context, state) => LoginScreen(
+        loginUseCase: locator<LoginUseCase>(),
+        sessionRepository: locator<SessionRepository>(),
+      ),
     ),
     GoRoute(
       path: '/register',
@@ -102,10 +126,10 @@ GoRouter createRouter(
     GoRoute(
       path: '/otp',
       builder: (context, state) {
-        final data = state.extra as Map<String, dynamic>?;
+        final data = state.extraAsMap;
         return OtpScreen(
-          destination: data?['destination'] as String?,
-          registrationData: data?['registrationData'] as Map<String, dynamic>?,
+          destination: data['destination'] as String?,
+          registrationData: data['registrationData'] as Map<String, dynamic>?,
           sendOtpUseCase: locator<SendOtpUseCase>(),
           verifyOtpUseCase: locator<VerifyOtpUseCase>(),
         );
@@ -113,31 +137,25 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/verification-method',
-      builder: (context, state) {
-        final registrationData = state.extra as Map<String, dynamic>;
-        return VerificationMethodScreen(registrationData: registrationData);
-      },
+      builder: (context, state) => VerificationMethodScreen(
+        registrationData: state.extraAsMap,
+        sendOtpUseCase: locator<SendOtpUseCase>(),
+      ),
     ),
     GoRoute(
       path: '/family-onboarding',
-      builder: (context, state) {
-        final registrationData = state.extra as Map<String, dynamic>;
-        return FamilyOnboardingScreen(registrationData: registrationData);
-      },
+      builder: (context, state) =>
+          FamilyOnboardingScreen(registrationData: state.extraAsMap),
     ),
     GoRoute(
       path: '/account-setup',
-      builder: (context, state) {
-        final registrationData = state.extra as Map<String, dynamic>;
-        return AccountSetupScreen(registrationData: registrationData);
-      },
+      builder: (context, state) =>
+          AccountSetupScreen(registrationData: state.extraAsMap),
     ),
     GoRoute(
       path: '/pin-setup',
-      builder: (context, state) {
-        final registrationData = state.extra as Map<String, dynamic>;
-        return PinSetupScreen(registrationData: registrationData);
-      },
+      builder: (context, state) =>
+          PinSetupScreen(registrationData: state.extraAsMap),
     ),
     GoRoute(
       path: '/forgot-password',
@@ -150,17 +168,13 @@ GoRouter createRouter(
     GoRoute(path: '/home', builder: (context, state) => const MainLayout()),
     GoRoute(
       path: '/booking',
-      builder: (context, state) {
-        final activity = state.extra as Activity?;
-        return BookingFlowScreen(initialActivity: activity);
-      },
+      builder: (context, state) =>
+          BookingFlowScreen(initialActivity: state.extraAsActivity),
     ),
     GoRoute(
       path: '/booking-success',
-      builder: (context, state) {
-        final activity = state.extra as Activity?;
-        return BookingSuccessScreen(activity: activity);
-      },
+      builder: (context, state) =>
+          BookingSuccessScreen(activity: state.extraAsActivity),
     ),
     GoRoute(
       path: '/planning',

@@ -19,11 +19,15 @@ class ApiAuthRepository implements AuthRepository {
   ApiAuthRepository(this._apiClient, this._sessionRepository);
 
   @override
-  Future<Result<User, Failure>> login(String email, String password) {
+  Future<Result<User, Failure>> login(String identifier, String password) {
     return executeApiCall(() async {
+      // Clear any existing token before login to avoid interference
+      _apiClient.setToken(null);
+
+      final isEmail = identifier.contains('@');
       final response =
           await _apiClient.post('/auth/login', {
-                'email': email,
+                isEmail ? 'email' : 'phone': identifier,
                 'password': password,
               })
               as Map<String, dynamic>;
@@ -67,6 +71,8 @@ class ApiAuthRepository implements AuthRepository {
     required String email,
     required String phone,
     required String password,
+    required String gender,
+    required DateTime birthDate,
     bool isFamilyAccount = false,
   }) {
     return executeApiCall(() async {
@@ -75,7 +81,9 @@ class ApiAuthRepository implements AuthRepository {
         'email': email,
         'phone': phone,
         'password': password,
-        'password_confirmation': password, // Ideally passed from UI
+        'password_confirmation': password,
+        'gender': gender,
+        'date_of_birth': birthDate.toIso8601String().split('T')[0],
         'is_family_account': isFamilyAccount,
       });
       return const Success(null);
@@ -112,15 +120,65 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<void, Failure>> completeRegistration(User user) {
+  Future<Result<void, Failure>> completeRegistration(User user, String pin) {
     return executeApiCall(() async {
-      await _apiClient.post('/auth/complete-registration', {
-        'name': '${user.firstName} ${user.lastName}',
-        'email': user.email,
-        'phone': user.phone,
-        'is_parent_account': user.isParentAccount,
-      });
+      final response =
+          await _apiClient.post('/auth/complete-registration', {
+                'name': '${user.firstName} ${user.lastName}',
+                'email': user.email,
+                'phone': user.phone,
+                'date_of_birth': user.birthDate?.toIso8601String().split(
+                  'T',
+                )[0],
+                'gender': user.gender,
+                'is_parent_account': user.isParentAccount,
+                'pin': pin,
+              })
+              as Map<String, dynamic>;
+
+      // Check if a token was returned in the response
+      final token = response['token'] as String?;
+      if (token != null) {
+        _apiClient.setToken(token);
+        await _sessionRepository.saveAuthToken(token);
+
+        // Fetch the full profile from the server to ensure we have
+        // consistent data (id, roles, etc.)
+        final profileResult = await getUserProfile();
+        return profileResult.when(
+          success: (_) => const Success(null),
+          failure: (failure) => FailureResult(failure),
+        );
+      }
+
       _authStateController.add(user);
+      return const Success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> forgotPassword(String identifier) {
+    return executeApiCall(() async {
+      await _apiClient.post('/auth/forgot-password', {
+        'identifier': identifier,
+      });
+      return const Success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> resetPassword({
+    required String identifier,
+    required String otp,
+    required String newPassword,
+  }) {
+    return executeApiCall(() async {
+      await _apiClient.post('/auth/reset-password', {
+        'identifier': identifier,
+        'otp': otp,
+        'password': newPassword,
+        'password_confirmation': newPassword,
+      });
       return const Success(null);
     });
   }
@@ -137,6 +195,19 @@ class ApiAuthRepository implements AuthRepository {
         'new_password_confirmation': newPassword,
       });
       return const Success(null);
+    });
+  }
+
+  @override
+  Future<Result<User, Failure>> getUserProfile() {
+    return executeApiCall(() async {
+      final userResponse =
+          await _apiClient.get('/user/profile') as Map<String, dynamic>;
+      final userModel = UserProfileModel.fromJson(userResponse);
+      final user = UserMapper.toEntity(userModel);
+
+      _authStateController.add(user);
+      return Success(user);
     });
   }
 

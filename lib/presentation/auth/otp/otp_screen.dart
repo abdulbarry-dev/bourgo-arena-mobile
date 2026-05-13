@@ -31,10 +31,10 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   late final OtpViewModel _viewModel;
   final List<TextEditingController> _controllers = List.generate(
-    4,
+    6,
     (_) => TextEditingController(),
   );
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   int _timerCount = 60;
   Timer? _timer;
 
@@ -70,7 +70,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _onVerify() {
     final code = _controllers.map((c) => c.text).join();
-    if (code.length == 4) {
+    if (code.length == 6) {
       _viewModel.verify(
         identifier: widget.destination ?? '',
         code: code,
@@ -121,7 +121,7 @@ class _OtpScreenState extends State<OtpScreen> {
       ),
       body: AuthBackground(
         child: SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -129,12 +129,16 @@ class _OtpScreenState extends State<OtpScreen> {
                 AuthHeader(
                   title: l10n.authVerificationTitle,
                   subtitle:
-                      '${l10n.authOtpSubtitlePrefix}${widget.destination ?? l10n.authOtpSubtitleDefault}.',
+                      '${l10n.authOtpSubtitlePrefix}'
+                      '${widget.destination ?? l10n.authOtpSubtitleDefault}.',
                 ),
                 const SizedBox(height: 48),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(4, (index) => _buildOTPField(index)),
+                  children: List.generate(
+                    6,
+                    (index) => _buildOTPField(index),
+                  ),
                 ),
                 const SizedBox(height: 48),
                 Center(
@@ -164,7 +168,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     ],
                   ),
                 ),
-                const Spacer(),
+                const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _viewModel.isLoading ? null : _onVerify,
                   child: _viewModel.isLoading
@@ -187,8 +191,8 @@ class _OtpScreenState extends State<OtpScreen> {
     final theme = Theme.of(context);
 
     return SizedBox(
-      width: 72,
-      height: 80,
+      width: 48,
+      height: 64,
       child: TextField(
         controller: _controllers[index],
         focusNode: _focusNodes[index],
@@ -217,7 +221,7 @@ class _OtpScreenState extends State<OtpScreen> {
           fillColor: theme.colorScheme.surfaceContainer,
         ),
         onChanged: (value) {
-          if (value.isNotEmpty && index < 3) {
+          if (value.isNotEmpty && index < 5) {
             _focusNodes[index + 1].requestFocus();
           } else if (value.isEmpty && index > 0) {
             _focusNodes[index - 1].requestFocus();

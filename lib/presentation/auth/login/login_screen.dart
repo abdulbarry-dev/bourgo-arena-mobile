@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/viewmodels/login_view_model.dart';
@@ -11,8 +12,13 @@ import 'package:material_symbols_icons/symbols.dart';
 /// The login screen for Bourgo Arena.
 class LoginScreen extends StatefulWidget {
   final LoginUseCase loginUseCase;
+  final SessionRepository sessionRepository;
 
-  const LoginScreen({super.key, required this.loginUseCase});
+  const LoginScreen({
+    super.key,
+    required this.loginUseCase,
+    required this.sessionRepository,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -24,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = LoginViewModel(widget.loginUseCase);
+    _viewModel = LoginViewModel(widget.loginUseCase, widget.sessionRepository);
+    _viewModel.initialize();
   }
 
   @override
@@ -78,18 +85,54 @@ class _LoginScreenState extends State<LoginScreen> {
                             : null,
                       ),
                       const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => context.push('/forgot-password'),
-                          child: Text(
-                            l10n.authForgotPassword,
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontSize: 12,
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 24,
+                                  width: 24,
+                                  child: Checkbox(
+                                    value: _viewModel.isRememberMeChecked,
+                                    onChanged: _viewModel.toggleRememberMe,
+                                    visualDensity: VisualDensity.compact,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    activeColor: theme.colorScheme.primary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                GestureDetector(
+                                  onTap: () => _viewModel.toggleRememberMe(
+                                    !_viewModel.isRememberMeChecked,
+                                  ),
+                                  child: Text(
+                                    l10n.authRememberMe,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
+                          TextButton(
+                            onPressed: () => context.push('/forgot-password'),
+                            child: Text(
+                              l10n.authForgotPassword,
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 32),
                       ElevatedButton(

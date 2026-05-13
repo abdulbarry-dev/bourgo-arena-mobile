@@ -80,11 +80,42 @@ void main() {
             'password': 'secret123',
           }),
         ).called(1);
+        verify(() => apiClient.setToken(null)).called(1);
         verify(() => apiClient.setToken(token)).called(1);
         verify(() => sessionRepository.saveAuthToken(token)).called(1);
         verify(() => apiClient.get('/user/profile')).called(1);
         await eventExpectation;
         verifyNoMoreInteractions(sessionRepository);
+      });
+
+      test('returns Success on 200 with phone identifier', () async {
+        const token = 'token-456';
+        final userJson = testUserJson(phone: '+212600000000');
+
+        when(
+          () => apiClient.post('/auth/login', {
+            'phone': '+212600000000',
+            'password': 'secret123',
+          }),
+        ).thenAnswer((_) async => {'token': token});
+
+        when(
+          () => apiClient.get('/user/profile'),
+        ).thenAnswer((_) async => userJson);
+        when(
+          () => sessionRepository.saveAuthToken(token),
+        ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+        final result = await repository.login('+212600000000', 'secret123');
+
+        expect(result, isA<Success<User, Failure>>());
+        verify(
+          () => apiClient.post('/auth/login', {
+            'phone': '+212600000000',
+            'password': 'secret123',
+          }),
+        ).called(1);
+        verify(() => apiClient.setToken(token)).called(1);
       });
 
       test(
@@ -111,7 +142,7 @@ void main() {
             }),
           ).called(1);
           verifyNever(() => apiClient.get('/user/profile'));
-          verifyNever(() => apiClient.setToken(null));
+          verify(() => apiClient.setToken(null)).called(1);
           verifyNever(() => sessionRepository.saveAuthToken(any()));
         },
       );
@@ -234,6 +265,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'male',
+          birthDate: DateTime.utc(1990, 1, 1),
         );
 
         expect(result, isA<Success<void, Failure>>());
@@ -244,6 +277,8 @@ void main() {
             'phone': '+15550000000',
             'password': 'secret123',
             'password_confirmation': 'secret123',
+            'gender': 'male',
+            'date_of_birth': '1990-01-01',
             'is_family_account': false,
           }),
         ).called(1);
@@ -260,6 +295,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'male',
+          birthDate: DateTime.utc(1990, 1, 1),
         );
 
         expect(result, isA<FailureResult<void, Failure>>());
@@ -280,6 +317,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'male',
+          birthDate: DateTime.utc(1990, 1, 1),
         );
 
         expect(result, isA<FailureResult<void, Failure>>());
@@ -300,6 +339,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'male',
+          birthDate: DateTime.utc(1990, 1, 1),
         );
 
         expect(result, isA<FailureResult<void, Failure>>());
@@ -480,7 +521,11 @@ void main() {
 
     group('completeRegistration', () {
       test('returns Success on 200 and emits the user', () async {
-        final user = testUserEntity(isParentAccount: true);
+        final user = testUserEntity(
+          isParentAccount: true,
+          birthDate: DateTime.utc(1990, 1, 1),
+        );
+        const pin = '1234';
         when(
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenAnswer((_) async => null);
@@ -489,7 +534,7 @@ void main() {
           emits(user),
         );
 
-        final result = await repository.completeRegistration(user);
+        final result = await repository.completeRegistration(user, pin);
 
         expect(result, isA<Success<void, Failure>>());
         verify(
@@ -497,7 +542,10 @@ void main() {
             'name': 'Alex Morgan',
             'email': 'alex@example.com',
             'phone': '+15550000000',
+            'date_of_birth': '1990-01-01',
+            'gender': 'male',
             'is_parent_account': true,
+            'pin': pin,
           }),
         ).called(1);
         await eventExpectation;
@@ -508,7 +556,10 @@ void main() {
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
-        final result = await repository.completeRegistration(testUserEntity());
+        final result = await repository.completeRegistration(
+          testUserEntity(),
+          '1234',
+        );
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(
@@ -522,7 +573,10 @@ void main() {
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const NetworkException('offline'));
 
-        final result = await repository.completeRegistration(testUserEntity());
+        final result = await repository.completeRegistration(
+          testUserEntity(),
+          '1234',
+        );
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(
@@ -536,7 +590,10 @@ void main() {
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
-        final result = await repository.completeRegistration(testUserEntity());
+        final result = await repository.completeRegistration(
+          testUserEntity(),
+          '1234',
+        );
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(

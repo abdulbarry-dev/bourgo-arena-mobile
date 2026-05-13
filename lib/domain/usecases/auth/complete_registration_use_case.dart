@@ -10,7 +10,7 @@ class CompleteRegistrationUseCase {
   const CompleteRegistrationUseCase(this._repository);
 
   /// Executes the complete registration operation.
-  Future<Result<void, Failure>> call(User user) async {
-    return _repository.completeRegistration(user);
+  Future<Result<void, Failure>> call(User user, String pin) async {
+    return _repository.completeRegistration(user, pin);
   }
 }

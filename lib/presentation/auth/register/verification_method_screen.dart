@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -7,65 +8,119 @@ import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen where users choose how they want to verify their account.
-class VerificationMethodScreen extends StatelessWidget {
+class VerificationMethodScreen extends StatefulWidget {
   /// Registration data passed from previous steps.
   final Map<String, dynamic> registrationData;
 
+  /// Use case to send OTP.
+  final SendOtpUseCase sendOtpUseCase;
+
   /// Creates a [VerificationMethodScreen].
-  const VerificationMethodScreen({super.key, required this.registrationData});
+  const VerificationMethodScreen({
+    super.key,
+    required this.registrationData,
+    required this.sendOtpUseCase,
+  });
+
+  @override
+  State<VerificationMethodScreen> createState() =>
+      _VerificationMethodScreenState();
+}
+
+class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
+  bool _isLoading = false;
+
+  void _setLoading(bool value) {
+    setState(() {
+      _isLoading = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final email = registrationData['email'] as String;
-    final phone = registrationData['phone'] as String;
+    final email = widget.registrationData['email'] as String;
+    final phone = widget.registrationData['phone'] as String;
 
     return AuthBackground(
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              AuthHeader(
-                title: l10n.authVerificationMethodTitle,
-                subtitle: l10n.authVerificationMethodSubtitle,
+      child: Stack(
+        children: [
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AuthHeader(
+                    title: l10n.authVerificationMethodTitle,
+                    subtitle: l10n.authVerificationMethodSubtitle,
+                  ),
+                  const SizedBox(height: 48),
+                  _MethodCard(
+                    title: l10n.authEmailMethod,
+                    value: email,
+                    icon: Symbols.mail,
+                    onTap: _isLoading
+                        ? () {}
+                        : () => _proceedToOtp(context, email),
+                  ),
+                  const SizedBox(height: 20),
+                  _MethodCard(
+                    title: l10n.authPhoneMethod,
+                    value: phone,
+                    icon: Symbols.call,
+                    onTap: _isLoading
+                        ? () {}
+                        : () => _proceedToOtp(context, phone),
+                  ),
+                  const Spacer(),
+                  Text(
+                    l10n.authMethodAccessInstruction,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
               ),
-              const SizedBox(height: 48),
-              _MethodCard(
-                title: l10n.authEmailMethod,
-                value: email,
-                icon: Symbols.mail,
-                onTap: () => _proceedToOtp(context, email),
-              ),
-              const SizedBox(height: 20),
-              _MethodCard(
-                title: l10n.authPhoneMethod,
-                value: phone,
-                icon: Symbols.call,
-                onTap: () => _proceedToOtp(context, phone),
-              ),
-              const Spacer(),
-              Text(
-                l10n.authMethodAccessInstruction,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
-        ),
+          if (_isLoading)
+            Container(
+              color: Colors.black.withAlpha(76),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+        ],
       ),
     );
   }
 
-  void _proceedToOtp(BuildContext context, String destination) {
-    context.push(
-      '/otp',
-      extra: {'destination': destination, 'registrationData': registrationData},
+  Future<void> _proceedToOtp(BuildContext context, String destination) async {
+    _setLoading(true);
+
+    final result = await widget.sendOtpUseCase(destination);
+
+    _setLoading(false);
+
+    if (!context.mounted) return;
+
+    result.fold(
+      onSuccess: (_) {
+        context.push(
+          '/otp',
+          extra: {
+            'destination': destination,
+            'registrationData': widget.registrationData,
+          },
+        );
+      },
+      onFailure: (failure) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(failure.message)));
+      },
     );
   }
 }

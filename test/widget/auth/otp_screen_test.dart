@@ -74,7 +74,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining('test@example.com'), findsOneWidget);
-      expect(find.byType(TextField), findsNWidgets(4));
+      expect(find.byType(TextField), findsNWidgets(6));
       expect(find.byType(ElevatedButton), findsOneWidget);
     });
 
@@ -92,7 +92,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final textFields = find.byType(TextField);
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < 6; i++) {
         await tester.enterText(textFields.at(i), i.toString());
       }
 
@@ -101,7 +101,9 @@ void main() {
       await tester.tap(verifyButton);
       await tester.pump();
 
-      verify(() => mockVerifyOtpUseCase('test@example.com', '0123')).called(1);
+      verify(
+        () => mockVerifyOtpUseCase('test@example.com', '012345'),
+      ).called(1);
     });
 
     testWidgets('shows error message on failure', (tester) async {
@@ -116,7 +118,7 @@ void main() {
       await tester.pumpAndSettle();
 
       final textFields = find.byType(TextField);
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < 6; i++) {
         await tester.enterText(textFields.at(i), '1');
       }
 

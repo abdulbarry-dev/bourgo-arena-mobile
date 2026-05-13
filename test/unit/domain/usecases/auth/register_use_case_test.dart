@@ -28,6 +28,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'female',
+          birthDate: DateTime.utc(1995, 5, 5),
           isFamilyAccount: false,
         ),
       ).thenAnswer((_) async => const Success<void, Failure>(null));
@@ -38,6 +40,8 @@ void main() {
         email: 'alex@example.com',
         phone: '+15550000000',
         password: 'secret123',
+        gender: 'female',
+        birthDate: DateTime.utc(1995, 5, 5),
       );
 
       expect(result, isA<Success<void, Failure>>());
@@ -48,6 +52,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'female',
+          birthDate: DateTime.utc(1995, 5, 5),
           isFamilyAccount: false,
         ),
       ).called(1);
@@ -64,6 +70,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'female',
+          birthDate: DateTime.utc(1995, 5, 5),
           isFamilyAccount: false,
         ),
       ).thenAnswer((_) async => const FailureResult<void, Failure>(failure));
@@ -74,6 +82,8 @@ void main() {
         email: 'alex@example.com',
         phone: '+15550000000',
         password: 'secret123',
+        gender: 'female',
+        birthDate: DateTime.utc(1995, 5, 5),
       );
 
       expect(result, isA<FailureResult<void, Failure>>());
@@ -85,6 +95,8 @@ void main() {
           email: 'alex@example.com',
           phone: '+15550000000',
           password: 'secret123',
+          gender: 'female',
+          birthDate: DateTime.utc(1995, 5, 5),
           isFamilyAccount: false,
         ),
       ).called(1);
@@ -101,6 +113,8 @@ void main() {
             email: '',
             phone: '',
             password: '',
+            gender: 'other',
+            birthDate: DateTime.utc(1900, 1, 1),
             isFamilyAccount: true,
           ),
         ).thenAnswer((_) async => const Success<void, Failure>(null));
@@ -111,6 +125,8 @@ void main() {
           email: '',
           phone: '',
           password: '',
+          gender: 'other',
+          birthDate: DateTime.utc(1900, 1, 1),
           isFamilyAccount: true,
         );
 
@@ -122,6 +138,8 @@ void main() {
             email: '',
             phone: '',
             password: '',
+            gender: 'other',
+            birthDate: DateTime.utc(1900, 1, 1),
             isFamilyAccount: true,
           ),
         ).called(1);

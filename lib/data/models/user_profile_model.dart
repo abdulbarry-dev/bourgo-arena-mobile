@@ -16,6 +16,7 @@ class UserProfileModel {
   final String? subscriptionExpiry;
   final int totalCheckIns;
   final DateTime? birthDate;
+  final String? gender;
   final bool isParentAccount;
   final List<ChildProfileModel> children;
 
@@ -30,6 +31,7 @@ class UserProfileModel {
     this.subscriptionExpiry,
     required this.totalCheckIns,
     this.birthDate,
+    this.gender,
     this.isParentAccount = false,
     this.children = const [],
   });

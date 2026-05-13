@@ -50,12 +50,13 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           lastName: widget.registrationData['lastName'] ?? '',
           email: widget.registrationData['email'] ?? '',
           phone: widget.registrationData['phone'] ?? '',
-          avatarUrl:
-              'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=2574&auto=format&fit=crop',
+          avatarUrl: '',
           loyaltyPoints: 0,
           subscriptionLevel: 'FREE',
           subscriptionExpiry: 'N/A',
           totalCheckIns: 0,
+          gender: widget.registrationData['gender'],
+          birthDate: widget.registrationData['birthDate'],
           isParentAccount: widget.registrationData['isParentAccount'] ?? false,
           children:
               (widget.registrationData['familyMembers']
@@ -65,7 +66,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
         final completeRegistrationUseCase =
             locator<CompleteRegistrationUseCase>();
-        final result = await completeRegistrationUseCase(user);
+        final result = await completeRegistrationUseCase(user, pin);
 
         result.fold(
           onSuccess: (_) {

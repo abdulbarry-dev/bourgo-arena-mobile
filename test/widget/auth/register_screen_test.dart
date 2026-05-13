@@ -80,6 +80,8 @@ void main() {
             email: any(named: 'email'),
             phone: any(named: 'phone'),
             password: any(named: 'password'),
+            gender: any(named: 'gender'),
+            birthDate: any(named: 'birthDate'),
             isFamilyAccount: any(named: 'isFamilyAccount'),
           ),
         ).thenAnswer((_) => completer.future);
@@ -96,6 +98,11 @@ void main() {
         // Set birth date via controller because the field is readOnly
         final birthDateField = tester.widget<TextFormField>(textFields.at(4));
         birthDateField.controller?.text = '2000-01-01';
+        // Select gender
+        await tester.tap(find.byKey(const Key('gender_dropdown')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Male').last);
+        await tester.pumpAndSettle();
         await tester.enterText(textFields.at(5), 'password123');
 
         final registerButton = find.byType(ElevatedButton);
@@ -125,6 +132,8 @@ void main() {
           email: any(named: 'email'),
           phone: any(named: 'phone'),
           password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
           isFamilyAccount: any(named: 'isFamilyAccount'),
         ),
       ).thenAnswer(
@@ -141,6 +150,11 @@ void main() {
       // Set birth date via controller because the field is readOnly
       final birthDateField = tester.widget<TextFormField>(textFields.at(4));
       birthDateField.controller?.text = '2000-01-01';
+      // Select gender
+      await tester.tap(find.byKey(const Key('gender_dropdown')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Male').last);
+      await tester.pumpAndSettle();
       await tester.enterText(textFields.at(5), 'password123');
 
       final registerButton = find.byType(ElevatedButton);
@@ -157,6 +171,8 @@ void main() {
           email: 'john@example.com',
           phone: '123456789',
           password: 'password123',
+          gender: 'male',
+          birthDate: DateTime.parse('2000-01-01'),
           isFamilyAccount: false,
         ),
       ).called(1);

@@ -55,6 +55,7 @@
   "authPasswordHint": "Enter your password",
   "authIdentifierLabel": "Email or Phone",
   "authPasswordLabel": "Password",
+  "authRememberMe": "Remember me",
   "authLoginTitle": "Login",
   "authLoginSubtitle": "Welcome back! Log in to continue.",
   "authRegisterTitle": "Registration",

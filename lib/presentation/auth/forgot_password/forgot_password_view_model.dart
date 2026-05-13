@@ -21,7 +21,10 @@ class ForgotPasswordViewModel extends ChangeNotifier {
       Future.delayed(const Duration(seconds: 2), () {
         if (context.mounted) {
           setLoading(false);
-          context.push('/otp', extra: identifierController.text);
+          context.push(
+            '/otp',
+            extra: {'destination': identifierController.text},
+          );
         }
       });
     }
