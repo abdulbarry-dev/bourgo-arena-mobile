@@ -260,8 +260,16 @@ All API responses must follow a consistent JSON structure.
     {
       "success": true,
       "data": [
-        {"time": "09:00", "available": true},
-        {"time": "10:00", "available": false}
+        {
+          "id": "101",
+          "time": "09:00",
+          "available": true
+        },
+        {
+          "id": "102",
+          "time": "10:00",
+          "available": false
+        }
       ]
     }
     ```
@@ -302,6 +310,7 @@ All API responses must follow a consistent JSON structure.
 * **Auth Required**: Yes
 * **Request Body**:
   * `activity_id` (string, required)
+  * `activity_slot_id` (string, required)
   * `date` (string, required, format: YYYY-MM-DD)
   * `time` (string, required, format: HH:mm)
   * `duration` (string, required)
@@ -448,13 +457,91 @@ Route::prefix('v1')->group(function () {
 
 ---
 
-## 14. Implementation Checklist
+## 15. Search Endpoints
 
-1. [ ] **Infrastructure**: Install Laravel + Sanctum. Configure `.env` with database and mail/SMS drivers for OTP.
-2. [ ] **Models**: Create all Eloquent models and migrations with the specified fields and relationships.
-3. [ ] **Validation**: Create `FormRequests` with strict rules (e.g., `email` unique, `otp` length).
-4. [ ] **Transformation**: Create `API Resources` to ensure `snake_case` field names and correct types (integers vs doubles).
-5. [ ] **Controllers**: Implement logic for OTP generation/validation and Sanctum token management.
-6. [ ] **Routes**: Register all routes in `api.php` with correct middleware.
+### GET /search
+
+* **Description**: Search for activities and courses.
+* **Auth Required**: No
+* **Query Parameters**:
+  * `q` (string, required): Search query (min 2 characters).
+* **Success Response**: Array of search results.
+
+    ```json
+    {
+      "success": true,
+      "data": [
+        {
+          "id": "1",
+          "type": "activity",
+          "title": "Football 5x5",
+          "subtitle": "Sport",
+          "icon": "sports_soccer"
+        },
+        {
+          "id": "c1",
+          "type": "course",
+          "title": "Karate Kids",
+          "subtitle": "Sensei Omar",
+          "icon": "sports_martial_arts"
+        }
+      ]
+    }
+    ```
+
+---
+
+## 16. Family Management Endpoints
+
+### GET /family/children
+
+* **Description**: List all children profiles managed by the authenticated parent.
+* **Auth Required**: Yes
+* **Success Response**: Array of `MemberResource` objects.
+
+### POST /family/children
+
+* **Description**: Add a new child profile to the family account.
+* **Auth Required**: Yes
+* **Request Body**:
+  * `first_name` (string, required)
+  * `last_name` (string, required)
+  * `birth_date` (string, required, format: YYYY-MM-DD)
+  * `gender` (string, required, in: male,female)
+* **Success Response**: `201 Created` with the new child object.
+
+### DELETE /family/children/{id}
+
+* **Description**: Remove a child profile.
+* **Auth Required**: Yes
+
+---
+
+## 17. Subscription & Device Endpoints
+
+### GET /member/subscription
+
+* **Description**: Get the current active subscription details for the member.
+* **Auth Required**: Yes
+* **Success Response**: Subscription details or `null`.
+
+### POST /device-token
+
+* **Description**: Register or update a device token for push notifications (FCM/OneSignal).
+* **Auth Required**: Yes
+* **Request Body**:
+  * `token` (string, required)
+  * `platform` (string, optional, e.g., android, ios)
+
+---
+
+## 18. Implementation Checklist
+
+1. [x] **Infrastructure**: Install Laravel + Sanctum.
+2. [x] **Models**: Create all Eloquent models and migrations.
+3. [x] **Validation**: Create `FormRequests` with strict rules.
+4. [x] **Transformation**: Create `API Resources` to ensure `snake_case` field names.
+5. [x] **Controllers**: Implement logic for OTP and Sanctum token management.
+6. [x] **Routes**: Register all routes in `api.php`.
 7. [ ] **Testing**: Write feature tests for the complete Auth flow and Reservation logic.
-8. [ ] **CORS**: Ensure `config/cors.php` allows requests from the mobile app's origin/environment.
+8. [ ] **CORS**: Ensure `config/cors.php` allows requests from the mobile app.
