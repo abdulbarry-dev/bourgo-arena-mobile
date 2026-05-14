@@ -14,8 +14,8 @@ import 'package:go_router/go_router.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables from .env file
-  await dotenv.load(fileName: '.env');
+  // Load environment variables from .env file when available.
+  await dotenv.load(fileName: '.env', isOptional: true);
 
   // Initialize Dependencies
   await initLocator();
