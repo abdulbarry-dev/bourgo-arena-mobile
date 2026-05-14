@@ -268,6 +268,8 @@ All API responses must follow a consistent JSON structure.
   * `otp` (string, required, length:6)
 * **Success Response**: Same structure as `/user/verify-email`
 
+* **Note:** For all verify endpoints (`/auth/verify-otp`, `/user/verify-email`, `/user/verify-phone`), the backend must return `"valid": true` alongside the updated `state` and `token` upon successful OTP validation. And the API must issue tokens for the next step of the authentication state flow (e.g. `pending_additional_verification` issues a token with the `verification` ability to hit `/user/verify-email` or `/user/verify-phone`).
+
 ### GET /user/verification-status
 
 * **Description**: Retrieves the current verification status for the authenticated user.
