@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/search/search_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/search_result.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/search/search_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -190,36 +191,10 @@ class _SearchResultTile extends StatelessWidget {
 class _RecentSearchesPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Symbols.search,
-            size: 64,
-            color: theme.colorScheme.outline.withAlpha(50),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Global Search',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: Text(
-              'Find activities, courses, or settings across the app.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
-              ),
-            ),
-          ),
-        ],
-      ),
+    return EmptyState(
+      title: 'Global Search',
+      message: 'Find activities, courses, or settings across the app.',
+      icon: Symbols.search,
     );
   }
 }
@@ -231,27 +206,10 @@ class _NoResultsPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Symbols.search_off,
-            size: 64,
-            color: theme.colorScheme.error.withAlpha(50),
-          ),
-          const SizedBox(height: 16),
-          Text('No results for "$query"', style: theme.textTheme.titleMedium),
-          const SizedBox(height: 8),
-          Text(
-            'Try different keywords or check spelling.',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
+    return EmptyState(
+      title: 'No results for "$query"',
+      message: 'Try different keywords or check spelling.',
+      icon: Symbols.search_off,
     );
   }
 }

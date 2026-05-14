@@ -127,6 +127,14 @@ class _ActivitiesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (viewModel.activities.isEmpty) {
+      return EmptyState(
+        title: AppLocalizations.of(context)!.commonNoResults,
+        message: AppLocalizations.of(context)!.commonNoResultsSubtitle,
+        icon: Symbols.search_off,
+      );
+    }
+
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       itemCount: viewModel.activities.length,

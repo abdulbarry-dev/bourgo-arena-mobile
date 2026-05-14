@@ -106,15 +106,18 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                GestureDetector(
-                                  onTap: () => _viewModel.toggleRememberMe(
-                                    !_viewModel.isRememberMeChecked,
-                                  ),
-                                  child: Text(
-                                    l10n.authRememberMe,
-                                    style: TextStyle(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontSize: 12,
+                                Flexible(
+                                  child: GestureDetector(
+                                    onTap: () => _viewModel.toggleRememberMe(
+                                      !_viewModel.isRememberMeChecked,
+                                    ),
+                                    child: Text(
+                                      l10n.authRememberMe,
+                                      style: TextStyle(
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                        fontSize: 12,
+                                      ),
                                     ),
                                   ),
                                 ),

@@ -186,19 +186,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 SizedBox(
                   height: 220,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    itemCount: _viewModel.activities.length,
-                    itemBuilder: (context, index) {
-                      final activity = _viewModel.activities[index];
-                      return ActivityCard(
-                        title: activity.title,
-                        imageUrl: activity.imageUrl,
-                        onTap: () => context.push('/booking', extra: activity),
-                      );
-                    },
-                  ),
+                  child: _viewModel.activities.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: EmptyState(
+                            title: AppLocalizations.of(
+                              context,
+                            )!.homeActivitiesEmpty,
+                            message: AppLocalizations.of(
+                              context,
+                            )!.homeActivitiesEmptySubtitle,
+                            icon: Symbols.sports_basketball,
+                          ),
+                        )
+                      : ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          itemCount: _viewModel.activities.length,
+                          itemBuilder: (context, index) {
+                            final activity = _viewModel.activities[index];
+                            return ActivityCard(
+                              title: activity.title,
+                              imageUrl: activity.imageUrl,
+                              onTap: () =>
+                                  context.push('/booking', extra: activity),
+                            );
+                          },
+                        ),
                 ),
 
                 const SizedBox(height: 32),

@@ -32,80 +32,104 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.0, end: 1.0),
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeOutCubic,
-      builder: (context, value, child) {
-        return Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 20 * (1 - value)),
-            child: child,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isSmall = constraints.maxHeight < 300;
+        final iconSize = isSmall ? 48.0 : 64.0;
+        final titleStyle = isSmall
+            ? theme.textTheme.titleMedium
+            : theme.textTheme.headlineSmall;
+        final messageStyle = isSmall
+            ? theme.textTheme.bodySmall
+            : theme.textTheme.bodyLarge;
+
+        return TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 0.0, end: 1.0),
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeOutCubic,
+          builder: (context, value, child) {
+            return Opacity(
+              opacity: value,
+              child: Transform.translate(
+                offset: Offset(0, 20 * (1 - value)),
+                child: child,
+              ),
+            );
+          },
+          child: Center(
+            child: SingleChildScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              child: Padding(
+                padding: EdgeInsets.all(isSmall ? 16.0 : 32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon with soft background
+                    Container(
+                      padding: EdgeInsets.all(isSmall ? 16 : 24),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: RadialGradient(
+                          colors: [
+                            theme.colorScheme.primary.withValues(alpha: 0.15),
+                            theme.colorScheme.primary.withValues(alpha: 0.05),
+                          ],
+                        ),
+                      ),
+                      child: Icon(
+                        icon,
+                        size: iconSize,
+                        color: theme.colorScheme.primary.withValues(alpha: 0.8),
+                      ),
+                    ),
+                    SizedBox(height: isSmall ? 16 : 32),
+                    // Title
+                    Text(
+                      title,
+                      textAlign: TextAlign.center,
+                      style: titleStyle?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    SizedBox(height: isSmall ? 4 : 12),
+                    // Message
+                    Text(
+                      message,
+                      textAlign: TextAlign.center,
+                      style: messageStyle?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.7,
+                        ),
+                        height: 1.4,
+                      ),
+                    ),
+                    // Action Button
+                    if (actionLabel != null && onAction != null) ...[
+                      SizedBox(height: isSmall ? 20 : 40),
+                      FilledButton.icon(
+                        onPressed: onAction,
+                        icon: const Icon(Icons.add, size: 20),
+                        label: Text(actionLabel!),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ),
         );
       },
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Icon with soft background
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: theme.colorScheme.primary.withAlpha(15),
-                ),
-                child: Icon(
-                  icon,
-                  size: 64,
-                  color: theme.colorScheme.primary.withAlpha(150),
-                ),
-              ),
-              const SizedBox(height: 32),
-              // Title
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // Message
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withAlpha(180),
-                  height: 1.5,
-                ),
-              ),
-              // Action Button
-              if (actionLabel != null && onAction != null) ...[
-                const SizedBox(height: 40),
-                FilledButton.icon(
-                  onPressed: onAction,
-                  icon: const Icon(Icons.add, size: 20),
-                  label: Text(actionLabel!),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
