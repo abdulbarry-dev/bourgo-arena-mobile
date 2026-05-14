@@ -121,7 +121,21 @@ class ApiClient {
       final String message =
           body['message'] ??
           'API Error: ${response.statusCode} ${response.body}';
-      final String? state = body['state'] as String?;
+      String? state = body['state'] as String?;
+      final String? code = body['code'] as String?;
+      if (state == null && code != null) {
+        switch (code) {
+          case 'EMAIL_NOT_VERIFIED':
+            state = 'pending_verification';
+            break;
+          case 'ADDITIONAL_VERIFICATION_REQUIRED':
+            state = 'pending_additional_verification';
+            break;
+          case 'ONBOARDING_INCOMPLETE':
+            state = 'pending_onboarding';
+            break;
+        }
+      }
       final String? token = body['token'] as String?;
 
       switch (response.statusCode) {
