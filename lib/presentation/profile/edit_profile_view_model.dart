@@ -1,37 +1,52 @@
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the Edit Profile screen.
 class EditProfileViewModel extends ChangeNotifier {
-  final GetUserProfileUseCase _getUserProfileUseCase;
   final UpdateUserProfileUseCase _updateUserProfileUseCase;
+  final AuthRepository _authRepository;
+  final AuthStateNotifier _authStateNotifier;
 
-  User? _user;
   bool _isLoading = true;
   bool _isSaving = false;
 
   EditProfileViewModel({
-    required GetUserProfileUseCase getUserProfileUseCase,
     required UpdateUserProfileUseCase updateUserProfileUseCase,
-  }) : _getUserProfileUseCase = getUserProfileUseCase,
-       _updateUserProfileUseCase = updateUserProfileUseCase {
+    required AuthRepository authRepository,
+    required AuthStateNotifier authStateNotifier,
+  }) : _updateUserProfileUseCase = updateUserProfileUseCase,
+       _authRepository = authRepository,
+       _authStateNotifier = authStateNotifier {
+    _authStateNotifier.addListener(notifyListeners);
     _loadProfile();
   }
 
-  User? get user => _user;
+  /// The user's profile data, sourced from the global AuthStateNotifier.
+  User? get user => _authStateNotifier.currentUser;
+
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
 
+  @override
+  void dispose() {
+    _authStateNotifier.removeListener(notifyListeners);
+    super.dispose();
+  }
+
   Future<void> _loadProfile() async {
+    if (user != null) {
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
     try {
-      final result = await _getUserProfileUseCase();
-      result.when(
-        success: (data) => _user = data,
-        failure: (failure) => developer.log('Error loading profile: $failure'),
-      );
+      // Use the auth repository to fetch the profile so it updates the global state
+      await _authRepository.getUserProfile();
     } catch (e, stackTrace) {
       developer.log('Error loading profile', error: e, stackTrace: stackTrace);
     } finally {
@@ -48,13 +63,13 @@ class EditProfileViewModel extends ChangeNotifier {
     required String phone,
     DateTime? birthDate,
   }) async {
-    if (_user == null) return false;
+    if (user == null) return false;
 
     _isSaving = true;
     notifyListeners();
 
     try {
-      final updatedUser = _user!.copyWith(
+      final updatedUser = user!.copyWith(
         firstName: firstName,
         lastName: lastName,
         email: email,
@@ -62,12 +77,14 @@ class EditProfileViewModel extends ChangeNotifier {
         birthDate: birthDate,
       );
       final result = await _updateUserProfileUseCase(updatedUser);
-      return result.when(
-        success: (data) {
-          _user = data;
+      return await result.fold(
+        onSuccess: (data) async {
+          // After a successful update, refresh the global session state
+          // to ensure all other view models (like ProfileViewModel) stay in sync.
+          await _authRepository.getUserProfile();
           return true;
         },
-        failure: (failure) => false,
+        onFailure: (failure) => false,
       );
     } catch (e) {
       return false;

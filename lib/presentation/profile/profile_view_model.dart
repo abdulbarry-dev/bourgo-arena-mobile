@@ -1,24 +1,23 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the Profile screen.
 class ProfileViewModel extends ChangeNotifier {
-  final GetUserProfileUseCase _getUserProfileUseCase;
-  final UpdateUserProfileUseCase _updateUserProfileUseCase;
+  final AuthRepository _authRepository;
   final LogoutUseCase _logoutUseCase;
+  final AuthStateNotifier _authStateNotifier;
 
-  User? _user;
   bool _isLoading = false;
   String? _errorMessage;
 
-  /// The user's profile data.
-  User? get user => _user;
+  /// The user's profile data, sourced from the global AuthStateNotifier.
+  User? get user => _authStateNotifier.currentUser;
 
   /// Whether data is currently being loaded.
   bool get isLoading => _isLoading;
@@ -28,29 +27,38 @@ class ProfileViewModel extends ChangeNotifier {
 
   /// Creates a new [ProfileViewModel] instance.
   ProfileViewModel({
-    required GetUserProfileUseCase getUserProfileUseCase,
-    required UpdateUserProfileUseCase updateUserProfileUseCase,
+    required AuthRepository authRepository,
     required LogoutUseCase logoutUseCase,
-  }) : _getUserProfileUseCase = getUserProfileUseCase,
-       _updateUserProfileUseCase = updateUserProfileUseCase,
-       _logoutUseCase = logoutUseCase {
-    loadProfile();
+    required AuthStateNotifier authStateNotifier,
+  }) : _authRepository = authRepository,
+       _logoutUseCase = logoutUseCase,
+       _authStateNotifier = authStateNotifier {
+    _authStateNotifier.addListener(notifyListeners);
+    if (user == null) {
+      loadProfile();
+    }
   }
 
-  /// Loads the user profile from the data service.
+  @override
+  void dispose() {
+    _authStateNotifier.removeListener(notifyListeners);
+    super.dispose();
+  }
+
+  /// Loads the user profile from the auth repository.
+  /// This will trigger an update in the global AuthStateNotifier.
   Future<void> loadProfile() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final result = await _getUserProfileUseCase();
-      result.when(
-        success: (data) {
-          _user = data;
+      final result = await _authRepository.getUserProfile();
+      result.fold(
+        onSuccess: (session) {
           _errorMessage = null;
         },
-        failure: (failure) {
+        onFailure: (failure) {
           _errorMessage = failure.message;
           developer.log('Error loading profile: $failure');
         },
@@ -62,29 +70,6 @@ class ProfileViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-  }
-
-  /// Updates the user's profile.
-  Future<Result<User, Failure>> updateProfile(User updatedUser) async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
-
-    final result = await _updateUserProfileUseCase(updatedUser);
-
-    result.when(
-      success: (data) {
-        _user = data;
-        _errorMessage = null;
-      },
-      failure: (failure) {
-        _errorMessage = failure.message;
-      },
-    );
-
-    _isLoading = false;
-    notifyListeners();
-    return result;
   }
 
   /// Logs out the user.

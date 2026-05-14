@@ -1,11 +1,11 @@
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -25,9 +25,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _viewModel = ProfileViewModel(
-      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
-      updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
+      authRepository: locator<AuthRepository>(),
       logoutUseCase: locator<LogoutUseCase>(),
+      authStateNotifier: locator<AuthStateNotifier>(),
     );
   }
 
