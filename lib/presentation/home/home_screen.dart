@@ -102,45 +102,97 @@ class _HomeScreenState extends State<HomeScreen> {
                     horizontal: 24,
                     vertical: 12,
                   ),
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
+                  child: ClipRRect(
                     borderRadius: BorderRadius.circular(24),
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        theme.colorScheme.primaryContainer.withValues(
-                          alpha: 0.3,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          'assets/images/background.jpg',
+                          fit: BoxFit.cover,
+                          alignment: Alignment.centerRight,
                         ),
-                        theme.colorScheme.surface,
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.18),
+                                Colors.black.withValues(alpha: 0.42),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(24),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.12),
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.35),
+                                    borderRadius: BorderRadius.circular(999),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.12,
+                                      ),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    AppLocalizations.of(context)!.appName,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.9,
+                                      ),
+                                      fontWeight: FontWeight.w700,
+                                      letterSpacing: 1.1,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  AppLocalizations.of(context)!.homeHeroPart1,
+                                  style: theme.textTheme.displayMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontFamily:
+                                            AppConstants.displayFontFamily,
+                                        height: 0.9,
+                                      ),
+                                ),
+                                Text(
+                                  AppLocalizations.of(context)!.homeHeroPart2,
+                                  style: theme.textTheme.displayMedium
+                                      ?.copyWith(
+                                        color: theme.colorScheme.primary,
+                                        fontFamily:
+                                            AppConstants.displayFontFamily,
+                                        height: 0.9,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      width: 1,
-                    ),
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppLocalizations.of(context)!.homeHeroPart1,
-                        style: theme.textTheme.displayMedium?.copyWith(
-                          color: theme.colorScheme.onSurface,
-                          fontFamily: AppConstants.displayFontFamily,
-                          height: 0.9,
-                        ),
-                      ),
-                      Text(
-                        AppLocalizations.of(context)!.homeHeroPart2,
-                        style: theme.textTheme.displayMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontFamily: AppConstants.displayFontFamily,
-                          height: 0.9,
-                        ),
-                      ),
-                    ],
                   ),
                 ),
 

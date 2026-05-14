@@ -129,8 +129,8 @@ class _ActivitiesTab extends StatelessWidget {
   Widget build(BuildContext context) {
     if (viewModel.activities.isEmpty) {
       return EmptyState(
-        title: AppLocalizations.of(context)!.commonNoResults,
-        message: AppLocalizations.of(context)!.commonNoResultsSubtitle,
+        title: AppLocalizations.of(context)!.activitiesNoSportsFound,
+        message: AppLocalizations.of(context)!.activitiesNoSportsFoundSubtitle,
         icon: Symbols.search_off,
       );
     }

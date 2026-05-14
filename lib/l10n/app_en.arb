@@ -43,6 +43,8 @@
   "activitiesNoReservations": "No reservations found.",
   "activitiesNoReservationsSubtitle": "Ready to play? Book your first session now and join the arena!",
   "activitiesNoReservationsCTA": "BOOK A SESSION",
+  "activitiesNoSportsFound": "No sports found.",
+  "activitiesNoSportsFoundSubtitle": "Try again later or explore a different category.",
   "activitiesRetry": "RETRY",
   "activitiesStatusConfirmed": "CONFIRMED",
   "activitiesStatusPending": "PENDING",
@@ -119,6 +121,8 @@
   "profileStatusNotConfigured": "Not set",
   "profileCheckinHistory": "CHECK-IN HISTORY",
   "profileCheckinEntry": "Entry recorded",
+  "profileNoCheckins": "No access history yet.",
+  "profileNoCheckinsSubtitle": "Your check-ins will appear here once you enter the arena.",
   "profileNoHistory": "No past reservations.",
   "profileNoHistorySubtitle": "Your past activities and sessions will appear here once you complete them.",
   

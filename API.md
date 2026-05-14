@@ -248,6 +248,35 @@ The API uses a state-driven authentication flow to ensure users complete require
   * `new_password` (string, required, min:8)
   * `new_password_confirmation` (string, required)
 
+### GET /user/access-history
+
+* **Description**: Returns the authenticated user's access/check-in history for the profile history screen.
+* **Auth Required**: Yes
+* **Success Response**:
+
+    ```json
+    {
+      "success": true,
+      "data": [
+        {
+          "id": "acc_001",
+          "checked_in_at": "2026-05-14T09:42:00Z",
+          "location": "Main Entrance"
+        },
+        {
+          "id": "acc_002",
+          "checked_in_at": "2026-05-13T17:15:00Z",
+          "location": "Gym Gate"
+        }
+      ]
+    }
+    ```
+
+* **Notes for the Flutter app**:
+  * The `HistoryScreen` access tab should fetch this endpoint on load instead of using the current mock list.
+  * When the returned `data` array is empty, the app should show the empty state copy for access history.
+  * The existing `GET /user/profile` response can continue exposing `total_check_ins`, but it does not replace this endpoint because the UI needs individual history rows.
+
 ---
 
 ## 6. Activity Endpoints

@@ -43,6 +43,8 @@
   "activitiesNoReservations": "Aucune réservation trouvée.",
   "activitiesNoReservationsSubtitle": "Prêt à jouer ? Réservez votre première session dès maintenant et rejoignez l'arène !",
   "activitiesNoReservationsCTA": "RÉSERVER UNE SESSION",
+  "activitiesNoSportsFound": "Aucun sport trouvé.",
+  "activitiesNoSportsFoundSubtitle": "Réessayez plus tard ou explorez une autre catégorie.",
   "activitiesRetry": "RÉESSAYER",
   "activitiesStatusConfirmed": "CONFIRMÉ",
   "activitiesStatusPending": "EN ATTENTE",
@@ -118,6 +120,8 @@
   "profileStatusNotConfigured": "Non configuré",
   "profileCheckinHistory": "HISTORIQUE D'ACCÈS",
   "profileCheckinEntry": "Entrée enregistrée",
+  "profileNoCheckins": "Aucun historique d'accès pour le moment.",
+  "profileNoCheckinsSubtitle": "Vos passages apparaîtront ici une fois que vous entrerez dans l'arène.",
   "profileNoHistory": "Aucune réservation passée.",
   "profileNoHistorySubtitle": "Vos activités et sessions passées apparaîtront ici une fois terminées.",
   

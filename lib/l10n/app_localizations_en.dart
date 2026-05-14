@@ -132,6 +132,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activitiesNoReservationsCTA => 'BOOK A SESSION';
 
   @override
+  String get activitiesNoSportsFound => 'No sports found.';
+
+  @override
+  String get activitiesNoSportsFoundSubtitle =>
+      'Try again later or explore a different category.';
+
+  @override
   String get activitiesRetry => 'RETRY';
 
   @override
@@ -355,6 +362,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileCheckinEntry => 'Entry recorded';
+
+  @override
+  String get profileNoCheckins => 'No access history yet.';
+
+  @override
+  String get profileNoCheckinsSubtitle =>
+      'Your check-ins will appear here once you enter the arena.';
 
   @override
   String get profileNoHistory => 'No past reservations.';

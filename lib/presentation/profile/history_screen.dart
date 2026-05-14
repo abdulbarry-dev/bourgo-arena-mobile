@@ -1,11 +1,15 @@
+import 'package:bourgo_arena_mobile/domain/entities/access_history_entry.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_access_history_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/access_history_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen for Check-in (QR) and Full History.
@@ -19,22 +23,29 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
-  late final ActivitiesViewModel _viewModel;
+  late final ActivitiesViewModel _reservationsViewModel;
+  late final AccessHistoryViewModel _accessHistoryViewModel;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _viewModel = ActivitiesViewModel(
+    _reservationsViewModel = ActivitiesViewModel(
       getActivitiesUseCase: locator<GetActivitiesUseCase>(),
       getUserBookingsUseCase: locator<GetUserBookingsUseCase>(),
     );
-    _viewModel.loadData();
+    _accessHistoryViewModel = AccessHistoryViewModel(
+      getAccessHistoryUseCase: locator<GetAccessHistoryUseCase>(),
+    );
+    _reservationsViewModel.loadData();
+    _accessHistoryViewModel.loadHistory();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _reservationsViewModel.dispose();
+    _accessHistoryViewModel.dispose();
     super.dispose();
   }
 
@@ -57,8 +68,8 @@ class _HistoryScreenState extends State<HistoryScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          const _AccessTab(),
-          _HistoryTab(viewModel: _viewModel),
+          _AccessTab(viewModel: _accessHistoryViewModel),
+          _HistoryTab(viewModel: _reservationsViewModel),
         ],
       ),
     );
@@ -66,61 +77,79 @@ class _HistoryScreenState extends State<HistoryScreen>
 }
 
 class _AccessTab extends StatelessWidget {
-  const _AccessTab();
+  final AccessHistoryViewModel viewModel;
+
+  const _AccessTab({required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Access Methods Section
-          Text(
-            l10n.profileAccessMethods,
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: theme.colorScheme.primary,
-              letterSpacing: 2,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _AccessMethodTile(
-            icon: Symbols.pin,
-            label: l10n.profileAccessPin,
-            isSet: true,
-          ),
-          const SizedBox(height: 12),
-          _AccessMethodTile(
-            icon: Symbols.fingerprint,
-            label: l10n.profileAccessFingerprint,
-            isSet: false,
-          ),
-          const SizedBox(height: 12),
-          _AccessMethodTile(
-            icon: Symbols.contactless,
-            label: l10n.profileAccessNfc,
-            isSet: true,
-          ),
+    return ListenableBuilder(
+      listenable: viewModel,
+      builder: (context, _) {
+        if (viewModel.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          const SizedBox(height: 40),
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Access Methods Section
+              Text(
+                l10n.profileAccessMethods,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.primary,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _AccessMethodTile(
+                icon: Symbols.pin,
+                label: l10n.profileAccessPin,
+                isSet: true,
+              ),
+              const SizedBox(height: 12),
+              _AccessMethodTile(
+                icon: Symbols.fingerprint,
+                label: l10n.profileAccessFingerprint,
+                isSet: false,
+              ),
+              const SizedBox(height: 12),
+              _AccessMethodTile(
+                icon: Symbols.contactless,
+                label: l10n.profileAccessNfc,
+                isSet: true,
+              ),
 
-          // Check-in History Section
-          Text(
-            l10n.profileCheckinHistory,
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: theme.colorScheme.primary,
-              letterSpacing: 2,
-              fontWeight: FontWeight.bold,
-            ),
+              const SizedBox(height: 40),
+
+              // Check-in History Section
+              Text(
+                l10n.profileCheckinHistory,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.primary,
+                  letterSpacing: 2,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (viewModel.history.isEmpty)
+                EmptyState(
+                  title: l10n.profileNoCheckins,
+                  message: l10n.profileNoCheckinsSubtitle,
+                  icon: Symbols.badge,
+                )
+              else
+                _CheckinHistoryList(history: viewModel.history),
+            ],
           ),
-          const SizedBox(height: 16),
-          _CheckinHistoryList(),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -201,18 +230,15 @@ class _AccessMethodTile extends StatelessWidget {
 }
 
 class _CheckinHistoryList extends StatelessWidget {
+  final List<AccessHistoryEntry> history;
+
+  const _CheckinHistoryList({required this.history});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-
-    // Mock data for check-in history
-    final history = [
-      {'date': 'Today', 'time': '09:42', 'location': 'Main Entrance'},
-      {'date': 'Yesterday', 'time': '17:15', 'location': 'Gym Gate'},
-      {'date': '01 May', 'time': '08:30', 'location': 'Main Entrance'},
-      {'date': '30 April', 'time': '18:00', 'location': 'Gym Gate'},
-    ];
+    final locale = Localizations.localeOf(context).toLanguageTag();
 
     return ListView.builder(
       shrinkWrap: true,
@@ -220,6 +246,9 @@ class _CheckinHistoryList extends StatelessWidget {
       itemCount: history.length,
       itemBuilder: (context, index) {
         final item = history[index];
+        final dateLabel = DateFormat.yMMMd(locale).format(item.checkedInAt);
+        final timeLabel = DateFormat.Hm(locale).format(item.checkedInAt);
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -250,7 +279,7 @@ class _CheckinHistoryList extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '${item['location']}',
+                      item.location,
                       style: TextStyle(
                         fontSize: 12,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -263,13 +292,13 @@ class _CheckinHistoryList extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${item['date']}',
+                    dateLabel,
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   Text(
-                    '${item['time']}',
+                    timeLabel,
                     style: TextStyle(
                       fontSize: 12,
                       color: theme.colorScheme.onSurfaceVariant,

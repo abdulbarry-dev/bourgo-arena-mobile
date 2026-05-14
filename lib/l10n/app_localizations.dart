@@ -332,6 +332,18 @@ abstract class AppLocalizations {
   /// **'RÉSERVER UNE SESSION'**
   String get activitiesNoReservationsCTA;
 
+  /// No description provided for @activitiesNoSportsFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun sport trouvé.'**
+  String get activitiesNoSportsFound;
+
+  /// No description provided for @activitiesNoSportsFoundSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayez plus tard ou explorez une autre catégorie.'**
+  String get activitiesNoSportsFoundSubtitle;
+
   /// No description provided for @activitiesRetry.
   ///
   /// In fr, this message translates to:
@@ -769,6 +781,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Entrée enregistrée'**
   String get profileCheckinEntry;
+
+  /// No description provided for @profileNoCheckins.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun historique d\'accès pour le moment.'**
+  String get profileNoCheckins;
+
+  /// No description provided for @profileNoCheckinsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos passages apparaîtront ici une fois que vous entrerez dans l\'arène.'**
+  String get profileNoCheckinsSubtitle;
 
   /// No description provided for @profileNoHistory.
   ///
