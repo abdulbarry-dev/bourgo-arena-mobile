@@ -3,7 +3,6 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.da
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen that prompts the user to select their preferred language.
@@ -109,10 +108,8 @@ class _LanguageSelectionScreenState extends State<LanguageSelectionScreen> {
 
                             // Continue Button
                             ElevatedButton(
-                              onPressed: () {
-                                // Proceed to onboarding or home
-                                context.go('/onboarding');
-                              },
+                              onPressed: () =>
+                                  widget.viewModel.confirmLanguageSelection(),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: theme.colorScheme.primary,
                                 foregroundColor: theme.colorScheme.onPrimary,

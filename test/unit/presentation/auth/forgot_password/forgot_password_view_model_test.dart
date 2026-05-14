@@ -1,14 +1,22 @@
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/forgot_password_use_case.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:checks/checks.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockForgotPasswordUseCase extends Mock implements ForgotPasswordUseCase {}
 
 void main() {
   late ForgotPasswordViewModel viewModel;
+  late MockForgotPasswordUseCase mockForgotPasswordUseCase;
 
   setUp(() {
-    viewModel = ForgotPasswordViewModel();
+    mockForgotPasswordUseCase = MockForgotPasswordUseCase();
+    viewModel = ForgotPasswordViewModel(mockForgotPasswordUseCase);
   });
 
   tearDown(() {
@@ -38,12 +46,16 @@ void main() {
 
       viewModel.sendCode(context);
       check(viewModel.isLoading).isFalse();
+      verifyNever(() => mockForgotPasswordUseCase(any()));
     });
 
     testWidgets('sendCode sets loading and navigates if form is valid', (
       tester,
     ) async {
       viewModel.identifierController.text = 'test@example.com';
+      when(
+        () => mockForgotPasswordUseCase(any()),
+      ).thenAnswer((_) async => const Success(null));
 
       final router = GoRouter(
         initialLocation: '/',
@@ -68,13 +80,44 @@ void main() {
 
       final context = tester.element(find.byType(Form));
 
-      viewModel.sendCode(context);
+      await viewModel.sendCode(context);
 
-      check(viewModel.isLoading).isTrue();
+      verify(() => mockForgotPasswordUseCase('test@example.com')).called(1);
+      check(viewModel.isLoading).isFalse();
+    });
 
-      // Wait for simulated API call
-      await tester.pump(const Duration(seconds: 3));
+    testWidgets('sendCode shows snackbar on failure', (tester) async {
+      viewModel.identifierController.text = 'test@example.com';
+      when(
+        () => mockForgotPasswordUseCase(any()),
+      ).thenAnswer((_) async => FailureResult(AuthFailure('error')));
 
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => Scaffold(
+              body: Form(
+                key: viewModel.formKey,
+                child: TextFormField(
+                  controller: viewModel.identifierController,
+                  validator: (value) => value!.isEmpty ? 'error' : null,
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+
+      final context = tester.element(find.byType(Form));
+
+      await viewModel.sendCode(context);
+      await tester.pumpAndSettle();
+
+      check(find.text('error').evaluate()).isNotEmpty();
       check(viewModel.isLoading).isFalse();
     });
   });

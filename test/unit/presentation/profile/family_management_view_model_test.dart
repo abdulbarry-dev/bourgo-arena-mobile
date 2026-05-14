@@ -122,6 +122,8 @@ void main() {
     test('addChildFromForm success', () async {
       await Future.delayed(Duration.zero);
 
+      viewModel.childFirstNameController.text = 'Junior';
+      viewModel.childLastNameController.text = 'Doe';
       viewModel.setChildGender('Male');
       viewModel.setChildBirthDate(DateTime(2015));
 

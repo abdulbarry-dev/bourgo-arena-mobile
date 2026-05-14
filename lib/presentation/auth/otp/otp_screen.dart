@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 class OtpScreen extends StatefulWidget {
   final String? destination;
   final Map<String, dynamic>? registrationData;
+  final bool isPasswordReset;
   final VerifyOtpUseCase verifyOtpUseCase;
   final SendOtpUseCase sendOtpUseCase;
 
@@ -20,6 +21,7 @@ class OtpScreen extends StatefulWidget {
     super.key,
     this.destination,
     this.registrationData,
+    this.isPasswordReset = false,
     required this.verifyOtpUseCase,
     required this.sendOtpUseCase,
   });
@@ -44,6 +46,14 @@ class _OtpScreenState extends State<OtpScreen> {
     _viewModel = OtpViewModel(widget.verifyOtpUseCase, widget.sendOtpUseCase);
     _viewModel.addListener(_onViewModelChanged);
     _startTimer();
+
+    // Trigger initial OTP send if not already handled by the navigation origin
+    // or if we want to ensure it's sent upon landing.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.destination != null) {
+        _viewModel.resend(widget.destination!);
+      }
+    });
   }
 
   @override
@@ -75,17 +85,24 @@ class _OtpScreenState extends State<OtpScreen> {
         identifier: widget.destination ?? '',
         code: code,
         onSuccess: () {
-          context.push(
-            '/account-setup',
-            extra:
-                widget.registrationData ??
-                {
-                  'email': widget.destination ?? '',
-                  'phone': '',
-                  'firstName': 'User',
-                  'lastName': '',
-                },
-          );
+          if (widget.isPasswordReset) {
+            context.push(
+              '/new-password',
+              extra: {'identifier': widget.destination ?? '', 'otp': code},
+            );
+          } else {
+            context.push(
+              '/account-setup',
+              extra:
+                  widget.registrationData ??
+                  {
+                    'email': widget.destination ?? '',
+                    'phone': '',
+                    'firstName': 'User',
+                    'lastName': '',
+                  },
+            );
+          }
         },
       );
     }
@@ -135,10 +152,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 const SizedBox(height: 48),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(
-                    6,
-                    (index) => _buildOTPField(index),
-                  ),
+                  children: List.generate(6, (index) => _buildOTPField(index)),
                 ),
                 const SizedBox(height: 48),
                 Center(

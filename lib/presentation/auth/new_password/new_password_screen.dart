@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/new_password/new_password_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -8,7 +9,16 @@ import 'package:material_symbols_icons/symbols.dart';
 
 /// The new password screen for Bourgo Arena.
 class NewPasswordScreen extends StatefulWidget {
-  const NewPasswordScreen({super.key});
+  final String identifier;
+  final String otp;
+  final ResetPasswordUseCase resetPasswordUseCase;
+
+  const NewPasswordScreen({
+    super.key,
+    required this.identifier,
+    required this.otp,
+    required this.resetPasswordUseCase,
+  });
 
   @override
   State<NewPasswordScreen> createState() => _NewPasswordScreenState();
@@ -20,7 +30,11 @@ class _NewPasswordScreenState extends State<NewPasswordScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = NewPasswordViewModel();
+    _viewModel = NewPasswordViewModel(
+      identifier: widget.identifier,
+      otp: widget.otp,
+      resetPasswordUseCase: widget.resetPasswordUseCase,
+    );
   }
 
   @override

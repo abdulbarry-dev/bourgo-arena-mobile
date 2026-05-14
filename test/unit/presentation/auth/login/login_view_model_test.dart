@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/viewmodels/login_view_model.dart';
@@ -53,10 +53,10 @@ void main() {
   testWidgets('calls use case and leaves isLoading false on success', (
     tester,
   ) async {
-    final user = testUserEntity();
+    final session = testAuthSession();
     when(
       () => mockLoginUseCase(any(), any()),
-    ).thenAnswer((_) async => Success(user));
+    ).thenAnswer((_) async => Success(session));
     when(
       () => mockSessionRepository.clearRememberedIdentifier(),
     ).thenAnswer((_) async => const Success(null));
@@ -106,10 +106,10 @@ void main() {
     testWidgets('login saves identifier when remember me is checked', (
       tester,
     ) async {
-      final user = testUserEntity();
+      final session = testAuthSession();
       when(
         () => mockLoginUseCase(any(), any()),
-      ).thenAnswer((_) async => Success(user));
+      ).thenAnswer((_) async => Success(session));
       when(
         () => mockSessionRepository.saveRememberedIdentifier(any()),
       ).thenAnswer((_) async => const Success(null));
@@ -142,10 +142,10 @@ void main() {
     testWidgets('login clears identifier when remember me is NOT checked', (
       tester,
     ) async {
-      final user = testUserEntity();
+      final session = testAuthSession();
       when(
         () => mockLoginUseCase(any(), any()),
-      ).thenAnswer((_) async => Success(user));
+      ).thenAnswer((_) async => Success(session));
       when(
         () => mockSessionRepository.clearRememberedIdentifier(),
       ).thenAnswer((_) async => const Success(null));
@@ -210,7 +210,7 @@ void main() {
   });
 
   testWidgets('isLoading resets to false on failure result', (tester) async {
-    final completer = Completer<Result<User, Failure>>();
+    final completer = Completer<Result<AuthSession, Failure>>();
     when(
       () => mockLoginUseCase(any(), any()),
     ).thenAnswer((_) => completer.future);
@@ -245,8 +245,8 @@ void main() {
     testWidgets('isLoading lifecycle and notifyListeners count', (
       tester,
     ) async {
-      final user = testUserEntity();
-      final completer = Completer<Result<User, Failure>>();
+      final session = testAuthSession();
+      final completer = Completer<Result<AuthSession, Failure>>();
       when(
         () => mockLoginUseCase(any(), any()),
       ).thenAnswer((_) => completer.future);
@@ -278,7 +278,7 @@ void main() {
       check(viewModel.isLoading).isTrue();
       check(notifyCount).equals(1); // setLoading(true)
 
-      completer.complete(Success(user));
+      completer.complete(Success(session));
       await loginFuture;
 
       check(viewModel.isLoading).isFalse();
@@ -286,8 +286,8 @@ void main() {
     });
 
     testWidgets('double submit prevention', (tester) async {
-      final user = testUserEntity();
-      final completer = Completer<Result<User, Failure>>();
+      final session = testAuthSession();
+      final completer = Completer<Result<AuthSession, Failure>>();
       when(
         () => mockLoginUseCase(any(), any()),
       ).thenAnswer((_) => completer.future);
@@ -321,7 +321,7 @@ void main() {
       // Verify use case only called once
       verify(() => mockLoginUseCase(any(), any())).called(1);
 
-      completer.complete(Success(user));
+      completer.complete(Success(session));
       await firstCall;
     });
   });

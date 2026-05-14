@@ -1,4 +1,6 @@
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart';
@@ -37,6 +39,20 @@ User testUserEntity({
     gender: gender,
     isParentAccount: isParentAccount,
     children: children,
+  );
+}
+
+AuthSession testAuthSession({
+  User? user,
+  AuthState state = AuthState.authenticated,
+  String? token = 'token-123',
+  String? pendingEmail,
+}) {
+  return AuthSession(
+    user: user,
+    state: state,
+    token: token,
+    pendingEmail: pendingEmail,
   );
 }
 

@@ -102,16 +102,21 @@ class ApiClient {
   }
 
   dynamic _handleResponse(http.Response response) {
-    final Map<String, dynamic> body = response.body.isNotEmpty
-        ? jsonDecode(response.body) as Map<String, dynamic>
-        : {};
+    Map<String, dynamic> body = {};
+    if (response.body.isNotEmpty) {
+      try {
+        body = jsonDecode(response.body) as Map<String, dynamic>;
+      } catch (_) {
+        // If body is not JSON, we'll use the status code and raw body message
+      }
+    }
 
     final bool success =
         body['success'] ??
         (response.statusCode >= 200 && response.statusCode < 300);
 
     if (success) {
-      return body['data'];
+      return body.containsKey('data') ? body['data'] : body;
     } else {
       final String message =
           body['message'] ??

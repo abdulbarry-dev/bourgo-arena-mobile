@@ -1,5 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
-import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
@@ -11,7 +11,10 @@ class LoginUseCase {
   const LoginUseCase(this._repository);
 
   /// Executes the login operation.
-  Future<Result<User, Failure>> call(String identifier, String password) async {
+  Future<Result<AuthSession, Failure>> call(
+    String identifier,
+    String password,
+  ) async {
     return _repository.login(identifier, password);
   }
 }

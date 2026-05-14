@@ -5,6 +5,8 @@ import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
@@ -13,13 +15,29 @@ import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart'
 class ApiAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
   final SessionRepository _sessionRepository;
-  final StreamController<User?> _authStateController =
-      StreamController<User?>.broadcast();
+  final StreamController<AuthSession> _authStateController =
+      StreamController<AuthSession>.broadcast();
 
   ApiAuthRepository(this._apiClient, this._sessionRepository);
 
+  AuthState _mapBackendState(String? state) {
+    switch (state) {
+      case 'pending_verification':
+        return AuthState.pendingVerification;
+      case 'pending_onboarding':
+        return AuthState.pendingOnboarding;
+      case 'active':
+        return AuthState.authenticated;
+      default:
+        return AuthState.unauthenticated;
+    }
+  }
+
   @override
-  Future<Result<User, Failure>> login(String identifier, String password) {
+  Future<Result<AuthSession, Failure>> login(
+    String identifier,
+    String password,
+  ) {
     return executeApiCall(() async {
       // Clear any existing token before login to avoid interference
       _apiClient.setToken(null);
@@ -32,20 +50,38 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final token = response['token'] as String;
-      _apiClient.setToken(token);
+      final token = response['token'] as String?;
+      final stateStr = response['state'] as String?;
+      final state = _mapBackendState(stateStr);
 
-      // Persist the token to local session storage
-      await _sessionRepository.saveAuthToken(token);
+      if (token != null) {
+        _apiClient.setToken(token);
+        await _sessionRepository.saveAuthToken(token);
+      }
 
-      // Fetch user profile after login
-      final userResponse =
-          await _apiClient.get('/user/profile') as Map<String, dynamic>;
-      final userModel = UserProfileModel.fromJson(userResponse);
-      final user = UserMapper.toEntity(userModel);
+      await _sessionRepository.saveAuthState(state.name);
 
-      _authStateController.add(user);
-      return Success(user);
+      if (state == AuthState.pendingVerification && isEmail) {
+        await _sessionRepository.savePendingVerificationEmail(identifier);
+      }
+
+      User? user;
+      if (response['user'] != null) {
+        final userModel = UserProfileModel.fromJson(
+          response['user'] as Map<String, dynamic>,
+        );
+        user = UserMapper.toEntity(userModel);
+      } else if (token != null) {
+        // Fetch user profile if token exists but user data is missing
+        final userResponse =
+            await _apiClient.get('/user/profile') as Map<String, dynamic>;
+        final userModel = UserProfileModel.fromJson(userResponse);
+        user = UserMapper.toEntity(userModel);
+      }
+
+      final session = AuthSession(user: user, state: state, token: token);
+      _authStateController.add(session);
+      return Success(session);
     });
   }
 
@@ -59,7 +95,7 @@ class ApiAuthRepository implements AuthRepository {
         _apiClient.setToken(null);
         // Clear the persisted session (including the token)
         await _sessionRepository.clearSession();
-        _authStateController.add(null);
+        _authStateController.add(AuthSession.unauthenticated());
       }
     });
   }
@@ -86,6 +122,17 @@ class ApiAuthRepository implements AuthRepository {
         'date_of_birth': birthDate.toIso8601String().split('T')[0],
         'is_family_account': isFamilyAccount,
       });
+
+      // After successful registration, the user is typically in pending_verification state.
+      await _sessionRepository.saveAuthState(
+        AuthState.pendingVerification.name,
+      );
+      await _sessionRepository.savePendingVerificationEmail(email);
+
+      _authStateController.add(
+        AuthSession(state: AuthState.pendingVerification, pendingEmail: email),
+      );
+
       return const Success(null);
     });
   }
@@ -107,7 +154,37 @@ class ApiAuthRepository implements AuthRepository {
                 'otp': otp,
               })
               as Map<String, dynamic>;
-      return Success(response['valid'] == true);
+
+      final isValid = response['valid'] == true;
+
+      if (isValid) {
+        final token = response['token'] as String?;
+        final stateStr = response['state'] as String?;
+
+        if (token != null) {
+          _apiClient.setToken(token);
+          await _sessionRepository.saveAuthToken(token);
+        }
+
+        if (stateStr != null) {
+          final state = _mapBackendState(stateStr);
+          await _sessionRepository.saveAuthState(state.name);
+
+          User? user;
+          if (response['user'] != null) {
+            final userModel = UserProfileModel.fromJson(
+              response['user'] as Map<String, dynamic>,
+            );
+            user = UserMapper.toEntity(userModel);
+          }
+
+          _authStateController.add(
+            AuthSession(user: user, state: state, token: token),
+          );
+        }
+      }
+
+      return Success(isValid);
     });
   }
 
@@ -151,7 +228,11 @@ class ApiAuthRepository implements AuthRepository {
         );
       }
 
-      _authStateController.add(user);
+      final stateStr = response['state'] as String? ?? 'active';
+      final state = _mapBackendState(stateStr);
+      await _sessionRepository.saveAuthState(state.name);
+
+      _authStateController.add(AuthSession(user: user, state: state));
       return const Success(null);
     });
   }
@@ -199,15 +280,29 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<User, Failure>> getUserProfile() {
+  Future<Result<AuthSession, Failure>> getUserProfile() {
     return executeApiCall(() async {
       final userResponse =
           await _apiClient.get('/user/profile') as Map<String, dynamic>;
+
       final userModel = UserProfileModel.fromJson(userResponse);
       final user = UserMapper.toEntity(userModel);
 
-      _authStateController.add(user);
-      return Success(user);
+      // Backend should ideally return state here too. If not, default to active.
+      final stateStr = userResponse['state'] as String? ?? 'active';
+      final state = _mapBackendState(stateStr);
+
+      await _sessionRepository.saveAuthState(state.name);
+
+      final tokenResult = await _sessionRepository.getAuthToken();
+      final token = tokenResult.fold(
+        onSuccess: (t) => t,
+        onFailure: (_) => null,
+      );
+
+      final session = AuthSession(user: user, state: state, token: token);
+      _authStateController.add(session);
+      return Success(session);
     });
   }
 
@@ -218,5 +313,5 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Stream<User?> get onAuthStateChanged => _authStateController.stream;
+  Stream<AuthSession> get onAuthStateChanged => _authStateController.stream;
 }

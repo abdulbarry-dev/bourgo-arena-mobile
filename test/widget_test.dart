@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/main.dart';
@@ -26,6 +27,9 @@ void main() {
     when(() => mockSettingsViewModel.locale).thenReturn(const Locale('fr'));
     when(() => mockSettingsViewModel.isLanguageSelected).thenReturn(true);
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(false);
+    when(
+      () => mockAuthStateNotifier.state,
+    ).thenReturn(AuthState.unauthenticated);
     when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
     when(() => mockSettingsViewModel.addListener(any())).thenReturn(null);
   });

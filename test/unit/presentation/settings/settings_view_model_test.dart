@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_theme_mode_use_case.dart';
@@ -24,6 +25,9 @@ class _MockSetLocale extends Mock implements SetLocaleUseCase {}
 class _MockIsLanguageSelected extends Mock
     implements IsLanguageSelectedUseCase {}
 
+class _MockCompleteLanguageSelection extends Mock
+    implements CompleteLanguageSelectionUseCase {}
+
 class _MockGetNotificationsEnabled extends Mock
     implements GetNotificationsEnabledUseCase {}
 
@@ -44,6 +48,7 @@ void main() {
   late _MockGetLocale mockGetLocale;
   late _MockSetLocale mockSetLocale;
   late _MockIsLanguageSelected mockIsLangSelected;
+  late _MockCompleteLanguageSelection mockCompleteLangSelection;
   late _MockGetNotificationsEnabled mockGetNotif;
   late _MockSetNotificationsEnabled mockSetNotif;
   late _MockDeviceTokenRegistrar mockDeviceTokenRegistrar;
@@ -54,6 +59,7 @@ void main() {
     mockGetLocale = _MockGetLocale();
     mockSetLocale = _MockSetLocale();
     mockIsLangSelected = _MockIsLanguageSelected();
+    mockCompleteLangSelection = _MockCompleteLanguageSelection();
     mockGetNotif = _MockGetNotificationsEnabled();
     mockSetNotif = _MockSetNotificationsEnabled();
     mockDeviceTokenRegistrar = _MockDeviceTokenRegistrar();
@@ -68,6 +74,9 @@ void main() {
     when(
       () => mockIsLangSelected(),
     ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockCompleteLangSelection(),
+    ).thenAnswer((_) async => Result.success(null));
 
     when(
       () => mockSetTheme(any()),
@@ -90,6 +99,7 @@ void main() {
       mockGetLocale,
       mockSetLocale,
       mockIsLangSelected,
+      mockCompleteLangSelection,
       mockGetNotif,
       mockSetNotif,
       mockDeviceTokenRegistrar,
@@ -154,8 +164,15 @@ void main() {
     });
 
     test(
-      'updateLocale persists then notifies and marks language selected',
+      'updateLocale persists and notifies but does NOT mark as selected',
       () async {
+        // Start with language NOT selected
+        when(
+          () => mockIsLangSelected(),
+        ).thenAnswer((_) async => Result.success(false));
+        await viewModel.initialize();
+        expect(viewModel.isLanguageSelected, isFalse);
+
         when(
           () => mockSetLocale(const Locale('fr')),
         ).thenAnswer((_) async => Result.success(null));
@@ -166,11 +183,29 @@ void main() {
         await viewModel.updateLocale(const Locale('fr'));
 
         expect(viewModel.locale, const Locale('fr'));
-        expect(viewModel.isLanguageSelected, isTrue);
+        expect(viewModel.isLanguageSelected, isFalse);
         expect(notifyCount, 1);
         verify(() => mockSetLocale(const Locale('fr'))).called(1);
       },
     );
+
+    test('confirmLanguageSelection marks as selected and notifies', () async {
+      // Set initial state to false
+      when(
+        () => mockIsLangSelected(),
+      ).thenAnswer((_) async => Result.success(false));
+      await viewModel.initialize();
+      expect(viewModel.isLanguageSelected, isFalse);
+
+      var notifyCount = 0;
+      viewModel.addListener(() => notifyCount += 1);
+
+      await viewModel.confirmLanguageSelection();
+
+      expect(viewModel.isLanguageSelected, isTrue);
+      expect(notifyCount, 1);
+      verify(() => mockCompleteLangSelection()).called(1);
+    });
 
     test('toggleNotifications updates and calls use case', () async {
       var notifyCount = 0;

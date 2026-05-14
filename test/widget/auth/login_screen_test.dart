@@ -71,10 +71,10 @@ void main() {
 
   testWidgets('calls login use case on valid form', (tester) async {
     await setupScreenSize(tester);
-    final user = testUserEntity();
+    final session = testAuthSession();
     when(
       () => mockLoginUseCase(any(), any()),
-    ).thenAnswer((_) async => Success(user));
+    ).thenAnswer((_) async => Success(session));
     when(
       () => mockSessionRepository.clearRememberedIdentifier(),
     ).thenAnswer((_) async => const Success(null));

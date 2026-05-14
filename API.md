@@ -56,6 +56,15 @@ All API responses must follow a consistent JSON structure.
 
 *Note: If the result is a list, `data` should be a JSON array.*
 
+### Authentication State Flow
+
+The API uses a state-driven authentication flow to ensure users complete required steps (OTP verification, onboarding) before full access.
+
+**Possible States (`state` field):**
+* `pending_verification`: Email or phone verification required.
+* `pending_onboarding`: Profile setup or onboarding required.
+* `active`: Fully authenticated; full access allowed.
+
 ### Error Response
 
 ```json
@@ -86,10 +95,10 @@ All API responses must follow a consistent JSON structure.
 
 ### POST /auth/login
 
-* **Description**: Authenticates a user and returns a session token.
+* **Description**: Authenticates a user and returns their current state.
 * **Auth Required**: No
 * **Request Body**:
-  * `email` (string, required, email)
+  * `email` (string, required, email) OR `phone` (string, required)
   * `password` (string, required)
 * **Success Response**:
 
@@ -97,10 +106,14 @@ All API responses must follow a consistent JSON structure.
     {
       "success": true,
       "data": {
-        "token": "sanctum_token_string_here"
+        "token": "sanctum_token_string_here",
+        "state": "active",
+        "user": { ... }
       }
     }
     ```
+
+*Note: `token` and `user` may be omitted if state is `pending_verification`.*
 
 * **Error Responses**:
   * `401`: Invalid credentials.
@@ -118,7 +131,7 @@ All API responses must follow a consistent JSON structure.
   * `password` (string, required, min:8)
   * `password_confirmation` (string, required)
   * `is_family_account` (boolean, optional, default: false)
-* **Success Response**: `201 Created` with empty `data` or user object.
+* **Success Response**: `201 Created` with `data` containing `state`.
 * **Laravel Note**: `AuthController@register`, `RegisterRequest`.
 
 ### POST /auth/logout
@@ -143,7 +156,19 @@ All API responses must follow a consistent JSON structure.
 * **Request Body**:
   * `identifier` (string, required)
   * `otp` (string, required, length:6)
-* **Success Response**: `{"success": true, "data": {"valid": true}}`
+* **Success Response**:
+
+    ```json
+    {
+      "success": true,
+      "data": {
+        "valid": true,
+        "token": "...",
+        "state": "pending_onboarding",
+        "user": { ... }
+      }
+    }
+    ```
 
 ### POST /auth/request-family-otp
 
@@ -160,6 +185,7 @@ All API responses must follow a consistent JSON structure.
   * `email` (string, required)
   * `phone` (string, required)
   * `is_parent_account` (boolean, required)
+* **Success Response**: `{"success": true, "data": {"token": "...", "state": "active"}}`
 
 ---
 
@@ -176,6 +202,7 @@ All API responses must follow a consistent JSON structure.
       "success": true,
       "data": {
         "id": "user_uuid",
+        "state": "active",
         "name": "John Doe",
         "email": "john@example.com",
         "phone": "+212600000000",

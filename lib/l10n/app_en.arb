@@ -71,7 +71,7 @@
   "authForgotPasswordTitle": "Forgot Password",
   "authForgotPasswordSubtitle": "Don't worry! Enter your email or number to receive a code.",
   "authVerificationTitle": "VERIFICATION",
-  "authOtpSubtitlePrefix": "Enter the 4-digit code sent to ",
+  "authOtpSubtitlePrefix": "Enter the 6-digit code sent to ",
   "authOtpSubtitleDefault": "your number",
   "authOtpResendTimer": "Resend code in {seconds}s",
   "authNewPasswordTitle": "New Password",

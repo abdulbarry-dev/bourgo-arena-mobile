@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockRegisterUseCase extends Mock implements RegisterUseCase {}
@@ -95,9 +96,11 @@ void main() {
         await tester.enterText(textFields.at(1), 'Doe');
         await tester.enterText(textFields.at(2), 'john@example.com');
         await tester.enterText(textFields.at(3), '123456789');
-        // Set birth date via controller because the field is readOnly
-        final birthDateField = tester.widget<TextFormField>(textFields.at(4));
-        birthDateField.controller?.text = '2000-01-01';
+        // Set birth date via date picker
+        await tester.tap(find.byIcon(Symbols.calendar_today));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('OK'));
+        await tester.pumpAndSettle();
         // Select gender
         await tester.tap(find.byKey(const Key('gender_dropdown')));
         await tester.pumpAndSettle();
@@ -147,9 +150,11 @@ void main() {
       await tester.enterText(textFields.at(1), 'Doe');
       await tester.enterText(textFields.at(2), 'john@example.com');
       await tester.enterText(textFields.at(3), '123456789');
-      // Set birth date via controller because the field is readOnly
-      final birthDateField = tester.widget<TextFormField>(textFields.at(4));
-      birthDateField.controller?.text = '2000-01-01';
+      // Set birth date via date picker
+      await tester.tap(find.byIcon(Symbols.calendar_today));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
       // Select gender
       await tester.tap(find.byKey(const Key('gender_dropdown')));
       await tester.pumpAndSettle();
@@ -172,7 +177,7 @@ void main() {
           phone: '123456789',
           password: 'password123',
           gender: 'male',
-          birthDate: DateTime.parse('2000-01-01'),
+          birthDate: any(named: 'birthDate'),
           isFamilyAccount: false,
         ),
       ).called(1);

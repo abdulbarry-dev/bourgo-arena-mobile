@@ -1,7 +1,13 @@
+import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// ViewModel for the New Password screen.
 class NewPasswordViewModel extends ChangeNotifier {
+  final String identifier;
+  final String otp;
+  final ResetPasswordUseCase _resetPasswordUseCase;
+
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -10,19 +16,44 @@ class NewPasswordViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  NewPasswordViewModel({
+    required this.identifier,
+    required this.otp,
+    required ResetPasswordUseCase resetPasswordUseCase,
+  }) : _resetPasswordUseCase = resetPasswordUseCase;
+
   void setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  void resetPassword(BuildContext context) {
+  Future<void> resetPassword(BuildContext context) async {
     if (formKey.currentState?.validate() ?? false) {
       setLoading(true);
-      // Simulate API call
-      Future.delayed(const Duration(seconds: 2), () {
-        setLoading(false);
-        // Navigate to Login or Success
-      });
+
+      final result = await _resetPasswordUseCase(
+        identifier: identifier,
+        otp: otp,
+        newPassword: passwordController.text,
+      );
+
+      setLoading(false);
+
+      if (context.mounted) {
+        result.fold(
+          onSuccess: (_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Password reset successfully')),
+            );
+            context.go('/login');
+          },
+          onFailure: (failure) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(failure.message)));
+          },
+        );
+      }
     }
   }
 

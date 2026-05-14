@@ -1,11 +1,15 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 
 /// Interface for authentication operations.
 abstract interface class AuthRepository {
   /// Signs in a user with [identifier] (email or phone) and [password].
-  Future<Result<User, Failure>> login(String identifier, String password);
+  Future<Result<AuthSession, Failure>> login(
+    String identifier,
+    String password,
+  );
 
   /// Registers a new user.
   Future<Result<void, Failure>> register({
@@ -54,8 +58,8 @@ abstract interface class AuthRepository {
   });
 
   /// Fetches the profile of the currently authenticated user.
-  Future<Result<User, Failure>> getUserProfile();
+  Future<Result<AuthSession, Failure>> getUserProfile();
 
   /// Stream of authentication state changes.
-  Stream<User?> get onAuthStateChanged;
+  Stream<AuthSession> get onAuthStateChanged;
 }

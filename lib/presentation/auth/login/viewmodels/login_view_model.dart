@@ -63,7 +63,7 @@ class LoginViewModel extends ChangeNotifier {
             ).showSnackBar(SnackBar(content: Text(failure.message)));
           }
         },
-        onSuccess: (user) async {
+        onSuccess: (session) async {
           if (_isRememberMeChecked) {
             await _sessionRepository.saveRememberedIdentifier(
               identifierController.text,
@@ -71,7 +71,7 @@ class LoginViewModel extends ChangeNotifier {
           } else {
             await _sessionRepository.clearRememberedIdentifier();
           }
-          // Note: GoRouter redirect in router.dart will handle navigation on success
+          // Note: GoRouter redirect in router.dart will handle navigation based on session.state
         },
       );
     }

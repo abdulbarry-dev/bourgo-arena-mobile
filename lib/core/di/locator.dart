@@ -29,12 +29,14 @@ import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/forgot_password_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/update_password_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
@@ -43,6 +45,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/device/register_device_token_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_theme_mode_use_case.dart';
@@ -132,6 +135,8 @@ Future<void> initLocator() async {
     () => RequestFamilyAccountOtpUseCase(locator()),
   );
   locator.registerLazySingleton(() => UpdatePasswordUseCase(locator()));
+  locator.registerLazySingleton(() => ForgotPasswordUseCase(locator()));
+  locator.registerLazySingleton(() => ResetPasswordUseCase(locator()));
   locator.registerLazySingleton(() => GetActivitiesUseCase(locator()));
   locator.registerLazySingleton(() => GetTimeSlotsUseCase(locator()));
   locator.registerLazySingleton(() => GetUserBookingsUseCase(locator()));
@@ -161,6 +166,9 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => SetLocaleUseCase(locator()));
   locator.registerLazySingleton(() => IsLanguageSelectedUseCase(locator()));
   locator.registerLazySingleton(
+    () => CompleteLanguageSelectionUseCase(locator()),
+  );
+  locator.registerLazySingleton(
     () => GetNotificationsEnabledUseCase(locator()),
   );
   locator.registerLazySingleton(
@@ -169,7 +177,7 @@ Future<void> initLocator() async {
 
   // State Notifiers
   locator.registerSingletonAsync<AuthStateNotifier>(() async {
-    final notifier = AuthStateNotifier(locator(), locator());
+    final notifier = AuthStateNotifier(locator(), locator(), locator());
     await notifier.initialize();
     return notifier;
   });
@@ -177,6 +185,7 @@ Future<void> initLocator() async {
   // ViewModels — registered as async so initialize() is awaited at startup.
   locator.registerSingletonAsync<SettingsViewModel>(() async {
     final vm = SettingsViewModel(
+      locator(),
       locator(),
       locator(),
       locator(),

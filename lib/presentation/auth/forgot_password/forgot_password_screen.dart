@@ -1,3 +1,5 @@
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/forgot_password_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -20,7 +22,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   void initState() {
     super.initState();
-    _viewModel = ForgotPasswordViewModel();
+    _viewModel = ForgotPasswordViewModel(locator<ForgotPasswordUseCase>());
   }
 
   @override

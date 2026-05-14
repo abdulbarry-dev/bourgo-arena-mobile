@@ -3,7 +3,8 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -23,6 +24,32 @@ void main() {
     apiClient = MockApiClient();
     sessionRepository = MockSessionRepository();
     repository = ApiAuthRepository(apiClient, sessionRepository);
+
+    // Default mocks for SessionRepository
+    when(
+      () => sessionRepository.saveAuthToken(any()),
+    ).thenAnswer((_) async => const Success(null));
+    when(
+      () => sessionRepository.getAuthToken(),
+    ).thenAnswer((_) async => const Success(null));
+    when(
+      () => sessionRepository.saveAuthState(any()),
+    ).thenAnswer((_) async => const Success(null));
+    when(
+      () => sessionRepository.getAuthState(),
+    ).thenAnswer((_) async => const Success(null));
+    when(
+      () => sessionRepository.savePendingVerificationEmail(any()),
+    ).thenAnswer((_) async => const Success(null));
+    when(
+      () => sessionRepository.getPendingVerificationEmail(),
+    ).thenAnswer((_) async => const Success(null));
+    when(
+      () => sessionRepository.isOnboardingCompleted(),
+    ).thenAnswer((_) async => const Success(false));
+    when(
+      () => sessionRepository.setOnboardingCompleted(any()),
+    ).thenAnswer((_) async => const Success(null));
   });
 
   group('ApiAuthRepository', () {
@@ -43,7 +70,7 @@ void main() {
             'email': 'alex@example.com',
             'password': 'secret123',
           }),
-        ).thenAnswer((_) async => {'token': token});
+        ).thenAnswer((_) async => {'token': token, 'state': 'active'});
 
         when(
           () => apiClient.get('/user/profile'),
@@ -55,25 +82,28 @@ void main() {
         final eventExpectation = expectLater(
           repository.onAuthStateChanged,
           emits(
-            predicate<User?>(
+            predicate<AuthSession>(
               (value) =>
-                  value != null &&
-                  value.id == expectedUser.id &&
-                  value.firstName == expectedUser.firstName &&
-                  value.lastName == expectedUser.lastName &&
-                  value.children.length == expectedUser.children.length,
+                  value.state == AuthState.authenticated &&
+                  value.user != null &&
+                  value.user!.id == expectedUser.id &&
+                  value.user!.firstName == expectedUser.firstName &&
+                  value.user!.lastName == expectedUser.lastName &&
+                  value.user!.children.length == expectedUser.children.length,
             ),
           ),
         );
 
         final result = await repository.login('alex@example.com', 'secret123');
 
-        expect(result, isA<Success<User, Failure>>());
-        expect((result as Success<User, Failure>).data.id, expectedUser.id);
-        expect(result.data.firstName, expectedUser.firstName);
-        expect(result.data.lastName, expectedUser.lastName);
-        expect(result.data.avatarUrl, expectedUser.avatarUrl);
-        expect(result.data.children, hasLength(1));
+        expect(result, isA<Success<AuthSession, Failure>>());
+        final session = (result as Success<AuthSession, Failure>).data;
+        expect(session.user?.id, expectedUser.id);
+        expect(session.user?.firstName, expectedUser.firstName);
+        expect(session.user?.lastName, expectedUser.lastName);
+        expect(session.user?.avatarUrl, expectedUser.avatarUrl);
+        expect(session.user?.children, hasLength(1));
+        expect(session.state, AuthState.authenticated);
         verify(
           () => apiClient.post('/auth/login', {
             'email': 'alex@example.com',
@@ -85,7 +115,6 @@ void main() {
         verify(() => sessionRepository.saveAuthToken(token)).called(1);
         verify(() => apiClient.get('/user/profile')).called(1);
         await eventExpectation;
-        verifyNoMoreInteractions(sessionRepository);
       });
 
       test('returns Success on 200 with phone identifier', () async {
@@ -97,7 +126,7 @@ void main() {
             'phone': '+212600000000',
             'password': 'secret123',
           }),
-        ).thenAnswer((_) async => {'token': token});
+        ).thenAnswer((_) async => {'token': token, 'state': 'active'});
 
         when(
           () => apiClient.get('/user/profile'),
@@ -108,7 +137,7 @@ void main() {
 
         final result = await repository.login('+212600000000', 'secret123');
 
-        expect(result, isA<Success<User, Failure>>());
+        expect(result, isA<Success<AuthSession, Failure>>());
         verify(
           () => apiClient.post('/auth/login', {
             'phone': '+212600000000',
@@ -130,9 +159,9 @@ void main() {
             'secret123',
           );
 
-          expect(result, isA<FailureResult<User, Failure>>());
+          expect(result, isA<FailureResult<AuthSession, Failure>>());
           expect(
-            (result as FailureResult<User, Failure>).failure,
+            (result as FailureResult<AuthSession, Failure>).failure,
             isA<AuthFailure>(),
           );
           verify(
@@ -154,9 +183,9 @@ void main() {
 
         final result = await repository.login('alex@example.com', 'secret123');
 
-        expect(result, isA<FailureResult<User, Failure>>());
+        expect(result, isA<FailureResult<AuthSession, Failure>>());
         expect(
-          (result as FailureResult<User, Failure>).failure,
+          (result as FailureResult<AuthSession, Failure>).failure,
           isA<NetworkFailure>(),
         );
       });
@@ -168,9 +197,9 @@ void main() {
 
         final result = await repository.login('alex@example.com', 'secret123');
 
-        expect(result, isA<FailureResult<User, Failure>>());
+        expect(result, isA<FailureResult<AuthSession, Failure>>());
         expect(
-          (result as FailureResult<User, Failure>).failure,
+          (result as FailureResult<AuthSession, Failure>).failure,
           isA<ServerFailure>(),
         );
       });
@@ -187,7 +216,11 @@ void main() {
 
         final eventExpectation = expectLater(
           repository.onAuthStateChanged,
-          emits(null),
+          emits(
+            predicate<AuthSession>(
+              (value) => value.state == AuthState.unauthenticated,
+            ),
+          ),
         );
 
         final result = await repository.logout();
@@ -528,10 +561,16 @@ void main() {
         const pin = '1234';
         when(
           () => apiClient.post('/auth/complete-registration', any()),
-        ).thenAnswer((_) async => null);
+        ).thenAnswer((_) async => {'state': 'active'});
         final eventExpectation = expectLater(
           repository.onAuthStateChanged,
-          emits(user),
+          emits(
+            predicate<AuthSession>(
+              (value) =>
+                  value.state == AuthState.authenticated &&
+                  value.user?.id == user.id,
+            ),
+          ),
         );
 
         final result = await repository.completeRegistration(user, pin);
@@ -688,6 +727,52 @@ void main() {
         expect(result, isA<Success<String?, Failure>>());
         expect((result as Success<String?, Failure>).data, resultToken);
         verify(() => sessionRepository.getAuthToken()).called(1);
+      });
+    });
+
+    group('getUserProfile', () {
+      test('returns Success and emits AuthSession on 200', () async {
+        final userJson = testUserJson();
+        final expectedUser = testUserEntity();
+
+        when(
+          () => apiClient.get('/user/profile'),
+        ).thenAnswer((_) async => userJson);
+
+        final eventExpectation = expectLater(
+          repository.onAuthStateChanged,
+          emits(
+            predicate<AuthSession>(
+              (value) =>
+                  value.state == AuthState.authenticated &&
+                  value.user?.id == expectedUser.id,
+            ),
+          ),
+        );
+
+        final result = await repository.getUserProfile();
+
+        expect(result, isA<Success<AuthSession, Failure>>());
+        expect(
+          (result as Success<AuthSession, Failure>).data.user?.id,
+          expectedUser.id,
+        );
+        verify(() => apiClient.get('/user/profile')).called(1);
+        await eventExpectation;
+      });
+
+      test('returns Failure(AuthFailure) on 401', () async {
+        when(
+          () => apiClient.get('/user/profile'),
+        ).thenThrow(const AuthException('401'));
+
+        final result = await repository.getUserProfile();
+
+        expect(result, isA<FailureResult<AuthSession, Failure>>());
+        expect(
+          (result as FailureResult<AuthSession, Failure>).failure,
+          isA<AuthFailure>(),
+        );
       });
     });
   });

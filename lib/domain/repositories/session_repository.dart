@@ -16,6 +16,18 @@ abstract interface class SessionRepository {
   /// Persists the authentication token.
   Future<Result<void, Failure>> saveAuthToken(String token);
 
+  /// Retrieves the current [AuthState].
+  Future<Result<String?, Failure>> getAuthState();
+
+  /// Persists the [AuthState].
+  Future<Result<void, Failure>> saveAuthState(String state);
+
+  /// Retrieves the pending verification email, if any.
+  Future<Result<String?, Failure>> getPendingVerificationEmail();
+
+  /// Persists the pending verification email.
+  Future<Result<void, Failure>> savePendingVerificationEmail(String email);
+
   /// Clears all session data atomically (tokens and session-scoped metadata).
   /// This is a full session wipe, not a field-by-field removal.
   Future<Result<void, Failure>> clearSession();
@@ -33,11 +45,20 @@ abstract interface class SessionRepository {
   /// Retrieves the persisted [Locale].
   Future<Result<Locale, Failure>> getLocale();
 
-  /// Persists the [Locale] and marks language as explicitly selected.
+  /// Persists the [Locale].
   Future<Result<void, Failure>> setLocale(Locale locale);
+
+  /// Marks the language selection process as complete.
+  Future<Result<void, Failure>> completeLanguageSelection();
 
   /// Checks if the user has explicitly selected a language.
   Future<Result<bool, Failure>> isLanguageSelected();
+
+  /// Checks if the onboarding flow has been completed.
+  Future<Result<bool, Failure>> isOnboardingCompleted();
+
+  /// Persists the onboarding completion status.
+  Future<Result<void, Failure>> setOnboardingCompleted(bool completed);
 
   // =========== Notification Preference ===========
 

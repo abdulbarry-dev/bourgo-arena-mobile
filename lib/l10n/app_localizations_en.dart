@@ -214,7 +214,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authVerificationTitle => 'VERIFICATION';
 
   @override
-  String get authOtpSubtitlePrefix => 'Enter the 4-digit code sent to ';
+  String get authOtpSubtitlePrefix => 'Enter the 6-digit code sent to ';
 
   @override
   String get authOtpSubtitleDefault => 'your number';

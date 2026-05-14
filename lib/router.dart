@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
@@ -32,6 +33,7 @@ import 'package:bourgo_arena_mobile/presentation/onboarding/language_selection_s
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 
@@ -81,28 +83,51 @@ GoRouter createRouter(
     }
 
     // 3. Auth Redirection
-    final bool isAuthenticated = authStateNotifier.isAuthenticated;
+    final authState = authStateNotifier.state;
     final bool isAuthRoute =
         state.matchedLocation == '/login' ||
         state.matchedLocation == '/register' ||
-        state.matchedLocation == '/otp' ||
-        state.matchedLocation == '/verification-method' ||
-        state.matchedLocation == '/family-onboarding' ||
-        state.matchedLocation == '/account-setup' ||
-        state.matchedLocation == '/pin-setup' ||
         state.matchedLocation == '/forgot-password' ||
         state.matchedLocation == '/new-password' ||
+        state.matchedLocation == '/otp' ||
         state.matchedLocation == '/';
 
-    if (!isAuthenticated) {
-      return isAuthRoute ? null : '/login';
-    }
+    switch (authState) {
+      case AuthState.unauthenticated:
+        return isAuthRoute ? null : '/login';
 
-    if (isAuthRoute) {
-      return '/home';
-    }
+      case AuthState.pendingVerification:
+        // Allow OTP verification and related registration steps
+        final bool isVerificationRoute =
+            state.matchedLocation == '/otp' ||
+            state.matchedLocation == '/verification-method' ||
+            state.matchedLocation == '/family-onboarding';
 
-    return null;
+        if (isVerificationRoute) return null;
+
+        // Otherwise, force restore OTP screen
+        return '/otp';
+
+      case AuthState.pendingOnboarding:
+        // Allow onboarding flow steps
+        final bool isOnboardingRoute =
+            state.matchedLocation == '/onboarding' ||
+            state.matchedLocation == '/account-setup' ||
+            state.matchedLocation == '/pin-setup';
+
+        if (isOnboardingRoute) return null;
+
+        return '/onboarding';
+
+      case AuthState.authenticated:
+        // Prevent accessing auth routes once fully authenticated
+        if (isAuthRoute ||
+            state.matchedLocation == '/otp' ||
+            state.matchedLocation == '/onboarding') {
+          return '/home';
+        }
+        return null;
+    }
   },
   routes: [
     GoRoute(
@@ -111,6 +136,10 @@ GoRouter createRouter(
           LanguageSelectionScreen(viewModel: settingsViewModel),
     ),
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
+    GoRoute(
+      path: '/onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
     GoRoute(
       path: '/login',
       builder: (context, state) => LoginScreen(
@@ -127,9 +156,13 @@ GoRouter createRouter(
       path: '/otp',
       builder: (context, state) {
         final data = state.extraAsMap;
+        final destination =
+            data['destination'] as String? ??
+            authStateNotifier.session.pendingEmail;
         return OtpScreen(
-          destination: data['destination'] as String?,
+          destination: destination,
           registrationData: data['registrationData'] as Map<String, dynamic>?,
+          isPasswordReset: data['isPasswordReset'] as bool? ?? false,
           sendOtpUseCase: locator<SendOtpUseCase>(),
           verifyOtpUseCase: locator<VerifyOtpUseCase>(),
         );
@@ -163,7 +196,14 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/new-password',
-      builder: (context, state) => const NewPasswordScreen(),
+      builder: (context, state) {
+        final data = state.extraAsMap;
+        return NewPasswordScreen(
+          identifier: data['identifier'] as String? ?? '',
+          otp: data['otp'] as String? ?? '',
+          resetPasswordUseCase: locator<ResetPasswordUseCase>(),
+        );
+      },
     ),
     GoRoute(path: '/home', builder: (context, state) => const MainLayout()),
     GoRoute(

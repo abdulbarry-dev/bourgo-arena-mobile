@@ -16,6 +16,8 @@ class LocalSessionRepository implements SessionRepository {
   // =========== Storage Keys (Private) ===========
   // Auth Session
   static const String _authTokenKey = 'auth_token';
+  static const String _authStateKey = 'auth_state';
+  static const String _pendingEmailKey = 'pending_verification_email';
 
   // Theme Preference
   static const String _themeKey = 'settings_theme_mode';
@@ -23,6 +25,7 @@ class LocalSessionRepository implements SessionRepository {
   // Locale & Onboarding
   static const String _localeKey = 'settings_locale';
   static const String _languageSelectedKey = 'settings_language_selected';
+  static const String _onboardingCompletedKey = 'onboarding_completed';
 
   // Notification Preference
   static const String _notificationsKey = 'settings_notifications_enabled';
@@ -39,8 +42,11 @@ class LocalSessionRepository implements SessionRepository {
   /// added in the future MUST be added here.
   static const List<String> _sessionKeys = [
     _authTokenKey,
+    _authStateKey,
+    _pendingEmailKey,
     _deviceTokenKey,
     _devicePlatformKey,
+    _onboardingCompletedKey,
   ];
 
   final SharedPreferences _prefs;
@@ -70,6 +76,60 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure('Failed to save auth token: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<String?, Failure>> getAuthState() async {
+    try {
+      final state = _prefs.getString(_authStateKey);
+      return Success(state);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to retrieve auth state: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> saveAuthState(String state) async {
+    try {
+      await _prefs.setString(_authStateKey, state);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save auth state: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<String?, Failure>> getPendingVerificationEmail() async {
+    try {
+      final email = _prefs.getString(_pendingEmailKey);
+      return Success(email);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          'Failed to retrieve pending verification email: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> savePendingVerificationEmail(
+    String email,
+  ) async {
+    try {
+      await _prefs.setString(_pendingEmailKey, email);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          'Failed to save pending verification email: ${e.toString()}',
+        ),
       );
     }
   }
@@ -139,12 +199,22 @@ class LocalSessionRepository implements SessionRepository {
   Future<Result<void, Failure>> setLocale(Locale locale) async {
     try {
       await _prefs.setString(_localeKey, locale.languageCode);
-      // Explicitly mark language as selected when a locale is set.
-      await _prefs.setBool(_languageSelectedKey, true);
       return const Success(null);
     } catch (e) {
       return FailureResult(
         CacheFailure('Failed to save locale: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> completeLanguageSelection() async {
+    try {
+      await _prefs.setBool(_languageSelectedKey, true);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to complete language selection: ${e.toString()}'),
       );
     }
   }
@@ -160,6 +230,30 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure('Failed to check language selection: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> isOnboardingCompleted() async {
+    try {
+      final completed = _prefs.getBool(_onboardingCompletedKey) ?? false;
+      return Success(completed);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to check onboarding completion: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setOnboardingCompleted(bool completed) async {
+    try {
+      await _prefs.setBool(_onboardingCompletedKey, completed);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure('Failed to save onboarding completion: ${e.toString()}'),
       );
     }
   }

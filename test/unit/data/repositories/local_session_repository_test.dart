@@ -41,13 +41,79 @@ void main() {
       });
 
       test('clearSession removes every session key atomically', () async {
-        when(() => prefs.remove('auth_token')).thenAnswer((_) async => true);
+        const sessionKeys = [
+          'auth_token',
+          'auth_state',
+          'pending_verification_email',
+          'device_token',
+          'device_platform',
+          'onboarding_completed',
+        ];
+
+        for (final key in sessionKeys) {
+          when(() => prefs.remove(key)).thenAnswer((_) async => true);
+        }
 
         final result = await repository.clearSession();
 
         expect(result, isA<Success<void, Failure>>());
-        verify(() => prefs.remove('auth_token')).called(1);
+        for (final key in sessionKeys) {
+          verify(() => prefs.remove(key)).called(1);
+        }
         verifyNoMoreInteractions(prefs);
+      });
+
+      test('saveAuthState stores the state under the auth_state key', () async {
+        when(
+          () => prefs.setString('auth_state', 'unverified'),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.saveAuthState('unverified');
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(() => prefs.setString('auth_state', 'unverified')).called(1);
+      });
+
+      test('getAuthState returns the stored state', () async {
+        when(() => prefs.getString('auth_state')).thenReturn('unverified');
+
+        final result = await repository.getAuthState();
+
+        expect(result, isA<Success<String?, Failure>>());
+        expect((result as Success<String?, Failure>).data, 'unverified');
+        verify(() => prefs.getString('auth_state')).called(1);
+      });
+
+      test(
+        'savePendingVerificationEmail stores the email under the pending_verification_email key',
+        () async {
+          when(
+            () =>
+                prefs.setString('pending_verification_email', 'test@test.com'),
+          ).thenAnswer((_) async => true);
+
+          final result = await repository.savePendingVerificationEmail(
+            'test@test.com',
+          );
+
+          expect(result, isA<Success<void, Failure>>());
+          verify(
+            () =>
+                prefs.setString('pending_verification_email', 'test@test.com'),
+          ).called(1);
+        },
+      );
+
+      test('getPendingVerificationEmail returns the stored email', () async {
+        when(
+          () => prefs.getString('pending_verification_email'),
+        ).thenReturn('test@test.com');
+
+        final result = await repository.getPendingVerificationEmail();
+
+        expect(result, isA<Success<String?, Failure>>());
+        expect((result as Success<String?, Failure>).data, 'test@test.com');
+        verify(() => prefs.getString('pending_verification_email')).called(1);
       });
 
       test(
@@ -66,6 +132,102 @@ void main() {
           );
         },
       );
+
+      test(
+        'clearSession returns CacheFailure when SharedPreferences throws',
+        () async {
+          when(() => prefs.remove(any())).thenThrow(Exception('boom'));
+
+          final result = await repository.clearSession();
+
+          expect(result, isA<FailureResult<void, Failure>>());
+          expect(
+            (result as FailureResult<void, Failure>).failure,
+            isA<CacheFailure>(),
+          );
+        },
+      );
+    });
+
+    group('device and onboarding', () {
+      test('saveDeviceToken stores the token', () async {
+        when(
+          () => prefs.setString('device_token', 'd-123'),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.saveDeviceToken('d-123');
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(() => prefs.setString('device_token', 'd-123')).called(1);
+      });
+
+      test('getDeviceToken returns the token', () async {
+        when(() => prefs.getString('device_token')).thenReturn('d-123');
+
+        final result = await repository.getDeviceToken();
+
+        expect(result, isA<Success<String?, Failure>>());
+        expect((result as Success<String?, Failure>).data, 'd-123');
+      });
+
+      test('isOnboardingCompleted defaults to false', () async {
+        when(() => prefs.getBool('onboarding_completed')).thenReturn(null);
+
+        final result = await repository.isOnboardingCompleted();
+
+        expect(result, isA<Success<bool, Failure>>());
+        expect((result as Success<bool, Failure>).data, isFalse);
+      });
+
+      test('setOnboardingCompleted stores the value', () async {
+        when(
+          () => prefs.setBool('onboarding_completed', true),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.setOnboardingCompleted(true);
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(() => prefs.setBool('onboarding_completed', true)).called(1);
+      });
+    });
+
+    group('remember me', () {
+      test('saveRememberedIdentifier stores the identifier', () async {
+        when(
+          () => prefs.setString('remembered_identifier', 'user@example.com'),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.saveRememberedIdentifier(
+          'user@example.com',
+        );
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(
+          () => prefs.setString('remembered_identifier', 'user@example.com'),
+        ).called(1);
+      });
+
+      test('getRememberedIdentifier returns the identifier', () async {
+        when(
+          () => prefs.getString('remembered_identifier'),
+        ).thenReturn('user@example.com');
+
+        final result = await repository.getRememberedIdentifier();
+
+        expect(result, isA<Success<String?, Failure>>());
+        expect((result as Success<String?, Failure>).data, 'user@example.com');
+      });
+
+      test('clearRememberedIdentifier removes the key', () async {
+        when(
+          () => prefs.remove('remembered_identifier'),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.clearRememberedIdentifier();
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(() => prefs.remove('remembered_identifier')).called(1);
+      });
     });
 
     group('theme preferences', () {

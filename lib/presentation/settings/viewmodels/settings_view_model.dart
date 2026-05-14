@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_theme_mode_use_case.dart';
@@ -16,6 +17,7 @@ class SettingsViewModel extends ChangeNotifier {
   final GetLocaleUseCase _getLocaleUseCase;
   final SetLocaleUseCase _setLocaleUseCase;
   final IsLanguageSelectedUseCase _isLanguageSelectedUseCase;
+  final CompleteLanguageSelectionUseCase _completeLanguageSelectionUseCase;
   final GetNotificationsEnabledUseCase _getNotificationsEnabledUseCase;
   final SetNotificationsEnabledUseCase _setNotificationsEnabledUseCase;
   final DeviceTokenRegistrar _deviceTokenRegistrar;
@@ -34,6 +36,7 @@ class SettingsViewModel extends ChangeNotifier {
     this._getLocaleUseCase,
     this._setLocaleUseCase,
     this._isLanguageSelectedUseCase,
+    this._completeLanguageSelectionUseCase,
     this._getNotificationsEnabledUseCase,
     this._setNotificationsEnabledUseCase,
     this._deviceTokenRegistrar,
@@ -96,15 +99,22 @@ class SettingsViewModel extends ChangeNotifier {
   Future<void> updateLocale(Locale? newLocale) async {
     if (newLocale == null) return;
 
-    // We only skip if the locale is the same AND it's already been persisted.
-    if (newLocale == _locale && isLanguageSelected) return;
+    // If the locale is the same, we don't need to do anything.
+    if (newLocale == _locale) return;
 
     _locale = newLocale;
-    // We persist before notifying so that GoRouter redirects see the updated
-    // state in SharedPreferences, preventing a redirection loop.
+    notifyListeners();
     await _setLocaleUseCase(newLocale);
+  }
+
+  /// Confirms the language selection and marks it as complete.
+  ///
+  /// This will trigger the router to redirect the user away from the language
+  /// selection screen.
+  Future<void> confirmLanguageSelection() async {
     _languageSelected = true;
     notifyListeners();
+    await _completeLanguageSelectionUseCase();
   }
 
   /// Toggles push notifications.

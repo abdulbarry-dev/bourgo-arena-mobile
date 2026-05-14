@@ -497,7 +497,7 @@ abstract class AppLocalizations {
   /// No description provided for @authOtpSubtitlePrefix.
   ///
   /// In fr, this message translates to:
-  /// **'Entrez le code à 4 chiffres envoyé à '**
+  /// **'Entrez le code à 6 chiffres envoyé à '**
   String get authOtpSubtitlePrefix;
 
   /// No description provided for @authOtpSubtitleDefault.
