@@ -86,32 +86,49 @@ GoRouter createRouter(
     final authState = authStateNotifier.state;
     final location = state.matchedLocation;
 
-    // Routes that are part of the public/registration flow
-    final bool isPublicRoute =
-        location == '/' ||
-        location == '/onboarding' ||
+    // Truly public routes accessible to everyone
+    final bool isAlwaysPublic =
+        location == '/terms' ||
+        location == '/privacy' ||
+        location == '/offline' ||
+        location == '/language-selection';
+
+    if (isAlwaysPublic) return null;
+
+    // Routes that are for unauthenticated users only (auth entry)
+    final bool isAuthEntryRoute =
         location == '/login' ||
         location == '/register' ||
         location == '/forgot-password' ||
         location == '/new-password' ||
+        location == '/onboarding' ||
+        location == '/';
+
+    // Routes that are part of the verification/onboarding flow
+    final bool isSetupRoute =
         location == '/otp' ||
-        location == '/verification-method';
+        location == '/verification-method' ||
+        location == '/account-setup' ||
+        location == '/pin-setup' ||
+        location == '/family-onboarding';
 
     switch (authState) {
       case AuthState.unauthenticated:
-        return isPublicRoute ? null : '/login';
+        // Allow auth entry and onboarding, otherwise force login
+        return (isAuthEntryRoute || isSetupRoute) ? null : '/login';
 
       case AuthState.pendingVerification:
-        // Allow all public routes during verification phase
-        if (isPublicRoute || location == '/family-onboarding') {
+        // Force OTP if not on a verification/setup screen
+        if (location == '/otp' ||
+            location == '/verification-method' ||
+            location == '/family-onboarding') {
           return null;
         }
         return '/otp';
 
       case AuthState.pendingOnboarding:
-        // Allow all public routes plus onboarding steps
-        if (isPublicRoute ||
-            location == '/account-setup' ||
+        // Force account setup if not on a setup screen
+        if (location == '/account-setup' ||
             location == '/pin-setup' ||
             location == '/family-onboarding') {
           return null;
@@ -119,10 +136,8 @@ GoRouter createRouter(
         return '/account-setup';
 
       case AuthState.authenticated:
-        // Prevent accessing public/auth/setup routes once fully authenticated
-        if (isPublicRoute ||
-            location == '/account-setup' ||
-            location == '/pin-setup') {
+        // Prevent accessing auth/setup routes once fully authenticated
+        if (isAuthEntryRoute || isSetupRoute) {
           return '/home';
         }
         return null;

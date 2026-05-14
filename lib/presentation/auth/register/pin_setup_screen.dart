@@ -115,13 +115,15 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         AuthHeader(
                           title: l10n.authPinSetupTitle,
                           subtitle: l10n.authPinSetupSubtitle,
                         ),
-                        const SizedBox(height: 48),
+                        const SizedBox(height: 32),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(
@@ -132,7 +134,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 48),
+                        const SizedBox(height: 32),
                         _NumericKeypad(
                           onNumberPressed: _onNumberPressed,
                           onBackspacePressed: _onBackspacePressed,
@@ -157,7 +159,6 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                             );
                           },
                         ),
-                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
@@ -242,7 +243,7 @@ class _NumericKeypad extends StatelessWidget {
           ['7', '8', '9'],
         ])
           Padding(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.only(bottom: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -257,7 +258,7 @@ class _NumericKeypad extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const SizedBox(width: 80), // Empty space for alignment
+            const SizedBox(width: 72), // Empty space for alignment
             _KeypadButton(label: '0', onPressed: () => onNumberPressed('0')),
             _KeypadButton(
               icon: Icons.backspace_outlined,
@@ -292,10 +293,10 @@ class _KeypadButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(36),
         child: Container(
-          width: 80,
-          height: 80,
+          width: 72,
+          height: 72,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,

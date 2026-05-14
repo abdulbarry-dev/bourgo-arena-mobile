@@ -50,6 +50,9 @@ void main() {
     when(
       () => sessionRepository.setOnboardingCompleted(any()),
     ).thenAnswer((_) async => const Success(null));
+    when(
+      () => sessionRepository.clearSession(),
+    ).thenAnswer((_) async => const Success(null));
   });
 
   group('ApiAuthRepository', () {
@@ -761,10 +764,22 @@ void main() {
         await eventExpectation;
       });
 
-      test('returns Failure(AuthFailure) on 401', () async {
+      test('returns Failure(AuthFailure) on 401 and clears session', () async {
         when(
           () => apiClient.get('/user/profile'),
         ).thenThrow(const AuthException('401'));
+        when(
+          () => sessionRepository.clearSession(),
+        ).thenAnswer((_) async => const Success(null));
+
+        final eventExpectation = expectLater(
+          repository.onAuthStateChanged,
+          emits(
+            predicate<AuthSession>(
+              (value) => value.state == AuthState.unauthenticated,
+            ),
+          ),
+        );
 
         final result = await repository.getUserProfile();
 
@@ -773,6 +788,9 @@ void main() {
           (result as FailureResult<AuthSession, Failure>).failure,
           isA<AuthFailure>(),
         );
+        verify(() => apiClient.setToken(null)).called(1);
+        verify(() => sessionRepository.clearSession()).called(1);
+        await eventExpectation;
       });
     });
   });

@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
@@ -44,7 +46,11 @@ class AuthStateNotifier extends ChangeNotifier {
     );
 
     if (token != null) {
-      await _authRepository.getUserProfile();
+      final result = await _authRepository.getUserProfile();
+      if (result is FailureResult<AuthSession, Failure>) {
+        _session = AuthSession.unauthenticated();
+        notifyListeners();
+      }
     } else {
       // If no token, check if we have a persisted auth state (e.g. pending_verification)
       final stateResult = await _sessionRepository.getAuthState();

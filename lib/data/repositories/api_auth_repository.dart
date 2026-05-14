@@ -321,8 +321,8 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<AuthSession, Failure>> getUserProfile() {
-    return executeApiCall(() async {
+  Future<Result<AuthSession, Failure>> getUserProfile() async {
+    final result = await executeApiCall(() async {
       final userResponse =
           await _apiClient.get('/user/profile') as Map<String, dynamic>;
 
@@ -345,6 +345,17 @@ class ApiAuthRepository implements AuthRepository {
       _authStateController.add(session);
       return Success(session);
     });
+
+    if (result is FailureResult<AuthSession, Failure>) {
+      if (result.failure is AuthFailure) {
+        // If profile fetch fails due to auth, clear everything
+        _apiClient.setToken(null);
+        await _sessionRepository.clearSession();
+        _authStateController.add(AuthSession.unauthenticated());
+      }
+    }
+
+    return result;
   }
 
   @override

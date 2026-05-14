@@ -131,6 +131,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                     ? _viewModel.user!.phone!
                     : _viewModel.user?.email ?? '',
               ),
+
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
