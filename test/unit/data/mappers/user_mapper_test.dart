@@ -53,8 +53,8 @@ void main() {
 
       expect(entity.firstName, 'SingleName');
       expect(entity.lastName, '');
-      expect(entity.avatarUrl, '');
-      expect(entity.subscriptionExpiry, '');
+      expect(entity.avatarUrl, isNull);
+      expect(entity.subscriptionExpiry, isNull);
       expect(entity.birthDate, isNull);
       expect(entity.children, isEmpty);
     });

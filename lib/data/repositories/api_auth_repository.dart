@@ -37,8 +37,8 @@ class ApiAuthRepository implements AuthRepository {
   Future<Result<AuthSession, Failure>> login(
     String identifier,
     String password,
-  ) {
-    return executeApiCall(() async {
+  ) async {
+    final result = await executeApiCall(() async {
       // Clear any existing token before login to avoid interference
       _apiClient.setToken(null);
 
@@ -83,6 +83,47 @@ class ApiAuthRepository implements AuthRepository {
       _authStateController.add(session);
       return Success(session);
     });
+
+    // If the API call failed but returned a state (e.g. pending_onboarding),
+    // we handle it as a partial success to allow redirection.
+    if (result is FailureResult<AuthSession, Failure>) {
+      final failure = result.failure;
+      if (failure.state != null) {
+        final state = _mapBackendState(failure.state);
+
+        if (failure.token != null) {
+          _apiClient.setToken(failure.token);
+          await _sessionRepository.saveAuthToken(failure.token!);
+
+          // Try to fetch user profile to populate the session
+          try {
+            final userResponse =
+                await _apiClient.get('/user/profile') as Map<String, dynamic>;
+            final userModel = UserProfileModel.fromJson(userResponse);
+            final user = UserMapper.toEntity(userModel);
+
+            await _sessionRepository.saveAuthState(state.name);
+            final session = AuthSession(
+              user: user,
+              state: state,
+              token: failure.token,
+            );
+            _authStateController.add(session);
+            return Success(session);
+          } catch (_) {
+            // If profile fetch fails, continue with state only
+          }
+        }
+
+        await _sessionRepository.saveAuthState(state.name);
+
+        final session = AuthSession(state: state, token: failure.token);
+        _authStateController.add(session);
+        return Success(session);
+      }
+    }
+
+    return result;
   }
 
   @override

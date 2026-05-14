@@ -84,46 +84,45 @@ GoRouter createRouter(
 
     // 3. Auth Redirection
     final authState = authStateNotifier.state;
-    final bool isAuthRoute =
-        state.matchedLocation == '/login' ||
-        state.matchedLocation == '/register' ||
-        state.matchedLocation == '/forgot-password' ||
-        state.matchedLocation == '/new-password' ||
-        state.matchedLocation == '/otp' ||
-        state.matchedLocation == '/';
+    final location = state.matchedLocation;
+
+    // Routes that are part of the public/registration flow
+    final bool isPublicRoute =
+        location == '/' ||
+        location == '/onboarding' ||
+        location == '/login' ||
+        location == '/register' ||
+        location == '/forgot-password' ||
+        location == '/new-password' ||
+        location == '/otp' ||
+        location == '/verification-method';
 
     switch (authState) {
       case AuthState.unauthenticated:
-        return isAuthRoute ? null : '/login';
+        return isPublicRoute ? null : '/login';
 
       case AuthState.pendingVerification:
-        // Allow OTP verification and related registration steps
-        final bool isVerificationRoute =
-            state.matchedLocation == '/otp' ||
-            state.matchedLocation == '/verification-method' ||
-            state.matchedLocation == '/family-onboarding';
-
-        if (isVerificationRoute) return null;
-
-        // Otherwise, force restore OTP screen
+        // Allow all public routes during verification phase
+        if (isPublicRoute || location == '/family-onboarding') {
+          return null;
+        }
         return '/otp';
 
       case AuthState.pendingOnboarding:
-        // Allow onboarding flow steps
-        final bool isOnboardingRoute =
-            state.matchedLocation == '/onboarding' ||
-            state.matchedLocation == '/account-setup' ||
-            state.matchedLocation == '/pin-setup';
-
-        if (isOnboardingRoute) return null;
-
-        return '/onboarding';
+        // Allow all public routes plus onboarding steps
+        if (isPublicRoute ||
+            location == '/account-setup' ||
+            location == '/pin-setup' ||
+            location == '/family-onboarding') {
+          return null;
+        }
+        return '/account-setup';
 
       case AuthState.authenticated:
-        // Prevent accessing auth routes once fully authenticated
-        if (isAuthRoute ||
-            state.matchedLocation == '/otp' ||
-            state.matchedLocation == '/onboarding') {
+        // Prevent accessing public/auth/setup routes once fully authenticated
+        if (isPublicRoute ||
+            location == '/account-setup' ||
+            location == '/pin-setup') {
           return '/home';
         }
         return null;
@@ -149,8 +148,10 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/register',
-      builder: (context, state) =>
-          RegisterScreen(registerUseCase: locator<RegisterUseCase>()),
+      builder: (context, state) => RegisterScreen(
+        registerUseCase: locator<RegisterUseCase>(),
+        initialData: state.extraAsMap,
+      ),
     ),
     GoRoute(
       path: '/otp',
@@ -182,8 +183,25 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/account-setup',
-      builder: (context, state) =>
-          AccountSetupScreen(registrationData: state.extraAsMap),
+      builder: (context, state) {
+        final data = state.extraAsMap;
+        if (data.isNotEmpty) {
+          return AccountSetupScreen(registrationData: data);
+        }
+
+        // Fallback for users who just logged in and need onboarding
+        final user = authStateNotifier.session.user;
+        final registrationData = {
+          'firstName': user?.firstName ?? 'User',
+          'lastName': user?.lastName ?? '',
+          'email': user?.email ?? '',
+          'phone': user?.phone ?? '',
+          'gender': user?.gender,
+          'birthDate': user?.birthDate,
+          'isParentAccount': user?.isParentAccount ?? false,
+        };
+        return AccountSetupScreen(registrationData: registrationData);
+      },
     ),
     GoRoute(
       path: '/pin-setup',

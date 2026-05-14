@@ -5,12 +5,15 @@ part 'child_profile_model.g.dart';
 /// DTO for a child's profile data.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ChildProfileModel {
+  @JsonKey(fromJson: _idFromJson)
   final String id;
   final String firstName;
   final String lastName;
   final DateTime birthDate;
   final String? gender;
   final String? avatarUrl;
+
+  static String _idFromJson(dynamic json) => json.toString();
 
   const ChildProfileModel({
     required this.id,

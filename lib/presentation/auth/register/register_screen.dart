@@ -14,8 +14,13 @@ import 'package:material_symbols_icons/symbols.dart';
 /// The registration screen for Bourgo Arena.
 class RegisterScreen extends StatefulWidget {
   final RegisterUseCase registerUseCase;
+  final Map<String, dynamic>? initialData;
 
-  const RegisterScreen({super.key, required this.registerUseCase});
+  const RegisterScreen({
+    super.key,
+    required this.registerUseCase,
+    this.initialData,
+  });
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -29,6 +34,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.initState();
     _viewModel = RegisterViewModel(widget.registerUseCase);
     _viewModel.addListener(_onViewModelChanged);
+
+    if (widget.initialData != null) {
+      _prefillData();
+    }
+  }
+
+  void _prefillData() {
+    final data = widget.initialData!;
+    _viewModel.firstNameController.text = data['firstName'] as String? ?? '';
+    _viewModel.lastNameController.text = data['lastName'] as String? ?? '';
+    _viewModel.emailController.text = data['email'] as String? ?? '';
+    _viewModel.phoneController.text = data['phone'] as String? ?? '';
+    if (data['gender'] != null) {
+      _viewModel.setGender(data['gender'] as String);
+    }
+    if (data['birthDate'] != null) {
+      final date = data['birthDate'] as DateTime;
+      _viewModel.setBirthDate(date);
+      _viewModel.birthDateController.text = DateFormat.yMMMd().format(date);
+    }
+    _viewModel.setParentAccount(data['isParentAccount'] as bool? ?? false);
   }
 
   @override

@@ -121,17 +121,19 @@ class ApiClient {
       final String message =
           body['message'] ??
           'API Error: ${response.statusCode} ${response.body}';
+      final String? state = body['state'] as String?;
+      final String? token = body['token'] as String?;
 
       switch (response.statusCode) {
         case 401:
         case 403:
-          throw AuthException(message);
+          throw AuthException(message, state, token);
         case 404:
-          throw NotFoundException(message);
+          throw NotFoundException(message, state, token);
         case 422:
-          throw ValidationException(message);
+          throw ValidationException(message, state, token);
         default:
-          throw ServerException(message);
+          throw ServerException(message, state, token);
       }
     }
   }

@@ -120,10 +120,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 40),
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(user.avatarUrl),
+                  backgroundImage: user.avatarUrl != null
+                      ? NetworkImage(user.avatarUrl!)
+                      : null,
                   backgroundColor: theme.colorScheme.primary.withValues(
                     alpha: 0.2,
                   ),
+                  child: user.avatarUrl == null
+                      ? Icon(
+                          Symbols.person,
+                          size: 50,
+                          color: theme.colorScheme.primary,
+                        )
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 Text(
@@ -144,7 +153,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    user.subscriptionLevel,
+                    user.subscriptionLevel ?? 'Standard',
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,

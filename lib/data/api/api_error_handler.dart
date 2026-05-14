@@ -10,15 +10,15 @@ Future<Result<T, Failure>> executeApiCall<T>(
   try {
     return await call();
   } on AuthException catch (e) {
-    return FailureResult(AuthFailure(e.message));
+    return FailureResult(AuthFailure(e.message, e.state, e.token));
   } on NetworkException catch (e) {
     return FailureResult(NetworkFailure(e.message));
   } on ValidationException catch (e) {
-    return FailureResult(ValidationFailure(e.message));
+    return FailureResult(ValidationFailure(e.message, e.state, e.token));
   } on NotFoundException catch (e) {
-    return FailureResult(NotFoundFailure(e.message));
+    return FailureResult(NotFoundFailure(e.message, e.state, e.token));
   } on ServerException catch (e) {
-    return FailureResult(ServerFailure(e.message));
+    return FailureResult(ServerFailure(e.message, e.state, e.token));
   } catch (e, stack) {
     developer.log('Unexpected API error', error: e, stackTrace: stack);
     return FailureResult(ServerFailure(e.toString()));

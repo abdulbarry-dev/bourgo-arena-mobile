@@ -128,6 +128,8 @@ The API uses a state-driven authentication flow to ensure users complete require
   * `name` (string, required): Full name (First + Last).
   * `email` (string, required, email, unique:users)
   * `phone` (string, required)
+  * `gender` (string, required, in: male,female,other)
+  * `date_of_birth` (string, required, format: YYYY-MM-DD)
   * `password` (string, required, min:8)
   * `password_confirmation` (string, required)
   * `is_family_account` (boolean, optional, default: false)
@@ -184,7 +186,10 @@ The API uses a state-driven authentication flow to ensure users complete require
   * `name` (string, required)
   * `email` (string, required)
   * `phone` (string, required)
+  * `gender` (string, required)
+  * `date_of_birth` (string, required, format: YYYY-MM-DD)
   * `is_parent_account` (boolean, required)
+  * `pin` (string, required, length:4)
 * **Success Response**: `{"success": true, "data": {"token": "...", "state": "active"}}`
 
 ---

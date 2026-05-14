@@ -107,49 +107,63 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           automaticallyImplyLeading: false,
         ),
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AuthHeader(
-                  title: l10n.authPinSetupTitle,
-                  subtitle: l10n.authPinSetupSubtitle,
-                ),
-                const SizedBox(height: 64),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    4,
-                    (index) => _PinIndicator(
-                      isFilled: _pin.length > index,
-                      isCurrent: _pin.length == index,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AuthHeader(
+                          title: l10n.authPinSetupTitle,
+                          subtitle: l10n.authPinSetupSubtitle,
+                        ),
+                        const SizedBox(height: 48),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            4,
+                            (index) => _PinIndicator(
+                              isFilled: _pin.length > index,
+                              isCurrent: _pin.length == index,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 48),
+                        _NumericKeypad(
+                          onNumberPressed: _onNumberPressed,
+                          onBackspacePressed: _onBackspacePressed,
+                        ),
+                        const SizedBox(height: 32),
+                        Builder(
+                          builder: (context) {
+                            final isComplete = _pin.length == 4;
+                            return ElevatedButton(
+                              onPressed: (_isLoading || !isComplete)
+                                  ? null
+                                  : _onFinish,
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(l10n.authCompleteRegistration),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
                   ),
                 ),
-                const Spacer(),
-                _NumericKeypad(
-                  onNumberPressed: _onNumberPressed,
-                  onBackspacePressed: _onBackspacePressed,
-                ),
-                const SizedBox(height: 32),
-                Builder(
-                  builder: (context) {
-                    final isComplete = _pin.length == 4;
-                    return ElevatedButton(
-                      onPressed: (_isLoading || !isComplete) ? null : _onFinish,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : Text(l10n.authCompleteRegistration),
-                    );
-                  },
-                ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),

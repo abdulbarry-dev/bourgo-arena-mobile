@@ -6,13 +6,16 @@ part 'user_profile_model.g.dart';
 /// DTO for the user profile data.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class UserProfileModel {
+  @JsonKey(fromJson: _idFromJson)
   final String id;
-  final String name;
+  final String? firstName;
+  final String? lastName;
+  final String? name;
   final String email;
-  final String phone;
+  final String? phone;
   final String? avatarUrl;
   final int loyaltyPoints;
-  final String subscriptionLevel;
+  final String? subscriptionLevel;
   final String? subscriptionExpiry;
   final int totalCheckIns;
   final DateTime? birthDate;
@@ -20,16 +23,20 @@ class UserProfileModel {
   final bool isParentAccount;
   final List<ChildProfileModel> children;
 
+  static String _idFromJson(dynamic json) => json.toString();
+
   const UserProfileModel({
     required this.id,
-    required this.name,
+    this.firstName,
+    this.lastName,
+    this.name,
     required this.email,
-    required this.phone,
+    this.phone,
     this.avatarUrl,
-    required this.loyaltyPoints,
-    required this.subscriptionLevel,
+    this.loyaltyPoints = 0,
+    this.subscriptionLevel,
     this.subscriptionExpiry,
-    required this.totalCheckIns,
+    this.totalCheckIns = 0,
     this.birthDate,
     this.gender,
     this.isParentAccount = false,

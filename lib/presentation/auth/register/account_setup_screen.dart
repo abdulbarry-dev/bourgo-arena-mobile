@@ -169,7 +169,8 @@ class AccountSetupScreen extends StatelessWidget {
 
                 // Edit Action
                 TextButton.icon(
-                  onPressed: () => context.pop(),
+                  onPressed: () =>
+                      context.go('/register', extra: registrationData),
                   icon: const Icon(Symbols.edit, size: 18),
                   label: Text(l10n.authEditInformation),
                   style: TextButton.styleFrom(

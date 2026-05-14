@@ -162,7 +162,9 @@ class FamilyManagementViewModel extends ChangeNotifier {
     _isVerifyingOtp = true;
     notifyListeners();
 
-    final identifier = _user!.phone.isNotEmpty ? _user!.phone : _user!.email;
+    final identifier = _user!.phone?.isNotEmpty == true
+        ? _user!.phone!
+        : _user!.email;
 
     final result = await _verifyOtpUseCase(identifier, otp);
 

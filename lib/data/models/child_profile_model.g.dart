@@ -8,7 +8,7 @@ part of 'child_profile_model.dart';
 
 ChildProfileModel _$ChildProfileModelFromJson(Map<String, dynamic> json) =>
     ChildProfileModel(
-      id: json['id'] as String,
+      id: ChildProfileModel._idFromJson(json['id']),
       firstName: json['first_name'] as String,
       lastName: json['last_name'] as String,
       birthDate: DateTime.parse(json['birth_date'] as String),

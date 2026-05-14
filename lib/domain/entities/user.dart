@@ -16,19 +16,19 @@ class User {
   final String email;
 
   /// Phone number.
-  final String phone;
+  final String? phone;
 
   /// URL to avatar image.
-  final String avatarUrl;
+  final String? avatarUrl;
 
   /// Loyalty points balance.
   final int loyaltyPoints;
 
   /// Current subscription level.
-  final String subscriptionLevel;
+  final String? subscriptionLevel;
 
   /// Date when the subscription expires.
-  final String subscriptionExpiry;
+  final String? subscriptionExpiry;
 
   /// Total number of check-ins.
   final int totalCheckIns;
@@ -51,11 +51,11 @@ class User {
     required this.firstName,
     required this.lastName,
     required this.email,
-    required this.phone,
-    required this.avatarUrl,
+    this.phone,
+    this.avatarUrl,
     required this.loyaltyPoints,
-    required this.subscriptionLevel,
-    required this.subscriptionExpiry,
+    this.subscriptionLevel,
+    this.subscriptionExpiry,
     required this.totalCheckIns,
     this.birthDate,
     this.gender,

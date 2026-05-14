@@ -26,6 +26,11 @@ void main() {
   setUp(() {
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockSendOtpUseCase = MockSendOtpUseCase();
+
+    // Default successful answer for resend which is called in initState
+    when(
+      () => mockSendOtpUseCase(any()),
+    ).thenAnswer((_) async => const Success(null));
   });
 
   Widget createWidgetUnderTest({String? destination}) {
@@ -151,7 +156,8 @@ void main() {
       await tester.tap(resendButton);
       await tester.pump();
 
-      verify(() => mockSendOtpUseCase('test@example.com')).called(1);
+      // Called once in initState and once on tap
+      verify(() => mockSendOtpUseCase('test@example.com')).called(2);
     });
   });
 }

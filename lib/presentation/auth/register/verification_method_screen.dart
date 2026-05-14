@@ -47,44 +47,55 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
       child: Stack(
         children: [
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  AuthHeader(
-                    title: l10n.authVerificationMethodTitle,
-                    subtitle: l10n.authVerificationMethodSubtitle,
-                  ),
-                  const SizedBox(height: 48),
-                  _MethodCard(
-                    title: l10n.authEmailMethod,
-                    value: email,
-                    icon: Symbols.mail,
-                    onTap: _isLoading
-                        ? () {}
-                        : () => _proceedToOtp(context, email),
-                  ),
-                  const SizedBox(height: 20),
-                  _MethodCard(
-                    title: l10n.authPhoneMethod,
-                    value: phone,
-                    icon: Symbols.call,
-                    onTap: _isLoading
-                        ? () {}
-                        : () => _proceedToOtp(context, phone),
-                  ),
-                  const Spacer(),
-                  Text(
-                    l10n.authMethodAccessInstruction,
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AuthHeader(
+                            title: l10n.authVerificationMethodTitle,
+                            subtitle: l10n.authVerificationMethodSubtitle,
+                          ),
+                          const SizedBox(height: 48),
+                          _MethodCard(
+                            title: l10n.authEmailMethod,
+                            value: email,
+                            icon: Symbols.mail,
+                            onTap: _isLoading
+                                ? () {}
+                                : () => _proceedToOtp(context, email),
+                          ),
+                          const SizedBox(height: 20),
+                          _MethodCard(
+                            title: l10n.authPhoneMethod,
+                            value: phone,
+                            icon: Symbols.call,
+                            onTap: _isLoading
+                                ? () {}
+                                : () => _proceedToOtp(context, phone),
+                          ),
+                          const SizedBox(height: 48),
+                          Text(
+                            l10n.authMethodAccessInstruction,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 24),
-                ],
-              ),
+                );
+              },
             ),
           ),
           if (_isLoading)

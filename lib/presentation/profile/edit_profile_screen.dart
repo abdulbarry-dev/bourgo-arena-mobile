@@ -56,7 +56,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _firstNameController.text = _viewModel.user!.firstName;
       _lastNameController.text = _viewModel.user!.lastName;
       _emailController.text = _viewModel.user!.email;
-      _phoneController.text = _viewModel.user!.phone;
+      _phoneController.text = _viewModel.user!.phone ?? '';
       if (_viewModel.user!.birthDate != null) {
         _selectedBirthDate = _viewModel.user!.birthDate;
         _birthDateController.text = DateFormat.yMMMd().format(
@@ -214,9 +214,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 }
 
 class _AvatarSection extends StatelessWidget {
-  final String avatarUrl;
+  final String? avatarUrl;
 
-  const _AvatarSection({required this.avatarUrl});
+  const _AvatarSection({this.avatarUrl});
 
   @override
   Widget build(BuildContext context) {
@@ -236,8 +236,17 @@ class _AvatarSection extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 60,
-              backgroundImage: NetworkImage(avatarUrl),
+              backgroundImage: avatarUrl != null
+                  ? NetworkImage(avatarUrl!)
+                  : null,
               backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+              child: avatarUrl == null
+                  ? Icon(
+                      Symbols.person,
+                      size: 60,
+                      color: theme.colorScheme.primary,
+                    )
+                  : null,
             ),
           ),
           Positioned(

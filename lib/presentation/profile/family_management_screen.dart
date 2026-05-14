@@ -127,8 +127,8 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
           children: [
             Text(
               l10n.profileVerifyFamilySubtitle(
-                _viewModel.user?.phone.isNotEmpty == true
-                    ? _viewModel.user!.phone
+                _viewModel.user?.phone?.isNotEmpty == true
+                    ? _viewModel.user!.phone!
                     : _viewModel.user?.email ?? '',
               ),
               style: theme.textTheme.bodyMedium?.copyWith(

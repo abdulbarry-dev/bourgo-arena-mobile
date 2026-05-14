@@ -7,20 +7,20 @@ import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 class UserMapper {
   /// Converts [UserProfileModel] to [User].
   static User toEntity(UserProfileModel model) {
-    final nameParts = model.name.split(' ');
-    final firstName = nameParts.first;
-    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-
     return User(
       id: model.id,
-      firstName: firstName,
-      lastName: lastName,
+      firstName: model.firstName ?? model.name?.split(' ').first ?? '',
+      lastName:
+          model.lastName ??
+          (model.name != null && model.name!.split(' ').length > 1
+              ? model.name!.split(' ').sublist(1).join(' ')
+              : ''),
       email: model.email,
       phone: model.phone,
-      avatarUrl: model.avatarUrl ?? '',
+      avatarUrl: model.avatarUrl,
       loyaltyPoints: model.loyaltyPoints,
       subscriptionLevel: model.subscriptionLevel,
-      subscriptionExpiry: model.subscriptionExpiry ?? '',
+      subscriptionExpiry: model.subscriptionExpiry,
       totalCheckIns: model.totalCheckIns,
       birthDate: model.birthDate,
       isParentAccount: model.isParentAccount,
@@ -32,6 +32,8 @@ class UserMapper {
   static UserProfileModel fromEntity(User entity) {
     return UserProfileModel(
       id: entity.id,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
       name: '${entity.firstName} ${entity.lastName}'.trim(),
       email: entity.email,
       phone: entity.phone,

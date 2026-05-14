@@ -262,25 +262,30 @@ void main() {
         expect((result as Success<Locale, Failure>).data.languageCode, 'en');
       });
 
-      test(
-        'setLocale stores the locale and marks language as selected',
-        () async {
-          when(
-            () => prefs.setString('settings_locale', 'fr'),
-          ).thenAnswer((_) async => true);
-          when(
-            () => prefs.setBool('settings_language_selected', true),
-          ).thenAnswer((_) async => true);
+      test('setLocale stores the locale', () async {
+        when(
+          () => prefs.setString('settings_locale', 'fr'),
+        ).thenAnswer((_) async => true);
 
-          final result = await repository.setLocale(const Locale('fr'));
+        final result = await repository.setLocale(const Locale('fr'));
 
-          expect(result, isA<Success<void, Failure>>());
-          verify(() => prefs.setString('settings_locale', 'fr')).called(1);
-          verify(
-            () => prefs.setBool('settings_language_selected', true),
-          ).called(1);
-        },
-      );
+        expect(result, isA<Success<void, Failure>>());
+        verify(() => prefs.setString('settings_locale', 'fr')).called(1);
+        verifyNever(() => prefs.setBool('settings_language_selected', true));
+      });
+
+      test('completeLanguageSelection marks language as selected', () async {
+        when(
+          () => prefs.setBool('settings_language_selected', true),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.completeLanguageSelection();
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(
+          () => prefs.setBool('settings_language_selected', true),
+        ).called(1);
+      });
 
       test('isLanguageSelected falls back to locale presence', () async {
         when(() => prefs.containsKey('settings_locale')).thenReturn(true);
