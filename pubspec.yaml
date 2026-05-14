@@ -47,7 +47,6 @@ dependencies:
   http: ^1.6.0
   get_it: ^9.2.1
   collection: ^1.19.1
-  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   test: ^1.26.3
@@ -78,7 +77,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - .env
     - assets/icons/app_icon.png
     - assets/icons/brandmark-vert.png
     - assets/images/
