@@ -292,6 +292,11 @@ void main() {
       await tester.tap(logoutButton);
       await tester.pumpAndSettle();
 
+      // Tap the confirm button in the dialog
+      final confirmButton = find.text('SIGN OUT').last;
+      await tester.tap(confirmButton);
+      await tester.pumpAndSettle();
+
       verify(() => mockLogoutUseCase()).called(1);
     });
   });

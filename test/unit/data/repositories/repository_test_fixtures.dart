@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/entities/notification.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 
 User testUserEntity({
   String id = 'user-1',
@@ -329,4 +330,32 @@ Map<String, dynamic> testTimeSlotJson({
   bool available = true,
 }) {
   return {'time': time, 'available': available};
+}
+
+VerificationStatus testVerificationStatusEntity({
+  bool emailVerified = false,
+  bool phoneVerified = false,
+  String? email = 'alex@example.com',
+  String? phone = '+15550000000',
+}) {
+  return VerificationStatus(
+    emailVerified: emailVerified,
+    phoneVerified: phoneVerified,
+    email: email,
+    phone: phone,
+  );
+}
+
+Map<String, dynamic> testVerificationStatusJson({
+  bool emailVerified = false,
+  bool phoneVerified = false,
+  String? email = 'alex@example.com',
+  String? phone = '+15550000000',
+}) {
+  return {
+    'email_verified': emailVerified,
+    'phone_verified': phoneVerified,
+    'email': email,
+    'phone': phone,
+  };
 }

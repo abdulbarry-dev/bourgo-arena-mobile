@@ -38,33 +38,31 @@ To maintain alignment with the mobile app's architecture and performance require
     └── api.php                   # All API routes defined here
     ```
 
-### Authentication State Management
-
-The API uses a state-driven authentication flow to guide users through required steps:
+The API uses a state-driven authentication flow to guide users through required steps. Both email AND phone verification are mandatory for full access.
 
 **Possible States (`state` field):**
-* `pending_verification`: User has just registered or logged in. They must verify at least one method (email OR phone).
-* `pending_additional_verification`: User has verified one method (email or phone) but must verify the remaining method before gaining full access. At this stage, a bearer token is issued so the user can call additional verification endpoints.
-* `pending_onboarding`: Both email and phone are verified. User must complete profile setup (PIN, family members, etc.).
-* `active`: Fully authenticated; full access allowed.
+* `pending_verification`: User has just registered or logged in. No methods have been verified yet.
+* `pending_additional_verification`: User has verified one method (email OR phone) but must verify the remaining one. A token with `verification` ability is issued.
+* `pending_onboarding`: Both email and phone are verified. User must complete profile setup (PIN, family members, etc.). A token with `onboarding` ability is issued.
+* `active`: Fully authenticated and onboarded; full access allowed. Token has `*` ability.
 
 **Verification Transition Flow:**
 ```
 Register/Login
     ↓
-pending_verification (must verify at least one method)
+pending_verification (No methods verified)
     ↓
-User selects email OR phone, receives OTP
+User verifies first method (email OR phone)
     ↓
-User verifies chosen method → Check verification status
-    ├─ If both email and phone are now verified → pending_onboarding
-    └─ If only one is verified → pending_additional_verification (token issued)
+pending_additional_verification (Token with 'verification' ability issued)
     ↓
-(If pending_additional_verification) User verifies second method
+User verifies second method (the remaining one)
     ↓
-pending_onboarding
+pending_onboarding (Token with 'onboarding' ability issued)
     ↓
-active
+User completes profile (PIN, etc.)
+    ↓
+active (Token with '*' ability issued)
 ```
 
 ---
@@ -85,14 +83,7 @@ All API responses must follow a consistent JSON structure.
 
 *Note: If the result is a list, `data` should be a JSON array.*
 
-### Authentication State Flow
 
-The API uses a state-driven authentication flow to ensure users complete required steps (OTP verification, onboarding) before full access.
-
-**Possible States (`state` field):**
-* `pending_verification`: Email or phone verification required.
-* `pending_onboarding`: Profile setup or onboarding required.
-* `active`: Fully authenticated; full access allowed.
 
 ### Error Response
 
@@ -137,12 +128,23 @@ The API uses a state-driven authentication flow to ensure users complete require
       "data": {
         "token": "sanctum_token_string_here",
         "state": "active",
-        "user": { ... }
+        "code": null,
+        "user": { ... },
+        "verification_status": {
+          "email_verified": true,
+          "phone_verified": true,
+          "email": "user@example.com",
+          "phone": "+212600000000",
+          "unverified_method": null
+        }
       }
     }
     ```
 
-*Note: `token` and `user` may be omitted if state is `pending_verification`.*
+* **Notes**: 
+  * If state is `pending_verification`, `token` is omitted and `code` is `EMAIL_NOT_VERIFIED`.
+  * If state is `pending_additional_verification`, `token` is issued with `verification` ability and `code` is `ADDITIONAL_VERIFICATION_REQUIRED`.
+  * If state is `pending_onboarding`, `token` is issued with `onboarding` ability.
 
 * **Error Responses**:
   * `401`: Invalid credentials.
@@ -162,8 +164,24 @@ The API uses a state-driven authentication flow to ensure users complete require
   * `password` (string, required, min:8)
   * `password_confirmation` (string, required)
   * `is_family_account` (boolean, optional, default: false)
-* **Success Response**: `201 Created` with `data` containing `state`.
-* **Laravel Note**: `AuthController@register`, `RegisterRequest`.
+* **Success Response**: 
+    ```json
+    {
+      "success": true,
+      "data": {
+        "state": "pending_verification",
+        "user": { ... },
+        "verification_status": {
+          "email_verified": false,
+          "phone_verified": false,
+          "email": "user@example.com",
+          "phone": "+212600000000",
+          "unverified_method": "email"
+        }
+      }
+    }
+    ```
+* **Laravel Note**: `AuthController@register`, `RegisterRequest`. Generates an initial OTP for the registration identifier.
 
 ### POST /auth/logout
 
@@ -195,24 +213,28 @@ The API uses a state-driven authentication flow to ensure users complete require
       "data": {
         "valid": true,
         "token": "...",
-        "state": "pending_onboarding",
+        "state": "pending_additional_verification",
+        "user": { ... },
         "verification_status": {
           "email_verified": true,
-          "phone_verified": true,
+          "phone_verified": false,
           "email": "user@example.com",
           "phone": "+212600000000",
-          "unverified_method": null
+          "unverified_method": "phone"
         }
       }
     }
     ```
 
-* **Notes**: If `state` is `pending_additional_verification`, the response includes a `token` allowing the user to call additional verification endpoints. The `verification_status` object indicates which methods are verified.
+* **Notes**: 
+  * If only one method is verified, `state` is `pending_additional_verification` and the `token` has the `verification` ability.
+  * If both methods are verified but onboarding is incomplete, `state` is `pending_onboarding` and the `token` has the `onboarding` ability.
+  * If all steps are complete, `state` is `active` and the `token` has the `*` ability.
 
 ### POST /user/verify-email
 
-* **Description**: Verifies a user's email address via OTP. Used when a user has verified by phone but needs email verification too.
-* **Auth Required**: Yes (token from `pending_additional_verification` state)
+* **Description**: Verifies a user's email address via OTP. Used during `pending_additional_verification`.
+* **Auth Required**: Yes (token with `verification` ability)
 * **Request Body**:
   * `email` (string, required)
   * `otp` (string, required, length:6)
@@ -228,16 +250,19 @@ The API uses a state-driven authentication flow to ensure users complete require
           "email_verified": true,
           "phone_verified": true,
           "email": "user@example.com",
-          "phone": "+212600000000"
+          "phone": "+212600000000",
+          "unverified_method": null
         }
       }
     }
     ```
 
+* **Notes**: Successful verification updates the current token's abilities (e.g., from `verification` to `onboarding`).
+
 ### POST /user/verify-phone
 
-* **Description**: Verifies a user's phone number via OTP. Used when a user has verified by email but needs phone verification too.
-* **Auth Required**: Yes (token from `pending_additional_verification` state)
+* **Description**: Verifies a user's phone number via OTP. Used during `pending_additional_verification`.
+* **Auth Required**: Yes (token with `verification` ability)
 * **Request Body**:
   * `phone` (string, required)
   * `otp` (string, required, length:6)
@@ -261,8 +286,6 @@ The API uses a state-driven authentication flow to ensure users complete require
       }
     }
     ```
-
-* **Notes**: The `unverified_method` field will be either `"email"`, `"phone"`, or `null` (if both are verified).
 
 ### POST /auth/request-family-otp
 
@@ -531,18 +554,18 @@ The following settings are **local-only** (stored via `SharedPreferences`) and d
 
 ---
 
-## 11. Error Handling Contract
+The Laravel API must return specific HTTP status codes based on the error type encountered. Many responses also include a `code` field to help the client handle specific business logic states.
 
-The Laravel API must return specific HTTP status codes based on the error type encountered. The Flutter app maps these status codes to `Failure` objects as follows:
-
-| Backend Scenario | HTTP Status | Flutter `Failure` |
-| :--- | :--- | :--- |
-| Invalid token or missing auth | `401` | `AuthFailure` |
-| Permission denied (Policy fail) | `403` | `AuthFailure` |
-| Resource not found (ModelNotFound) | `404` | `NotFoundFailure` |
-| Validation failed (FormRequest) | `422` | `ValidationFailure` |
-| Rate limit exceeded | `429` | `ServerFailure` (Generic) |
-| Server crash / Exception | `500` | `ServerFailure` |
+| Backend Scenario | HTTP Status | `code` (if applicable) | Flutter `Failure` |
+| :--- | :--- | :--- | :--- |
+| Invalid token or missing auth | `401` | - | `AuthFailure` |
+| Email/Phone not verified | `403` | `EMAIL_NOT_VERIFIED` | `AuthFailure` |
+| One method verified, one pending | `403` | `ADDITIONAL_VERIFICATION_REQUIRED` | `AuthFailure` |
+| Onboarding incomplete | `403` | `ONBOARDING_INCOMPLETE` | `AuthFailure` |
+| Permission denied (Policy fail) | `403` | - | `AuthFailure` |
+| Resource not found | `404` | - | `NotFoundFailure` |
+| Validation failed | `422` | - | `ValidationFailure` |
+| Server failure | `500` | - | `ServerFailure` |
 
 ---
 
@@ -584,6 +607,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/profile', [UserController::class, 'profile']);
             Route::put('/profile', [UserController::class, 'updateProfile']);
             Route::put('/password', [UserController::class, 'updatePassword']);
+            
+            // New verification endpoints
+            Route::get('/verification-status', [AuthController::class, 'verificationStatus']);
+            Route::post('/verify-email', [AuthController::class, 'verifyEmail']);
+            Route::post('/verify-phone', [AuthController::class, 'verifyPhone']);
         });
 
         Route::apiResource('reservations', ReservationController::class)->only(['index', 'store', 'destroy']);

@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/data/repositories/api_auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -791,6 +792,339 @@ void main() {
         verify(() => apiClient.setToken(null)).called(1);
         verify(() => sessionRepository.clearSession()).called(1);
         await eventExpectation;
+      });
+    });
+
+    group('getVerificationStatus', () {
+      test('returns success with verification status on 200', () async {
+        final verificationStatusJson = testVerificationStatusJson(
+          emailVerified: true,
+          phoneVerified: false,
+        );
+
+        when(
+          () => apiClient.get('/user/verification-status'),
+        ).thenAnswer((_) async => verificationStatusJson);
+
+        final result = await repository.getVerificationStatus();
+
+        expect(result, isA<Success<VerificationStatus, Failure>>());
+        final status = (result as Success<VerificationStatus, Failure>).data;
+        expect(status.emailVerified, isTrue);
+        expect(status.phoneVerified, isFalse);
+        expect(status.email, 'alex@example.com');
+        verify(() => apiClient.get('/user/verification-status')).called(1);
+      });
+
+      test('returns failure on server error', () async {
+        when(
+          () => apiClient.get('/user/verification-status'),
+        ).thenThrow(const ServerException('Server error'));
+
+        final result = await repository.getVerificationStatus();
+
+        expect(result, isA<FailureResult<VerificationStatus, Failure>>());
+        expect(
+          (result as FailureResult<VerificationStatus, Failure>).failure,
+          isA<ServerFailure>(),
+        );
+      });
+
+      test('returns failure on network error', () async {
+        when(
+          () => apiClient.get('/user/verification-status'),
+        ).thenThrow(const NetworkException('Connection error'));
+
+        final result = await repository.getVerificationStatus();
+
+        expect(result, isA<FailureResult<VerificationStatus, Failure>>());
+        expect(
+          (result as FailureResult<VerificationStatus, Failure>).failure,
+          isA<NetworkFailure>(),
+        );
+      });
+
+      test('handles both methods verified', () async {
+        final verificationStatusJson = testVerificationStatusJson(
+          emailVerified: true,
+          phoneVerified: true,
+        );
+
+        when(
+          () => apiClient.get('/user/verification-status'),
+        ).thenAnswer((_) async => verificationStatusJson);
+
+        final result = await repository.getVerificationStatus();
+
+        expect(result, isA<Success<VerificationStatus, Failure>>());
+        final status = (result as Success<VerificationStatus, Failure>).data;
+        expect(status.isFullyVerified, isTrue);
+      });
+    });
+
+    group('verifyEmail', () {
+      test('returns success and broadcasts auth state on 200', () async {
+        const token = 'new-token-123';
+        final responseData = {'valid': true, 'token': token, 'state': 'pending_onboarding'};
+
+        when(
+          () => apiClient.post('/user/verify-email', {
+            'email': 'alex@example.com',
+            'otp': '123456',
+          }),
+        ).thenAnswer((_) async => responseData);
+        when(
+          () => sessionRepository.saveAuthToken(token),
+        ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+        final eventExpectation = expectLater(
+          repository.onAuthStateChanged,
+          emits(
+            predicate<AuthSession>(
+              (value) => value.state == AuthState.pendingOnboarding,
+            ),
+          ),
+        );
+
+        final result = await repository.verifyEmail(
+          'alex@example.com',
+          '123456',
+        );
+
+        expect(result, isA<Success<bool, Failure>>());
+        expect((result as Success<bool, Failure>).data, isTrue);
+        verify(
+          () => apiClient.post('/user/verify-email', {
+            'email': 'alex@example.com',
+            'otp': '123456',
+          }),
+        ).called(1);
+        verify(() => sessionRepository.saveAuthToken(token)).called(1);
+        await eventExpectation;
+      });
+
+      test('returns failure on invalid OTP', () async {
+        when(
+          () => apiClient.post('/user/verify-email', any()),
+        ).thenThrow(const ServerException('Invalid OTP'));
+
+        final result = await repository.verifyEmail(
+          'alex@example.com',
+          '999999',
+        );
+
+        expect(result, isA<FailureResult<bool, Failure>>());
+        expect(
+          (result as FailureResult<bool, Failure>).failure,
+          isA<ServerFailure>(),
+        );
+      });
+
+      test('handles network error', () async {
+        when(
+          () => apiClient.post('/user/verify-email', any()),
+        ).thenThrow(const NetworkException('Connection timeout'));
+
+        final result = await repository.verifyEmail(
+          'alex@example.com',
+          '123456',
+        );
+
+        expect(result, isA<FailureResult<bool, Failure>>());
+        expect(
+          (result as FailureResult<bool, Failure>).failure,
+          isA<NetworkFailure>(),
+        );
+      });
+
+      test('maps pending_additional_verification state correctly', () async {
+        const token = 'token-with-limited-scope';
+        final responseData = {
+          'valid': true,
+          'token': token,
+          'state': 'pending_additional_verification',
+        };
+
+        when(
+          () => apiClient.post('/user/verify-email', any()),
+        ).thenAnswer((_) async => responseData);
+        when(
+          () => sessionRepository.saveAuthToken(token),
+        ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+        final eventExpectation = expectLater(
+          repository.onAuthStateChanged,
+          emits(
+            predicate<AuthSession>(
+              (value) => value.state == AuthState.pendingAdditionalVerification,
+            ),
+          ),
+        );
+
+        final result = await repository.verifyEmail(
+          'alex@example.com',
+          '123456',
+        );
+
+        expect(result, isA<Success<bool, Failure>>());
+        await eventExpectation;
+      });
+
+      test('saves auth token on successful verification', () async {
+        const token = 'new-token-456';
+
+        when(() => apiClient.post('/user/verify-email', any())).thenAnswer(
+          (_) async => {'valid': true, 'token': token, 'state': 'pending_onboarding'},
+        );
+        when(
+          () => sessionRepository.saveAuthToken(token),
+        ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+        await repository.verifyEmail('alex@example.com', '123456');
+
+        verify(() => sessionRepository.saveAuthToken(token)).called(1);
+      });
+    });
+
+    group('verifyPhone', () {
+      test('returns success and broadcasts auth state on 200', () async {
+        const token = 'phone-verified-token';
+        final responseData = {'valid': true, 'token': token, 'state': 'active'};
+
+        when(
+          () => apiClient.post('/user/verify-phone', {
+            'phone': '+15550000000',
+            'otp': '123456',
+          }),
+        ).thenAnswer((_) async => responseData);
+        when(
+          () => sessionRepository.saveAuthToken(token),
+        ).thenAnswer((_) async => const Success<void, Failure>(null));
+        when(
+          () => apiClient.get('/user/profile'),
+        ).thenAnswer((_) async => testUserJson());
+
+        final eventExpectation = expectLater(
+          repository.onAuthStateChanged,
+          emits(
+            predicate<AuthSession>(
+              (value) => value.state == AuthState.authenticated,
+            ),
+          ),
+        );
+
+        final result = await repository.verifyPhone('+15550000000', '123456');
+
+        expect(result, isA<Success<bool, Failure>>());
+        expect((result as Success<bool, Failure>).data, isTrue);
+        verify(
+          () => apiClient.post('/user/verify-phone', {
+            'phone': '+15550000000',
+            'otp': '123456',
+          }),
+        ).called(1);
+        await eventExpectation;
+      });
+
+      test('returns failure on invalid OTP', () async {
+        when(
+          () => apiClient.post('/user/verify-phone', any()),
+        ).thenThrow(const ServerException('Invalid OTP'));
+
+        final result = await repository.verifyPhone('+15550000000', '999999');
+
+        expect(result, isA<FailureResult<bool, Failure>>());
+        expect(
+          (result as FailureResult<bool, Failure>).failure,
+          isA<ServerFailure>(),
+        );
+      });
+
+      test('handles network error', () async {
+        when(
+          () => apiClient.post('/user/verify-phone', any()),
+        ).thenThrow(const NetworkException('Connection timeout'));
+
+        final result = await repository.verifyPhone('+15550000000', '123456');
+
+        expect(result, isA<FailureResult<bool, Failure>>());
+        expect(
+          (result as FailureResult<bool, Failure>).failure,
+          isA<NetworkFailure>(),
+        );
+      });
+
+      test('maps pending_additional_verification state correctly', () async {
+        const token = 'token-with-limited-scope';
+        final responseData = {
+          'valid': true,
+          'token': token,
+          'state': 'pending_additional_verification',
+        };
+
+        when(
+          () => apiClient.post('/user/verify-phone', any()),
+        ).thenAnswer((_) async => responseData);
+        when(
+          () => sessionRepository.saveAuthToken(token),
+        ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+        final eventExpectation = expectLater(
+          repository.onAuthStateChanged,
+          emits(
+            predicate<AuthSession>(
+              (value) => value.state == AuthState.pendingAdditionalVerification,
+            ),
+          ),
+        );
+
+        final result = await repository.verifyPhone('+15550000000', '123456');
+
+        expect(result, isA<Success<bool, Failure>>());
+        await eventExpectation;
+      });
+
+      test('saves auth token on successful verification', () async {
+        const token = 'phone-token-789';
+
+        when(
+          () => apiClient.post('/user/verify-phone', any()),
+        ).thenAnswer((_) async => {'valid': true, 'token': token, 'state': 'active'});
+        when(
+          () => sessionRepository.saveAuthToken(token),
+        ).thenAnswer((_) async => const Success<void, Failure>(null));
+        when(
+          () => apiClient.get('/user/profile'),
+        ).thenAnswer((_) async => testUserJson());
+
+        await repository.verifyPhone('+15550000000', '123456');
+
+        verify(() => sessionRepository.saveAuthToken(token)).called(1);
+      });
+
+      test('handles different phone number formats', () async {
+        final phoneNumbers = ['+15550000000', '15550000000', '555-000-0000'];
+
+        for (final phone in phoneNumbers) {
+          when(
+            () => apiClient.post('/user/verify-phone', {
+              'phone': phone,
+              'otp': '123456',
+            }),
+          ).thenAnswer(
+            (_) async => {'valid': true, 'token': 'token', 'state': 'authenticated'},
+          );
+          when(
+            () => sessionRepository.saveAuthToken('token'),
+          ).thenAnswer((_) async => const Success<void, Failure>(null));
+          when(
+            () => apiClient.get('/user/profile'),
+          ).thenAnswer((_) async => testUserJson());
+
+          final result = await repository.verifyPhone(phone, '123456');
+
+          expect(result, isA<Success<bool, Failure>>());
+        }
       });
     });
   });
