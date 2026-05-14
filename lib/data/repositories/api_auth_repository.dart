@@ -16,6 +16,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart'
 class ApiAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
   final SessionRepository _sessionRepository;
+  AuthSession? _currentSession;
   final StreamController<AuthSession> _authStateController =
       StreamController<AuthSession>.broadcast();
 
@@ -482,14 +483,13 @@ class ApiAuthRepository implements AuthRepository {
       if (stateStr != null) {
         final state = _mapBackendState(stateStr);
         await _sessionRepository.saveAuthState(state.name);
-        
-        _authStateController.add(
-          AuthSession(
-            user: _authStateController.value.user,
-            state: state,
-            token: token,
-          ),
+
+        _currentSession = AuthSession(
+          user: _currentSession?.user,
+          state: state,
+          token: token ?? _currentSession?.token,
         );
+        _authStateController.add(_currentSession!);
       }
 
       return Success(true);
