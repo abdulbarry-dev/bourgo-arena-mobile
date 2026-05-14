@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:async';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
@@ -468,6 +469,9 @@ class ApiAuthRepository implements AuthRepository {
   @override
   Future<Result<bool, Failure>> skipAdditionalVerification() {
     return executeApiCall(() async {
+      developer.log(
+        'Skipping additional verification with token: ${_currentSession?.token != null ? 'Present' : 'Missing'}',
+      );
       final response =
           await _apiClient.post('/auth/skip-additional-verification', {})
               as Map<String, dynamic>;
