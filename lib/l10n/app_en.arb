@@ -259,5 +259,9 @@
   "profileDisableFamilyTitle": "Disable Family Account?",
   "profileDisableFamilyContent": "This will hide all children profiles and features. Are you sure you want to continue?",
   "profileDisableConfirm": "DISABLE",
-  "commonCancel": "CANCEL"
+  "commonCancel": "CANCEL",
+  "profileLogoutTitle": "Sign Out?",
+  "profileLogoutMessage": "Are you sure you want to sign out? You'll need to log in again to access your account.",
+  "profileLogoutConfirm": "SIGN OUT",
+  "profileLogoutSuccess": "You have been signed out successfully"
 }

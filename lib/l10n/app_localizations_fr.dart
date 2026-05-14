@@ -369,11 +369,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileCheckinEntry => 'Entrée enregistrée';
 
   @override
-  String get profileNoCheckins => "Aucun historique d'accès pour le moment.";
+  String get profileNoCheckins => 'Aucun historique d\'accès pour le moment.';
 
   @override
   String get profileNoCheckinsSubtitle =>
-      "Vos passages apparaîtront ici une fois que vous entrerez dans l'arène.";
+      'Vos passages apparaîtront ici une fois que vous entrerez dans l\'arène.';
 
   @override
   String get profileNoHistory => 'Aucune réservation passée.';
@@ -746,6 +746,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get profileLogoutTitle => 'Vous déconnecter ?';
+
+  @override
+  String get profileLogoutMessage =>
+      'Êtes-vous sûr de vouloir vous déconnecter ? Vous devrez vous reconnecter pour accéder à votre compte.';
+
+  @override
+  String get profileLogoutConfirm => 'DÉCONNEXION';
+
+  @override
+  String get profileLogoutSuccess => 'Vous avez été déconnecté avec succès';
 
   @override
   String get languageFrench => 'Français';

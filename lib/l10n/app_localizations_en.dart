@@ -744,6 +744,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageEnglish => 'English';
 
   @override
+  String get profileLogoutTitle => 'Sign Out?';
+
+  @override
+  String get profileLogoutMessage =>
+      'Are you sure you want to sign out? You\'ll need to log in again to access your account.';
+
+  @override
+  String get profileLogoutConfirm => 'SIGN OUT';
+
+  @override
+  String get profileLogoutSuccess => 'You have been signed out successfully';
+
+  @override
   String get languageFrench => 'Français';
 
   @override

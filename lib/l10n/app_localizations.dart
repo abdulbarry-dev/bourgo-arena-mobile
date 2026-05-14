@@ -1508,6 +1508,30 @@ abstract class AppLocalizations {
   /// **'English'**
   String get languageEnglish;
 
+  /// No description provided for @profileLogoutTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous déconnecter ?'**
+  String get profileLogoutTitle;
+
+  /// No description provided for @profileLogoutMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Êtes-vous sûr de vouloir vous déconnecter ? Vous devrez vous reconnecter pour accéder à votre compte.'**
+  String get profileLogoutMessage;
+
+  /// No description provided for @profileLogoutConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉCONNEXION'**
+  String get profileLogoutConfirm;
+
+  /// No description provided for @profileLogoutSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez été déconnecté avec succès'**
+  String get profileLogoutSuccess;
+
   /// No description provided for @languageFrench.
   ///
   /// In fr, this message translates to:

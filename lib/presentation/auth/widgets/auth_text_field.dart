@@ -74,9 +74,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
             prefixIcon: widget.leadingIcon != null
                 ? Icon(
                     widget.leadingIcon,
-                    color: theme.colorScheme.onSurfaceVariant.withValues(
-                      alpha: 0.5,
-                    ),
+                    color: theme.colorScheme.onSurfaceVariant,
                     size: 20,
                   )
                 : null,
@@ -84,9 +82,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
                 ? IconButton(
                     icon: Icon(
                       _obscureText ? Icons.visibility : Icons.visibility_off,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.5,
-                      ),
+                      color: theme.colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     onPressed: () =>

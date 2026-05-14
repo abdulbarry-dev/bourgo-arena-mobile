@@ -346,10 +346,52 @@ class _LogoutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return TextButton(
-      onPressed: onLogout,
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext dialogContext) {
+            return AlertDialog(
+              title: Text(l10n.profileLogoutTitle),
+              content: Text(l10n.profileLogoutMessage),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: Text(
+                    l10n.commonCancel,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogContext).pop();
+                    onLogout();
+                    // Show toast message
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.profileLogoutSuccess),
+                        duration: const Duration(seconds: 2),
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.all(16),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    l10n.profileLogoutConfirm,
+                    style: const TextStyle(color: Colors.redAccent),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
       child: Text(
-        AppLocalizations.of(context)?.profileLogout ?? 'Log out',
+        l10n.profileLogout,
         style: const TextStyle(
           color: Colors.redAccent,
           fontWeight: FontWeight.bold,
