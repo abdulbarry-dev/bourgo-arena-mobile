@@ -23,6 +23,7 @@ class UserMapper {
       subscriptionExpiry: model.subscriptionExpiry,
       totalCheckIns: model.totalCheckIns,
       birthDate: model.birthDate,
+      gender: model.gender,
       isParentAccount: model.isParentAccount,
       children: model.children.map((m) => ChildMapper.toEntity(m)).toList(),
     );
@@ -43,6 +44,7 @@ class UserMapper {
       subscriptionExpiry: entity.subscriptionExpiry,
       totalCheckIns: entity.totalCheckIns,
       birthDate: entity.birthDate,
+      gender: entity.gender,
       isParentAccount: entity.isParentAccount,
       children: entity.children.map((e) => ChildMapper.fromEntity(e)).toList(),
     );

@@ -33,6 +33,7 @@ void main() {
       expect(entity.subscriptionExpiry, dto.subscriptionExpiry);
       expect(entity.totalCheckIns, dto.totalCheckIns);
       expect(entity.birthDate, dto.birthDate);
+      expect(entity.gender, dto.gender);
       expect(entity.isParentAccount, dto.isParentAccount);
       expect(entity.children, hasLength(1));
       expect(entity.children.first, isA<ChildProfile>());
@@ -107,6 +108,7 @@ void main() {
       expect(dto.name, 'Jamie Rivera');
       expect(dto.id, entity.id);
       expect(dto.email, entity.email);
+      expect(dto.gender, entity.gender);
       expect(dto.children, hasLength(1));
       expect(dto.children.first.name, 'Mia Rivera');
     });
