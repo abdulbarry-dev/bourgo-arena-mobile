@@ -3,6 +3,8 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_method_screen.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -11,9 +13,11 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
+class MockGetVerificationStatusUseCase extends Mock implements GetVerificationStatusUseCase {}
 
 void main() {
   late MockSendOtpUseCase mockSendOtpUseCase;
+  late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
 
   setUpAll(() {
     registerFallbackValue(const Success<void, Failure>(null));
@@ -21,6 +25,9 @@ void main() {
 
   setUp(() {
     mockSendOtpUseCase = MockSendOtpUseCase();
+    mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
+
+    when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: true, phoneVerified: false, email: 'alex@example.com', phone: '+15550000000')));
 
     // Default successful answer for send OTP
     when(
@@ -42,6 +49,7 @@ void main() {
             email: email,
             phone: phone,
             sendOtpUseCase: mockSendOtpUseCase,
+            getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
           ),
         ),
         GoRoute(
@@ -127,19 +135,7 @@ void main() {
       expect(find.textContaining('VERIFY'), findsWidgets);
     });
 
-    testWidgets('renders skip for now button', (tester) async {
-      await setupScreenSize(tester);
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          unverifiedMethod: 'email',
-          email: 'alex@example.com',
-          phone: '+15550000000',
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.textContaining('SKIP'), findsOneWidget);
-    });
+    
 
     testWidgets(
       'calls sendOtpUseCase with correct phone when verify now is tapped',
@@ -202,24 +198,7 @@ void main() {
       expect(find.text('OTP'), findsOneWidget);
     });
 
-    testWidgets('skip for now button navigates to onboarding', (tester) async {
-      await setupScreenSize(tester);
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          unverifiedMethod: 'email',
-          email: 'alex@example.com',
-          phone: '+15550000000',
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Tap skip for now button
-      await tester.tap(find.textContaining('SKIP FOR NOW'));
-      await tester.pumpAndSettle();
-
-      // Should navigate to onboarding
-      expect(find.text('Onboarding'), findsOneWidget);
-    });
+    
 
     testWidgets('renders title correctly', (tester) async {
       await setupScreenSize(tester);
@@ -282,6 +261,7 @@ void main() {
     });
 
     testWidgets('handles null email correctly', (tester) async {
+      when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: true, phoneVerified: false, email: null, phone: '+15550000000')));
       await setupScreenSize(tester);
       await tester.pumpWidget(
         createWidgetUnderTest(
@@ -297,6 +277,7 @@ void main() {
     });
 
     testWidgets('handles null phone correctly', (tester) async {
+      when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: false, phoneVerified: true, email: 'alex@example.com', phone: null)));
       await setupScreenSize(tester);
       await tester.pumpWidget(
         createWidgetUnderTest(

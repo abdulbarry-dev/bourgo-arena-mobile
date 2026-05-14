@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -19,6 +20,9 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
 
   /// Use case to send OTP
   final SendOtpUseCase sendOtpUseCase;
+  
+  /// Use case to fetch verification status
+  final GetVerificationStatusUseCase getVerificationStatusUseCase;
 
   const VerifyAdditionalMethodScreen({
     super.key,
@@ -26,6 +30,7 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
     this.email,
     this.phone,
     required this.sendOtpUseCase,
+    required this.getVerificationStatusUseCase,
   });
 
   @override
@@ -36,6 +41,55 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
 class _VerifyAdditionalMethodScreenState
     extends State<VerifyAdditionalMethodScreen> {
   bool _isLoading = false;
+  bool _isFetchingStatus = false;
+  String? _email;
+  String? _phone;
+  late String _unverifiedMethod;
+
+  @override
+  void initState() {
+    super.initState();
+    _email = widget.email;
+    _phone = widget.phone;
+    _unverifiedMethod = widget.unverifiedMethod;
+
+    if (_email == null || _phone == null) {
+      _fetchVerificationStatus();
+    }
+  }
+
+  Future<void> _fetchVerificationStatus() async {
+    setState(() {
+      _isFetchingStatus = true;
+    });
+
+    final result = await widget.getVerificationStatusUseCase();
+    
+    if (mounted) {
+      setState(() {
+        _isFetchingStatus = false;
+      });
+      
+      result.when(
+        success: (status) {
+          setState(() {
+            _email = status.email;
+            _phone = status.phone;
+            if (!status.emailVerified) {
+              _unverifiedMethod = 'email';
+            } else if (!status.phoneVerified) {
+              _unverifiedMethod = 'phone';
+            }
+          });
+        },
+        failure: (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(failure.message)),
+          );
+        },
+      );
+    }
+  }
 
   void _setLoading(bool value) {
     setState(() {
@@ -45,43 +99,59 @@ class _VerifyAdditionalMethodScreenState
 
   void _verifyNow() async {
     _setLoading(true);
-    final identifier = widget.unverifiedMethod == 'email'
-        ? widget.email
-        : widget.phone;
+    final identifier = _unverifiedMethod == 'email'
+        ? _email
+        : _phone;
 
-    if (identifier != null) {
+    if (identifier != null && identifier.isNotEmpty) {
       // Send OTP to the unverified method
-      await widget.sendOtpUseCase(identifier);
+      final result = await widget.sendOtpUseCase(identifier);
 
       if (mounted) {
         _setLoading(false);
-        // Navigate to OTP verification screen for the unverified method
-        context.push(
-          '/otp',
-          extra: {'destination': identifier, 'is_password_reset': false},
+        result.when(
+          success: (_) {
+            // Navigate to OTP verification screen for the unverified method
+            context.push(
+              '/otp',
+              extra: {'destination': identifier, 'is_password_reset': false},
+            );
+          },
+          failure: (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(failure.message)),
+            );
+          },
         );
       }
+    } else {
+      _setLoading(false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Missing contact information.')),
+      );
     }
-  }
-
-  void _skipForNow() {
-    // Navigate to onboarding (can prompt for verification later)
-    context.go('/onboarding');
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final identifier = widget.unverifiedMethod == 'email'
-        ? widget.email
-        : widget.phone;
+    
+    if (_isFetchingStatus) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    
+    final identifier = _unverifiedMethod == 'email'
+        ? _email
+        : _phone;
 
-    final title = widget.unverifiedMethod == 'email'
+    final title = _unverifiedMethod == 'email'
         ? l10n.authVerifyEmailTitle
         : l10n.authVerifyPhoneTitle;
 
-    final subtitle = widget.unverifiedMethod == 'email'
+    final subtitle = _unverifiedMethod == 'email'
         ? l10n.authVerifyEmailSubtitle(identifier ?? '')
         : l10n.authVerifyPhoneSubtitle(identifier ?? '');
 
@@ -97,7 +167,7 @@ class _VerifyAdditionalMethodScreenState
                 AuthHeader(
                   title: l10n.authVerifyAdditionalMethodTitle,
                   subtitle: l10n.authVerifyAdditionalMethodMessage(
-                    widget.unverifiedMethod,
+                    _unverifiedMethod,
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -112,7 +182,7 @@ class _VerifyAdditionalMethodScreenState
                     ),
                     child: Center(
                       child: Icon(
-                        widget.unverifiedMethod == 'email'
+                        _unverifiedMethod == 'email'
                             ? Symbols.mail
                             : Symbols.call,
                         size: 48,
@@ -152,11 +222,6 @@ class _VerifyAdditionalMethodScreenState
                           ),
                         )
                       : Text(l10n.authVerifyNow),
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: _isLoading ? null : _skipForNow,
-                  child: Text(l10n.authSkipForNow),
                 ),
                 const SizedBox(height: 32),
                 // Informational text

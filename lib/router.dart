@@ -206,6 +206,7 @@ GoRouter createRouter(
           email: data['email'] as String?,
           phone: data['phone'] as String?,
           sendOtpUseCase: locator<SendOtpUseCase>(),
+          getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
         );
       },
     ),
