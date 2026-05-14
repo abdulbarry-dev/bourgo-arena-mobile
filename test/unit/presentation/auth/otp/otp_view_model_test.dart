@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
@@ -36,6 +37,16 @@ void main() {
       when(
         () => mockVerifyOtpUseCase(any(), any()),
       ).thenAnswer((_) async => const Success(true));
+      when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+        (_) async => const Success(
+          VerificationStatus(
+            emailVerified: true,
+            phoneVerified: true,
+            email: 'test@example.com',
+            phone: '+1234567890',
+          ),
+        ),
+      );
 
       bool successCalled = false;
       await viewModel.verify(
@@ -48,9 +59,50 @@ void main() {
       verify(
         () => mockVerifyOtpUseCase('test@example.com', '123456'),
       ).called(1);
+      verify(() => mockGetVerificationStatusUseCase()).called(1);
       expect(successCalled, isTrue);
       expect(viewModel.isLoading, isFalse);
     });
+
+    test(
+      'verify triggers additional verification callback when needed',
+      () async {
+        when(
+          () => mockVerifyOtpUseCase(any(), any()),
+        ).thenAnswer((_) async => const Success(true));
+        when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+          (_) async => const Success(
+            VerificationStatus(
+              emailVerified: false,
+              phoneVerified: true,
+              email: 'test@example.com',
+              phone: '+1234567890',
+            ),
+          ),
+        );
+
+        bool successCalled = false;
+        String? unverifiedMethod;
+        String? additionalEmail;
+        String? additionalPhone;
+
+        await viewModel.verify(
+          identifier: 'test@example.com',
+          code: '123456',
+          onSuccess: () => successCalled = true,
+          onAdditionalVerificationNeeded: (method, email, phone) {
+            unverifiedMethod = method;
+            additionalEmail = email;
+            additionalPhone = phone;
+          },
+        );
+
+        expect(successCalled, isFalse);
+        expect(unverifiedMethod, 'email');
+        expect(additionalEmail, 'test@example.com');
+        expect(additionalPhone, '+1234567890');
+      },
+    );
 
     test('verify sets error message on invalid code', () async {
       when(

@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
@@ -37,6 +38,16 @@ void main() {
     when(
       () => mockSendOtpUseCase(any()),
     ).thenAnswer((_) async => const Success(null));
+    when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+      (_) async => const Success(
+        VerificationStatus(
+          emailVerified: true,
+          phoneVerified: true,
+          email: 'test@example.com',
+          phone: '+1234567890',
+        ),
+      ),
+    );
   });
 
   Widget createWidgetUnderTest({String? destination}) {

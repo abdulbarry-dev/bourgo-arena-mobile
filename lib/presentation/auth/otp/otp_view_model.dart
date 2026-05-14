@@ -46,12 +46,12 @@ class OtpViewModel extends ChangeNotifier {
 
       setLoading(false);
 
-      result.fold(
+      await result.fold<Future<void>>(
         onSuccess: (isValid) async {
           if (isValid) {
             // After successful verification, check status to see if additional verification needed
             final statusResult = await _getVerificationStatusUseCase();
-            statusResult.fold(
+            statusResult.fold<void>(
               onSuccess: (status) {
                 if (!status.isFullyVerified &&
                     status.unverifiedMethod != null) {
@@ -80,6 +80,7 @@ class OtpViewModel extends ChangeNotifier {
         onFailure: (failure) {
           _errorMessage = failure.message;
           notifyListeners();
+          return Future.value();
         },
       );
     }
