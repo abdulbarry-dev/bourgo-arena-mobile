@@ -465,5 +465,37 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<Result<bool, Failure>> skipAdditionalVerification() {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post('/auth/skip-additional-verification', {})
+              as Map<String, dynamic>;
+
+      final stateStr = response['state'] as String?;
+      final token = response['token'] as String?;
+
+      if (token != null) {
+        _apiClient.setToken(token);
+        await _sessionRepository.saveAuthToken(token);
+      }
+
+      if (stateStr != null) {
+        final state = _mapBackendState(stateStr);
+        await _sessionRepository.saveAuthState(state.name);
+        
+        _authStateController.add(
+          AuthSession(
+            user: _authStateController.value.user,
+            state: state,
+            token: token,
+          ),
+        );
+      }
+
+      return Success(true);
+    });
+  }
+
+  @override
   Stream<AuthSession> get onAuthStateChanged => _authStateController.stream;
 }

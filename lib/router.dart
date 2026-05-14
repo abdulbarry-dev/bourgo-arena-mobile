@@ -210,6 +210,7 @@ GoRouter createRouter(
           email: data['email'] as String? ?? user?.email,
           phone: data['phone'] as String? ?? user?.phone,
           sendOtpUseCase: locator<SendOtpUseCase>(),
+          authRepository: locator<AuthRepository>(),
           getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
         );
       },

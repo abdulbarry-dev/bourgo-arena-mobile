@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -21,6 +22,9 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
   /// Use case to send OTP
   final SendOtpUseCase sendOtpUseCase;
   
+  /// Repository for auth operations
+  final AuthRepository authRepository;
+  
   /// Use case to fetch verification status
   final GetVerificationStatusUseCase getVerificationStatusUseCase;
 
@@ -30,6 +34,7 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
     this.email,
     this.phone,
     required this.sendOtpUseCase,
+    required this.authRepository,
     required this.getVerificationStatusUseCase,
   });
 
@@ -132,9 +137,23 @@ class _VerifyAdditionalMethodScreenState
     }
   }
 
-  void _skipForNow() {
-    // Navigate to onboarding
-    context.go('/account-setup');
+  void _skipForNow() async {
+    _setLoading(true);
+    final result = await widget.authRepository.skipAdditionalVerification();
+    
+    if (mounted) {
+      _setLoading(false);
+      result.when(
+        success: (_) {
+          context.go('/account-setup');
+        },
+        failure: (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(failure.message)),
+          );
+        },
+      );
+    }
   }
 
   @override

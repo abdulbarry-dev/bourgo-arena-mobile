@@ -41,6 +41,9 @@ abstract interface class AuthRepository {
   /// Used when a user has initially verified by email and needs phone verification.
   Future<Result<bool, Failure>> verifyPhone(String phone, String otp);
 
+  /// Allows the user to explicitly skip the secondary verification method.
+  Future<Result<bool, Failure>> skipAdditionalVerification();
+
   /// Retrieves the current verification status for the authenticated user.
   /// Shows which methods (email/phone) have been verified.
   Future<Result<VerificationStatus, Failure>> getVerificationStatus();

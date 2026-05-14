@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_method_screen.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:flutter/material.dart';
@@ -13,11 +14,13 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
+class MockAuthRepository extends Mock implements AuthRepository {}
 class MockGetVerificationStatusUseCase extends Mock implements GetVerificationStatusUseCase {}
 
 void main() {
   late MockSendOtpUseCase mockSendOtpUseCase;
   late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
+  late MockAuthRepository mockAuthRepository;
 
   setUpAll(() {
     registerFallbackValue(const Success<void, Failure>(null));
@@ -26,6 +29,9 @@ void main() {
   setUp(() {
     mockSendOtpUseCase = MockSendOtpUseCase();
     mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
+    mockAuthRepository = MockAuthRepository();
+
+    when(() => mockAuthRepository.skipAdditionalVerification()).thenAnswer((_) async => Success(true));
 
     when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: true, phoneVerified: false, email: 'alex@example.com', phone: '+15550000000')));
 
@@ -49,6 +55,7 @@ void main() {
             email: email,
             phone: phone,
             sendOtpUseCase: mockSendOtpUseCase,
+            authRepository: mockAuthRepository,
             getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
           ),
         ),
