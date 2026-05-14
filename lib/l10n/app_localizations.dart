@@ -278,6 +278,18 @@ abstract class AppLocalizations {
   /// **'NOS ACTIVITÉS'**
   String get homeActivitiesTitle;
 
+  /// No description provided for @homeActivitiesEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune activité disponible.'**
+  String get homeActivitiesEmpty;
+
+  /// No description provided for @homeActivitiesEmptySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenez plus tard pour découvrir de nouveaux sports.'**
+  String get homeActivitiesEmptySubtitle;
+
   /// No description provided for @homeSeeAll.
   ///
   /// In fr, this message translates to:

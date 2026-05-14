@@ -33,6 +33,8 @@
   "homeTicker": "RESERVE YOUR SESSION • FOOTBALL • PADEL • FITNESS • ",
   "homeNoCourses": "No courses scheduled for today.",
   "homeActivitiesTitle": "OUR ACTIVITIES",
+  "homeActivitiesEmpty": "No activities available.",
+  "homeActivitiesEmptySubtitle": "Check back later for new sports and activities.",
   "homeSeeAll": "SEE ALL",
   "homeTodayTitle": "TODAY",
   

@@ -103,6 +103,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeActivitiesTitle => 'OUR ACTIVITIES';
 
   @override
+  String get homeActivitiesEmpty => 'No activities available.';
+
+  @override
+  String get homeActivitiesEmptySubtitle =>
+      'Check back later for new sports and activities.';
+
+  @override
   String get homeSeeAll => 'SEE ALL';
 
   @override

@@ -106,6 +106,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get homeActivitiesTitle => 'NOS ACTIVITÉS';
 
   @override
+  String get homeActivitiesEmpty => 'Aucune activité disponible.';
+
+  @override
+  String get homeActivitiesEmptySubtitle =>
+      'Revenez plus tard pour découvrir de nouveaux sports.';
+
+  @override
   String get homeSeeAll => 'VOIR TOUT';
 
   @override
