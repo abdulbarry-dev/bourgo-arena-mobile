@@ -3,12 +3,16 @@ import 'dart:io';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,6 +26,10 @@ class MockUpdateUserProfileUseCase extends Mock
     implements UpdateUserProfileUseCase {}
 
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
+
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
+class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockHttpClient extends Mock implements HttpClient {}
 
@@ -144,6 +152,8 @@ void main() {
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
   late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
   late MockLogoutUseCase mockLogoutUseCase;
+  late MockAuthStateNotifier mockAuthStateNotifier;
+  late MockAuthRepository mockAuthRepository;
 
   final testUser = User(
     id: 'user-1',
@@ -162,12 +172,20 @@ void main() {
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
     mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
     mockLogoutUseCase = MockLogoutUseCase();
+    mockAuthStateNotifier = MockAuthStateNotifier();
+    mockAuthRepository = MockAuthRepository();
 
     locator.registerSingleton<GetUserProfileUseCase>(mockGetUserProfileUseCase);
     locator.registerSingleton<UpdateUserProfileUseCase>(
       mockUpdateUserProfileUseCase,
     );
     locator.registerSingleton<LogoutUseCase>(mockLogoutUseCase);
+    locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
+    locator.registerSingleton<AuthRepository>(mockAuthRepository);
+
+    when(() => mockAuthStateNotifier.currentUser).thenReturn(testUser);
+    when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
   });
 
   tearDown(() {
@@ -195,17 +213,13 @@ void main() {
 
   group('ProfileScreen', () {
     testWidgets('shows loading spinner when fetching data', (tester) async {
-      when(
-        () => mockGetUserProfileUseCase(),
-      ).thenAnswer((_) async => Result.success(testUser));
-
-      // We don't await pumpWidget fully to catch the loading state if possible,
-      // but ProfileViewModel calls it in constructor and it might complete immediately if not delayed.
-      // To reliably test loading, we can delay the response.
-      when(() => mockGetUserProfileUseCase()).thenAnswer(
+      when(() => mockAuthStateNotifier.currentUser).thenReturn(null);
+      when(() => mockAuthRepository.getUserProfile()).thenAnswer(
         (_) async => Future.delayed(
           const Duration(milliseconds: 100),
-          () => Result.success(testUser),
+          () => Result.success(
+            AuthSession(user: testUser, state: AuthState.authenticated),
+          ),
         ),
       );
 
@@ -218,9 +232,12 @@ void main() {
     });
 
     testWidgets('shows user data when fetch is successful', (tester) async {
-      when(
-        () => mockGetUserProfileUseCase(),
-      ).thenAnswer((_) async => Result.success(testUser));
+      when(() => mockAuthStateNotifier.currentUser).thenReturn(testUser);
+      when(() => mockAuthRepository.getUserProfile()).thenAnswer(
+        (_) async => Result.success(
+          AuthSession(user: testUser, state: AuthState.authenticated),
+        ),
+      );
 
       await tester.pumpWidget(createWidget());
       await tester.pumpAndSettle();
@@ -232,7 +249,8 @@ void main() {
     });
 
     testWidgets('shows error message when fetch fails', (tester) async {
-      when(() => mockGetUserProfileUseCase()).thenAnswer(
+      when(() => mockAuthStateNotifier.currentUser).thenReturn(null);
+      when(() => mockAuthRepository.getUserProfile()).thenAnswer(
         (_) async => Result.failure(const ServerFailure('Failed to load')),
       );
 
@@ -245,9 +263,12 @@ void main() {
     });
 
     testWidgets('logout button triggers LogoutUseCase', (tester) async {
-      when(
-        () => mockGetUserProfileUseCase(),
-      ).thenAnswer((_) async => Result.success(testUser));
+      when(() => mockAuthStateNotifier.currentUser).thenReturn(testUser);
+      when(() => mockAuthRepository.getUserProfile()).thenAnswer(
+        (_) async => Result.success(
+          AuthSession(user: testUser, state: AuthState.authenticated),
+        ),
+      );
       when(
         () => mockLogoutUseCase(),
       ).thenAnswer((_) async => Result.success(null));

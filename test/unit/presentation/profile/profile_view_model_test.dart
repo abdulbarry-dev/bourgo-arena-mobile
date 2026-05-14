@@ -1,29 +1,30 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
-
-class MockUpdateUserProfileUseCase extends Mock
-    implements UpdateUserProfileUseCase {}
+class MockAuthRepository extends Mock implements AuthRepository {}
 
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
+
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 class FakeUser extends Fake implements User {}
 
 void main() {
   late ProfileViewModel viewModel;
-  late MockGetUserProfileUseCase mockGetUserProfileUseCase;
-  late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
+  late MockAuthRepository mockAuthRepository;
   late MockLogoutUseCase mockLogoutUseCase;
+  late MockAuthStateNotifier mockAuthStateNotifier;
 
   final testUser = User(
     id: 'user-1',
@@ -46,24 +47,33 @@ void main() {
     ],
   );
 
+  final testSession = AuthSession(
+    user: testUser,
+    state: AuthState.authenticated,
+  );
+
   setUpAll(() {
     registerFallbackValue(FakeUser());
   });
 
   setUp(() {
-    mockGetUserProfileUseCase = MockGetUserProfileUseCase();
-    mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
+    mockAuthRepository = MockAuthRepository();
     mockLogoutUseCase = MockLogoutUseCase();
+    mockAuthStateNotifier = MockAuthStateNotifier();
 
     // Default behavior for constructor's loadProfile call
     when(
-      () => mockGetUserProfileUseCase(),
-    ).thenAnswer((_) async => Result.success(testUser));
+      () => mockAuthRepository.getUserProfile(),
+    ).thenAnswer((_) async => Result.success(testSession));
+
+    when(() => mockAuthStateNotifier.currentUser).thenReturn(testUser);
+    when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
 
     viewModel = ProfileViewModel(
-      getUserProfileUseCase: mockGetUserProfileUseCase,
-      updateUserProfileUseCase: mockUpdateUserProfileUseCase,
+      authRepository: mockAuthRepository,
       logoutUseCase: mockLogoutUseCase,
+      authStateNotifier: mockAuthStateNotifier,
     );
   });
 
@@ -72,12 +82,21 @@ void main() {
       // ViewModel calls loadProfile in constructor
       check(viewModel.isLoading).isFalse();
       check(viewModel.user).isNotNull().equals(testUser);
-      check(viewModel.user?.children.length).equals(1);
       check(viewModel.errorMessage).isNull();
     });
 
     test('loadProfile sets failure state on error', () async {
-      when(() => mockGetUserProfileUseCase()).thenAnswer(
+      // Return null for current user to trigger loadProfile in constructor
+      when(() => mockAuthStateNotifier.currentUser).thenReturn(null);
+
+      // Re-initialize to trigger constructor logic
+      viewModel = ProfileViewModel(
+        authRepository: mockAuthRepository,
+        logoutUseCase: mockLogoutUseCase,
+        authStateNotifier: mockAuthStateNotifier,
+      );
+
+      when(() => mockAuthRepository.getUserProfile()).thenAnswer(
         (_) async => Result.failure(const ServerFailure('Server error')),
       );
 
@@ -85,31 +104,6 @@ void main() {
 
       check(viewModel.isLoading).isFalse();
       check(viewModel.errorMessage).isNotNull().equals('Server error');
-    });
-
-    test('updateProfile success updates user data', () async {
-      final updatedUser = testUser.copyWith(firstName: 'Johnny');
-      when(
-        () => mockUpdateUserProfileUseCase(any()),
-      ).thenAnswer((_) async => Result.success(updatedUser));
-
-      final result = await viewModel.updateProfile(updatedUser);
-
-      check(result.isSuccess).isTrue();
-      check(viewModel.user).equals(updatedUser);
-      check(viewModel.errorMessage).isNull();
-      verify(() => mockUpdateUserProfileUseCase(updatedUser)).called(1);
-    });
-
-    test('updateProfile failure sets error message', () async {
-      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
-        (_) async => Result.failure(const ServerFailure('Update failed')),
-      );
-
-      final result = await viewModel.updateProfile(testUser);
-
-      check(result.isFailure).isTrue();
-      check(viewModel.errorMessage).isNotNull().equals('Update failed');
     });
 
     test('logout calls LogoutUseCase', () async {

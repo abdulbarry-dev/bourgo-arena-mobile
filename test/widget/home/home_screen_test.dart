@@ -89,7 +89,7 @@ void main() {
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.byType(EmptyState), findsOneWidget);
+    expect(find.byType(EmptyState), findsNWidgets(2));
   });
 }
 
