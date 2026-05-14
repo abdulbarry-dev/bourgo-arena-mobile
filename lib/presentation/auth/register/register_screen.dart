@@ -252,7 +252,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => context.pop(),
+                            onPressed: () => context.go('/login'),
                             child: Text(
                               l10n.authLogin,
                               style: TextStyle(

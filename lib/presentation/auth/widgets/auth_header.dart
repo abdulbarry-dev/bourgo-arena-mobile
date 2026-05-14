@@ -32,7 +32,11 @@ class AuthHeader extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: IconButton(
-              onPressed: () => context.pop(),
+              onPressed: () {
+                if (context.canPop()) {
+                  context.pop();
+                }
+              },
               icon: Icon(
                 Symbols.arrow_back,
                 color: theme.colorScheme.onSurface,

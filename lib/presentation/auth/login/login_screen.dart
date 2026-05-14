@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () => context.push('/register'),
+                            onPressed: () => context.go('/register'),
                             child: Text(
                               l10n.authRegister,
                               style: TextStyle(
