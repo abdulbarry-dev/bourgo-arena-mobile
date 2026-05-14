@@ -23,6 +23,16 @@ class ApiAuthRepository implements AuthRepository {
 
   ApiAuthRepository(this._apiClient, this._sessionRepository);
 
+  Future<void> _updateSession(AuthSession session) async {
+    _currentSession = session;
+    if (session.token != null) {
+      _apiClient.setToken(session.token);
+      await _sessionRepository.saveAuthToken(session.token!);
+    }
+    await _sessionRepository.saveAuthState(session.state.name);
+    _authStateController.add(session);
+  }
+
   AuthState _mapBackendState(String? state) {
     switch (state) {
       case 'pending_verification':
@@ -85,7 +95,7 @@ class ApiAuthRepository implements AuthRepository {
       }
 
       final session = AuthSession(user: user, state: state, token: token);
-      _authStateController.add(session);
+      await _updateSession(session);
       return Success(session);
     });
 
@@ -141,6 +151,7 @@ class ApiAuthRepository implements AuthRepository {
         _apiClient.setToken(null);
         // Clear the persisted session (including the token)
         await _sessionRepository.clearSession();
+        _currentSession = null;
         _authStateController.add(AuthSession.unauthenticated());
       }
     });
@@ -175,7 +186,7 @@ class ApiAuthRepository implements AuthRepository {
       );
       await _sessionRepository.savePendingVerificationEmail(email);
 
-      _authStateController.add(
+      _updateSession(
         AuthSession(state: AuthState.pendingVerification, pendingEmail: email),
       );
 
@@ -224,7 +235,7 @@ class ApiAuthRepository implements AuthRepository {
             user = UserMapper.toEntity(userModel);
           }
 
-          _authStateController.add(
+          await _updateSession(
             AuthSession(user: user, state: state, token: token),
           );
         }
@@ -347,7 +358,7 @@ class ApiAuthRepository implements AuthRepository {
       );
 
       final session = AuthSession(user: user, state: state, token: token);
-      _authStateController.add(session);
+      await _updateSession(session);
       return Success(session);
     });
 
@@ -413,7 +424,7 @@ class ApiAuthRepository implements AuthRepository {
             user = UserMapper.toEntity(userModel);
           }
 
-          _authStateController.add(
+          await _updateSession(
             AuthSession(user: user, state: state, token: token),
           );
         }
@@ -456,7 +467,7 @@ class ApiAuthRepository implements AuthRepository {
             user = UserMapper.toEntity(userModel);
           }
 
-          _authStateController.add(
+          await _updateSession(
             AuthSession(user: user, state: state, token: token),
           );
         }
