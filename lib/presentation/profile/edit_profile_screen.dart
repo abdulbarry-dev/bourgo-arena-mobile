@@ -1,9 +1,10 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_view_model.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -31,10 +32,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     _viewModel = EditProfileViewModel(
-      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
       updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
+      authRepository: locator<AuthRepository>(),
+      authStateNotifier: locator<AuthStateNotifier>(),
     );
     _viewModel.addListener(_onViewModelChange);
+    // Populate fields immediately if user is already loaded
+    // (in case the ViewModel notified listeners before this listener was attached)
+    _onViewModelChange();
   }
 
   @override
