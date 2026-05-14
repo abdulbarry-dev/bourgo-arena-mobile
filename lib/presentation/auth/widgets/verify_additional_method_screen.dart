@@ -132,6 +132,11 @@ class _VerifyAdditionalMethodScreenState
     }
   }
 
+  void _skipForNow() {
+    // Navigate to onboarding
+    context.go('/account-setup');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -222,6 +227,11 @@ class _VerifyAdditionalMethodScreenState
                           ),
                         )
                       : Text(l10n.authVerifyNow),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: _isLoading ? null : _skipForNow,
+                  child: Text(l10n.authSkipForNow),
                 ),
                 const SizedBox(height: 32),
                 // Informational text

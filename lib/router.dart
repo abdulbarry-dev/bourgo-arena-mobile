@@ -130,10 +130,13 @@ GoRouter createRouter(
         return '/otp';
 
       case AuthState.pendingAdditionalVerification:
-        // Force additional verification flow until both methods are verified
+        // Users can skip additional verification, so we allow setup and onboarding routes
         if (location == '/otp' ||
             location == '/verify-additional-method' ||
-            location == '/family-onboarding') {
+            location == '/account-setup' ||
+            location == '/pin-setup' ||
+            location == '/family-onboarding' ||
+            location == '/onboarding') {
           return null;
         }
         return '/verify-additional-method';
@@ -201,10 +204,11 @@ GoRouter createRouter(
       path: '/verify-additional-method',
       builder: (context, state) {
         final data = state.extraAsMap;
+        final user = authStateNotifier.session.user;
         return VerifyAdditionalMethodScreen(
           unverifiedMethod: data['unverified_method'] as String? ?? 'phone',
-          email: data['email'] as String?,
-          phone: data['phone'] as String?,
+          email: data['email'] as String? ?? user?.email,
+          phone: data['phone'] as String? ?? user?.phone,
           sendOtpUseCase: locator<SendOtpUseCase>(),
           getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
         );

@@ -60,6 +60,10 @@ void main() {
           path: '/onboarding',
           builder: (context, state) => const Scaffold(body: Text('Onboarding')),
         ),
+        GoRoute(
+          path: '/account-setup',
+          builder: (context, state) => const Scaffold(body: Text('Account Setup')),
+        ),
       ],
     );
 
@@ -120,6 +124,40 @@ void main() {
         expect(find.textContaining('+15550000000'), findsWidgets);
       },
     );
+
+    
+    testWidgets('renders skip for now button', (tester) async {
+      await setupScreenSize(tester);
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          unverifiedMethod: 'email',
+          email: 'alex@example.com',
+          phone: '+15550000000',
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('SKIP'), findsOneWidget);
+    });
+
+    testWidgets('skip for now button navigates to onboarding', (tester) async {
+      await setupScreenSize(tester);
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          unverifiedMethod: 'email',
+          email: 'alex@example.com',
+          phone: '+15550000000',
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Tap skip for now button
+      await tester.tap(find.textContaining('SKIP FOR NOW'));
+      await tester.pumpAndSettle();
+
+      // Should navigate to onboarding
+      expect(find.text('Account Setup'), findsOneWidget);
+    });
 
     testWidgets('renders verify now button', (tester) async {
       await setupScreenSize(tester);
