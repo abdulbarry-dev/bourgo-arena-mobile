@@ -262,5 +262,19 @@
   "profileDisableFamilyTitle": "Désactiver le compte famille ?",
   "profileDisableFamilyContent": "Cela masquera tous les profils d'enfants et les fonctionnalités. Êtes-vous sûr de vouloir continuer ?",
   "profileDisableConfirm": "DÉSACTIVER",
-  "commonCancel": "ANNULER"
+  "commonCancel": "ANNULER",
+  "authVerifyAdditionalMethodTitle": "Complétez votre vérification",
+  "authVerifyAdditionalMethodMessage": "Pour assurer la sécurité de votre compte, veuillez vérifier votre {method}.",
+  "authVerifyNow": "VÉRIFIER MAINTENANT",
+  "authSkipForNow": "PLUS TARD",
+  "authEmailVerificationPending": "Vérification email en attente",
+  "authPhoneVerificationPending": "Vérification téléphone en attente",
+  "authBothMethodsVerified": "Email et téléphone sont tous deux vérifiés",
+  "authOneMethodVerified": "Une méthode vérifiée, une en attente",
+  "authVerifyPhoneTitle": "Vérifier le numéro de téléphone",
+  "authVerifyPhoneSubtitle": "Nous enverrons un code à 6 chiffres à votre téléphone {phone}.",
+  "authVerifyEmailTitle": "Vérifier l'adresse e-mail",
+  "authVerifyEmailSubtitle": "Nous enverrons un code à 6 chiffres à votre e-mail {email}.",
+  "authVerificationCompleteTitle": "Vérification terminée",
+  "authVerificationCompleteMessage": "Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil."
 }

@@ -36,6 +36,9 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart'
 import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_email_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_phone_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/update_password_use_case.dart';
@@ -132,6 +135,9 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => CompleteRegistrationUseCase(locator()));
   locator.registerLazySingleton(() => SendOtpUseCase(locator()));
   locator.registerLazySingleton(() => VerifyOtpUseCase(locator()));
+  locator.registerLazySingleton(() => VerifyEmailUseCase(locator()));
+  locator.registerLazySingleton(() => VerifyPhoneUseCase(locator()));
+  locator.registerLazySingleton(() => GetVerificationStatusUseCase(locator()));
   locator.registerLazySingleton(
     () => RequestFamilyAccountOtpUseCase(locator()),
   );

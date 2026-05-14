@@ -3,8 +3,11 @@ enum AuthState {
   /// User is not logged in.
   unauthenticated,
 
-  /// User has registered or logged in but needs to verify their email/OTP.
+  /// User has registered or logged in but needs to verify at least one method (email or phone).
   pendingVerification,
+
+  /// User has verified one method (email or phone) but must verify the other method.
+  pendingAdditionalVerification,
 
   /// User is verified but has not completed the required onboarding steps.
   pendingOnboarding,

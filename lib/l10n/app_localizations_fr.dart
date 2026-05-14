@@ -791,4 +791,55 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get commonCancel => 'ANNULER';
+
+  @override
+  String get authVerifyAdditionalMethodTitle => 'Complétez votre vérification';
+
+  @override
+  String authVerifyAdditionalMethodMessage(Object method) {
+    return 'Pour assurer la sécurité de votre compte, veuillez vérifier votre $method.';
+  }
+
+  @override
+  String get authVerifyNow => 'VÉRIFIER MAINTENANT';
+
+  @override
+  String get authSkipForNow => 'PLUS TARD';
+
+  @override
+  String get authEmailVerificationPending => 'Vérification email en attente';
+
+  @override
+  String get authPhoneVerificationPending =>
+      'Vérification téléphone en attente';
+
+  @override
+  String get authBothMethodsVerified =>
+      'Email et téléphone sont tous deux vérifiés';
+
+  @override
+  String get authOneMethodVerified => 'Une méthode vérifiée, une en attente';
+
+  @override
+  String get authVerifyPhoneTitle => 'Vérifier le numéro de téléphone';
+
+  @override
+  String authVerifyPhoneSubtitle(Object phone) {
+    return 'Nous enverrons un code à 6 chiffres à votre téléphone $phone.';
+  }
+
+  @override
+  String get authVerifyEmailTitle => 'Vérifier l\'adresse e-mail';
+
+  @override
+  String authVerifyEmailSubtitle(Object email) {
+    return 'Nous enverrons un code à 6 chiffres à votre e-mail $email.';
+  }
+
+  @override
+  String get authVerificationCompleteTitle => 'Vérification terminée';
+
+  @override
+  String get authVerificationCompleteMessage =>
+      'Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil.';
 }

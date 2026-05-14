@@ -263,5 +263,19 @@
   "profileLogoutTitle": "Sign Out?",
   "profileLogoutMessage": "Are you sure you want to sign out? You'll need to log in again to access your account.",
   "profileLogoutConfirm": "SIGN OUT",
-  "profileLogoutSuccess": "You have been signed out successfully"
+  "profileLogoutSuccess": "You have been signed out successfully",
+  "authVerifyAdditionalMethodTitle": "Complete Your Verification",
+  "authVerifyAdditionalMethodMessage": "To ensure account security, please verify your {method}.",
+  "authVerifyNow": "VERIFY NOW",
+  "authSkipForNow": "SKIP FOR NOW",
+  "authEmailVerificationPending": "Email verification pending",
+  "authPhoneVerificationPending": "Phone verification pending",
+  "authBothMethodsVerified": "Both email and phone are verified",
+  "authOneMethodVerified": "One method verified, one pending",
+  "authVerifyPhoneTitle": "Verify Phone Number",
+  "authVerifyPhoneSubtitle": "We'll send a 6-digit code to your phone {phone}.",
+  "authVerifyEmailTitle": "Verify Email Address",
+  "authVerifyEmailSubtitle": "We'll send a 6-digit code to your email {email}.",
+  "authVerificationCompleteTitle": "Verification Complete",
+  "authVerificationCompleteMessage": "All verification methods have been successfully verified. Let's continue with your profile setup."
 }

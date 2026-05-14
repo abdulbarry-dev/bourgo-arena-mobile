@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 
@@ -24,6 +25,8 @@ class ApiAuthRepository implements AuthRepository {
     switch (state) {
       case 'pending_verification':
         return AuthState.pendingVerification;
+      case 'pending_additional_verification':
+        return AuthState.pendingAdditionalVerification;
       case 'pending_onboarding':
         return AuthState.pendingOnboarding;
       case 'active':
@@ -362,6 +365,103 @@ class ApiAuthRepository implements AuthRepository {
   Future<Result<String?, Failure>> getToken() async {
     // Retrieve the persisted auth token from local session storage
     return _sessionRepository.getAuthToken();
+  }
+
+  @override
+  Future<Result<VerificationStatus, Failure>> getVerificationStatus() {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get('/user/verification-status')
+              as Map<String, dynamic>;
+      final status = VerificationStatus.fromJson(response);
+      return Success(status);
+    });
+  }
+
+  @override
+  Future<Result<bool, Failure>> verifyEmail(String email, String otp) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post('/user/verify-email', {
+                'email': email,
+                'otp': otp,
+              })
+              as Map<String, dynamic>;
+
+      final isValid = response['valid'] == true;
+
+      if (isValid) {
+        final token = response['token'] as String?;
+        final stateStr = response['state'] as String?;
+
+        if (token != null) {
+          _apiClient.setToken(token);
+          await _sessionRepository.saveAuthToken(token);
+        }
+
+        if (stateStr != null) {
+          final state = _mapBackendState(stateStr);
+          await _sessionRepository.saveAuthState(state.name);
+
+          User? user;
+          if (response['user'] != null) {
+            final userModel = UserProfileModel.fromJson(
+              response['user'] as Map<String, dynamic>,
+            );
+            user = UserMapper.toEntity(userModel);
+          }
+
+          _authStateController.add(
+            AuthSession(user: user, state: state, token: token),
+          );
+        }
+      }
+
+      return Success(isValid);
+    });
+  }
+
+  @override
+  Future<Result<bool, Failure>> verifyPhone(String phone, String otp) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post('/user/verify-phone', {
+                'phone': phone,
+                'otp': otp,
+              })
+              as Map<String, dynamic>;
+
+      final isValid = response['valid'] == true;
+
+      if (isValid) {
+        final token = response['token'] as String?;
+        final stateStr = response['state'] as String?;
+
+        if (token != null) {
+          _apiClient.setToken(token);
+          await _sessionRepository.saveAuthToken(token);
+        }
+
+        if (stateStr != null) {
+          final state = _mapBackendState(stateStr);
+          await _sessionRepository.saveAuthState(state.name);
+
+          User? user;
+          if (response['user'] != null) {
+            final userModel = UserProfileModel.fromJson(
+              response['user'] as Map<String, dynamic>,
+            );
+            user = UserMapper.toEntity(userModel);
+          }
+
+          _authStateController.add(
+            AuthSession(user: user, state: state, token: token),
+          );
+        }
+      }
+
+      return Success(isValid);
+    });
   }
 
   @override

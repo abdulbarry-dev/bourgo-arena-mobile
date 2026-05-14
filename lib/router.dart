@@ -12,6 +12,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/register/family_onboarding
 import 'package:bourgo_arena_mobile/presentation/auth/register/pin_setup_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/verification_method_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_method_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_flow_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_success_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/common/not_found_screen.dart';
@@ -36,6 +37,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart'
 import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -108,6 +110,7 @@ GoRouter createRouter(
     final bool isSetupRoute =
         location == '/otp' ||
         location == '/verification-method' ||
+        location == '/verify-additional-method' ||
         location == '/account-setup' ||
         location == '/pin-setup' ||
         location == '/family-onboarding';
@@ -125,6 +128,15 @@ GoRouter createRouter(
           return null;
         }
         return '/otp';
+
+      case AuthState.pendingAdditionalVerification:
+        // Force additional verification flow until both methods are verified
+        if (location == '/otp' ||
+            location == '/verify-additional-method' ||
+            location == '/family-onboarding') {
+          return null;
+        }
+        return '/verify-additional-method';
 
       case AuthState.pendingOnboarding:
         // Force account setup if not on a setup screen
@@ -181,6 +193,19 @@ GoRouter createRouter(
           isPasswordReset: data['isPasswordReset'] as bool? ?? false,
           sendOtpUseCase: locator<SendOtpUseCase>(),
           verifyOtpUseCase: locator<VerifyOtpUseCase>(),
+          getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/verify-additional-method',
+      builder: (context, state) {
+        final data = state.extraAsMap;
+        return VerifyAdditionalMethodScreen(
+          unverifiedMethod: data['unverified_method'] as String? ?? 'phone',
+          email: data['email'] as String?,
+          phone: data['phone'] as String?,
+          sendOtpUseCase: locator<SendOtpUseCase>(),
         );
       },
     ),

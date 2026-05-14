@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_screen.dart';
 import 'package:flutter/material.dart';
@@ -14,9 +15,13 @@ class MockVerifyOtpUseCase extends Mock implements VerifyOtpUseCase {}
 
 class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
 
+class MockGetVerificationStatusUseCase extends Mock
+    implements GetVerificationStatusUseCase {}
+
 void main() {
   late MockVerifyOtpUseCase mockVerifyOtpUseCase;
   late MockSendOtpUseCase mockSendOtpUseCase;
+  late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
 
   setUpAll(() {
     registerFallbackValue(const Success<bool, Failure>(true));
@@ -26,6 +31,7 @@ void main() {
   setUp(() {
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockSendOtpUseCase = MockSendOtpUseCase();
+    mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
 
     // Default successful answer for resend which is called in initState
     when(
@@ -42,6 +48,7 @@ void main() {
             destination: destination,
             verifyOtpUseCase: mockVerifyOtpUseCase,
             sendOtpUseCase: mockSendOtpUseCase,
+            getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
           ),
         ),
         GoRoute(

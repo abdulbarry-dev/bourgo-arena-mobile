@@ -1,14 +1,20 @@
 import 'dart:developer' as developer;
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the OTP Verification screen.
 class OtpViewModel extends ChangeNotifier {
   final VerifyOtpUseCase _verifyOtpUseCase;
   final SendOtpUseCase _sendOtpUseCase;
+  final GetVerificationStatusUseCase _getVerificationStatusUseCase;
 
-  OtpViewModel(this._verifyOtpUseCase, this._sendOtpUseCase);
+  OtpViewModel(
+    this._verifyOtpUseCase,
+    this._sendOtpUseCase,
+    this._getVerificationStatusUseCase,
+  );
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -22,10 +28,13 @@ class OtpViewModel extends ChangeNotifier {
   }
 
   /// Verifies the OTP code for the given identifier.
+  /// Also checks verification status to determine if additional verification is needed.
   Future<void> verify({
     required String identifier,
     required String code,
     required VoidCallback onSuccess,
+    required Function(String unverifiedMethod, String? email, String? phone)
+    onAdditionalVerificationNeeded,
   }) async {
     if (code.length == 6) {
       setLoading(true);
@@ -38,9 +47,31 @@ class OtpViewModel extends ChangeNotifier {
       setLoading(false);
 
       result.fold(
-        onSuccess: (isValid) {
+        onSuccess: (isValid) async {
           if (isValid) {
-            onSuccess();
+            // After successful verification, check status to see if additional verification needed
+            final statusResult = await _getVerificationStatusUseCase();
+            statusResult.fold(
+              onSuccess: (status) {
+                if (!status.isFullyVerified &&
+                    status.unverifiedMethod != null) {
+                  // Additional verification needed
+                  onAdditionalVerificationNeeded(
+                    status.unverifiedMethod!,
+                    status.email,
+                    status.phone,
+                  );
+                } else {
+                  // All verifications complete
+                  onSuccess();
+                }
+              },
+              onFailure: (failure) {
+                // If status check fails, still consider verification successful
+                // and proceed (backend will enforce additional verification requirement)
+                onSuccess();
+              },
+            );
           } else {
             _errorMessage = 'Invalid verification code';
             notifyListeners();

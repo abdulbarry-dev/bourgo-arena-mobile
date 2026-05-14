@@ -38,6 +38,35 @@ To maintain alignment with the mobile app's architecture and performance require
     └── api.php                   # All API routes defined here
     ```
 
+### Authentication State Management
+
+The API uses a state-driven authentication flow to guide users through required steps:
+
+**Possible States (`state` field):**
+* `pending_verification`: User has just registered or logged in. They must verify at least one method (email OR phone).
+* `pending_additional_verification`: User has verified one method (email or phone) but must verify the remaining method before gaining full access. At this stage, a bearer token is issued so the user can call additional verification endpoints.
+* `pending_onboarding`: Both email and phone are verified. User must complete profile setup (PIN, family members, etc.).
+* `active`: Fully authenticated; full access allowed.
+
+**Verification Transition Flow:**
+```
+Register/Login
+    ↓
+pending_verification (must verify at least one method)
+    ↓
+User selects email OR phone, receives OTP
+    ↓
+User verifies chosen method → Check verification status
+    ├─ If both email and phone are now verified → pending_onboarding
+    └─ If only one is verified → pending_additional_verification (token issued)
+    ↓
+(If pending_additional_verification) User verifies second method
+    ↓
+pending_onboarding
+    ↓
+active
+```
+
 ---
 
 ## 3. Global Response Envelope
@@ -153,10 +182,10 @@ The API uses a state-driven authentication flow to ensure users complete require
 
 ### POST /auth/verify-otp
 
-* **Description**: Verifies the OTP code.
+* **Description**: Verifies the OTP code for either email or phone.
 * **Auth Required**: No
 * **Request Body**:
-  * `identifier` (string, required)
+  * `identifier` (string, required): Email or Phone number.
   * `otp` (string, required, length:6)
 * **Success Response**:
 
@@ -167,10 +196,73 @@ The API uses a state-driven authentication flow to ensure users complete require
         "valid": true,
         "token": "...",
         "state": "pending_onboarding",
-        "user": { ... }
+        "verification_status": {
+          "email_verified": true,
+          "phone_verified": true,
+          "email": "user@example.com",
+          "phone": "+212600000000",
+          "unverified_method": null
+        }
       }
     }
     ```
+
+* **Notes**: If `state` is `pending_additional_verification`, the response includes a `token` allowing the user to call additional verification endpoints. The `verification_status` object indicates which methods are verified.
+
+### POST /user/verify-email
+
+* **Description**: Verifies a user's email address via OTP. Used when a user has verified by phone but needs email verification too.
+* **Auth Required**: Yes (token from `pending_additional_verification` state)
+* **Request Body**:
+  * `email` (string, required)
+  * `otp` (string, required, length:6)
+* **Success Response**:
+
+    ```json
+    {
+      "success": true,
+      "data": {
+        "valid": true,
+        "state": "pending_onboarding",
+        "verification_status": {
+          "email_verified": true,
+          "phone_verified": true,
+          "email": "user@example.com",
+          "phone": "+212600000000"
+        }
+      }
+    }
+    ```
+
+### POST /user/verify-phone
+
+* **Description**: Verifies a user's phone number via OTP. Used when a user has verified by email but needs phone verification too.
+* **Auth Required**: Yes (token from `pending_additional_verification` state)
+* **Request Body**:
+  * `phone` (string, required)
+  * `otp` (string, required, length:6)
+* **Success Response**: Same structure as `/user/verify-email`
+
+### GET /user/verification-status
+
+* **Description**: Retrieves the current verification status for the authenticated user.
+* **Auth Required**: Yes
+* **Success Response**:
+
+    ```json
+    {
+      "success": true,
+      "data": {
+        "email_verified": true,
+        "phone_verified": false,
+        "email": "user@example.com",
+        "phone": "+212600000000",
+        "unverified_method": "phone"
+      }
+    }
+    ```
+
+* **Notes**: The `unverified_method` field will be either `"email"`, `"phone"`, or `null` (if both are verified).
 
 ### POST /auth/request-family-otp
 

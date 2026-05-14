@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 
 /// Interface for authentication operations.
 abstract interface class AuthRepository {
@@ -27,7 +28,22 @@ abstract interface class AuthRepository {
   Future<Result<void, Failure>> sendOtp(String identifier);
 
   /// Verifies an OTP code for the given [identifier].
+  /// Returns true if verification was successful.
+  /// Checks full verification status and may transition to pending_additional_verification
+  /// if only one method (email or phone) is verified.
   Future<Result<bool, Failure>> verifyOtp(String identifier, String otp);
+
+  /// Verifies a user's email address via OTP.
+  /// Used when a user has initially verified by phone and needs email verification.
+  Future<Result<bool, Failure>> verifyEmail(String email, String otp);
+
+  /// Verifies a user's phone number via OTP.
+  /// Used when a user has initially verified by email and needs phone verification.
+  Future<Result<bool, Failure>> verifyPhone(String phone, String otp);
+
+  /// Retrieves the current verification status for the authenticated user.
+  /// Shows which methods (email/phone) have been verified.
+  Future<Result<VerificationStatus, Failure>> getVerificationStatus();
 
   /// Requests an OTP for enabling family account mode.
   Future<Result<void, Failure>> requestFamilyAccountOtp();

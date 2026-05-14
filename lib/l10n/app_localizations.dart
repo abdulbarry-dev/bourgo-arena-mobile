@@ -1591,6 +1591,90 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'ANNULER'**
   String get commonCancel;
+
+  /// No description provided for @authVerifyAdditionalMethodTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Complétez votre vérification'**
+  String get authVerifyAdditionalMethodTitle;
+
+  /// No description provided for @authVerifyAdditionalMethodMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour assurer la sécurité de votre compte, veuillez vérifier votre {method}.'**
+  String authVerifyAdditionalMethodMessage(Object method);
+
+  /// No description provided for @authVerifyNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'VÉRIFIER MAINTENANT'**
+  String get authVerifyNow;
+
+  /// No description provided for @authSkipForNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'PLUS TARD'**
+  String get authSkipForNow;
+
+  /// No description provided for @authEmailVerificationPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification email en attente'**
+  String get authEmailVerificationPending;
+
+  /// No description provided for @authPhoneVerificationPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification téléphone en attente'**
+  String get authPhoneVerificationPending;
+
+  /// No description provided for @authBothMethodsVerified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email et téléphone sont tous deux vérifiés'**
+  String get authBothMethodsVerified;
+
+  /// No description provided for @authOneMethodVerified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une méthode vérifiée, une en attente'**
+  String get authOneMethodVerified;
+
+  /// No description provided for @authVerifyPhoneTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier le numéro de téléphone'**
+  String get authVerifyPhoneTitle;
+
+  /// No description provided for @authVerifyPhoneSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous enverrons un code à 6 chiffres à votre téléphone {phone}.'**
+  String authVerifyPhoneSubtitle(Object phone);
+
+  /// No description provided for @authVerifyEmailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifier l\'adresse e-mail'**
+  String get authVerifyEmailTitle;
+
+  /// No description provided for @authVerifyEmailSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous enverrons un code à 6 chiffres à votre e-mail {email}.'**
+  String authVerifyEmailSubtitle(Object email);
+
+  /// No description provided for @authVerificationCompleteTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification terminée'**
+  String get authVerificationCompleteTitle;
+
+  /// No description provided for @authVerificationCompleteMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil.'**
+  String get authVerificationCompleteMessage;
 }
 
 class _AppLocalizationsDelegate
