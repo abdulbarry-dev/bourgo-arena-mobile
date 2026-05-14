@@ -64,14 +64,18 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 const BrandLogo(size: 32, isPremium: true),
                 const SizedBox(width: 12),
-                Text(
-                  AppLocalizations.of(context)!.appName.toUpperCase(),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontFamily: AppConstants.displayFontFamily,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 2.0,
-                    fontSize: 16,
-                    color: theme.colorScheme.primary,
+                Flexible(
+                  child: Text(
+                    AppLocalizations.of(context)!.appName.toUpperCase(),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontFamily: AppConstants.displayFontFamily,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 2.0,
+                      fontSize: 16,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
