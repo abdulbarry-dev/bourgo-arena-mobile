@@ -7,12 +7,29 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:checks/checks.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() {
+    const MethodChannel('dev.fluttercommunity.plus/package_info')
+        .setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'getAll') {
+        return <String, dynamic>{
+          'appName': 'Bourgo Arena',
+          'packageName': 'com.example.bourgo',
+          'version': '1.0.0',
+          'buildNumber': '1',
+          'buildSignature': '',
+        };
+      }
+      return null;
+    });
+  });
 
   group('Locator', () {
     setUp(() async {

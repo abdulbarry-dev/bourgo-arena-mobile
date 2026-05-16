@@ -121,7 +121,7 @@ void main() {
         onAdditionalVerificationNeeded: (method, email, phone) {},
       );
 
-      expect(viewModel.errorMessage, 'Invalid verification code');
+      expect(viewModel.errorMessage, 'authInvalidVerificationCode');
       expect(viewModel.isLoading, isFalse);
     });
 

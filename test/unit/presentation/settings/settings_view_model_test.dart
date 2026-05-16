@@ -11,9 +11,11 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class _MockGetThemeMode extends Mock implements GetThemeModeUseCase {}
 
@@ -38,9 +40,25 @@ class _MockSetNotificationsEnabled extends Mock
 class _MockDeviceTokenRegistrar extends Mock implements DeviceTokenRegistrar {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUpAll(() {
     registerFallbackValue(ThemeMode.system);
     registerFallbackValue(const Locale('en'));
+
+    const MethodChannel('dev.fluttercommunity.plus/package_info')
+        .setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'getAll') {
+        return <String, dynamic>{
+          'appName': 'Bourgo Arena',
+          'packageName': 'com.example.bourgo',
+          'version': '1.0.0',
+          'buildNumber': '1',
+          'buildSignature': '',
+        };
+      }
+      return null;
+    });
   });
 
   late SettingsViewModel viewModel;

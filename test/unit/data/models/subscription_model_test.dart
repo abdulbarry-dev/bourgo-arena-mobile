@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:bourgo_arena_mobile/data/models/subscription_model.dart';
 import 'package:checks/checks.dart';
 import 'package:test/test.dart';
@@ -17,7 +18,13 @@ void main() {
       );
 
       final json = model.toJson();
-      final fromJson = SubscriptionModel.fromJson(json);
+      // Ensure nested objects are actually maps, not instances, as fromJson expects Map<String, dynamic>
+      // json_serializable's toJson returns a map where nested lists might still contain objects
+      // depending on configuration. We force a re-encoding/decoding to simulate real JSON boundary.
+      final encoded = jsonEncode(json);
+      final decoded = jsonDecode(encoded) as Map<String, dynamic>;
+
+      final fromJson = SubscriptionModel.fromJson(decoded);
 
       check(fromJson.id).equals(model.id);
       check(fromJson.name).equals(model.name);

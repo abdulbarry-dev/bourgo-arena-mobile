@@ -43,6 +43,23 @@ class MockGetMemberTierUseCase extends Mock implements GetMemberTierUseCase {}
 class MockProjectPointsUseCase extends Mock implements ProjectPointsUseCase {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(
+      const Reservation(
+        id: 'fake',
+        activityId: 'fake',
+        activityTitle: 'fake',
+        date: 'fake',
+        time: 'fake',
+        duration: 'fake',
+        price: 0,
+        status: 'fake',
+        paymentStatus: 'fake',
+        qrCode: 'fake',
+      ),
+    );
+  });
+
   late BookingViewModel viewModel;
   late MockGetActivitiesUseCase mockGetActivitiesUseCase;
   late MockGetTimeSlotsUseCase mockGetTimeSlotsUseCase;

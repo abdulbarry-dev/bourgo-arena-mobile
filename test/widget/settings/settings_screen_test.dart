@@ -16,6 +16,7 @@ void main() {
     when(() => mockViewModel.locale).thenReturn(const Locale('en'));
     when(() => mockViewModel.notificationsEnabled).thenReturn(true);
     when(() => mockViewModel.isLanguageSelected).thenReturn(false);
+    when(() => mockViewModel.appVersion).thenReturn('1.0.0 (1)');
 
     // Stub addListener/removeListener because it's a ChangeNotifier
     when(() => mockViewModel.addListener(any())).thenReturn(null);
