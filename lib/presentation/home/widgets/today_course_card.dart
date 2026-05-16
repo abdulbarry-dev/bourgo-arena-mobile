@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -12,6 +13,7 @@ class TodayCourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       onTap: onTap,
@@ -106,7 +108,9 @@ class TodayCourseCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                course.isFull ? 'FULL' : '${course.remainingSpots} LEFT',
+                course.isFull
+                    ? l10n.courseFull
+                    : l10n.courseRemaining(course.remainingSpots.toString()),
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: course.isFull

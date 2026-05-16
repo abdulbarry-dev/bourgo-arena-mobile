@@ -160,7 +160,7 @@ class SettingsScreen extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<String>(
-              title: const Text('English'),
+              title: Text(l10n.languageEnglish),
               value: 'en',
               // ignore: deprecated_member_use
               groupValue: viewModel.locale.languageCode,
@@ -173,7 +173,7 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             RadioListTile<String>(
-              title: const Text('Français'),
+              title: Text(l10n.languageFrench),
               value: 'fr',
               // ignore: deprecated_member_use
               groupValue: viewModel.locale.languageCode,

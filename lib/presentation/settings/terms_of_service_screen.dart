@@ -18,7 +18,7 @@ class TermsOfServiceScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Last Updated: May 2026',
+              l10n.legalLastUpdated,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -26,34 +26,28 @@ class TermsOfServiceScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             _Section(
-              title: '1. Acceptance of Terms',
-              content:
-                  'By accessing or using Bourgo Arena services, you agree to be bound by these terms. If you do not agree, please do not use the application.',
+              title: l10n.termsSection1Title,
+              content: l10n.termsSection1Content,
             ),
             _Section(
-              title: '2. Description of Service',
-              content:
-                  'Bourgo Arena provides a platform for booking sports facilities, managing gym memberships, and participating in scheduled fitness classes in Djerba, Tunisia.',
+              title: l10n.termsSection2Title,
+              content: l10n.termsSection2Content,
             ),
             _Section(
-              title: '3. User Responsibilities',
-              content:
-                  'Users are responsible for maintaining the confidentiality of their accounts and for all activities that occur under their credentials. You agree to follow gym rules and respect other members.',
+              title: l10n.termsSection3Title,
+              content: l10n.termsSection3Content,
             ),
             _Section(
-              title: '4. Bookings and Payments',
-              content:
-                  'All bookings are subject to availability. Payments made through the app are processed securely. Cancellations must be made according to our cancellation policy to be eligible for refunds.',
+              title: l10n.termsSection4Title,
+              content: l10n.termsSection4Content,
             ),
             _Section(
-              title: '5. Limitation of Liability',
-              content:
-                  'Bourgo Arena is not liable for any personal injury or property damage sustained while using the facilities, except where caused by our gross negligence.',
+              title: l10n.termsSection5Title,
+              content: l10n.termsSection5Content,
             ),
             _Section(
-              title: '6. Changes to Terms',
-              content:
-                  'We reserve the right to modify these terms at any time. Your continued use of the app after such changes constitutes acceptance of the new terms.',
+              title: l10n.termsSection6Title,
+              content: l10n.termsSection6Content,
             ),
             const SizedBox(height: 40),
           ],

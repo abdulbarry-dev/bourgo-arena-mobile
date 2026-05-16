@@ -51,7 +51,13 @@ class NotFoundScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 48),
                 FilledButton.icon(
-                  onPressed: () => context.go('/home'),
+                  onPressed: () {
+                    try {
+                      GoRouter.of(context).go('/home');
+                    } catch (_) {
+                      GoRouter.of(context).go('/');
+                    }
+                  },
                   icon: const Icon(Symbols.home, size: 20),
                   label: Text(l10n.errorNotFoundAction),
                   style: FilledButton.styleFrom(
