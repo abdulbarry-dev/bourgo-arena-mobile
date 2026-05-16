@@ -243,7 +243,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('JOHN DOE'), findsOneWidget);
-      expect(find.text('Gold'), findsOneWidget);
+      expect(find.text('GOLD'), findsOneWidget);
       expect(find.text('100'), findsOneWidget); // Points
       expect(find.text('42'), findsOneWidget); // Check-ins
     });

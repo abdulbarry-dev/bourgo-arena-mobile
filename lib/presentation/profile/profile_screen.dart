@@ -4,6 +4,8 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/loyalty/widgets/tier_badge.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
@@ -46,11 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         final user = _viewModel.user;
         if (user == null) {
-          return Scaffold(
-            body: Center(
-              child: Text(l10n?.commonLoadingError ?? 'Loading error'),
-            ),
-          );
+          return Scaffold(body: Center(child: Text(l10n!.commonLoadingError)));
         }
 
         return Scaffold(
@@ -93,6 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildAppBar(BuildContext context, User user) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SliverAppBar(
       expandedHeight: 280,
@@ -143,23 +142,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    user.subscriptionLevel ?? 'Standard',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
+                TierBadge(
+                  tierName: user.subscriptionLevel ?? l10n.profileStandardTier,
                 ),
               ],
             ),
@@ -191,14 +175,25 @@ class _StatsRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _StatItem(
-            label: AppLocalizations.of(context)?.profilePoints ?? 'Points',
-            value: user.loyaltyPoints.toString(),
-            icon: Symbols.stars,
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoyaltyDashboardScreen(),
+                ),
+              );
+            },
+            child: _StatItem(
+              label: AppLocalizations.of(context)!.profilePoints,
+              value: user.loyaltyPoints.toString(),
+              icon: Symbols.stars,
+            ),
           ),
+
           Container(width: 1, height: 40, color: theme.colorScheme.outline),
           _StatItem(
-            label: AppLocalizations.of(context)?.profileCheckins ?? 'Check-ins',
+            label: AppLocalizations.of(context)!.profileCheckins,
             value: user.totalCheckIns.toString(),
             icon: Symbols.qr_code_scanner,
           ),
@@ -263,29 +258,25 @@ class _ProfileMenu extends StatelessWidget {
       children: [
         _MenuItem(
           icon: Symbols.card_membership,
-          label:
-              AppLocalizations.of(context)?.profileMySubscription ??
-              'My subscription',
+          label: AppLocalizations.of(context)!.profileMySubscription,
           onTap: onTapAbonnement,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.history,
-          label: AppLocalizations.of(context)?.profileHistory ?? 'History',
+          label: AppLocalizations.of(context)!.profileHistory,
           onTap: onTapHistorique,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.notifications,
-          label:
-              AppLocalizations.of(context)?.profileNotifications ??
-              'Notifications',
+          label: AppLocalizations.of(context)!.profileNotifications,
           onTap: onTapNotifications,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.settings,
-          label: AppLocalizations.of(context)?.profileSettings ?? 'Settings',
+          label: AppLocalizations.of(context)!.profileSettings,
           onTap: onTapSettings,
         ),
       ],

@@ -38,7 +38,7 @@ class SubscriptionViewModel extends ChangeNotifier {
         },
       );
     } catch (e, stackTrace) {
-      _errorMessage = 'An unexpected error occurred';
+      _errorMessage = null;
       developer.log(
         'Error loading subscription',
         error: e,

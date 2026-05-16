@@ -64,7 +64,7 @@ class ProfileViewModel extends ChangeNotifier {
         },
       );
     } catch (e, stackTrace) {
-      _errorMessage = 'An unexpected error occurred';
+      _errorMessage = null;
       developer.log('Error loading profile', error: e, stackTrace: stackTrace);
     } finally {
       _isLoading = false;

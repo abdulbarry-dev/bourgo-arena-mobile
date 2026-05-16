@@ -34,7 +34,7 @@ class AccessHistoryViewModel extends ChangeNotifier {
         },
       );
     } catch (e, stackTrace) {
-      _error = 'Failed to load access history';
+      _error = null;
       developer.log(
         'Unexpected error loading access history',
         error: e,

@@ -138,8 +138,8 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
             ),
             const SizedBox(height: 24),
             AuthTextField(
-              label: 'OTP CODE',
-              hint: '000000',
+              label: l10n.profileOtpCodeLabel,
+              hint: l10n.profileOtpCodeHint,
               leadingIcon: Symbols.lock,
               controller: otpController,
               keyboardType: TextInputType.number,

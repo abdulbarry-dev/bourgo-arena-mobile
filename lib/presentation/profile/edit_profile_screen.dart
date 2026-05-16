@@ -108,8 +108,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           context.pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error updating profile'),
+            SnackBar(
+              content: Text(AppLocalizations.of(context)!.errorUpdatingProfile),
               backgroundColor: Colors.red,
             ),
           );
@@ -153,7 +153,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Expanded(
                         child: AuthTextField(
                           label: l10n.authFirstNameLabel,
-                          hint: 'First name',
+                          hint: l10n.authFirstNameHint,
                           leadingIcon: Symbols.person,
                           controller: _firstNameController,
                         ),
@@ -162,7 +162,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Expanded(
                         child: AuthTextField(
                           label: l10n.authLastNameLabel,
-                          hint: 'Last name',
+                          hint: l10n.authLastNameHint,
                           leadingIcon: Symbols.person,
                           controller: _lastNameController,
                         ),
@@ -172,7 +172,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 20),
                   AuthTextField(
                     label: l10n.authEmailLabel,
-                    hint: 'email@example.com',
+                    hint: l10n.authEmailLabelHint,
                     leadingIcon: Symbols.mail,
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -180,7 +180,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 20),
                   AuthTextField(
                     label: l10n.authPhoneLabel,
-                    hint: '+1 234 567 8900',
+                    hint: l10n.authPhoneHint,
                     leadingIcon: Symbols.phone,
                     controller: _phoneController,
                     keyboardType: TextInputType.phone,
@@ -188,7 +188,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 20),
                   AuthTextField(
                     label: l10n.authBirthDateLabel,
-                    hint: 'Select birth date',
+                    hint: l10n.authBirthDateHint,
                     leadingIcon: Symbols.calendar_today,
                     controller: _birthDateController,
                     readOnly: true,

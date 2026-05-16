@@ -9,7 +9,9 @@ class SubscriptionMapper {
       id: model.id,
       name: model.name,
       price: model.price,
-      benefits: model.benefits,
+      benefits: model.benefits
+          .map((b) => Benefit(label: b.label, icon: b.icon))
+          .toList(),
       durationMonths: model.durationMonths,
     );
   }
@@ -20,7 +22,9 @@ class SubscriptionMapper {
       id: entity.id,
       name: entity.name,
       price: entity.price,
-      benefits: entity.benefits,
+      benefits: entity.benefits
+          .map((b) => BenefitModel(label: b.label, icon: b.icon))
+          .toList(),
       durationMonths: entity.durationMonths,
     );
   }

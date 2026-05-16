@@ -216,7 +216,8 @@ class _AccessMethodTile extends StatelessWidget {
               ],
             ),
           ),
-          if (!isSet) TextButton(onPressed: () {}, child: const Text('SET UP')),
+          if (!isSet)
+            TextButton(onPressed: () {}, child: Text(l10n.commonSetUp)),
           if (isSet)
             Icon(
               Symbols.check_circle,

@@ -1,8 +1,8 @@
-import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/subscription_management_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -64,7 +64,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ..._buildBenefits(subscription, l10n),
                 const SizedBox(height: 40),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SubscriptionManagementScreen(
+                          currentSubscription: subscription,
+                        ),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 56),
                   ),
@@ -84,9 +93,19 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   ) {
     final benefits = subscription?.benefits;
     if (benefits != null && benefits.isNotEmpty) {
-      return benefits.map((benefit) => _BenefitItem(text: benefit)).toList();
+      return benefits
+          .map(
+            (benefit) => _BenefitItem(
+              text: benefit.label,
+              icon: benefit.icon != null
+                  ? Icons.check_circle
+                  : Icons.check_circle,
+            ),
+          )
+          .toList();
     }
 
+    // Fallback static benefits if no data
     return [
       _BenefitItem(text: l10n.profileBenefit1),
       _BenefitItem(text: l10n.profileBenefit2),
@@ -136,13 +155,13 @@ class _ActivePlanCard extends StatelessWidget {
               Text(
                 subscription?.name ?? fallbackPlanLabel,
                 style: theme.textTheme.headlineMedium?.copyWith(
-                  fontFamily: AppConstants.displayFontFamily,
+                  fontWeight: FontWeight.bold,
                   color: theme.colorScheme.primary,
                 ),
               ),
               Icon(
                 Symbols.verified,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                color: theme.colorScheme.primary,
                 size: 40,
               ),
             ],
@@ -157,35 +176,11 @@ class _ActivePlanCard extends StatelessWidget {
           ),
           Text(
             subscription?.durationMonths != null
-                ? '${subscription!.durationMonths} months'
+                ? '${subscription!.durationMonths} ${AppLocalizations.of(context)!.months}'
                 : '...',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),
-          ),
-          const SizedBox(height: 24),
-          LinearProgressIndicator(
-            value: 0.7,
-            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(2),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.profileMonthlyUsage,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              Text(
-                '70%',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -195,8 +190,9 @@ class _ActivePlanCard extends StatelessWidget {
 
 class _BenefitItem extends StatelessWidget {
   final String text;
+  final IconData icon;
 
-  const _BenefitItem({required this.text});
+  const _BenefitItem({required this.text, this.icon = Icons.check_circle});
 
   @override
   Widget build(BuildContext context) {
@@ -206,11 +202,7 @@ class _BenefitItem extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(
-            Symbols.check_circle,
-            color: theme.colorScheme.primary,
-            size: 20,
-          ),
+          Icon(icon, color: theme.colorScheme.primary, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
