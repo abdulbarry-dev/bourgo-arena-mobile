@@ -28,12 +28,15 @@ class LoyaltyDashboardViewModel extends ChangeNotifier {
 
   /// The user's current loyalty tier.
   MemberTier get currentTier {
-    if (currentPoints >= LoyaltyConstants.platinumThreshold)
+    if (currentPoints >= LoyaltyConstants.platinumThreshold) {
       return MemberTier.ultra;
-    if (currentPoints >= LoyaltyConstants.goldThreshold)
+    }
+    if (currentPoints >= LoyaltyConstants.goldThreshold) {
       return MemberTier.standard;
+    }
     return MemberTier.public;
   }
+
 
   /// The points required for the next tier.
   int get pointsToNextTier {
@@ -46,11 +49,15 @@ class LoyaltyDashboardViewModel extends ChangeNotifier {
 
   /// The next tier.
   MemberTier? get nextTier {
-    if (currentPoints >= LoyaltyConstants.platinumThreshold) return null;
-    if (currentPoints >= LoyaltyConstants.goldThreshold)
+    if (currentPoints >= LoyaltyConstants.platinumThreshold) {
+      return null;
+    }
+    if (currentPoints >= LoyaltyConstants.goldThreshold) {
       return MemberTier.ultra;
+    }
     return MemberTier.standard;
   }
+
 
   /// Progress percentage towards the next tier (0.0 to 1.0).
   double get progressToNextTier {

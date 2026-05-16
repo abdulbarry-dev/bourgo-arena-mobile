@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:checks/checks.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockForgotPasswordUseCase extends Mock implements ForgotPasswordUseCase {}
 
@@ -88,9 +89,11 @@ void main() {
 
     testWidgets('sendCode shows snackbar on failure', (tester) async {
       viewModel.identifierController.text = 'test@example.com';
-      when(
-        () => mockForgotPasswordUseCase(any()),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('error')));
+      when(() => mockForgotPasswordUseCase(any())).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'error'),
+        ),
+      );
 
       final router = GoRouter(
         initialLocation: '/',

@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
 
@@ -36,7 +37,7 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = NotFoundFailure('profile missing');
+      const failure = NotFoundFailure(AppErrorCode.notFound, 'profile missing');
 
       when(
         () => repository.getUserProfile(),

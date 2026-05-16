@@ -19,6 +19,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
@@ -251,7 +252,9 @@ void main() {
     testWidgets('shows error message when fetch fails', (tester) async {
       when(() => mockAuthStateNotifier.currentUser).thenReturn(null);
       when(() => mockAuthRepository.getUserProfile()).thenAnswer(
-        (_) async => Result.failure(const ServerFailure('Failed to load')),
+        (_) async => Result.failure(
+          const ServerFailure(AppErrorCode.serverError, 'Failed to load'),
+        ),
       );
 
       await tester.pumpWidget(createWidget());

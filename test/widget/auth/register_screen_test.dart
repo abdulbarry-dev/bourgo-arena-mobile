@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockRegisterUseCase extends Mock implements RegisterUseCase {}
 
@@ -140,7 +141,9 @@ void main() {
           isFamilyAccount: any(named: 'isFamilyAccount'),
         ),
       ).thenAnswer(
-        (_) async => FailureResult(AuthFailure('Email already exists')),
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Email already exists'),
+        ),
       );
 
       await tester.pumpWidget(createWidgetUnderTest());

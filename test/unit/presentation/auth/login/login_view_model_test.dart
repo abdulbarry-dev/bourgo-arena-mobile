@@ -11,6 +11,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
 
 import '../../../data/repositories/repository_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockLoginUseCase extends Mock implements LoginUseCase {}
 
@@ -174,9 +175,10 @@ void main() {
   });
 
   testWidgets('shows SnackBar with failure message on failure', (tester) async {
-    when(
-      () => mockLoginUseCase(any(), any()),
-    ).thenAnswer((_) async => FailureResult(AuthFailure('bad')));
+    when(() => mockLoginUseCase(any(), any())).thenAnswer(
+      (_) async =>
+          FailureResult(AuthFailure(AppErrorCode.invalidCredentials, 'bad')),
+    );
 
     viewModel.identifierController.text = 'alex@example.com';
     viewModel.passwordController.text = 'wrong';
@@ -235,7 +237,9 @@ void main() {
 
     check(viewModel.isLoading).isTrue();
 
-    completer.complete(FailureResult(AuthFailure('failed')));
+    completer.complete(
+      FailureResult(AuthFailure(AppErrorCode.invalidCredentials, 'failed')),
+    );
     await loginFuture;
 
     check(viewModel.isLoading).isFalse();

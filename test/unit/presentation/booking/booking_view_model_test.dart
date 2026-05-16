@@ -16,6 +16,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_ca
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 
@@ -115,9 +116,11 @@ void main() {
     when(
       () => mockGetFamilyMembersUseCase(),
     ).thenAnswer((_) async => Result.success([]));
-    when(
-      () => mockGetUserProfileUseCase(),
-    ).thenAnswer((_) async => Result.failure(const ServerFailure('error')));
+    when(() => mockGetUserProfileUseCase()).thenAnswer(
+      (_) async => Result.failure(
+        const ServerFailure(AppErrorCode.serverError, 'error'),
+      ),
+    );
   });
 
   BookingViewModel createViewModel({Activity? initialActivity}) {

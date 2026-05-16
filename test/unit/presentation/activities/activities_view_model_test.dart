@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import '../../data/repositories/repository_test_fixtures.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
@@ -57,7 +58,10 @@ void main() {
     test('loadData handles partial failure (activities)', () async {
       when(
         () => mockGetActivitiesUseCase(),
-      ).thenAnswer((_) async => FailureResult(Failure.server('fail')));
+      ).thenAnswer(
+        (_) async =>
+            FailureResult(Failure.server(AppErrorCode.serverError, 'fail')),
+      );
       when(
         () => mockGetUserBookingsUseCase(),
       ).thenAnswer((_) async => Success([]));
@@ -73,7 +77,10 @@ void main() {
       ).thenAnswer((_) async => Success([]));
       when(
         () => mockGetUserBookingsUseCase(),
-      ).thenAnswer((_) async => FailureResult(Failure.server('fail')));
+      ).thenAnswer(
+        (_) async =>
+            FailureResult(Failure.server(AppErrorCode.serverError, 'fail')),
+      );
 
       await viewModel.loadData();
 

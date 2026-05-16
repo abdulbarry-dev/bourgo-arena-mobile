@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockReservationRepository extends Mock implements ReservationRepository {}
 
@@ -39,7 +40,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ServerFailure('bookings unavailable');
+      const failure = ServerFailure(
+        AppErrorCode.serverError,
+        'bookings unavailable',
+      );
 
       when(() => repository.getReservations()).thenAnswer(
         (_) async => const FailureResult<List<Reservation>, Failure>(failure),

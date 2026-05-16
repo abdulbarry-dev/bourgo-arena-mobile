@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../unit/data/repositories/repository_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockLoginUseCase extends Mock implements LoginUseCase {}
 
@@ -113,9 +114,10 @@ void main() {
 
   testWidgets('shows SnackBar on failure', (tester) async {
     await setupScreenSize(tester);
-    when(
-      () => mockLoginUseCase(any(), any()),
-    ).thenAnswer((_) async => FailureResult(AuthFailure('bad')));
+    when(() => mockLoginUseCase(any(), any())).thenAnswer(
+      (_) async =>
+          FailureResult(AuthFailure(AppErrorCode.invalidCredentials, 'bad')),
+    );
 
     await tester.pumpWidget(
       MaterialApp(

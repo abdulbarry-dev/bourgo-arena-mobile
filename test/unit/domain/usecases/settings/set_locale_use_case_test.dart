@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_
 import 'package:flutter/material.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
@@ -37,7 +38,10 @@ void main() {
 
     test('propagates repository failures unchanged', () async {
       const locale = Locale('en', 'US');
-      const failure = ValidationFailure('locale rejected');
+      const failure = ValidationFailure(
+        AppErrorCode.validationFailed,
+        'locale rejected',
+      );
 
       when(
         () => repository.setLocale(locale),
@@ -81,7 +85,10 @@ void main() {
 
     test('propagates repository failures unchanged', () async {
       const mode = ThemeMode.light;
-      const failure = ValidationFailure('mode rejected');
+      const failure = ValidationFailure(
+        AppErrorCode.validationFailed,
+        'mode rejected',
+      );
 
       when(
         () => repository.setThemeMode(mode),

@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 /// Local implementation of [SessionRepository] using [SharedPreferences].
 ///
@@ -66,7 +67,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(token);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to retrieve auth token: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to retrieve auth token: ${e.toString()}',
+        ),
       );
     }
   }
@@ -78,7 +82,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save auth token: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save auth token: ${e.toString()}',
+        ),
       );
     }
   }
@@ -90,7 +97,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(state);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to retrieve auth state: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to retrieve auth state: ${e.toString()}',
+        ),
       );
     }
   }
@@ -102,7 +112,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save auth state: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save auth state: ${e.toString()}',
+        ),
       );
     }
   }
@@ -115,6 +128,7 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure(
+          AppErrorCode.cacheError,
           'Failed to retrieve pending verification email: ${e.toString()}',
         ),
       );
@@ -131,6 +145,7 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure(
+          AppErrorCode.cacheError,
           'Failed to save pending verification email: ${e.toString()}',
         ),
       );
@@ -146,7 +161,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to clear session: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to clear session: ${e.toString()}',
+        ),
       );
     }
   }
@@ -166,7 +184,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(mode);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to load theme mode: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load theme mode: ${e.toString()}',
+        ),
       );
     }
   }
@@ -178,7 +199,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save theme mode: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save theme mode: ${e.toString()}',
+        ),
       );
     }
   }
@@ -193,7 +217,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(Locale(localeCode));
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to load locale: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load locale: ${e.toString()}',
+        ),
       );
     }
   }
@@ -205,7 +232,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save locale: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save locale: ${e.toString()}',
+        ),
       );
     }
   }
@@ -217,7 +247,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to complete language selection: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to complete language selection: ${e.toString()}',
+        ),
       );
     }
   }
@@ -232,7 +265,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(isSelected);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to check language selection: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to check language selection: ${e.toString()}',
+        ),
       );
     }
   }
@@ -244,7 +280,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(completed);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to check onboarding completion: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to check onboarding completion: ${e.toString()}',
+        ),
       );
     }
   }
@@ -256,7 +295,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save onboarding completion: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save onboarding completion: ${e.toString()}',
+        ),
       );
     }
   }
@@ -270,7 +312,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(enabled);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to load notification settings: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load notification settings: ${e.toString()}',
+        ),
       );
     }
   }
@@ -282,7 +327,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save notification settings: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save notification settings: ${e.toString()}',
+        ),
       );
     }
   }
@@ -296,7 +344,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(token);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to retrieve device token: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to retrieve device token: ${e.toString()}',
+        ),
       );
     }
   }
@@ -308,7 +359,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save device token: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save device token: ${e.toString()}',
+        ),
       );
     }
   }
@@ -320,7 +374,10 @@ class LocalSessionRepository implements SessionRepository {
       return Success(platform);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to retrieve device platform: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to retrieve device platform: ${e.toString()}',
+        ),
       );
     }
   }
@@ -332,7 +389,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save device platform: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save device platform: ${e.toString()}',
+        ),
       );
     }
   }
@@ -347,6 +407,7 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure(
+          AppErrorCode.cacheError,
           'Failed to retrieve remembered identifier: ${e.toString()}',
         ),
       );
@@ -362,7 +423,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to save remembered identifier: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save remembered identifier: ${e.toString()}',
+        ),
       );
     }
   }
@@ -374,7 +438,10 @@ class LocalSessionRepository implements SessionRepository {
       return const Success(null);
     } catch (e) {
       return FailureResult(
-        CacheFailure('Failed to clear remembered identifier: ${e.toString()}'),
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to clear remembered identifier: ${e.toString()}',
+        ),
       );
     }
   }
@@ -389,6 +456,7 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure(
+          AppErrorCode.cacheError,
           'Failed to check login OTP skip preference: ${e.toString()}',
         ),
       );
@@ -403,6 +471,7 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure(
+          AppErrorCode.cacheError,
           'Failed to save login OTP skip preference: ${e.toString()}',
         ),
       );

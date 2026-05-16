@@ -13,6 +13,7 @@ import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_vi
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class _MockGetThemeMode extends Mock implements GetThemeModeUseCase {}
 
@@ -126,18 +127,22 @@ void main() {
     });
 
     test('initialize handles failures and keeps defaults', () async {
-      when(
-        () => mockGetTheme(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(
-        () => mockGetLocale(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(
-        () => mockGetNotif(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(
-        () => mockIsLangSelected(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
+      when(() => mockGetTheme()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
+      when(() => mockGetLocale()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
+      when(() => mockGetNotif()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
+      when(() => mockIsLangSelected()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
 
       var notifyCount = 0;
       viewModel.addListener(() => notifyCount += 1);

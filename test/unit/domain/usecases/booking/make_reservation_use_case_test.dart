@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockReservationRepository extends Mock implements ReservationRepository {}
 
@@ -37,7 +38,10 @@ void main() {
 
     test('propagates repository failures unchanged', () async {
       final reservation = testReservation();
-      const failure = ValidationFailure('reservation invalid');
+      const failure = ValidationFailure(
+        AppErrorCode.validationFailed,
+        'reservation invalid',
+      );
 
       when(() => repository.makeReservation(reservation)).thenAnswer(
         (_) async => const FailureResult<Reservation, Failure>(failure),

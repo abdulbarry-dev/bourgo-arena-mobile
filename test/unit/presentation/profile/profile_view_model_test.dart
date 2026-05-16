@@ -11,6 +11,7 @@ import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -97,7 +98,9 @@ void main() {
       );
 
       when(() => mockAuthRepository.getUserProfile()).thenAnswer(
-        (_) async => Result.failure(const ServerFailure('Server error')),
+        (_) async => Result.failure(
+          const ServerFailure(AppErrorCode.serverError, 'Server error'),
+        ),
       );
 
       await viewModel.loadProfile();

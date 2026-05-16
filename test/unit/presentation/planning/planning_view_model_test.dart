@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.da
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockGetCoursesUseCase extends Mock implements GetCoursesUseCase {}
 
@@ -46,9 +47,11 @@ void main() {
     when(
       () => mockGetFamilyMembers.call(),
     ).thenAnswer((_) async => Result.success([]));
-    when(
-      () => mockGetUserProfile.call(),
-    ).thenAnswer((_) async => Result.failure(const ServerFailure('error')));
+    when(() => mockGetUserProfile.call()).thenAnswer(
+      (_) async => Result.failure(
+        const ServerFailure(AppErrorCode.serverError, 'error'),
+      ),
+    );
 
     viewModel = PlanningViewModel(
       getCoursesUseCase: mockGetCourses,

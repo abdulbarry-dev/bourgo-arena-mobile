@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/widgets/tier_badge.dart';

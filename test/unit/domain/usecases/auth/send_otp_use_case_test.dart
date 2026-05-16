@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -30,7 +31,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ServerFailure('otp unavailable');
+      const failure = ServerFailure(
+        AppErrorCode.serverError,
+        'otp unavailable',
+      );
 
       when(
         () => repository.sendOtp('alex@example.com'),

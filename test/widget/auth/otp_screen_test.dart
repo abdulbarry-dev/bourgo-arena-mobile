@@ -11,6 +11,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockVerifyOtpUseCase extends Mock implements VerifyOtpUseCase {}
 
@@ -133,9 +134,11 @@ void main() {
 
     testWidgets('shows error message on failure', (tester) async {
       await setupScreenSize(tester);
-      when(
-        () => mockVerifyOtpUseCase(any(), any()),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('Invalid code')));
+      when(() => mockVerifyOtpUseCase(any(), any())).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Invalid code'),
+        ),
+      );
 
       await tester.pumpWidget(
         createWidgetUnderTest(destination: 'test@example.com'),

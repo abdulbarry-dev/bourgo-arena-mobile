@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -38,7 +39,10 @@ void main() {
     test('propagates repository failures unchanged', () async {
       final user = testUser();
       const pin = '1234';
-      const failure = AuthFailure('registration completion failed');
+      const failure = AuthFailure(
+        AppErrorCode.invalidCredentials,
+        'registration completion failed',
+      );
 
       when(
         () => repository.completeRegistration(user, pin),

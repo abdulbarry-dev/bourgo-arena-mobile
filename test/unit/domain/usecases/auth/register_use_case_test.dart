@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -61,7 +62,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ValidationFailure('invalid registration data');
+      const failure = ValidationFailure(
+        AppErrorCode.validationFailed,
+        'invalid registration data',
+      );
 
       when(
         () => repository.register(

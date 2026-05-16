@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/presentation/notifications/notifications_vie
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class _MockGetNotificationsUseCase extends Mock
     implements GetNotificationsUseCase {}
@@ -61,7 +62,9 @@ void main() {
       'loadNotifications keeps list null and stops loading on failure',
       () async {
         when(() => mockGetNotifications()).thenAnswer(
-          (_) async => FailureResult(const ServerFailure('Network error')),
+          (_) async => FailureResult(
+            const ServerFailure(AppErrorCode.serverError, 'Network error'),
+          ),
         );
 
         final viewModel = NotificationsViewModel(
@@ -91,9 +94,11 @@ void main() {
       check(allRead).isTrue();
     });
     test('markAllAsRead does nothing if notifications are null', () async {
-      when(
-        () => mockGetNotifications(),
-      ).thenAnswer((_) async => FailureResult(const ServerFailure('Error')));
+      when(() => mockGetNotifications()).thenAnswer(
+        (_) async => FailureResult(
+          const ServerFailure(AppErrorCode.serverError, 'Error'),
+        ),
+      );
 
       final viewModel = NotificationsViewModel(
         getNotificationsUseCase: mockGetNotifications,

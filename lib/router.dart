@@ -26,6 +26,7 @@ import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/search/search_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/privacy_policy_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';

@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/update_password_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -41,7 +42,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ValidationFailure('password too weak');
+      const failure = ValidationFailure(
+        AppErrorCode.validationFailed,
+        'password too weak',
+      );
 
       when(
         () => repository.updatePassword(

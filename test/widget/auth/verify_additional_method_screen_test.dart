@@ -15,6 +15,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
 
@@ -394,7 +395,9 @@ void main() {
 
     testWidgets('handles OTP send failure gracefully', (tester) async {
       when(() => mockSendOtpUseCase(any())).thenAnswer(
-        (_) async => FailureResult(ServerFailure('Failed to send OTP')),
+        (_) async => FailureResult(
+          ServerFailure(AppErrorCode.serverError, 'Failed to send OTP'),
+        ),
       );
 
       await setupScreenSize(tester);

@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_access_history_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockUserRepository extends Mock implements UserRepository {}
 
@@ -43,7 +44,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ServerFailure('access history unavailable');
+      const failure = ServerFailure(
+        AppErrorCode.serverError,
+        'access history unavailable',
+      );
 
       when(() => repository.getAccessHistory()).thenAnswer(
         (_) async =>

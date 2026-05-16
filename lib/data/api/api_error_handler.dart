@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'dart:developer' as developer;
 
@@ -10,17 +11,26 @@ Future<Result<T, Failure>> executeApiCall<T>(
   try {
     return await call();
   } on AuthException catch (e) {
-    return FailureResult(AuthFailure(e.message, e.state, e.token));
+    return FailureResult(
+      AuthFailure(AppErrorCode.invalidCredentials, e.message, e.state, e.token),
+    );
   } on NetworkException catch (e) {
-    return FailureResult(NetworkFailure(e.message));
+    return FailureResult(NetworkFailure(AppErrorCode.networkUnavailable, e.message));
   } on ValidationException catch (e) {
-    return FailureResult(ValidationFailure(e.message, e.state, e.token));
+    return FailureResult(
+      ValidationFailure(AppErrorCode.validationFailed, e.message, e.state, e.token),
+    );
   } on NotFoundException catch (e) {
-    return FailureResult(NotFoundFailure(e.message, e.state, e.token));
+    return FailureResult(
+      NotFoundFailure(AppErrorCode.notFound, e.message, e.state, e.token),
+    );
   } on ServerException catch (e) {
-    return FailureResult(ServerFailure(e.message, e.state, e.token));
+    return FailureResult(
+      ServerFailure(AppErrorCode.serverError, e.message, e.state, e.token),
+    );
   } catch (e, stack) {
     developer.log('Unexpected API error', error: e, stackTrace: stack);
-    return FailureResult(ServerFailure(e.toString()));
+    return FailureResult(ServerFailure(AppErrorCode.serverError, e.toString()));
   }
 }
+

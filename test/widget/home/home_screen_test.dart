@@ -17,6 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../unit/data/repositories/repository_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockGetActivities extends Mock implements GetActivitiesUseCase {}
 
@@ -79,12 +80,15 @@ void main() {
   testWidgets('when use cases return failure, empty lists are shown', (
     tester,
   ) async {
-    when(
-      () => mockActivities(),
-    ).thenAnswer((_) async => FailureResult(NetworkFailure('offline')));
-    when(
-      () => mockCourses(),
-    ).thenAnswer((_) async => FailureResult(ServerFailure('error')));
+    when(() => mockActivities()).thenAnswer(
+      (_) async => FailureResult(
+        NetworkFailure(AppErrorCode.networkUnavailable, 'offline'),
+      ),
+    );
+    when(() => mockCourses()).thenAnswer(
+      (_) async =>
+          FailureResult(ServerFailure(AppErrorCode.serverError, 'error')),
+    );
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(milliseconds: 500));

@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 void main() {
   test('Success holds value and fold/when call success branch', () {
@@ -16,7 +17,7 @@ void main() {
   });
 
   test('FailureResult holds failure and fold/when call failure branch', () {
-    final ex = ServerFailure('err');
+    final ex = ServerFailure(AppErrorCode.serverError, 'err');
     final r = Result<int, Failure>.failure(ex);
     expect(r.isSuccess, isFalse);
     expect(r.isFailure, isTrue);

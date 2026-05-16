@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class _MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 
@@ -107,12 +108,16 @@ void main() {
     );
 
     test('loadHomeData failure handles errors gracefully', () async {
-      when(
-        () => mockGetActivities(),
-      ).thenAnswer((_) async => Result.failure(const ServerFailure('Error')));
-      when(
-        () => mockGetCourses(),
-      ).thenAnswer((_) async => Result.failure(const ServerFailure('Error')));
+      when(() => mockGetActivities()).thenAnswer(
+        (_) async => Result.failure(
+          const ServerFailure(AppErrorCode.serverError, 'Error'),
+        ),
+      );
+      when(() => mockGetCourses()).thenAnswer(
+        (_) async => Result.failure(
+          const ServerFailure(AppErrorCode.serverError, 'Error'),
+        ),
+      );
 
       await viewModel.loadHomeData();
 

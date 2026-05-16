@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockNotificationRepository extends Mock
     implements NotificationRepository {}
@@ -40,7 +41,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ServerFailure('notifications unavailable');
+      const failure = ServerFailure(
+        AppErrorCode.serverError,
+        'notifications unavailable',
+      );
 
       when(() => repository.getNotifications()).thenAnswer(
         (_) async => const FailureResult<List<Notification>, Failure>(failure),

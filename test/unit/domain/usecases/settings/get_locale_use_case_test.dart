@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/get_theme_mode_use_
 import 'package:flutter/material.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
@@ -37,7 +38,7 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = CacheFailure('locale missing');
+      const failure = CacheFailure(AppErrorCode.cacheError, 'locale missing');
 
       when(
         () => repository.getLocale(),
@@ -82,7 +83,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = CacheFailure('theme mode missing');
+      const failure = CacheFailure(
+        AppErrorCode.cacheError,
+        'theme mode missing',
+      );
 
       when(() => repository.getThemeMode()).thenAnswer(
         (_) async => const FailureResult<ThemeMode, Failure>(failure),

@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../../../data/repositories/repository_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -119,7 +120,10 @@ void main() {
     });
 
     test('returns failure when repository call fails', () async {
-      const failure = ServerFailure('Failed to fetch status');
+      const failure = ServerFailure(
+        AppErrorCode.serverError,
+        'Failed to fetch status',
+      );
 
       when(
         () => repository.getVerificationStatus(),
@@ -135,7 +139,10 @@ void main() {
     });
 
     test('propagates auth failures from repository', () async {
-      const failure = AuthFailure('Unauthorized - token expired');
+      const failure = AuthFailure(
+        AppErrorCode.invalidCredentials,
+        'Unauthorized - token expired',
+      );
 
       when(
         () => repository.getVerificationStatus(),
@@ -151,7 +158,10 @@ void main() {
     });
 
     test('propagates network failures from repository', () async {
-      const failure = NetworkFailure('No internet connection');
+      const failure = NetworkFailure(
+        AppErrorCode.networkUnavailable,
+        'No internet connection',
+      );
 
       when(
         () => repository.getVerificationStatus(),

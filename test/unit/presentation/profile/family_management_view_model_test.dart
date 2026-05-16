@@ -12,6 +12,7 @@ import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
@@ -147,9 +148,11 @@ void main() {
     test(
       'requestFamilyAccountOtp failure sets error message and does not change OTP state',
       () async {
-        when(
-          () => mockRequestFamilyAccountOtpUseCase(),
-        ).thenAnswer((_) async => Result.failure(AuthFailure('OTP failed')));
+        when(() => mockRequestFamilyAccountOtpUseCase()).thenAnswer(
+          (_) async => Result.failure(
+            AuthFailure(AppErrorCode.invalidCredentials, 'OTP failed'),
+          ),
+        );
 
         final result = await viewModel.requestFamilyAccountOtp();
 
@@ -162,9 +165,11 @@ void main() {
     test(
       'verifyFamilyAccountOtp failure sets error message and does not proceed',
       () async {
-        when(
-          () => mockVerifyOtpUseCase(any(), any()),
-        ).thenAnswer((_) async => Result.failure(AuthFailure('Verify failed')));
+        when(() => mockVerifyOtpUseCase(any(), any())).thenAnswer(
+          (_) async => Result.failure(
+            AuthFailure(AppErrorCode.invalidCredentials, 'Verify failed'),
+          ),
+        );
 
         final initialIsParent = viewModel.user?.isParentAccount;
         final result = await viewModel.verifyFamilyAccountOtp('123456');
@@ -186,7 +191,9 @@ void main() {
             gender: any(named: 'gender'),
           ),
         ).thenAnswer(
-          (_) async => Result.failure(ServerFailure('Add child failed')),
+          (_) async => Result.failure(
+            ServerFailure(AppErrorCode.serverError, 'Add child failed'),
+          ),
         );
 
         viewModel.childFirstNameController.text = 'Junior';
@@ -251,9 +258,11 @@ void main() {
       );
       await Future.delayed(Duration.zero);
 
-      when(
-        () => mockRemoveChildUseCase.execute(any()),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('Remove failed')));
+      when(() => mockRemoveChildUseCase.execute(any())).thenAnswer(
+        (_) async => Result.failure(
+          ServerFailure(AppErrorCode.serverError, 'Remove failed'),
+        ),
+      );
 
       final result = await viewModel.removeChild('child-1');
 
