@@ -1,5 +1,7 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
+import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
@@ -7,6 +9,11 @@ import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
@@ -17,6 +24,11 @@ class BookingViewModel extends ChangeNotifier {
   final GetUserBookingsUseCase _getUserBookingsUseCase;
   final MakeReservationUseCase _makeReservationUseCase;
   final CancelBookingUseCase _cancelBookingUseCase;
+  final GetFamilyMembersUseCase _getFamilyMembersUseCase;
+  final GetUserProfileUseCase _getUserProfileUseCase;
+  final GetContextualPriceUseCase _getContextualPriceUseCase;
+  final GetMemberTierUseCase _getMemberTierUseCase;
+  final ProjectPointsUseCase _projectPointsUseCase;
 
   int _currentStep = 0;
   Activity? _selectedActivity;
@@ -27,6 +39,13 @@ class BookingViewModel extends ChangeNotifier {
   List<Activity> _activities = [];
   List<TimeSlot> _availableSlots = [];
   List<Reservation> _userBookings = [];
+  List<FamilyMember> _familyMembers = [];
+  FamilyMember? _selectedMember;
+  bool _isFamilyAccount = false;
+  MemberTier _memberTier = MemberTier.public;
+
+  double? _contextualPrice;
+  bool _isPricingLoading = false;
   bool _isLoading = false;
   String? _error;
 
@@ -37,27 +56,39 @@ class BookingViewModel extends ChangeNotifier {
     required GetUserBookingsUseCase getUserBookingsUseCase,
     required MakeReservationUseCase makeReservationUseCase,
     required CancelBookingUseCase cancelBookingUseCase,
+    required GetFamilyMembersUseCase getFamilyMembersUseCase,
+    required GetUserProfileUseCase getUserProfileUseCase,
+    required GetContextualPriceUseCase getContextualPriceUseCase,
+    required GetMemberTierUseCase getMemberTierUseCase,
+    required ProjectPointsUseCase projectPointsUseCase,
     Activity? initialActivity,
   }) : _getActivitiesUseCase = getActivitiesUseCase,
        _getTimeSlotsUseCase = getTimeSlotsUseCase,
        _getUserBookingsUseCase = getUserBookingsUseCase,
        _makeReservationUseCase = makeReservationUseCase,
        _cancelBookingUseCase = cancelBookingUseCase,
+       _getFamilyMembersUseCase = getFamilyMembersUseCase,
+       _getUserProfileUseCase = getUserProfileUseCase,
+       _getContextualPriceUseCase = getContextualPriceUseCase,
+       _getMemberTierUseCase = getMemberTierUseCase,
+       _projectPointsUseCase = projectPointsUseCase,
        _selectedActivity = initialActivity {
     loadUserBookings();
-    if (_selectedActivity != null) {
-      _currentStep = 1;
-      _loadSlots();
-    } else {
-      _loadActivities();
-    }
+    _initializeFamilyContext();
   }
 
   /// Current step in the booking flow (0-2).
   int get currentStep => _currentStep;
 
+  int get totalSteps => _isFamilyAccount ? 4 : 3;
+  int get paymentStepIndex => totalSteps - 1;
+
   /// The activity selected for booking.
   Activity? get selectedActivity => _selectedActivity;
+
+  List<FamilyMember> get familyMembers => _familyMembers;
+  FamilyMember? get selectedMember => _selectedMember;
+  bool get isFamilyAccount => _isFamilyAccount;
 
   /// The date selected for booking.
   DateTime get selectedDate => _selectedDate;
@@ -80,12 +111,21 @@ class BookingViewModel extends ChangeNotifier {
   /// Whether data is currently loading.
   bool get isLoading => _isLoading;
 
+  bool get isPricingLoading => _isPricingLoading;
+
   /// Current error message if any.
   String? get error => _error;
 
+  double get priceToPay =>
+      _contextualPrice ?? _selectedActivity?.basePrice ?? 0;
+  bool get hasContextualPrice => _contextualPrice != null;
+  MemberTier get memberTier => _memberTier;
+  int get projectedPoints =>
+      _projectPointsUseCase(amount: priceToPay, tier: _memberTier);
+
   /// Moves to the next step in the flow.
   void nextStep() {
-    if (_currentStep < 2) {
+    if (_currentStep < totalSteps - 1) {
       _currentStep++;
       notifyListeners();
     }
@@ -102,8 +142,9 @@ class BookingViewModel extends ChangeNotifier {
   /// Selects an [activity] and proceeds to the next step.
   void selectActivity(Activity activity) {
     _selectedActivity = activity;
-    _currentStep = 1;
+    _currentStep = _isFamilyAccount ? 2 : 1;
     _loadSlots();
+    _loadContextualPrice();
     notifyListeners();
   }
 
@@ -118,6 +159,14 @@ class BookingViewModel extends ChangeNotifier {
   /// Selects a specific [slot].
   void selectSlot(TimeSlot slot) {
     _selectedSlot = slot;
+    notifyListeners();
+  }
+
+  void selectMember(FamilyMember member) {
+    _selectedMember = member;
+    _contextualPrice = null;
+    _loadContextualPrice();
+    // If selecting member is the first step, allow moving forward.
     notifyListeners();
   }
 
@@ -173,9 +222,15 @@ class BookingViewModel extends ChangeNotifier {
   Future<bool> makeReservation() async {
     final activity = _selectedActivity;
     final slot = _selectedSlot;
+    final member = _selectedMember;
 
     if (activity == null || slot == null) {
       _error = 'missing_selection';
+      notifyListeners();
+      return false;
+    }
+    if (_isFamilyAccount && member == null) {
+      _error = 'missing_member';
       notifyListeners();
       return false;
     }
@@ -188,12 +243,13 @@ class BookingViewModel extends ChangeNotifier {
       id: '', // Will be assigned by backend
       activityId: activity.id,
       activityTitle: activity.category,
+      memberId: member?.id,
       date: _selectedDate.toIso8601String().split('T')[0],
       time: slot.time,
       duration: activity.id == 'padel-1'
           ? '90 min'
           : '60 min', // Mock logic for demo
-      price: activity.basePrice,
+      price: priceToPay,
       status: 'confirmed',
       paymentStatus: 'paid',
       qrCode: 'mock-qr-code',
@@ -221,8 +277,9 @@ class BookingViewModel extends ChangeNotifier {
   void _resetForm() {
     _selectedActivity = null;
     _selectedSlot = null;
-    _currentStep = 0;
+    _currentStep = _isFamilyAccount ? 0 : 0;
     _availableSlots = [];
+    _contextualPrice = null;
   }
 
   Future<void> _loadActivities() async {
@@ -284,5 +341,71 @@ class BookingViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> _initializeFamilyContext() async {
+    try {
+      final userResult = await _getUserProfileUseCase();
+      userResult.when(
+        success: (user) {
+          _isFamilyAccount = user.isParentAccount;
+          _memberTier = _getMemberTierUseCase(
+            subscriptionLevel: user.subscriptionLevel,
+          );
+        },
+        failure: (_) => _isFamilyAccount = false,
+      );
+
+      if (_isFamilyAccount) {
+        final membersResult = await _getFamilyMembersUseCase();
+        membersResult.when(
+          success: (members) {
+            _familyMembers = members;
+            _selectedMember ??= members.isNotEmpty ? members.first : null;
+          },
+          failure: (_) => _familyMembers = [],
+        );
+      }
+
+      if (_selectedActivity != null) {
+        _currentStep = _isFamilyAccount ? 2 : 1;
+        _loadSlots();
+        _loadContextualPrice();
+      } else {
+        _currentStep = _isFamilyAccount ? 0 : 0;
+        _loadActivities();
+      }
+    } catch (_) {
+      _isFamilyAccount = false;
+      _loadActivities();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> _loadContextualPrice() async {
+    final activity = _selectedActivity;
+    final member = _selectedMember;
+    if (activity == null) return;
+    if (_isFamilyAccount && member == null) return;
+
+    final memberId = member?.id;
+    if (memberId == null) return;
+
+    _isPricingLoading = true;
+    notifyListeners();
+
+    final result = await _getContextualPriceUseCase(
+      activityId: activity.id,
+      memberId: memberId,
+    );
+
+    result.when(
+      success: (price) => _contextualPrice = price,
+      failure: (_) => _contextualPrice = null,
+    );
+
+    _isPricingLoading = false;
+    notifyListeners();
   }
 }

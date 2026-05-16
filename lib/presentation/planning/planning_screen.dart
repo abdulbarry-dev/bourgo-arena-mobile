@@ -1,10 +1,16 @@
-import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
+import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -25,7 +31,13 @@ class _PlanningScreenState extends State<PlanningScreen> {
     super.initState();
     _viewModel =
         widget.viewModel ??
-        PlanningViewModel(getCoursesUseCase: locator<GetCoursesUseCase>());
+        PlanningViewModel(
+          getCoursesUseCase: locator<GetCoursesUseCase>(),
+          getUserBookingsUseCase: locator<GetUserBookingsUseCase>(),
+          getFamilyMembersUseCase: locator<GetFamilyMembersUseCase>(),
+          getMemberTierUseCase: locator<GetMemberTierUseCase>(),
+          getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+        );
   }
 
   @override
@@ -39,16 +51,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
           appBar: AppBar(
             title: Text(AppLocalizations.of(context)!.planningTitle),
             backgroundColor: theme.colorScheme.surface,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.filter_list),
-                onPressed: () => _showCategoryFilter(context),
-              ),
-            ],
           ),
           body: Column(
             children: [
               _DaySelector(viewModel: _viewModel),
+              _PlanningControls(viewModel: _viewModel),
               Expanded(
                 child: _viewModel.isLoading
                     ? const Center(child: CircularProgressIndicator())
@@ -61,67 +68,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
                           ),
                         ),
                       )
-                    : _CourseList(viewModel: _viewModel),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _showCategoryFilter(BuildContext context) {
-    final theme = Theme.of(context);
-    final categories = [
-      AppConstants.planningCategoryAll,
-      AppConstants.planningCategoryFitness,
-      AppConstants.planningCategoryAcademy,
-      AppConstants.planningCategoryWellness,
-    ];
-
-    final Map<String, String> categoryLabels = {
-      AppConstants.planningCategoryAll: AppLocalizations.of(
-        context,
-      )!.planningCategoryAll,
-      AppConstants.planningCategoryFitness: AppLocalizations.of(
-        context,
-      )!.planningCategoryFitness,
-      AppConstants.planningCategoryAcademy: AppLocalizations.of(
-        context,
-      )!.planningCategoryAcademy,
-      AppConstants.planningCategoryWellness: AppLocalizations.of(
-        context,
-      )!.planningCategoryWellness,
-    };
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: theme.colorScheme.surface,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.symmetric(vertical: 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.planningFilterTitle,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1,
-                ),
-              ),
-              const SizedBox(height: 16),
-              ...categories.map(
-                (cat) => ListTile(
-                  title: Text(categoryLabels[cat] ?? cat),
-                  onTap: () {
-                    _viewModel.selectCategory(cat);
-                    Navigator.pop(context);
-                  },
-                  trailing: _viewModel.selectedCategory == cat
-                      ? Icon(Icons.check, color: theme.colorScheme.primary)
-                      : null,
-                ),
+                    : _UnifiedList(viewModel: _viewModel),
               ),
             ],
           ),
@@ -199,16 +146,74 @@ class _DaySelector extends StatelessWidget {
   }
 }
 
-class _CourseList extends StatelessWidget {
+class _PlanningControls extends StatelessWidget {
   final PlanningViewModel viewModel;
 
-  const _CourseList({required this.viewModel});
+  const _PlanningControls({required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    final courses = viewModel.courses;
+    final theme = Theme.of(context);
 
-    if (courses.isEmpty) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border(
+          bottom: BorderSide(
+            color: theme.colorScheme.outline.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          if (viewModel.familyMembers.length > 1)
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                initialValue: viewModel.selectedMember?.id,
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                ),
+                items: viewModel.familyMembers
+                    .map(
+                      (m) => DropdownMenuItem(
+                        value: m.id,
+                        child: Text(m.isPrimary ? '${m.name} (Me)' : m.name),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (id) {
+                  if (id == null) return;
+                  final member = viewModel.familyMembers.firstWhere(
+                    (m) => m.id == id,
+                    orElse: () => viewModel.familyMembers.first,
+                  );
+                  viewModel.selectMember(member);
+                },
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UnifiedList extends StatelessWidget {
+  final PlanningViewModel viewModel;
+
+  const _UnifiedList({required this.viewModel});
+
+  @override
+  Widget build(BuildContext context) {
+    final entries = viewModel.unified;
+
+    if (entries.isEmpty) {
       return EmptyState(
         title: AppLocalizations.of(context)!.planningNoCourses,
         message: AppLocalizations.of(context)!.planningNoCoursesSubtitle,
@@ -218,11 +223,20 @@ class _CourseList extends StatelessWidget {
 
     return ListView.builder(
       padding: const EdgeInsets.all(24),
-      itemCount: courses.length,
+      itemCount: entries.length,
       itemBuilder: (context, index) {
+        final entry = entries[index];
+        final child = switch (entry.type) {
+          PlanningEntryType.course => CourseCard(
+            course: entry.source as Course,
+          ),
+          PlanningEntryType.reservation => ReservationCard(
+            reservation: entry.source as Reservation,
+          ),
+        };
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
-          child: CourseCard(course: courses[index]),
+          child: child,
         );
       },
     );

@@ -30,6 +30,9 @@ class Reservation {
   /// QR code string for check-in.
   final String qrCode;
 
+  /// Optional member id when booking on behalf of a family member.
+  final String? memberId;
+
   /// Creates a new [Reservation] instance.
   const Reservation({
     required this.id,
@@ -42,6 +45,7 @@ class Reservation {
     required this.status,
     required this.paymentStatus,
     required this.qrCode,
+    this.memberId,
   });
 
   @override
@@ -58,7 +62,8 @@ class Reservation {
           price == other.price &&
           status == other.status &&
           paymentStatus == other.paymentStatus &&
-          qrCode == other.qrCode;
+          qrCode == other.qrCode &&
+          memberId == other.memberId;
 
   @override
   int get hashCode =>
@@ -71,5 +76,6 @@ class Reservation {
       price.hashCode ^
       status.hashCode ^
       paymentStatus.hashCode ^
-      qrCode.hashCode;
+      qrCode.hashCode ^
+      memberId.hashCode;
 }

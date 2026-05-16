@@ -55,6 +55,7 @@ void main() {
 
     // Default mock behaviors
     when(() => mockViewModel.isLoading).thenReturn(false);
+    when(() => mockViewModel.isFamilyAccount).thenReturn(false);
     when(() => mockViewModel.error).thenReturn(null);
     when(() => mockViewModel.activities).thenReturn([testActivity]);
     when(() => mockViewModel.availableSlots).thenReturn([testSlot]);
@@ -62,6 +63,9 @@ void main() {
     when(() => mockViewModel.selectedActivity).thenReturn(null);
     when(() => mockViewModel.selectedDate).thenReturn(DateTime(2024, 1, 1));
     when(() => mockViewModel.selectedSlot).thenReturn(null);
+    when(() => mockViewModel.priceToPay).thenReturn(0);
+    when(() => mockViewModel.isPricingLoading).thenReturn(false);
+    when(() => mockViewModel.projectedPoints).thenReturn(0);
     when(
       () => mockViewModel.paymentMethod,
     ).thenReturn(AppConstants.paymentMethodCardId);
@@ -143,6 +147,7 @@ void main() {
       when(() => mockViewModel.currentStep).thenReturn(2);
       when(() => mockViewModel.selectedActivity).thenReturn(testActivity);
       when(() => mockViewModel.selectedSlot).thenReturn(testSlot);
+      when(() => mockViewModel.priceToPay).thenReturn(25.0);
       when(
         () => mockViewModel.paymentMethod,
       ).thenReturn(AppConstants.paymentMethodCardId);

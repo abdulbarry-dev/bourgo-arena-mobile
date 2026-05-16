@@ -8,6 +8,7 @@ class ReservationModel {
   final String id;
   final String activityId;
   final String activityTitle;
+  final String? memberId;
   final String date;
   final String time;
   final String duration;
@@ -20,6 +21,7 @@ class ReservationModel {
     required this.id,
     required this.activityId,
     required this.activityTitle,
+    this.memberId,
     required this.date,
     required this.time,
     required this.duration,
