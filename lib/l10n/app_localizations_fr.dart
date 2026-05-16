@@ -704,6 +704,64 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileFamilyEnabled => 'Compte famille activé avec succès !';
 
   @override
+  String get profileFamilyNotEnabled =>
+      'Activez le compte famille pour gérer les profils de vos enfants.';
+
+  @override
+  String get profileManageChildren => 'Gérer les enfants';
+
+  @override
+  String get profileEdit => 'Modifier';
+
+  @override
+  String get profileDelete => 'Supprimer';
+
+  @override
+  String get profileConfirmDeleteChild => 'Supprimer l\'enfant ?';
+
+  @override
+  String profileConfirmDeleteChildMessage(String childName) {
+    return 'Êtes-vous sûr de vouloir supprimer $childName de votre compte famille ? Cette action ne peut pas être annulée.';
+  }
+
+  @override
+  String get profileChildRemoved => 'Profil d\'enfant supprimé avec succès.';
+
+  @override
+  String get profileChildAdded => 'Profil d\'enfant ajouté avec succès.';
+
+  @override
+  String get profileFirstName => 'Prénom';
+
+  @override
+  String get profileFirstNameHint => 'Entrez le prénom de l\'enfant';
+
+  @override
+  String get profileLastName => 'Nom';
+
+  @override
+  String get profileLastNameHint => 'Entrez le nom de l\'enfant';
+
+  @override
+  String get profileGender => 'Genre';
+
+  @override
+  String get profileMale => 'Garçon';
+
+  @override
+  String get profileFemale => 'Fille';
+
+  @override
+  String get profileBirthDate => 'Date de naissance';
+
+  @override
+  String get profileSelectDate => 'Sélectionnez la date de naissance';
+
+  @override
+  String get profileNoChildrenDescription =>
+      'Commencez par ajouter le profil de votre enfant pour gérer ses activités.';
+
+  @override
   String get authVerificationMethodTitle => 'Vérification de Sécurité';
 
   @override

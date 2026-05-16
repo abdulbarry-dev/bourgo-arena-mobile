@@ -1430,6 +1430,114 @@ abstract class AppLocalizations {
   /// **'Compte famille activé avec succès !'**
   String get profileFamilyEnabled;
 
+  /// No description provided for @profileFamilyNotEnabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activez le compte famille pour gérer les profils de vos enfants.'**
+  String get profileFamilyNotEnabled;
+
+  /// No description provided for @profileManageChildren.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer les enfants'**
+  String get profileManageChildren;
+
+  /// No description provided for @profileEdit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get profileEdit;
+
+  /// No description provided for @profileDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get profileDelete;
+
+  /// No description provided for @profileConfirmDeleteChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer l\'enfant ?'**
+  String get profileConfirmDeleteChild;
+
+  /// No description provided for @profileConfirmDeleteChildMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Êtes-vous sûr de vouloir supprimer {childName} de votre compte famille ? Cette action ne peut pas être annulée.'**
+  String profileConfirmDeleteChildMessage(String childName);
+
+  /// No description provided for @profileChildRemoved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil d\'enfant supprimé avec succès.'**
+  String get profileChildRemoved;
+
+  /// No description provided for @profileChildAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil d\'enfant ajouté avec succès.'**
+  String get profileChildAdded;
+
+  /// No description provided for @profileFirstName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prénom'**
+  String get profileFirstName;
+
+  /// No description provided for @profileFirstNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez le prénom de l\'enfant'**
+  String get profileFirstNameHint;
+
+  /// No description provided for @profileLastName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom'**
+  String get profileLastName;
+
+  /// No description provided for @profileLastNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez le nom de l\'enfant'**
+  String get profileLastNameHint;
+
+  /// No description provided for @profileGender.
+  ///
+  /// In fr, this message translates to:
+  /// **'Genre'**
+  String get profileGender;
+
+  /// No description provided for @profileMale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garçon'**
+  String get profileMale;
+
+  /// No description provided for @profileFemale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fille'**
+  String get profileFemale;
+
+  /// No description provided for @profileBirthDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de naissance'**
+  String get profileBirthDate;
+
+  /// No description provided for @profileSelectDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez la date de naissance'**
+  String get profileSelectDate;
+
+  /// No description provided for @profileNoChildrenDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commencez par ajouter le profil de votre enfant pour gérer ses activités.'**
+  String get profileNoChildrenDescription;
+
   /// No description provided for @authVerificationMethodTitle.
   ///
   /// In fr, this message translates to:

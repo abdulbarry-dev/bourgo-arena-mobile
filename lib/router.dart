@@ -25,6 +25,8 @@ import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_screen.dar
 import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/manage_children_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/add_edit_child_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/search/search_screen.dart';
@@ -326,6 +328,21 @@ GoRouter createRouter(
     GoRoute(
       path: '/family-management',
       builder: (context, state) => const FamilyManagementScreen(),
+    ),
+    GoRoute(
+      path: '/manage-children',
+      builder: (context, state) => const ManageChildrenScreen(),
+    ),
+    GoRoute(
+      path: '/add-child',
+      builder: (context, state) => const AddEditChildScreen(),
+    ),
+    GoRoute(
+      path: '/edit-child/:id',
+      builder: (context, state) {
+        final childId = state.pathParameters['id'];
+        return AddEditChildScreen(childId: childId);
+      },
     ),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
     GoRoute(

@@ -3,17 +3,16 @@ import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_ca
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
-import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// Screen for managing family account and children profiles.
@@ -45,24 +44,6 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
   void dispose() {
     _viewModel.dispose();
     super.dispose();
-  }
-
-  Future<void> _selectChildBirthDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate:
-          _viewModel.selectedChildBirthDate ??
-          DateTime.now().subtract(const Duration(days: 365 * 10)),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
-    );
-
-    if (picked != null) {
-      _viewModel.setChildBirthDate(picked);
-      _viewModel.childBirthDateController.text = DateFormat.yMMMd().format(
-        picked,
-      );
-    }
   }
 
   Future<void> _toggleFamilyAccount(bool value) async {
@@ -176,6 +157,10 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                             backgroundColor: Colors.green,
                           ),
                         );
+                        // Navigate to manage children
+                        if (context.mounted) {
+                          context.push('/manage-children');
+                        }
                       }
                     },
               child: _viewModel.isVerifyingOtp
@@ -197,6 +182,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
+    final spacing = context.spacing;
 
     return Scaffold(
       appBar: AppBar(
@@ -219,142 +205,68 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(spacing.xl),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Family Account Status Section
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(spacing.lg),
                   decoration: BoxDecoration(
                     color: appColors.bgElevated,
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: appColors.bgBorder),
                   ),
-                  child: Column(
-                    children: [
-                      FamilyAccountToggle(
-                        value: user.isParentAccount,
-                        onChanged: _toggleFamilyAccount,
-                      ),
-                      if (user.isParentAccount) ...[
-                        const SizedBox(height: 24),
-                        const Divider(),
-                        const SizedBox(height: 24),
-                        _ChildrenSection(
-                          children: user.children,
-                          viewModel: _viewModel,
-                          onSelectBirthDate: _selectChildBirthDate,
-                        ),
-                      ],
-                    ],
+                  child: FamilyAccountToggle(
+                    value: user.isParentAccount,
+                    onChanged: _toggleFamilyAccount,
                   ),
                 ),
+                SizedBox(height: spacing.xl),
+
+                // Manage Children Section (if family account is enabled)
+                if (user.isParentAccount) ...[
+                  Text(
+                    l10n.profileManageChildren,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: spacing.lg),
+                  ElevatedButton.icon(
+                    onPressed: () => context.push('/manage-children'),
+                    icon: const Icon(Symbols.groups),
+                    label: Text(l10n.profileManageChildren),
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: spacing.lg),
+                    ),
+                  ),
+                ] else ...[
+                  Center(
+                    child: Column(
+                      children: [
+                        Icon(
+                          Symbols.family_restroom,
+                          size: 64,
+                          color: theme.colorScheme.primary.withOpacity(0.3),
+                        ),
+                        SizedBox(height: spacing.lg),
+                        Text(
+                          l10n.profileFamilyNotEnabled,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           );
         },
       ),
-    );
-  }
-}
-
-class _ChildrenSection extends StatelessWidget {
-  final List<ChildProfile> children;
-  final FamilyManagementViewModel viewModel;
-  final VoidCallback onSelectBirthDate;
-
-  const _ChildrenSection({
-    required this.children,
-    required this.viewModel,
-    required this.onSelectBirthDate,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          l10n.authAddedMembers.toUpperCase(),
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 16),
-        if (children.isEmpty)
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant,
-                style: BorderStyle.solid,
-              ),
-            ),
-            child: Text(
-              l10n.profileNoChildren,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          )
-        else
-          SizedBox(
-            height: 140,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: children.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 16),
-              itemBuilder: (context, index) {
-                final child = children[index];
-                return FamilyMemberCard(
-                  name: child.name,
-                  gender: child.gender,
-                  onRemove: () => viewModel.removeChild(child.id),
-                );
-              },
-            ),
-          ),
-        const SizedBox(height: 32),
-        Text(
-          l10n.profileAddChild.toUpperCase(),
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.primary,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-          ),
-        ),
-        const SizedBox(height: 16),
-        FamilyMemberForm(
-          firstNameController: viewModel.childFirstNameController,
-          lastNameController: viewModel.childLastNameController,
-          birthDateController: viewModel.childBirthDateController,
-          selectedGender: viewModel.selectedChildGender,
-          onGenderChanged: viewModel.setChildGender,
-          onSelectBirthDate: onSelectBirthDate,
-          onAdd: () => viewModel.addChildFromForm(),
-          firstNameError: viewModel.hasChildFirstNameError
-              ? l10n.commonRequiredField
-              : null,
-          lastNameError: viewModel.hasChildLastNameError
-              ? l10n.commonRequiredField
-              : null,
-          genderError: viewModel.hasChildGenderError
-              ? l10n.commonRequiredField
-              : null,
-          birthDateError: viewModel.hasChildBirthDateError
-              ? l10n.commonRequiredField
-              : null,
-        ),
-      ],
     );
   }
 }

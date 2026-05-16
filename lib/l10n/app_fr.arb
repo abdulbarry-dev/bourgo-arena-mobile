@@ -235,6 +235,31 @@
   "profileVerifyFamilyTitle": "Vérifier le compte famille",
   "profileVerifyFamilySubtitle": "Pour activer le compte famille, nous devons vérifier votre identité. Entrez le code envoyé à votre {identifier}.",
   "profileFamilyEnabled": "Compte famille activé avec succès !",
+  "profileFamilyNotEnabled": "Activez le compte famille pour gérer les profils de vos enfants.",
+  "profileManageChildren": "Gérer les enfants",
+  "profileEdit": "Modifier",
+  "profileDelete": "Supprimer",
+  "profileConfirmDeleteChild": "Supprimer l'enfant ?",
+  "profileConfirmDeleteChildMessage": "Êtes-vous sûr de vouloir supprimer {childName} de votre compte famille ? Cette action ne peut pas être annulée.",
+  "@profileConfirmDeleteChildMessage": {
+    "placeholders": {
+      "childName": {
+        "type": "String"
+      }
+    }
+  },
+  "profileChildRemoved": "Profil d'enfant supprimé avec succès.",
+  "profileChildAdded": "Profil d'enfant ajouté avec succès.",
+  "profileFirstName": "Prénom",
+  "profileFirstNameHint": "Entrez le prénom de l'enfant",
+  "profileLastName": "Nom",
+  "profileLastNameHint": "Entrez le nom de l'enfant",
+  "profileGender": "Genre",
+  "profileMale": "Garçon",
+  "profileFemale": "Fille",
+  "profileBirthDate": "Date de naissance",
+  "profileSelectDate": "Sélectionnez la date de naissance",
+  "profileNoChildrenDescription": "Commencez par ajouter le profil de votre enfant pour gérer ses activités.",
   "authVerificationMethodTitle": "Vérification de Sécurité",
   "authVerificationMethodSubtitle": "Choisissez une méthode pour recevoir votre code de vérification.",
   "authEmailMethod": "Adresse E-mail",

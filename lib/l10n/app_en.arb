@@ -231,11 +231,36 @@
   "profileFamilyAccountDescription": "Manage your children's profiles and activities.",
   "profileAddChild": "Add Child",
   "profileNoChildren": "No children profiles added.",
+  "profileNoChildrenDescription": "Start by adding your child's profile to manage their activities.",
   "profileChildName": "Child Name",
   "profileChildBirthDate": "Child Birth Date",
   "profileVerifyFamilyTitle": "Verify Family Account",
   "profileVerifyFamilySubtitle": "To enable family account, we need to verify your identity. Enter the code sent to your {identifier}.",
   "profileFamilyEnabled": "Family account enabled successfully!",
+  "profileFamilyNotEnabled": "Enable family account to manage your children's profiles.",
+  "profileManageChildren": "Manage Children",
+  "profileEdit": "Edit",
+  "profileDelete": "Delete",
+  "profileConfirmDeleteChild": "Delete Child?",
+  "profileConfirmDeleteChildMessage": "Are you sure you want to remove {childName} from your family account? This action cannot be undone.",
+  "@profileConfirmDeleteChildMessage": {
+    "placeholders": {
+      "childName": {
+        "type": "String"
+      }
+    }
+  },
+  "profileChildRemoved": "Child profile removed successfully.",
+  "profileChildAdded": "Child profile added successfully.",
+  "profileFirstName": "First Name",
+  "profileFirstNameHint": "Enter child's first name",
+  "profileLastName": "Last Name",
+  "profileLastNameHint": "Enter child's last name",
+  "profileGender": "Gender",
+  "profileMale": "Boy",
+  "profileFemale": "Girl",
+  "profileBirthDate": "Date of Birth",
+  "profileSelectDate": "Select date of birth",
   "authVerificationMethodTitle": "Security Verification",
   "authVerificationMethodSubtitle": "Choose a method to receive your verification code.",
   "authEmailMethod": "Email Address",

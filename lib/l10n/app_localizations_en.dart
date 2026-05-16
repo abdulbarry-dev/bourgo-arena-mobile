@@ -699,6 +699,64 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileFamilyEnabled => 'Family account enabled successfully!';
 
   @override
+  String get profileFamilyNotEnabled =>
+      'Enable family account to manage your children\'s profiles.';
+
+  @override
+  String get profileManageChildren => 'Manage Children';
+
+  @override
+  String get profileEdit => 'Edit';
+
+  @override
+  String get profileDelete => 'Delete';
+
+  @override
+  String get profileConfirmDeleteChild => 'Delete Child?';
+
+  @override
+  String profileConfirmDeleteChildMessage(String childName) {
+    return 'Are you sure you want to remove $childName from your family account? This action cannot be undone.';
+  }
+
+  @override
+  String get profileChildRemoved => 'Child profile removed successfully.';
+
+  @override
+  String get profileChildAdded => 'Child profile added successfully.';
+
+  @override
+  String get profileFirstName => 'First Name';
+
+  @override
+  String get profileFirstNameHint => 'Enter child\'s first name';
+
+  @override
+  String get profileLastName => 'Last Name';
+
+  @override
+  String get profileLastNameHint => 'Enter child\'s last name';
+
+  @override
+  String get profileGender => 'Gender';
+
+  @override
+  String get profileMale => 'Boy';
+
+  @override
+  String get profileFemale => 'Girl';
+
+  @override
+  String get profileBirthDate => 'Date of Birth';
+
+  @override
+  String get profileSelectDate => 'Select date of birth';
+
+  @override
+  String get profileNoChildrenDescription =>
+      'Start by adding your child\'s profile to manage their activities.';
+
+  @override
   String get authVerificationMethodTitle => 'Security Verification';
 
   @override
