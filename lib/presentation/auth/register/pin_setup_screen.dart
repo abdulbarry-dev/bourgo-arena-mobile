@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
@@ -109,6 +110,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final spacing = context.spacing;
 
     return AuthBackground(
       child: Scaffold(
@@ -123,10 +125,12 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: Padding(
-                    padding: const EdgeInsets.all(24.0),
+                    padding: spacing.screenPadding(context),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -136,7 +140,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                           title: l10n.authPinSetupTitle,
                           subtitle: l10n.authPinSetupSubtitle,
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: spacing.xl),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: List.generate(
@@ -147,12 +151,12 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: spacing.xl),
                         _NumericKeypad(
                           onNumberPressed: _onNumberPressed,
                           onBackspacePressed: _onBackspacePressed,
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: spacing.xl),
                         Builder(
                           builder: (context) {
                             final isComplete = _pin.length == 4;
@@ -206,10 +210,11 @@ class _PinIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final spacing = context.spacing;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: EdgeInsets.symmetric(horizontal: spacing.sm),
       width: isCurrent ? 24 : 20,
       height: isCurrent ? 24 : 20,
       decoration: BoxDecoration(
@@ -248,6 +253,8 @@ class _NumericKeypad extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final spacing = context.spacing;
+
     return Column(
       children: [
         for (var row in [
@@ -256,7 +263,7 @@ class _NumericKeypad extends StatelessWidget {
           ['7', '8', '9'],
         ])
           Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: EdgeInsets.only(bottom: spacing.sm),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -271,7 +278,7 @@ class _NumericKeypad extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            const SizedBox(width: 72), // Empty space for alignment
+            SizedBox(width: spacing.xxxl + spacing.sm),
             _KeypadButton(label: '0', onPressed: () => onNumberPressed('0')),
             _KeypadButton(
               icon: Icons.backspace_outlined,

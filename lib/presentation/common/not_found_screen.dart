@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -19,58 +20,74 @@ class NotFoundScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final spacing = context.spacing;
+    final minHeight =
+        MediaQuery.sizeOf(context).height -
+        MediaQuery.paddingOf(context).vertical;
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _IconBadge(theme: theme),
-                const SizedBox(height: 32),
-                Text(
-                  l10n.errorNotFoundTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.5,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.errorNotFoundSubtitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withAlpha(180),
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 48),
-                FilledButton.icon(
-                  onPressed: () {
-                    try {
-                      GoRouter.of(context).go('/home');
-                    } catch (_) {
-                      GoRouter.of(context).go('/');
-                    }
-                  },
-                  icon: const Icon(Symbols.home, size: 20),
-                  label: Text(l10n.errorNotFoundAction),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 28,
-                      vertical: 14,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: spacing.horizontalValueFor(context),
+            vertical: spacing.screenVertical,
+          ),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: minHeight),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 480),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _IconBadge(theme: theme),
+                    SizedBox(height: spacing.xl),
+                    Text(
+                      l10n.errorNotFoundTitle,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                        color: theme.colorScheme.onSurface,
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    SizedBox(height: spacing.md),
+                    Text(
+                      l10n.errorNotFoundSubtitle,
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withAlpha(
+                          180,
+                        ),
+                        height: 1.6,
+                      ),
                     ),
-                  ),
+                    SizedBox(height: spacing.xxl),
+                    FilledButton.icon(
+                      onPressed: () {
+                        try {
+                          GoRouter.of(context).go('/home');
+                        } catch (_) {
+                          GoRouter.of(context).go('/');
+                        }
+                      },
+                      icon: const Icon(Symbols.home, size: 20),
+                      label: Text(l10n.errorNotFoundAction),
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: spacing.xl,
+                          vertical: spacing.md,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

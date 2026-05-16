@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
@@ -168,6 +169,7 @@ class _VerifyAdditionalMethodScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final spacing = context.spacing;
 
     if (_isFetchingStatus) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -188,7 +190,8 @@ class _VerifyAdditionalMethodScreenState
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: spacing.screenPadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -200,7 +203,7 @@ class _VerifyAdditionalMethodScreenState
                         : l10n.authPhoneLabel,
                   ),
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: spacing.xxl),
                 // Icon representation of the method
                 Center(
                   child: Container(
@@ -221,7 +224,7 @@ class _VerifyAdditionalMethodScreenState
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: spacing.xl),
                 // Method details
                 Text(
                   title,
@@ -230,7 +233,7 @@ class _VerifyAdditionalMethodScreenState
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: spacing.sm),
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
@@ -238,7 +241,7 @@ class _VerifyAdditionalMethodScreenState
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: spacing.xxl),
                 // Action buttons
                 ElevatedButton(
                   onPressed: _isLoading ? null : _verifyNow,
@@ -253,14 +256,14 @@ class _VerifyAdditionalMethodScreenState
                         )
                       : Text(l10n.authVerifyNow),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: spacing.md),
                 OutlinedButton(
                   onPressed: _isLoading ? null : _skipForNow,
                   child: Text(l10n.authSkipForNow),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: spacing.lg),
                 const Divider(),
-                const SizedBox(height: 16),
+                SizedBox(height: spacing.md),
                 TextButton(
                   onPressed: _isLoading ? null : _skipForever,
                   child: Text(
@@ -271,7 +274,7 @@ class _VerifyAdditionalMethodScreenState
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: spacing.xs),
                 Text(
                   l10n.authSkipForeverMessage,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -279,7 +282,7 @@ class _VerifyAdditionalMethodScreenState
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: spacing.lg),
                 // Informational text
                 Text(
                   l10n.authMethodAccessInstruction,

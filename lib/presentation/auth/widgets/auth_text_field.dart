@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 
 /// A custom themed text field for authentication screens.
@@ -43,6 +44,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final spacing = context.spacing;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +57,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
             letterSpacing: 1.5,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: spacing.xs),
         TextFormField(
           controller: widget.controller,
           obscureText: _obscureText,
@@ -108,9 +110,9 @@ class _AuthTextFieldState extends State<AuthTextField> {
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: theme.colorScheme.error, width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 16,
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: spacing.lg,
+              vertical: spacing.md,
             ),
           ),
         ),

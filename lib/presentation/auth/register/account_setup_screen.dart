@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -130,6 +131,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final spacing = context.spacing;
 
     return AuthBackground(
       child: Scaffold(
@@ -148,7 +150,8 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: spacing.screenPadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -160,7 +163,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       ? l10n.profileEditSubtitle
                       : l10n.authAccountOverviewSubtitle,
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: spacing.xl),
 
                 // Profile Picture Section (only show when not editing for clarity, or keep it)
                 if (!_isEditing) ...[
@@ -217,9 +220,9 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: spacing.md),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: EdgeInsets.symmetric(horizontal: spacing.lg),
                           child: Text(
                             l10n.authProfilePictureRecommendation,
                             textAlign: TextAlign.center,
@@ -232,7 +235,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  SizedBox(height: spacing.xxl),
                 ],
 
                 // Details Section
@@ -257,7 +260,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                           controller: _firstNameController,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: spacing.md),
                       Expanded(
                         child: AuthTextField(
                           label: l10n.authLastNameLabel,
@@ -270,7 +273,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                   ),
                 ],
 
-                const SizedBox(height: 20),
+                SizedBox(height: spacing.lg),
                 AuthTextField(
                   label: l10n.authEmailLabel,
                   hint: '',
@@ -279,7 +282,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                   readOnly: !_isEditing,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: spacing.lg),
                 AuthTextField(
                   label: l10n.authPhoneLabel,
                   hint: '',
@@ -290,7 +293,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                 ),
 
                 if (_isEditing || _selectedGender != null) ...[
-                  const SizedBox(height: 20),
+                  SizedBox(height: spacing.lg),
                   if (_isEditing)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +305,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: spacing.xs),
                         Row(
                           children: [
                             _GenderOption(
@@ -311,7 +314,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                               onTap: () =>
                                   setState(() => _selectedGender = 'male'),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: spacing.sm),
                             _GenderOption(
                               label: l10n.commonGenderFemale,
                               isSelected: _selectedGender == 'female',
@@ -333,7 +336,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                 ],
 
                 if (_isEditing || _selectedBirthDate != null) ...[
-                  const SizedBox(height: 20),
+                  SizedBox(height: spacing.lg),
                   AuthTextField(
                     label: l10n.authBirthDateLabel,
                     hint: l10n.authBirthDateHint,
@@ -344,7 +347,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                   ),
                 ],
 
-                const SizedBox(height: 32),
+                SizedBox(height: spacing.xl),
 
                 // Edit Action
                 if (!_isEditing)
@@ -366,7 +369,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                     child: Text(l10n.profileSave),
                   ),
 
-                const SizedBox(height: 48),
+                SizedBox(height: spacing.xxl),
 
                 if (!_isEditing)
                   ElevatedButton(
@@ -374,7 +377,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                     child: Text(l10n.authConfirmContinue),
                   ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: spacing.lg),
               ],
             ),
           ),
@@ -404,7 +407,7 @@ class _GenderOption extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: EdgeInsets.symmetric(vertical: context.spacing.md),
           decoration: BoxDecoration(
             color: isSelected
                 ? theme.colorScheme.primary

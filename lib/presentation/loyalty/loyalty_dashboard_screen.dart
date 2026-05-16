@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_model.dart';
@@ -15,6 +16,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final spacing = context.spacing;
     final numberFormat = NumberFormat('#,###');
 
     return Scaffold(
@@ -45,65 +47,73 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           };
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.loyaltyTotalPoints,
-                        style: const TextStyle(color: Colors.white70),
+            padding: spacing.screenPadding(context),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(spacing.xl),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary,
+                        borderRadius: BorderRadius.circular(24),
                       ),
-                      const SizedBox(height: 8),
+                      child: Column(
+                        children: [
+                          Text(
+                            l10n.loyaltyTotalPoints,
+                            style: const TextStyle(color: Colors.white70),
+                          ),
+                          SizedBox(height: spacing.sm),
+                          Text(
+                            numberFormat.format(points),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 48,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: spacing.md),
+                          TierBadge(tierName: tierName),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: spacing.xl),
+                    if (nextTier != null) ...[
+                      LinearProgressIndicator(
+                        value: progress,
+                        backgroundColor:
+                            theme.colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                        minHeight: 8,
+                      ),
+                      SizedBox(height: spacing.sm),
                       Text(
-                        numberFormat.format(points),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
+                        l10n
+                            .loyaltyPointsToPlatinum(
+                              numberFormat.format(pointsToNext),
+                            )
+                            .replaceAll('Platinum', nextTierLabel),
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      TierBadge(tierName: tierName),
+                    ] else ...[
+                      Text(
+                        'You have reached the highest tier!',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ],
-                  ),
+                  ],
                 ),
-                const SizedBox(height: 32),
-                if (nextTier != null) ...[
-                  LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(8),
-                    minHeight: 8,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    l10n
-                        .loyaltyPointsToPlatinum(
-                          numberFormat.format(pointsToNext),
-                        )
-                        .replaceAll('Platinum', nextTierLabel),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ] else ...[
-                  Text(
-                    'You have reached the highest tier!',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ],
+              ),
             ),
           );
         },
