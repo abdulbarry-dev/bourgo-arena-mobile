@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/data/repositories/api_course_repository.dart
 import 'package:bourgo_arena_mobile/data/repositories/api_device_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_notification_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_reservation_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_pricing_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_subscription_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_user_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/local_session_repository.dart';
@@ -18,6 +19,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/course_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/notification_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/pricing_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_search_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/search_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/search/search_use_case.dart';
@@ -26,6 +28,7 @@ import 'package:bourgo_arena_mobile/data/repositories/api_family_repository.dart
 import 'package:bourgo_arena_mobile/domain/repositories/family_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
@@ -46,6 +49,9 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_c
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/device/register_device_token_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
@@ -105,6 +111,9 @@ Future<void> initLocator() async {
   locator.registerLazySingleton<ReservationRepository>(
     () => ApiReservationRepository(locator<ApiClient>()),
   );
+  locator.registerLazySingleton<PricingRepository>(
+    () => ApiPricingRepository(locator<ApiClient>()),
+  );
   locator.registerLazySingleton<UserRepository>(
     () => ApiUserRepository(locator<ApiClient>()),
   );
@@ -156,10 +165,19 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => GetAccessHistoryUseCase(locator()));
   locator.registerLazySingleton(() => UpdateUserProfileUseCase(locator()));
   locator.registerLazySingleton(() => GetChildrenUseCase(locator()));
+  locator.registerLazySingleton(
+    () => GetFamilyMembersUseCase(
+      locator<UserRepository>(),
+      locator<FamilyRepository>(),
+    ),
+  );
   locator.registerLazySingleton(() => AddChildUseCase(locator()));
   locator.registerLazySingleton(() => RemoveChildUseCase(locator()));
   locator.registerLazySingleton(() => GetActiveSubscriptionUseCase(locator()));
   locator.registerLazySingleton(() => RegisterDeviceTokenUseCase(locator()));
+  locator.registerLazySingleton(() => const GetMemberTierUseCase());
+  locator.registerLazySingleton(() => const ProjectPointsUseCase());
+  locator.registerLazySingleton(() => GetContextualPriceUseCase(locator()));
   locator.registerLazySingleton(
     () => DeviceTokenRegistrar(
       locator<SessionRepository>(),

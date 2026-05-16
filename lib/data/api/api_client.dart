@@ -102,21 +102,49 @@ class ApiClient {
   }
 
   dynamic _handleResponse(http.Response response) {
-    Map<String, dynamic> body = {};
+    dynamic decoded;
     if (response.body.isNotEmpty) {
       try {
-        body = jsonDecode(response.body) as Map<String, dynamic>;
+        decoded = jsonDecode(response.body);
       } catch (_) {
         // If body is not JSON, we'll use the status code and raw body message
       }
     }
+
+    if (decoded is List) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return decoded;
+      }
+      throw ServerException(
+        'API Error: ${response.statusCode} ${response.body}',
+      );
+    }
+
+    final Map<String, dynamic> body = decoded is Map<String, dynamic>
+        ? decoded
+        : {};
 
     final bool success =
         body['success'] ??
         (response.statusCode >= 200 && response.statusCode < 300);
 
     if (success) {
-      return body.containsKey('data') ? body['data'] : body;
+      if (body.containsKey('data')) {
+        final data = body['data'];
+        if (data is Map<String, dynamic>) {
+          final dataMap = Map<String, dynamic>.from(data);
+          // Preserve important top-level fields if they're not already in data
+          if (body.containsKey('token') && !dataMap.containsKey('token')) {
+            dataMap['token'] = body['token'];
+          }
+          if (body.containsKey('state') && !dataMap.containsKey('state')) {
+            dataMap['state'] = body['state'];
+          }
+          return dataMap;
+        }
+        return data;
+      }
+      return body;
     } else {
       final String message =
           body['message'] ??

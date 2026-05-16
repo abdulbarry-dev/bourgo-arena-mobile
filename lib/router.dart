@@ -25,6 +25,7 @@ import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_screen.dar
 import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/search/search_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/privacy_policy_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
@@ -131,13 +132,7 @@ GoRouter createRouter(
         return '/otp';
 
       case AuthState.pendingAdditionalVerification:
-        // Users can skip additional verification, so we allow setup and onboarding routes
-        if (location == '/otp' ||
-            location == '/verify-additional-method' ||
-            location == '/account-setup' ||
-            location == '/pin-setup' ||
-            location == '/family-onboarding' ||
-            location == '/onboarding') {
+        if (isSetupRoute || location == '/onboarding') {
           return null;
         }
         return '/verify-additional-method';
@@ -152,7 +147,16 @@ GoRouter createRouter(
         return '/account-setup';
 
       case AuthState.authenticated:
-        // Prevent accessing auth/setup routes once fully authenticated
+        // Force additional verification if required for this session
+        if (authStateNotifier.session.needsLoginVerification &&
+            !authStateNotifier.skippedForSession) {
+          if (location == '/verify-additional-method' || location == '/otp') {
+            return null;
+          }
+          return '/verify-additional-method';
+        }
+
+        // Prevent accessing auth/setup routes once fully authenticated or skipped
         if (isAuthEntryRoute || isSetupRoute) {
           return '/home';
         }
@@ -204,15 +208,16 @@ GoRouter createRouter(
     GoRoute(
       path: '/verify-additional-method',
       builder: (context, state) {
-        final data = state.extraAsMap;
+        final verificationData = authStateNotifier.session.verificationData;
         final user = authStateNotifier.session.user;
         return VerifyAdditionalMethodScreen(
-          unverifiedMethod: data['unverified_method'] as String? ?? 'phone',
-          email: data['email'] as String? ?? user?.email,
-          phone: data['phone'] as String? ?? user?.phone,
+          unverifiedMethod: verificationData?.unverifiedMethod ?? 'phone',
+          email: verificationData?.email ?? user?.email,
+          phone: verificationData?.phone ?? user?.phone,
           sendOtpUseCase: locator<SendOtpUseCase>(),
           authRepository: locator<AuthRepository>(),
           getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
+          authStateNotifier: authStateNotifier,
         );
       },
     ),
@@ -284,6 +289,10 @@ GoRouter createRouter(
     GoRoute(
       path: '/planning',
       builder: (context, state) => const PlanningScreen(),
+    ),
+    GoRoute(
+      path: '/loyalty',
+      builder: (context, state) => const LoyaltyDashboardScreen(),
     ),
     GoRoute(
       path: '/subscription',
