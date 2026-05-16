@@ -217,7 +217,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                                 backgroundColor: Colors.green,
                               ),
                             );
-                            context.pop();
+                            context.pop(true);
                           }
                         },
                   style: ElevatedButton.styleFrom(

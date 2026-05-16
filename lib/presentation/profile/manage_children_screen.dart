@@ -122,7 +122,12 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
                   _buildChildrenList(context, children, theme, spacing),
                 SizedBox(height: spacing.xl),
                 ElevatedButton.icon(
-                  onPressed: () => context.push('/add-child'),
+                  onPressed: () async {
+                    final childAdded = await context.push<bool>('/add-child');
+                    if (childAdded == true) {
+                      await _viewModel.reloadChildren();
+                    }
+                  },
                   icon: const Icon(Symbols.add),
                   label: Text(l10n.profileAddChild),
                   style: ElevatedButton.styleFrom(

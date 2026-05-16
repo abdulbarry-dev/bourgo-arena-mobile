@@ -25,6 +25,11 @@ class ManageChildrenViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+  /// Public method to reload children list from external triggers
+  Future<void> reloadChildren() async {
+    await _loadChildren();
+  }
+
   Future<void> _loadChildren() async {
     _isLoading = true;
     notifyListeners();
