@@ -21,7 +21,11 @@
   "commonGenderFemale": "Female",
   "commonGenderOther": "Other",
   "commonErrorOccurred": "An error occurred. Please try again.",
+  "commonMissingContactInfo": "Missing contact information.",
   "commonImagePickerPlaceholder": "Image picker would open here",
+  "commonMe": "Me",
+  "commonSetUp": "SET UP",
+  "commonPointsShort": "pts",
   
   "navHome": "HOME",
   "navActivities": "ACTIVITIES",
@@ -102,6 +106,7 @@
   "profileNextBilling": "NEXT BILLING",
   "profileMonthlyUsage": "Monthly usage",
   "profilePlanLabel": "PLAN",
+  "months": "months",
   "profileBenefit1": "Unlimited gym access",
   "profileBenefit2": "Priority court reservation",
   "profileBenefit3": "1 free guest per month",
@@ -138,6 +143,8 @@
   "bookingViewTicket": "VIEW TICKET",
   "bookingNoSlots": "No slots available for this date.",
   "bookingPay": "PAY",
+  "bookingStepMember": "MEMBER",
+  "bookingMemberSelectSubtitle": "Select a profile for pricing and eligibility.",
   "bookingDateLabel": "DATE & TIME",
   "bookingLocationLabel": "LOCATION",
   "bookingSummaryTitle": "SUMMARY",
@@ -204,12 +211,15 @@
   "settingsDelete": "DELETE",
   "settingsCancel": "CANCEL",
   "profileEditTitle": "EDIT PROFILE",
+  "profileEditSubtitle": "Update your information and profile details.",
   "profileSave": "SAVE CHANGES",
   "profileUpdateSuccess": "Profile updated successfully!",
   "passwordChangeTitle": "CHANGE PASSWORD",
   "passwordCurrentLabel": "Current Password",
   "passwordCurrentHint": "Enter current password",
   "passwordUpdateSuccess": "Password updated successfully!",
+  "errorUpdatingProfile": "Error updating profile",
+  "errorUpdatingPassword": "Error updating password",
   "authFirstNameLabel": "First Name",
   "authFirstNameHint": "Enter your first name",
   "authLastNameLabel": "Last Name",
@@ -250,8 +260,82 @@
   "languageLabel": "Select Language",
   "languageEnglish": "English",
   "languageFrench": "Français",
+  "profileStandardTier": "Standard",
+  "authInvalidVerificationCode": "Invalid verification code",
+  "searchHint": "Search activities, courses, settings...",
+  "searchRecentTitle": "Global Search",
+  "searchRecentSubtitle": "Find activities, courses, or settings across the app.",
+  "searchNoResultsTitle": "No results for \"{query}\"",
+  "@searchNoResultsTitle": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResultsSubtitle": "Try different keywords or check spelling.",
+  "subscriptionSelectPlanTitle": "Select a Plan",
+  "subscriptionPlanBasic": "Basic",
+  "subscriptionPlanPremium": "Premium",
+  "subscriptionConfirmPlan": "CONFIRM PLAN",
+  "subscriptionPricePerMonth": "{price} TND / month",
+  "@subscriptionPricePerMonth": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "profileOtpCodeLabel": "OTP Code",
+  "profileOtpCodeHint": "000000",
+  "bookingPointsToEarned": "Points to be earned",
+  "courseFull": "FULL",
+  "courseRemaining": "{remaining} LEFT",
+  "@courseRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "loyaltyDashboardTitle": "Loyalty Program",
+  "loyaltyTotalPoints": "Total Points",
+  "loyaltyGoldMember": "Gold Member",
+  "loyaltyPointsToPlatinum": "{points} points until Platinum Tier",
+  "@loyaltyPointsToPlatinum": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
   "authGenderLabel": "Gender",
   "authGenderHint": "Select gender",
+  "legalLastUpdated": "Last Updated: May 2026",
+  "privacyPolicySection1Title": "1. Information Collection",
+  "privacyPolicySection1Content": "We collect personal information that you provide to us, such as your name, email address, phone number, and payment information when you register or use our services.",
+  "privacyPolicySection2Title": "2. Use of Information",
+  "privacyPolicySection2Content": "Your information is used to provide and improve our services, process payments, send notifications about your bookings, and communicate with you about updates or offers.",
+  "privacyPolicySection3Title": "3. Data Security",
+  "privacyPolicySection3Content": "We implement industry-standard security measures to protect your personal data. However, no method of transmission over the internet is 100% secure.",
+  "privacyPolicySection4Title": "4. Third-Party Services",
+  "privacyPolicySection4Content": "We may use third-party service providers to facilitate our services, such as payment processors. These third parties have access to your information only to perform specific tasks on our behalf.",
+  "privacyPolicySection5Title": "5. Your Rights",
+  "privacyPolicySection5Content": "You have the right to access, update, or delete your personal information at any time through the app settings or by contacting our support team.",
+  "privacyPolicySection6Title": "6. Cookies and Tracking",
+  "privacyPolicySection6Content": "We use cookies and similar tracking technologies to track activity on our service and hold certain information to improve your experience.",
+  "termsSection1Title": "1. Acceptance of Terms",
+  "termsSection1Content": "By accessing or using Bourgo Arena services, you agree to be bound by these terms. If you do not agree, please do not use the application.",
+  "termsSection2Title": "2. Description of Service",
+  "termsSection2Content": "Bourgo Arena provides a platform for booking sports facilities, managing gym memberships, and participating in scheduled fitness classes in Djerba, Tunisia.",
+  "termsSection3Title": "3. User Responsibilities",
+  "termsSection3Content": "Users are responsible for maintaining the confidentiality of their accounts and for all activities that occur under their credentials. You agree to follow gym rules and respect other members.",
+  "termsSection4Title": "4. Bookings and Payments",
+  "termsSection4Content": "All bookings are subject to availability. Payments made through the app are processed securely. Cancellations must be made according to our cancellation policy to be eligible for refunds.",
+  "termsSection5Title": "5. Limitation of Liability",
+  "termsSection5Content": "Bourgo Arena is not liable for any personal injury or property damage sustained while using the facilities, except where caused by our gross negligence.",
+  "termsSection6Title": "6. Changes to Terms",
+  "termsSection6Content": "We reserve the right to modify these terms at any time. Your continued use of the app after such changes constitutes acceptance of the new terms.",
 
   "errorNotFoundTitle": "PAGE NOT FOUND",
   "errorNotFoundSubtitle": "Oops! The page you're looking for doesn't exist or has been moved.",
@@ -260,6 +344,7 @@
   "profileDisableFamilyContent": "This will hide all children profiles and features. Are you sure you want to continue?",
   "profileDisableConfirm": "DISABLE",
   "commonCancel": "CANCEL",
+  "commonContinue": "CONTINUE",
   "profileLogoutTitle": "Sign Out?",
   "profileLogoutMessage": "Are you sure you want to sign out? You'll need to log in again to access your account.",
   "profileLogoutConfirm": "SIGN OUT",
@@ -277,5 +362,8 @@
   "authVerifyEmailTitle": "Verify Email Address",
   "authVerifyEmailSubtitle": "We'll send a 6-digit code to your email {email}.",
   "authVerificationCompleteTitle": "Verification Complete",
-  "authVerificationCompleteMessage": "All verification methods have been successfully verified. Let's continue with your profile setup."
+  "authVerificationCompleteMessage": "All verification methods have been successfully verified. Let's continue with your profile setup.",
+  "authDontShowAgain": "Don't show again",
+  "authSkipForever": "SKIP FOREVER",
+  "authSkipForeverMessage": "We recommend verifying both methods for maximum security. You can always do this later in settings."
 }
