@@ -39,6 +39,12 @@ class User {
   /// Gender of the user.
   final String? gender;
 
+  /// Current status of the user account.
+  final String status;
+
+  /// Current flow state of the user account.
+  final String state;
+
   /// Whether this is a parent account that can manage children.
   final bool isParentAccount;
 
@@ -59,6 +65,8 @@ class User {
     required this.totalCheckIns,
     this.birthDate,
     this.gender,
+    this.status = 'active',
+    this.state = 'active',
     this.isParentAccount = false,
     this.children = const [],
   });
@@ -76,6 +84,8 @@ class User {
     int? totalCheckIns,
     DateTime? birthDate,
     String? gender,
+    String? status,
+    String? state,
     bool? isParentAccount,
     List<ChildProfile>? children,
   }) {
@@ -92,6 +102,8 @@ class User {
       totalCheckIns: totalCheckIns ?? this.totalCheckIns,
       birthDate: birthDate ?? this.birthDate,
       gender: gender ?? this.gender,
+      status: status ?? this.status,
+      state: state ?? this.state,
       isParentAccount: isParentAccount ?? this.isParentAccount,
       children: children ?? this.children,
     );
@@ -117,6 +129,8 @@ class User {
           totalCheckIns == other.totalCheckIns &&
           birthDate == other.birthDate &&
           gender == other.gender &&
+          status == other.status &&
+          state == other.state &&
           isParentAccount == other.isParentAccount &&
           _listEquality.equals(children, other.children);
 
@@ -134,6 +148,8 @@ class User {
       totalCheckIns.hashCode ^
       birthDate.hashCode ^
       gender.hashCode ^
+      status.hashCode ^
+      state.hashCode ^
       isParentAccount.hashCode ^
       _listEquality.hash(children);
 

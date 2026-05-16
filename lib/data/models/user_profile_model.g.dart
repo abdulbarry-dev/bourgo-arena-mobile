@@ -23,6 +23,8 @@ UserProfileModel _$UserProfileModelFromJson(Map<String, dynamic> json) =>
           ? null
           : DateTime.parse(json['birth_date'] as String),
       gender: json['gender'] as String?,
+      status: json['status'] as String?,
+      state: json['state'] as String?,
       isParentAccount: json['is_parent_account'] as bool? ?? false,
       children:
           (json['children'] as List<dynamic>?)
@@ -48,6 +50,8 @@ Map<String, dynamic> _$UserProfileModelToJson(UserProfileModel instance) =>
       'total_check_ins': instance.totalCheckIns,
       'birth_date': instance.birthDate?.toIso8601String(),
       'gender': instance.gender,
+      'status': instance.status,
+      'state': instance.state,
       'is_parent_account': instance.isParentAccount,
       'children': instance.children,
     };

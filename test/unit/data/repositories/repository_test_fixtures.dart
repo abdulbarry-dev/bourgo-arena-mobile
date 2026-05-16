@@ -335,12 +335,16 @@ Map<String, dynamic> testTimeSlotJson({
 VerificationStatus testVerificationStatusEntity({
   bool emailVerified = false,
   bool phoneVerified = false,
+  bool onboardingCompleted = false,
+  bool? isFullyVerified,
   String? email = 'alex@example.com',
   String? phone = '+15550000000',
 }) {
   return VerificationStatus(
     emailVerified: emailVerified,
     phoneVerified: phoneVerified,
+    onboardingCompleted: onboardingCompleted,
+    isFullyVerified: isFullyVerified,
     email: email,
     phone: phone,
   );
@@ -349,12 +353,16 @@ VerificationStatus testVerificationStatusEntity({
 Map<String, dynamic> testVerificationStatusJson({
   bool emailVerified = false,
   bool phoneVerified = false,
+  bool onboardingCompleted = false,
+  bool? isFullyVerified,
   String? email = 'alex@example.com',
   String? phone = '+15550000000',
 }) {
   return {
     'email_verified': emailVerified,
     'phone_verified': phoneVerified,
+    'onboarding_completed': onboardingCompleted,
+    'is_fully_verified': isFullyVerified,
     'email': email,
     'phone': phone,
   };
