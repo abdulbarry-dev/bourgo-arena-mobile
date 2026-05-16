@@ -4,7 +4,6 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/widgets/tier_badge.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
@@ -176,14 +175,7 @@ class _StatsRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoyaltyDashboardScreen(),
-                ),
-              );
-            },
+            onTap: () => context.push('/loyalty'),
             child: _StatItem(
               label: AppLocalizations.of(context)!.profilePoints,
               value: user.loyaltyPoints.toString(),

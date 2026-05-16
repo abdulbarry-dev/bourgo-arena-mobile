@@ -292,7 +292,11 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/loyalty',
-      builder: (context, state) => const LoyaltyDashboardScreen(),
+      builder: (context, state) => LoyaltyDashboardScreen(
+        viewModel: LoyaltyDashboardViewModel(
+          authStateNotifier: authStateNotifier,
+        ),
+      ),
     ),
     GoRoute(
       path: '/subscription',

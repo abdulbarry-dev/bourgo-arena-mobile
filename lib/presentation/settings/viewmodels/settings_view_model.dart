@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_e
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 /// ViewModel for managing application-wide settings.
 class SettingsViewModel extends ChangeNotifier {
@@ -26,6 +27,7 @@ class SettingsViewModel extends ChangeNotifier {
   Locale _locale = const Locale('en');
   bool _notificationsEnabled = true;
   bool _languageSelected = false;
+  String _appVersion = '';
 
   /// Creates a new [SettingsViewModel] with sensible defaults.
   ///
@@ -54,6 +56,9 @@ class SettingsViewModel extends ChangeNotifier {
   /// Whether push notifications are enabled.
   bool get notificationsEnabled => _notificationsEnabled;
 
+  /// The formatted app version string (e.g., "1.0.0 (1)").
+  String get appVersion => _appVersion;
+
   /// Loads all persisted settings from storage.
   ///
   /// Must be called once after construction (e.g. during DI setup).
@@ -63,12 +68,14 @@ class SettingsViewModel extends ChangeNotifier {
       _getLocaleUseCase(),
       _getNotificationsEnabledUseCase(),
       _isLanguageSelectedUseCase(),
+      PackageInfo.fromPlatform(),
     ]);
 
     final themeResult = results[0] as Result<ThemeMode, dynamic>;
     final localeResult = results[1] as Result<Locale, dynamic>;
     final notifResult = results[2] as Result<bool, dynamic>;
     final langResult = results[3] as Result<bool, dynamic>;
+    final packageInfo = results[4] as PackageInfo;
 
     if (themeResult.isSuccess) {
       _themeMode = (themeResult as Success<ThemeMode, dynamic>).data;
@@ -82,6 +89,8 @@ class SettingsViewModel extends ChangeNotifier {
     if (langResult.isSuccess) {
       _languageSelected = (langResult as Success<bool, dynamic>).data;
     }
+
+    _appVersion = '${packageInfo.version} (${packageInfo.buildNumber})';
 
     notifyListeners();
   }

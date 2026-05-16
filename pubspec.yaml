@@ -47,6 +47,7 @@ dependencies:
   http: ^1.6.0
   get_it: ^9.2.1
   collection: ^1.19.1
+  package_info_plus: ^10.1.0
 
 dev_dependencies:
   test: ^1.26.3

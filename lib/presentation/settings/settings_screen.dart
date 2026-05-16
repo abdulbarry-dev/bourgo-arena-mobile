@@ -109,7 +109,7 @@ class SettingsScreen extends StatelessWidget {
                     icon: Symbols.info,
                     title: l10n.settingsAppVersion,
                     trailing: Text(
-                      '1.0.0 (1)',
+                      viewModel.appVersion,
                       style: TextStyle(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
