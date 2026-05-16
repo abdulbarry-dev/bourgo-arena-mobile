@@ -23,7 +23,18 @@ class ApiAuthRepository implements AuthRepository {
   final StreamController<AuthSession> _authStateController =
       StreamController<AuthSession>.broadcast();
 
-  ApiAuthRepository(this._apiClient, this._sessionRepository);
+  ApiAuthRepository(this._apiClient, this._sessionRepository) {
+    _apiClient.onAuthError = (String? state) {
+      if (state != null) {
+        final authState = _mapBackendState(state);
+        if (_currentSession != null && _currentSession!.state != authState) {
+          _updateSession(_currentSession!.copyWith(state: authState));
+        } else if (_currentSession == null) {
+          _updateSession(AuthSession(state: authState));
+        }
+      }
+    };
+  }
 
   Future<void> _updateSession(AuthSession session) async {
     _currentSession = session;
@@ -222,6 +233,9 @@ class ApiAuthRepository implements AuthRepository {
     bool isFamilyAccount = false,
   }) {
     return executeApiCall(() async {
+      // Clear any existing token to ensure registration is unauthenticated
+      _apiClient.setToken(null);
+
       await _apiClient.post('/auth/register', {
         'name': '$firstName $lastName',
         'email': email,
