@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/verification_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
+import 'package:bourgo_arena_mobile/data/models/verification_status_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
@@ -69,9 +71,19 @@ class ApiAuthRepository implements AuthRepository {
       final stateStr = response['state'] as String?;
       final state = _mapBackendState(stateStr);
 
+      VerificationData? verificationData;
+      if (response['verification_status'] != null) {
+        final status = response['verification_status'] as Map<String, dynamic>;
+        verificationData = VerificationData(
+          unverifiedMethod: status['unverified_method'] ?? 'phone',
+          email: status['email'],
+          phone: status['phone'],
+        );
+      }
+
       if (token != null) {
         _apiClient.setToken(token);
-        await _sessionRepository.saveAuthToken(token);
+        // _updateSession will handle saving the token
       }
 
       await _sessionRepository.saveAuthState(state.name);
@@ -94,9 +106,15 @@ class ApiAuthRepository implements AuthRepository {
         user = UserMapper.toEntity(userModel);
       }
 
-      final session = AuthSession(user: user, state: state, token: token);
-      await _updateSession(session);
-      return Success(session);
+      final session = AuthSession(
+        user: user,
+        state: state,
+        token: token,
+        verificationData: verificationData,
+      );
+      final finalSession = await _checkLoginVerification(session);
+      await _updateSession(finalSession);
+      return Success(finalSession);
     });
 
     // If the API call failed but returned a state (e.g. pending_onboarding),
@@ -108,7 +126,6 @@ class ApiAuthRepository implements AuthRepository {
 
         if (failure.token != null) {
           _apiClient.setToken(failure.token);
-          await _sessionRepository.saveAuthToken(failure.token!);
 
           // Try to fetch user profile to populate the session
           try {
@@ -117,28 +134,64 @@ class ApiAuthRepository implements AuthRepository {
             final userModel = UserProfileModel.fromJson(userResponse);
             final user = UserMapper.toEntity(userModel);
 
-            await _sessionRepository.saveAuthState(state.name);
             final session = AuthSession(
               user: user,
               state: state,
               token: failure.token,
             );
-            _authStateController.add(session);
-            return Success(session);
+            final finalSession = await _checkLoginVerification(session);
+            await _updateSession(finalSession);
+            return Success(finalSession);
           } catch (_) {
             // If profile fetch fails, continue with state only
           }
         }
 
-        await _sessionRepository.saveAuthState(state.name);
-
         final session = AuthSession(state: state, token: failure.token);
-        _authStateController.add(session);
+        await _updateSession(session);
         return Success(session);
       }
     }
 
     return result;
+  }
+
+  Future<AuthSession> _checkLoginVerification(AuthSession session) async {
+    // We only prompt for second OTP if the user is already "authenticated" (active)
+    // and fully onboarded (PIN set).
+    if (session.state == AuthState.authenticated && session.user != null) {
+      final skipForeverResult = await _sessionRepository
+          .shouldSkipLoginOtpForever();
+      final skipForever = skipForeverResult.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => false,
+      );
+
+      if (!skipForever) {
+        final statusResult = await getVerificationStatus();
+        return statusResult.fold(
+          onSuccess: (status) {
+            // If not fully verified, mark as needing login verification
+            if (!status.isFullyVerified) {
+              return AuthSession(
+                user: session.user,
+                state: AuthState.pendingAdditionalVerification,
+                token: session.token,
+                verificationData: VerificationData(
+                  unverifiedMethod: status.unverifiedMethod ?? 'phone',
+                  email: status.email,
+                  phone: status.phone,
+                ),
+                needsLoginVerification: true,
+              );
+            }
+            return session;
+          },
+          onFailure: (_) => session,
+        );
+      }
+    }
+    return session;
   }
 
   @override
@@ -181,12 +234,8 @@ class ApiAuthRepository implements AuthRepository {
       });
 
       // After successful registration, the user is typically in pending_verification state.
-      await _sessionRepository.saveAuthState(
-        AuthState.pendingVerification.name,
-      );
       await _sessionRepository.savePendingVerificationEmail(email);
-
-      _updateSession(
+      await _updateSession(
         AuthSession(state: AuthState.pendingVerification, pendingEmail: email),
       );
 
@@ -212,15 +261,18 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final isValid = response['valid'] == true;
+      final isValid =
+          response['valid'] == true || response.containsKey('state');
 
       if (isValid) {
         final token = response['token'] as String?;
         final stateStr = response['state'] as String?;
 
-        if (token != null) {
+        if (token != null && stateStr == null) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
+        } else if (token != null) {
+          _apiClient.setToken(token);
         }
 
         if (stateStr != null) {
@@ -274,7 +326,7 @@ class ApiAuthRepository implements AuthRepository {
       final token = response['token'] as String?;
       if (token != null) {
         _apiClient.setToken(token);
-        await _sessionRepository.saveAuthToken(token);
+        // _updateSession will be called via getUserProfile()
 
         // Fetch the full profile from the server to ensure we have
         // consistent data (id, roles, etc.)
@@ -287,9 +339,24 @@ class ApiAuthRepository implements AuthRepository {
 
       final stateStr = response['state'] as String? ?? 'active';
       final state = _mapBackendState(stateStr);
-      await _sessionRepository.saveAuthState(state.name);
 
-      _authStateController.add(AuthSession(user: user, state: state));
+      VerificationData? verificationData;
+      if (response['verification_status'] != null) {
+        final status = response['verification_status'] as Map<String, dynamic>;
+        verificationData = VerificationData(
+          unverifiedMethod: status['unverified_method'] ?? 'phone',
+          email: status['email'],
+          phone: status['phone'],
+        );
+      }
+
+      await _updateSession(
+        AuthSession(
+          user: user,
+          state: state,
+          verificationData: verificationData,
+        ),
+      );
       return const Success(null);
     });
   }
@@ -358,8 +425,9 @@ class ApiAuthRepository implements AuthRepository {
       );
 
       final session = AuthSession(user: user, state: state, token: token);
-      await _updateSession(session);
-      return Success(session);
+      final finalSession = await _checkLoginVerification(session);
+      await _updateSession(finalSession);
+      return Success(finalSession);
     });
 
     if (result is FailureResult<AuthSession, Failure>) {
@@ -386,7 +454,8 @@ class ApiAuthRepository implements AuthRepository {
       final response =
           await _apiClient.get('/user/verification-status')
               as Map<String, dynamic>;
-      final status = VerificationStatus.fromJson(response);
+      final model = VerificationStatusModel.fromJson(response);
+      final status = VerificationMapper.toEntity(model);
       return Success(status);
     });
   }
@@ -401,15 +470,18 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final isValid = response['valid'] == true;
+      final isValid =
+          response['valid'] == true || response.containsKey('state');
 
       if (isValid) {
         final token = response['token'] as String?;
         final stateStr = response['state'] as String?;
 
-        if (token != null) {
+        if (token != null && stateStr == null) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
+        } else if (token != null) {
+          _apiClient.setToken(token);
         }
 
         if (stateStr != null) {
@@ -444,15 +516,18 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final isValid = response['valid'] == true;
+      final isValid =
+          response['valid'] == true || response.containsKey('state');
 
       if (isValid) {
         final token = response['token'] as String?;
         final stateStr = response['state'] as String?;
 
-        if (token != null) {
+        if (token != null && stateStr == null) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
+        } else if (token != null) {
+          _apiClient.setToken(token);
         }
 
         if (stateStr != null) {
@@ -490,21 +565,22 @@ class ApiAuthRepository implements AuthRepository {
       final stateStr = response['state'] as String?;
       final token = response['token'] as String?;
 
-      if (token != null) {
+      if (token != null && stateStr == null) {
         _apiClient.setToken(token);
         await _sessionRepository.saveAuthToken(token);
+      } else if (token != null) {
+        _apiClient.setToken(token);
       }
 
       if (stateStr != null) {
         final state = _mapBackendState(stateStr);
-        await _sessionRepository.saveAuthState(state.name);
-
-        _currentSession = AuthSession(
-          user: _currentSession?.user,
-          state: state,
-          token: token ?? _currentSession?.token,
+        await _updateSession(
+          AuthSession(
+            user: _currentSession?.user,
+            state: state,
+            token: token ?? _currentSession?.token,
+          ),
         );
-        _authStateController.add(_currentSession!);
       }
 
       return Success(true);

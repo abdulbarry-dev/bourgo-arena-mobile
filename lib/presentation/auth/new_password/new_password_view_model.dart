@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -43,7 +44,11 @@ class NewPasswordViewModel extends ChangeNotifier {
         result.fold(
           onSuccess: (_) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Password reset successfully')),
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)!.passwordUpdateSuccess,
+                ),
+              ),
             );
             context.go('/login');
           },

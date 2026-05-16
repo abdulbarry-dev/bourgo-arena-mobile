@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -21,12 +22,15 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
 
   /// Use case to send OTP
   final SendOtpUseCase sendOtpUseCase;
-  
+
   /// Repository for auth operations
   final AuthRepository authRepository;
-  
+
   /// Use case to fetch verification status
   final GetVerificationStatusUseCase getVerificationStatusUseCase;
+
+  /// Auth state notifier for session and persistence management
+  final AuthStateNotifier authStateNotifier;
 
   const VerifyAdditionalMethodScreen({
     super.key,
@@ -36,6 +40,7 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
     required this.sendOtpUseCase,
     required this.authRepository,
     required this.getVerificationStatusUseCase,
+    required this.authStateNotifier,
   });
 
   @override
@@ -69,12 +74,12 @@ class _VerifyAdditionalMethodScreenState
     });
 
     final result = await widget.getVerificationStatusUseCase();
-    
+
     if (mounted) {
       setState(() {
         _isFetchingStatus = false;
       });
-      
+
       result.when(
         success: (status) {
           setState(() {
@@ -88,9 +93,9 @@ class _VerifyAdditionalMethodScreenState
           });
         },
         failure: (failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(failure.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(failure.message)));
         },
       );
     }
@@ -104,9 +109,7 @@ class _VerifyAdditionalMethodScreenState
 
   void _verifyNow() async {
     _setLoading(true);
-    final identifier = _unverifiedMethod == 'email'
-        ? _email
-        : _phone;
+    final identifier = _unverifiedMethod == 'email' ? _email : _phone;
 
     if (identifier != null && identifier.isNotEmpty) {
       // Send OTP to the unverified method
@@ -123,36 +126,41 @@ class _VerifyAdditionalMethodScreenState
             );
           },
           failure: (failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(failure.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(failure.message)));
           },
         );
       }
     } else {
       _setLoading(false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Missing contact information.')),
-      );
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.commonMissingContactInfo)));
+      }
     }
   }
 
-  void _skipForNow() async {
+  void _skipForNow() {
+    widget.authStateNotifier.skipForSession();
+  }
+
+  void _skipForever() async {
     _setLoading(true);
-    final result = await widget.authRepository.skipAdditionalVerification();
-    
-    if (mounted) {
-      _setLoading(false);
-      result.when(
-        success: (_) {
-          context.go('/account-setup');
-        },
-        failure: (failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(failure.message)),
-          );
-        },
-      );
+    try {
+      // Synchronize with backend if possible
+      await widget.authRepository.skipAdditionalVerification();
+      // Update local state and persistence
+      await widget.authStateNotifier.skipForever();
+    } catch (e) {
+      // Even if backend fails, we respect the user's wish locally
+      await widget.authStateNotifier.skipForever();
+    } finally {
+      if (mounted) {
+        _setLoading(false);
+      }
     }
   }
 
@@ -160,16 +168,12 @@ class _VerifyAdditionalMethodScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    
+
     if (_isFetchingStatus) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    
-    final identifier = _unverifiedMethod == 'email'
-        ? _email
-        : _phone;
+
+    final identifier = _unverifiedMethod == 'email' ? _email : _phone;
 
     final title = _unverifiedMethod == 'email'
         ? l10n.authVerifyEmailTitle
@@ -191,7 +195,9 @@ class _VerifyAdditionalMethodScreenState
                 AuthHeader(
                   title: l10n.authVerifyAdditionalMethodTitle,
                   subtitle: l10n.authVerifyAdditionalMethodMessage(
-                    _unverifiedMethod,
+                    _unverifiedMethod == 'email'
+                        ? l10n.authEmailLabel
+                        : l10n.authPhoneLabel,
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -237,22 +243,43 @@ class _VerifyAdditionalMethodScreenState
                 ElevatedButton(
                   onPressed: _isLoading ? null : _verifyNow,
                   child: _isLoading
-                      ? SizedBox(
+                      ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: theme.colorScheme.onPrimary,
+                            color: Colors.white,
                           ),
                         )
                       : Text(l10n.authVerifyNow),
                 ),
                 const SizedBox(height: 16),
-                TextButton(
+                OutlinedButton(
                   onPressed: _isLoading ? null : _skipForNow,
                   child: Text(l10n.authSkipForNow),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: _isLoading ? null : _skipForever,
+                  child: Text(
+                    l10n.authDontShowAgain,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.authSkipForeverMessage,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
                 // Informational text
                 Text(
                   l10n.authMethodAccessInstruction,

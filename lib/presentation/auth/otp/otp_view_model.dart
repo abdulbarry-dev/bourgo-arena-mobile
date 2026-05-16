@@ -73,7 +73,7 @@ class OtpViewModel extends ChangeNotifier {
               },
             );
           } else {
-            _errorMessage = 'Invalid verification code';
+            _errorMessage = 'authInvalidVerificationCode';
             notifyListeners();
           }
         },

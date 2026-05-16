@@ -17,6 +17,7 @@ class AuthStateNotifier extends ChangeNotifier {
 
   AuthSession _session = AuthSession.unauthenticated();
   StreamSubscription<AuthSession>? _authSubscription;
+  bool _skippedForSession = false;
 
   AuthStateNotifier(
     this._authRepository,
@@ -28,17 +29,53 @@ class AuthStateNotifier extends ChangeNotifier {
 
   void _init() {
     _authSubscription = _authRepository.onAuthStateChanged.listen((session) {
-      _session = session;
-      if (session.isAuthenticated) {
-        unawaited(_deviceTokenRegistrar.registerIfPossible());
-      }
-      notifyListeners();
+      _applySession(session);
     });
+  }
+
+  void _applySession(AuthSession session) {
+    if (_skippedForSession &&
+        (session.state == AuthState.pendingAdditionalVerification ||
+            session.needsLoginVerification)) {
+      _session = session.copyWith(
+        state: AuthState.authenticated,
+        needsLoginVerification: false,
+      );
+    } else {
+      _session = session;
+    }
+
+    if (_session.isAuthenticated) {
+      unawaited(_deviceTokenRegistrar.registerIfPossible());
+    }
+    notifyListeners();
+  }
+
+  /// Whether the user has skipped the additional verification for this session.
+  bool get skippedForSession => _skippedForSession;
+
+  /// Sets the flag to skip login OTP verification for the current session only.
+  void skipForSession() {
+    _skippedForSession = true;
+    _applySession(_session);
+  }
+
+  /// Sets the persistent preference to skip login OTP verification forever.
+  Future<void> skipForever() async {
+    _skippedForSession = true;
+    await _sessionRepository.setSkipLoginOtpForever(true);
+    _applySession(_session);
   }
 
   /// Initializes the auth state by fetching the current user profile if a
   /// token exists, or restoring a pending state from persistence.
   Future<void> initialize() async {
+    final skipResult = await _sessionRepository.shouldSkipLoginOtpForever();
+    _skippedForSession = skipResult.fold(
+      onSuccess: (v) => v,
+      onFailure: (_) => false,
+    );
+
     final tokenResult = await _authRepository.getToken();
     final token = tokenResult.fold(
       onSuccess: (token) => token,

@@ -154,10 +154,10 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
               children: [
                 AuthHeader(
                   title: _isEditing
-                      ? 'Edit Profile'
+                      ? l10n.profileEditTitle
                       : l10n.authAccountOverviewTitle,
                   subtitle: _isEditing
-                      ? 'Update your information'
+                      ? l10n.profileEditSubtitle
                       : l10n.authAccountOverviewSubtitle,
                 ),
                 const SizedBox(height: 32),
@@ -252,7 +252,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       Expanded(
                         child: AuthTextField(
                           label: l10n.authFirstNameLabel,
-                          hint: 'First name',
+                          hint: l10n.authFirstNameHint,
                           leadingIcon: Symbols.person,
                           controller: _firstNameController,
                         ),
@@ -261,7 +261,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       Expanded(
                         child: AuthTextField(
                           label: l10n.authLastNameLabel,
-                          hint: 'Last name',
+                          hint: l10n.authLastNameHint,
                           leadingIcon: Symbols.person,
                           controller: _lastNameController,
                         ),
@@ -296,7 +296,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Gender',
+                          l10n.authGenderLabel,
                           style: theme.textTheme.labelLarge?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w600,
@@ -306,14 +306,14 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                         Row(
                           children: [
                             _GenderOption(
-                              label: 'Male',
+                              label: l10n.commonGenderMale,
                               isSelected: _selectedGender == 'male',
                               onTap: () =>
                                   setState(() => _selectedGender = 'male'),
                             ),
                             const SizedBox(width: 12),
                             _GenderOption(
-                              label: 'Female',
+                              label: l10n.commonGenderFemale,
                               isSelected: _selectedGender == 'female',
                               onTap: () =>
                                   setState(() => _selectedGender = 'female'),
@@ -324,7 +324,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                     )
                   else
                     AuthTextField(
-                      label: 'Gender',
+                      label: l10n.authGenderLabel,
                       hint: '',
                       leadingIcon: Symbols.person,
                       controller: TextEditingController(text: _selectedGender),
@@ -335,8 +335,8 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                 if (_isEditing || _selectedBirthDate != null) ...[
                   const SizedBox(height: 20),
                   AuthTextField(
-                    label: 'Birth Date',
-                    hint: 'Select birth date',
+                    label: l10n.authBirthDateLabel,
+                    hint: l10n.authBirthDateHint,
                     leadingIcon: Symbols.calendar_month,
                     controller: _birthDateController,
                     readOnly: true,
@@ -363,7 +363,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       backgroundColor: theme.colorScheme.primaryContainer,
                       foregroundColor: theme.colorScheme.onPrimaryContainer,
                     ),
-                    child: const Text('Save Changes'),
+                    child: Text(l10n.profileSave),
                   ),
 
                 const SizedBox(height: 48),

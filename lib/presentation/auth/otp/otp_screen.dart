@@ -79,9 +79,13 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _onViewModelChanged() {
     if (_viewModel.errorMessage != null) {
+      final l10n = AppLocalizations.of(context)!;
+      final message = _viewModel.errorMessage == 'authInvalidVerificationCode'
+          ? l10n.authInvalidVerificationCode
+          : _viewModel.errorMessage!;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 

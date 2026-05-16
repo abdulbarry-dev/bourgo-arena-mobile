@@ -54,6 +54,19 @@ void main() {
     when(
       () => sessionRepository.clearSession(),
     ).thenAnswer((_) async => const Success(null));
+
+    when(
+      () => sessionRepository.shouldSkipLoginOtpForever(),
+    ).thenAnswer((_) async => const Success(false));
+
+    // Default mock for verification status endpoint
+    when(() => apiClient.get('/user/verification-status')).thenAnswer(
+      (_) async => {
+        'email_verified': true,
+        'phone_verified': true,
+        'is_fully_verified': true,
+      },
+    );
   });
 
   group('ApiAuthRepository', () {
@@ -115,7 +128,7 @@ void main() {
           }),
         ).called(1);
         verify(() => apiClient.setToken(null)).called(1);
-        verify(() => apiClient.setToken(token)).called(1);
+        verify(() => apiClient.setToken(token)).called(2);
         verify(() => sessionRepository.saveAuthToken(token)).called(1);
         verify(() => apiClient.get('/user/profile')).called(1);
         await eventExpectation;
@@ -148,7 +161,7 @@ void main() {
             'password': 'secret123',
           }),
         ).called(1);
-        verify(() => apiClient.setToken(token)).called(1);
+        verify(() => apiClient.setToken(token)).called(2);
       });
 
       test(
@@ -848,6 +861,7 @@ void main() {
         final verificationStatusJson = testVerificationStatusJson(
           emailVerified: true,
           phoneVerified: true,
+          isFullyVerified: true,
         );
 
         when(
@@ -865,7 +879,11 @@ void main() {
     group('verifyEmail', () {
       test('returns success and broadcasts auth state on 200', () async {
         const token = 'new-token-123';
-        final responseData = {'valid': true, 'token': token, 'state': 'pending_onboarding'};
+        final responseData = {
+          'valid': true,
+          'token': token,
+          'state': 'pending_onboarding',
+        };
 
         when(
           () => apiClient.post('/user/verify-email', {
@@ -974,7 +992,11 @@ void main() {
         const token = 'new-token-456';
 
         when(() => apiClient.post('/user/verify-email', any())).thenAnswer(
-          (_) async => {'valid': true, 'token': token, 'state': 'pending_onboarding'},
+          (_) async => {
+            'valid': true,
+            'token': token,
+            'state': 'pending_onboarding',
+          },
         );
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -1087,9 +1109,9 @@ void main() {
       test('saves auth token on successful verification', () async {
         const token = 'phone-token-789';
 
-        when(
-          () => apiClient.post('/user/verify-phone', any()),
-        ).thenAnswer((_) async => {'valid': true, 'token': token, 'state': 'active'});
+        when(() => apiClient.post('/user/verify-phone', any())).thenAnswer(
+          (_) async => {'valid': true, 'token': token, 'state': 'active'},
+        );
         when(
           () => sessionRepository.saveAuthToken(token),
         ).thenAnswer((_) async => const Success<void, Failure>(null));
@@ -1112,7 +1134,11 @@ void main() {
               'otp': '123456',
             }),
           ).thenAnswer(
-            (_) async => {'valid': true, 'token': 'token', 'state': 'authenticated'},
+            (_) async => {
+              'valid': true,
+              'token': 'token',
+              'state': 'authenticated',
+            },
           );
           when(
             () => sessionRepository.saveAuthToken('token'),

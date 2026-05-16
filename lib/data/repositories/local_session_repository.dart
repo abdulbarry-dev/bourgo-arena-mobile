@@ -37,6 +37,9 @@ class LocalSessionRepository implements SessionRepository {
   // Remember Me
   static const String _rememberedIdentifierKey = 'remembered_identifier';
 
+  // Login OTP Verification
+  static const String _skipLoginOtpForeverKey = 'skip_login_otp_forever';
+
   /// All session-scoped keys that should be wiped atomically by [clearSession].
   /// This list is the source of truth for session-wide data; every session field
   /// added in the future MUST be added here.
@@ -372,6 +375,36 @@ class LocalSessionRepository implements SessionRepository {
     } catch (e) {
       return FailureResult(
         CacheFailure('Failed to clear remembered identifier: ${e.toString()}'),
+      );
+    }
+  }
+
+  // =========== Login OTP Verification ===========
+
+  @override
+  Future<Result<bool, Failure>> shouldSkipLoginOtpForever() async {
+    try {
+      final skip = _prefs.getBool(_skipLoginOtpForeverKey) ?? false;
+      return Success(skip);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          'Failed to check login OTP skip preference: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setSkipLoginOtpForever(bool skip) async {
+    try {
+      await _prefs.setBool(_skipLoginOtpForeverKey, skip);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          'Failed to save login OTP skip preference: ${e.toString()}',
+        ),
       );
     }
   }

@@ -6,6 +6,9 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -14,13 +17,19 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
+
 class MockAuthRepository extends Mock implements AuthRepository {}
-class MockGetVerificationStatusUseCase extends Mock implements GetVerificationStatusUseCase {}
+
+class MockGetVerificationStatusUseCase extends Mock
+    implements GetVerificationStatusUseCase {}
+
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 void main() {
   late MockSendOtpUseCase mockSendOtpUseCase;
   late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
   late MockAuthRepository mockAuthRepository;
+  late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUpAll(() {
     registerFallbackValue(const Success<void, Failure>(null));
@@ -30,10 +39,37 @@ void main() {
     mockSendOtpUseCase = MockSendOtpUseCase();
     mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
     mockAuthRepository = MockAuthRepository();
+    mockAuthStateNotifier = MockAuthStateNotifier();
 
-    when(() => mockAuthRepository.skipAdditionalVerification()).thenAnswer((_) async => Success(true));
+    when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
 
-    when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: true, phoneVerified: false, email: 'alex@example.com', phone: '+15550000000')));
+    when(() => mockAuthStateNotifier.session).thenReturn(
+      AuthSession(
+        user: null,
+        state: AuthState.pendingVerification,
+        token: 'test_token',
+        pendingEmail: null,
+        needsLoginVerification: false,
+      ),
+    );
+
+    when(
+      () => mockAuthRepository.skipAdditionalVerification(),
+    ).thenAnswer((_) async => Success(true));
+
+    when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+      (_) async => Success(
+        VerificationStatus(
+          emailVerified: true,
+          phoneVerified: false,
+          onboardingCompleted: false,
+          isFullyVerified: false,
+          email: 'alex@example.com',
+          phone: '+15550000000',
+        ),
+      ),
+    );
 
     // Default successful answer for send OTP
     when(
@@ -57,6 +93,7 @@ void main() {
             sendOtpUseCase: mockSendOtpUseCase,
             authRepository: mockAuthRepository,
             getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
+            authStateNotifier: mockAuthStateNotifier,
           ),
         ),
         GoRoute(
@@ -69,7 +106,8 @@ void main() {
         ),
         GoRoute(
           path: '/account-setup',
-          builder: (context, state) => const Scaffold(body: Text('Account Setup')),
+          builder: (context, state) =>
+              const Scaffold(body: Text('Account Setup')),
         ),
       ],
     );
@@ -132,7 +170,6 @@ void main() {
       },
     );
 
-    
     testWidgets('renders skip for now button', (tester) async {
       await setupScreenSize(tester);
       await tester.pumpWidget(
@@ -179,8 +216,6 @@ void main() {
 
       expect(find.textContaining('VERIFY'), findsWidgets);
     });
-
-    
 
     testWidgets(
       'calls sendOtpUseCase with correct phone when verify now is tapped',
@@ -243,8 +278,6 @@ void main() {
       expect(find.text('OTP'), findsOneWidget);
     });
 
-    
-
     testWidgets('renders title correctly', (tester) async {
       await setupScreenSize(tester);
       await tester.pumpWidget(
@@ -306,7 +339,18 @@ void main() {
     });
 
     testWidgets('handles null email correctly', (tester) async {
-      when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: true, phoneVerified: false, email: null, phone: '+15550000000')));
+      when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+        (_) async => Success(
+          VerificationStatus(
+            emailVerified: true,
+            phoneVerified: false,
+            onboardingCompleted: false,
+            isFullyVerified: false,
+            email: null,
+            phone: '+15550000000',
+          ),
+        ),
+      );
       await setupScreenSize(tester);
       await tester.pumpWidget(
         createWidgetUnderTest(
@@ -322,7 +366,18 @@ void main() {
     });
 
     testWidgets('handles null phone correctly', (tester) async {
-      when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: false, phoneVerified: true, email: 'alex@example.com', phone: null)));
+      when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+        (_) async => Success(
+          VerificationStatus(
+            emailVerified: false,
+            phoneVerified: true,
+            onboardingCompleted: false,
+            isFullyVerified: false,
+            email: 'alex@example.com',
+            phone: null,
+          ),
+        ),
+      );
       await setupScreenSize(tester);
       await tester.pumpWidget(
         createWidgetUnderTest(

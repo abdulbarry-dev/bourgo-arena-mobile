@@ -43,6 +43,8 @@ void main() {
         VerificationStatus(
           emailVerified: true,
           phoneVerified: true,
+          onboardingCompleted: true,
+          isFullyVerified: true,
           email: 'test@example.com',
           phone: '+1234567890',
         ),

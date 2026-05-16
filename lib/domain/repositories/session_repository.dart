@@ -92,4 +92,12 @@ abstract interface class SessionRepository {
 
   /// Clears the persisted identifier for "Remember Me".
   Future<Result<void, Failure>> clearRememberedIdentifier();
+
+  // =========== Login OTP Verification ===========
+
+  /// Checks if the user has opted out of login OTP verification reminders.
+  Future<Result<bool, Failure>> shouldSkipLoginOtpForever();
+
+  /// Persists the user's preference to skip login OTP verification reminders forever.
+  Future<Result<void, Failure>> setSkipLoginOtpForever(bool skip);
 }

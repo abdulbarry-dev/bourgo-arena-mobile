@@ -42,6 +42,8 @@ void main() {
           VerificationStatus(
             emailVerified: true,
             phoneVerified: true,
+            onboardingCompleted: true,
+            isFullyVerified: true,
             email: 'test@example.com',
             phone: '+1234567890',
           ),
@@ -75,6 +77,8 @@ void main() {
             VerificationStatus(
               emailVerified: false,
               phoneVerified: true,
+              onboardingCompleted: false,
+              isFullyVerified: false,
               email: 'test@example.com',
               phone: '+1234567890',
             ),
