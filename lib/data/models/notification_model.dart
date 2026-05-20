@@ -6,7 +6,7 @@ part 'notification_model.g.dart';
 @JsonSerializable(fieldRename: FieldRename.snake)
 class NotificationModel {
   /// Unique identifier.
-  final String id;
+  final int id;
 
   /// Title of the notification.
   final String title;
@@ -17,8 +17,8 @@ class NotificationModel {
   /// Timestamp string (ISO format).
   final String timestamp;
 
-  /// Type of notification (booking, promotion, system).
-  final String? type;
+  /// Category (e.g., welcome, reservation, system, alert).
+  final String type;
 
   /// Whether the notification has been read.
   final bool isRead;
@@ -29,7 +29,7 @@ class NotificationModel {
     required this.title,
     required this.message,
     required this.timestamp,
-    this.type,
+    required this.type,
     required this.isRead,
   });
 

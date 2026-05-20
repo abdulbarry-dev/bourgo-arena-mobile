@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/core/paginated_result.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/notification_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
@@ -25,18 +26,27 @@ void main() {
   group('GetNotificationsUseCase', () {
     test('returns notifications on success', () async {
       final notifications = <Notification>[testNotification()];
-      when(() => repository.getNotifications()).thenAnswer(
-        (_) async => Success<List<Notification>, Failure>(notifications),
+      final paginated = PaginatedResult(
+        data: notifications,
+        currentPage: 1,
+        lastPage: 1,
+        total: 1,
+        hasMore: false,
+      );
+      when(
+        () => repository.getNotifications(page: any(named: 'page')),
+      ).thenAnswer(
+        (_) async => Success<PaginatedResult<Notification>, Failure>(paginated),
       );
 
       final result = await useCase();
 
-      expect(result, isA<Success<List<Notification>, Failure>>());
+      expect(result, isA<Success<PaginatedResult<Notification>, Failure>>());
       expect(
-        (result as Success<List<Notification>, Failure>).data,
-        same(notifications),
+        (result as Success<PaginatedResult<Notification>, Failure>).data,
+        same(paginated),
       );
-      verify(() => repository.getNotifications()).called(1);
+      verify(() => repository.getNotifications(page: 1)).called(1);
       verifyNoMoreInteractions(repository);
     });
 
@@ -46,31 +56,53 @@ void main() {
         'notifications unavailable',
       );
 
-      when(() => repository.getNotifications()).thenAnswer(
-        (_) async => const FailureResult<List<Notification>, Failure>(failure),
+      when(
+        () => repository.getNotifications(page: any(named: 'page')),
+      ).thenAnswer(
+        (_) async =>
+            const FailureResult<PaginatedResult<Notification>, Failure>(
+              failure,
+            ),
       );
 
       final result = await useCase();
 
-      expect(result, isA<FailureResult<List<Notification>, Failure>>());
       expect(
-        (result as FailureResult<List<Notification>, Failure>).failure,
+        result,
+        isA<FailureResult<PaginatedResult<Notification>, Failure>>(),
+      );
+      expect(
+        (result as FailureResult<PaginatedResult<Notification>, Failure>)
+            .failure,
         same(failure),
       );
-      verify(() => repository.getNotifications()).called(1);
+      verify(() => repository.getNotifications(page: 1)).called(1);
       verifyNoMoreInteractions(repository);
     });
 
     test('returns empty notification lists unchanged', () async {
+      final emptyPaginated = PaginatedResult<Notification>(
+        data: [],
+        currentPage: 1,
+        lastPage: 1,
+        total: 0,
+        hasMore: false,
+      );
       when(
-        () => repository.getNotifications(),
-      ).thenAnswer((_) async => const Success<List<Notification>, Failure>([]));
+        () => repository.getNotifications(page: any(named: 'page')),
+      ).thenAnswer(
+        (_) async =>
+            Success<PaginatedResult<Notification>, Failure>(emptyPaginated),
+      );
 
       final result = await useCase();
 
-      expect(result, isA<Success<List<Notification>, Failure>>());
-      expect((result as Success<List<Notification>, Failure>).data, isEmpty);
-      verify(() => repository.getNotifications()).called(1);
+      expect(result, isA<Success<PaginatedResult<Notification>, Failure>>());
+      expect(
+        (result as Success<PaginatedResult<Notification>, Failure>).data.data,
+        isEmpty,
+      );
+      verify(() => repository.getNotifications(page: 1)).called(1);
       verifyNoMoreInteractions(repository);
     });
   });

@@ -38,7 +38,7 @@ void main() {
 
     test('maps an entity back to the DTO', () {
       final notification = entity.Notification(
-        id: 'notification-9',
+        id: 9,
         title: 'Reminder',
         message: 'Your session starts soon.',
         timestamp: DateTime.utc(2026, 5, 8, 12),
@@ -53,16 +53,13 @@ void main() {
     });
 
     test('toEntityList converts a list of DTOs', () {
-      final dtos = [
-        testNotificationModel(id: 'n1'),
-        testNotificationModel(id: 'n2'),
-      ];
+      final dtos = [testNotificationModel(id: 1), testNotificationModel(id: 2)];
 
       final entities = dtos.toEntityList();
 
       expect(entities.length, 2);
-      expect(entities[0].id, 'n1');
-      expect(entities[1].id, 'n2');
+      expect(entities[0].id, 1);
+      expect(entities[1].id, 2);
     });
   });
 }

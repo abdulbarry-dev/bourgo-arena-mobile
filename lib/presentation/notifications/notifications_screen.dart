@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/notification/mark_notifications_read_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
@@ -20,6 +21,7 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
   late final NotificationsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -28,7 +30,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         widget.viewModel ??
         NotificationsViewModel(
           getNotificationsUseCase: locator<GetNotificationsUseCase>(),
+          markNotificationsReadUseCase: locator<MarkNotificationsReadUseCase>(),
         );
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    if (widget.viewModel == null) {
+      _viewModel.dispose();
+    }
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   @override
@@ -55,21 +76,35 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ],
           ),
-          body: _viewModel.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : (_viewModel.notifications?.isEmpty ?? true)
-              ? _buildEmptyState()
-              : ListView.separated(
-                  padding: const EdgeInsets.all(24),
-                  itemCount: _viewModel.notifications?.length ?? 0,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final notification = _viewModel.notifications?[index];
-                    if (notification == null) return const SizedBox.shrink();
-                    return _NotificationItem(notification: notification);
-                  },
-                ),
+          body: RefreshIndicator(
+            onRefresh: _viewModel.loadNotifications,
+            child: _viewModel.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _viewModel.notifications.isEmpty
+                ? _buildEmptyState()
+                : ListView.separated(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(24),
+                    itemCount:
+                        _viewModel.notifications.length +
+                        (_viewModel.hasMore ? 1 : 0),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      if (index < _viewModel.notifications.length) {
+                        final notification = _viewModel.notifications[index];
+                        return _NotificationItem(notification: notification);
+                      } else {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+          ),
         );
       },
     );
@@ -185,10 +220,13 @@ class _NotificationItem extends StatelessWidget {
 
   IconData _getIcon(String type) {
     switch (type) {
+      case 'welcome':
+        return Symbols.celebration;
+      case 'reservation':
       case 'booking':
         return Symbols.calendar_month;
-      case 'promotion':
-        return Symbols.campaign;
+      case 'alert':
+        return Symbols.warning;
       case 'system':
         return Symbols.settings;
       default:
