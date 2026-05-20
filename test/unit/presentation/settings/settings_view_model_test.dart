@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_notifications_enabled_use_case.dart';
@@ -15,7 +16,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class _MockGetThemeMode extends Mock implements GetThemeModeUseCase {}
 
@@ -37,6 +37,8 @@ class _MockGetNotificationsEnabled extends Mock
 class _MockSetNotificationsEnabled extends Mock
     implements SetNotificationsEnabledUseCase {}
 
+class _MockDeleteAccount extends Mock implements DeleteAccountUseCase {}
+
 class _MockDeviceTokenRegistrar extends Mock implements DeviceTokenRegistrar {}
 
 void main() {
@@ -46,8 +48,9 @@ void main() {
     registerFallbackValue(ThemeMode.system);
     registerFallbackValue(const Locale('en'));
 
-    const MethodChannel('dev.fluttercommunity.plus/package_info')
-        .setMockMethodCallHandler((MethodCall methodCall) async {
+    const MethodChannel(
+      'dev.fluttercommunity.plus/package_info',
+    ).setMockMethodCallHandler((MethodCall methodCall) async {
       if (methodCall.method == 'getAll') {
         return <String, dynamic>{
           'appName': 'Bourgo Arena',
@@ -71,6 +74,7 @@ void main() {
   late _MockGetNotificationsEnabled mockGetNotif;
   late _MockSetNotificationsEnabled mockSetNotif;
   late _MockDeviceTokenRegistrar mockDeviceTokenRegistrar;
+  late _MockDeleteAccount mockDeleteAccount;
 
   setUp(() {
     mockGetTheme = _MockGetThemeMode();
@@ -82,6 +86,7 @@ void main() {
     mockGetNotif = _MockGetNotificationsEnabled();
     mockSetNotif = _MockSetNotificationsEnabled();
     mockDeviceTokenRegistrar = _MockDeviceTokenRegistrar();
+    mockDeleteAccount = _MockDeleteAccount();
 
     when(
       () => mockGetTheme(),
@@ -122,6 +127,7 @@ void main() {
       mockGetNotif,
       mockSetNotif,
       mockDeviceTokenRegistrar,
+      mockDeleteAccount,
     );
   });
 

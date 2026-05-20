@@ -173,8 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       : Text(l10n.authLogin),
                                 ),
                                 SizedBox(height: spacing.lg),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                Wrap(
+                                  alignment: WrapAlignment.center,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
                                   children: [
                                     Text(
                                       l10n.authNoAccount,

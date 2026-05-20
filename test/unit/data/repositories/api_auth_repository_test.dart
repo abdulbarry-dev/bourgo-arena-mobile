@@ -90,7 +90,11 @@ void main() {
         ).thenAnswer((_) async => {'token': token, 'state': 'active'});
 
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/user/profile',
+            fullResponse: false,
+            skipAuthError: true,
+          ),
         ).thenAnswer((_) async => userJson);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -130,7 +134,13 @@ void main() {
         verify(() => apiClient.setToken(null)).called(1);
         verify(() => apiClient.setToken(token)).called(2);
         verify(() => sessionRepository.saveAuthToken(token)).called(1);
-        verify(() => apiClient.get('/user/profile')).called(1);
+        verify(
+          () => apiClient.get(
+            '/user/profile',
+            fullResponse: false,
+            skipAuthError: true,
+          ),
+        ).called(1);
         await eventExpectation;
       });
 
@@ -146,7 +156,11 @@ void main() {
         ).thenAnswer((_) async => {'token': token, 'state': 'active'});
 
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/user/profile',
+            fullResponse: false,
+            skipAuthError: true,
+          ),
         ).thenAnswer((_) async => userJson);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -220,6 +234,74 @@ void main() {
           isA<ServerFailure>(),
         );
       });
+
+      test(
+        'converts pendingAdditionalVerification to pendingOnboarding when profile fetch fails',
+        () async {
+          const token = 'incomplete-onboarding-token';
+
+          // Backend returns pendingAdditionalVerification
+          when(
+            () => apiClient.post('/auth/login', {
+              'email': 'incomplete@example.com',
+              'password': 'secret123',
+            }),
+          ).thenAnswer(
+            (_) async => {
+              'token': token,
+              'state': 'pending_additional_verification',
+            },
+          );
+
+          // Profile fetch fails (user hasn't completed onboarding yet)
+          when(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).thenThrow(const ServerException('Forbidden: 403'));
+
+          when(
+            () => sessionRepository.saveAuthToken(token),
+          ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+          final eventExpectation = expectLater(
+            repository.onAuthStateChanged,
+            emits(
+              predicate<AuthSession>(
+                (value) =>
+                    value.state == AuthState.pendingOnboarding &&
+                    value.token == token,
+              ),
+            ),
+          );
+
+          final result = await repository.login(
+            'incomplete@example.com',
+            'secret123',
+          );
+
+          expect(result, isA<Success<AuthSession, Failure>>());
+          final session = (result as Success<AuthSession, Failure>).data;
+          expect(session.state, AuthState.pendingOnboarding);
+          expect(session.token, token);
+          verify(
+            () => apiClient.post('/auth/login', {
+              'email': 'incomplete@example.com',
+              'password': 'secret123',
+            }),
+          ).called(1);
+          verify(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).called(1);
+          await eventExpectation;
+        },
+      );
     });
 
     group('logout', () {
@@ -305,9 +387,12 @@ void main() {
 
     group('register', () {
       test('returns Success on 200', () async {
-        when(
-          () => apiClient.post('/auth/register', any()),
-        ).thenAnswer((_) async => null);
+        when(() => apiClient.post('/auth/register', any())).thenAnswer(
+          (_) async => {
+            'token': 'verify-token',
+            'state': 'pending_verification',
+          },
+        );
 
         final result = await repository.register(
           firstName: 'Alex',
@@ -322,14 +407,10 @@ void main() {
         expect(result, isA<Success<void, Failure>>());
         verify(
           () => apiClient.post('/auth/register', {
-            'name': 'Alex Morgan',
             'email': 'alex@example.com',
             'phone': '+15550000000',
             'password': 'secret123',
             'password_confirmation': 'secret123',
-            'gender': 'male',
-            'date_of_birth': '1990-01-01',
-            'is_family_account': false,
           }),
         ).called(1);
       });
@@ -517,13 +598,21 @@ void main() {
 
     group('requestFamilyAccountOtp', () {
       test('returns Success on 200', () async {
-        when(
-          () => apiClient.post('/auth/request-family-otp', {}),
-        ).thenAnswer((_) async => null);
+        when(() => apiClient.post('/auth/request-family-otp', {})).thenAnswer(
+          (_) async => {
+            'success': true,
+            'message': 'OTP code sent to your registered email.',
+            'data': null,
+          },
+        );
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<Success<void, Failure>>());
+        expect(result, isA<Success<String, Failure>>());
+        expect(
+          (result as Success<String, Failure>).data,
+          'OTP code sent to your registered email.',
+        );
       });
 
       test('returns Failure(AuthFailure) on 401', () async {
@@ -533,9 +622,9 @@ void main() {
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<FailureResult<void, Failure>>());
+        expect(result, isA<FailureResult<String, Failure>>());
         expect(
-          (result as FailureResult<void, Failure>).failure,
+          (result as FailureResult<String, Failure>).failure,
           isA<AuthFailure>(),
         );
       });
@@ -547,9 +636,9 @@ void main() {
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<FailureResult<void, Failure>>());
+        expect(result, isA<FailureResult<String, Failure>>());
         expect(
-          (result as FailureResult<void, Failure>).failure,
+          (result as FailureResult<String, Failure>).failure,
           isA<NetworkFailure>(),
         );
       });
@@ -561,9 +650,9 @@ void main() {
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<FailureResult<void, Failure>>());
+        expect(result, isA<FailureResult<String, Failure>>());
         expect(
-          (result as FailureResult<void, Failure>).failure,
+          (result as FailureResult<String, Failure>).failure,
           isA<ServerFailure>(),
         );
       });

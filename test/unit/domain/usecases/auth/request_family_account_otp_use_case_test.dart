@@ -19,13 +19,14 @@ void main() {
 
   group('RequestFamilyAccountOtpUseCase', () {
     test('returns success when request succeeds', () async {
-      when(
-        () => repository.requestFamilyAccountOtp(),
-      ).thenAnswer((_) async => const Success<void, Failure>(null));
+      when(() => repository.requestFamilyAccountOtp()).thenAnswer(
+        (_) async => const Success<String, Failure>('OTP code sent.'),
+      );
 
       final result = await useCase();
 
-      expect(result, isA<Success<void, Failure>>());
+      expect(result, isA<Success<String, Failure>>());
+      expect((result as Success<String, Failure>).data, 'OTP code sent.');
       verify(() => repository.requestFamilyAccountOtp()).called(1);
       verifyNoMoreInteractions(repository);
     });
@@ -38,20 +39,20 @@ void main() {
 
       when(
         () => repository.requestFamilyAccountOtp(),
-      ).thenAnswer((_) async => const FailureResult<void, Failure>(failure));
+      ).thenAnswer((_) async => const FailureResult<String, Failure>(failure));
 
       final result = await useCase();
 
-      expect(result, isA<FailureResult<void, Failure>>());
-      expect((result as FailureResult<void, Failure>).failure, same(failure));
+      expect(result, isA<FailureResult<String, Failure>>());
+      expect((result as FailureResult<String, Failure>).failure, same(failure));
       verify(() => repository.requestFamilyAccountOtp()).called(1);
       verifyNoMoreInteractions(repository);
     });
 
     test('can be invoked more than once without parameters', () async {
-      when(
-        () => repository.requestFamilyAccountOtp(),
-      ).thenAnswer((_) async => const Success<void, Failure>(null));
+      when(() => repository.requestFamilyAccountOtp()).thenAnswer(
+        (_) async => const Success<String, Failure>('OTP code sent.'),
+      );
 
       await useCase();
       await useCase();

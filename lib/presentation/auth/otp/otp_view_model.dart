@@ -1,11 +1,12 @@
 import 'dart:developer' as developer;
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the OTP Verification screen.
-class OtpViewModel extends ChangeNotifier {
+class OtpViewModel extends BaseViewModel {
   final VerifyOtpUseCase _verifyOtpUseCase;
   final SendOtpUseCase _sendOtpUseCase;
   final GetVerificationStatusUseCase _getVerificationStatusUseCase;
@@ -18,9 +19,6 @@ class OtpViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-
-  String? _errorMessage;
-  String? get errorMessage => _errorMessage;
 
   void setLoading(bool value) {
     _isLoading = value;
@@ -35,11 +33,16 @@ class OtpViewModel extends ChangeNotifier {
     required VoidCallback onSuccess,
     required Function(String unverifiedMethod, String? email, String? phone)
     onAdditionalVerificationNeeded,
+    bool isPasswordReset = false,
   }) async {
     if (code.length == 6) {
+      if (isPasswordReset) {
+        onSuccess();
+        return;
+      }
+
       setLoading(true);
-      _errorMessage = null;
-      notifyListeners();
+      clearError();
 
       developer.log('Verifying OTP: $code for $identifier');
       final result = await _verifyOtpUseCase(identifier, code);
@@ -73,13 +76,11 @@ class OtpViewModel extends ChangeNotifier {
               },
             );
           } else {
-            _errorMessage = 'authInvalidVerificationCode';
-            notifyListeners();
+            setErrorMessage('authInvalidVerificationCode');
           }
         },
         onFailure: (failure) {
-          _errorMessage = failure.message;
-          notifyListeners();
+          setErrorMessage(failure.message);
           return Future.value();
         },
       );
@@ -89,8 +90,7 @@ class OtpViewModel extends ChangeNotifier {
   /// Resends the OTP code to the given identifier.
   Future<void> resend(String identifier) async {
     setLoading(true);
-    _errorMessage = null;
-    notifyListeners();
+    clearError();
 
     final result = await _sendOtpUseCase(identifier);
 
@@ -101,8 +101,57 @@ class OtpViewModel extends ChangeNotifier {
         // Handle resend success (e.g., show a toast/snackbar if needed)
       },
       onFailure: (failure) {
-        _errorMessage = failure.message;
-        notifyListeners();
+        setErrorMessage(failure.message);
+      },
+    );
+  }
+
+  /// Requests an OTP for enabling family account mode.
+  /// Checks verification status first to ensure the method is not already verified.
+  Future<void> requestFamilyOtp({
+    required bool isEmail,
+    required VoidCallback onSuccess,
+    required Function(String) onError,
+  }) async {
+    setLoading(true);
+    clearError();
+
+    // 1. Check Verification Status
+    final statusResult = await _getVerificationStatusUseCase();
+
+    await statusResult.fold<Future<void>>(
+      onSuccess: (status) async {
+        // 2. Conditional UI Logic
+        if (isEmail && status.emailVerified) {
+          onError('This email address is already verified.');
+          setLoading(false);
+          return;
+        } else if (!isEmail && status.phoneVerified) {
+          onError('This phone number is already verified.');
+          setLoading(false);
+          return;
+        }
+
+        // 3. API Call
+        final result = await _sendOtpUseCase(
+          isEmail ? status.email! : status.phone!,
+        );
+
+        setLoading(false);
+        result.when(
+          success: (_) => onSuccess(),
+          failure: (failure) {
+            setErrorMessage(failure.message);
+            onError(failure.message);
+          },
+        );
+        return Future.value();
+      },
+      onFailure: (failure) {
+        setLoading(false);
+        setErrorMessage(failure.message);
+        onError(failure.message);
+        return Future.value();
       },
     );
   }

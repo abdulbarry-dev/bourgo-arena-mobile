@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -95,6 +96,28 @@ void main() {
       await Future.delayed(Duration.zero);
 
       check(notifyCount).equals(1);
+    });
+
+    test('restores pending onboarding session on initialize', () async {
+      when(
+        () => mockSessionRepository.shouldSkipLoginOtpForever(),
+      ).thenAnswer((_) async => const Success(false));
+      when(
+        () => mockAuthRepository.getToken(),
+      ).thenAnswer((_) async => const Success('onboarding-token'));
+      when(
+        () => mockSessionRepository.getAuthState(),
+      ).thenAnswer((_) async => const Success('pending_onboarding'));
+      when(
+        () => mockSessionRepository.getPendingVerificationEmail(),
+      ).thenAnswer((_) async => const Success('john@example.com'));
+
+      await notifier.initialize();
+
+      check(notifier.state).equals(AuthState.pendingOnboarding);
+      check(notifier.session.token).equals('onboarding-token');
+      check(notifier.session.pendingEmail).equals('john@example.com');
+      verifyNever(() => mockAuthRepository.getUserProfile());
     });
   });
 }

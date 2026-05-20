@@ -6,9 +6,13 @@ import 'dart:async';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/onboarding_setup_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 
 /// High-fidelity OTP verification screen for Bourgo Arena.
 class OtpScreen extends StatefulWidget {
@@ -95,13 +99,41 @@ class _OtpScreenState extends State<OtpScreen> {
       _viewModel.verify(
         identifier: widget.destination ?? '',
         code: code,
-        onSuccess: () {
+        onSuccess: () async {
           if (widget.isPasswordReset) {
             context.push(
               '/new-password',
               extra: {'identifier': widget.destination ?? '', 'otp': code},
             );
           } else {
+            final authNotifier = locator<AuthStateNotifier>();
+            final authState = authNotifier.state;
+
+            if (authState == AuthState.authenticated) {
+              context.go('/home');
+              return;
+            }
+
+            if (authState == AuthState.pendingOnboarding && mounted) {
+              final shouldComplete = await OnboardingSetupModal.show(context);
+              if (shouldComplete == true && mounted) {
+                if (context.mounted) {
+                  context.push(
+                    '/account-setup',
+                    extra:
+                        widget.registrationData ??
+                        {
+                          'email': widget.destination ?? '',
+                          'phone': '',
+                          'firstName': '',
+                          'lastName': '',
+                        },
+                  );
+                }
+              }
+              return;
+            }
+
             context.push(
               '/account-setup',
               extra:
@@ -109,7 +141,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   {
                     'email': widget.destination ?? '',
                     'phone': '',
-                    'firstName': 'User',
+                    'firstName': '',
                     'lastName': '',
                   },
             );
@@ -126,6 +158,7 @@ class _OtpScreenState extends State<OtpScreen> {
             },
           );
         },
+        isPasswordReset: widget.isPasswordReset,
       );
     }
   }
@@ -167,9 +200,16 @@ class _OtpScreenState extends State<OtpScreen> {
               children: [
                 AuthHeader(
                   title: l10n.authVerificationTitle,
-                  subtitle:
-                      '${l10n.authOtpSubtitlePrefix}'
-                      '${widget.destination ?? l10n.authOtpSubtitleDefault}.',
+                  subtitle: () {
+                    final authNotifier = locator<AuthStateNotifier>();
+                    if (authNotifier.state ==
+                        AuthState.pendingDeletionCancellation) {
+                      return l10n.authDeletionCancelSubtitle;
+                    }
+
+                    return '${l10n.authOtpSubtitlePrefix}'
+                        '${widget.destination ?? l10n.authOtpSubtitleDefault}.';
+                  }(),
                 ),
                 const SizedBox(height: 48),
                 Row(

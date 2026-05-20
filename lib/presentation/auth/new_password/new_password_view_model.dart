@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -28,38 +29,39 @@ class NewPasswordViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Resets the user's password using the new credentials.
   Future<void> resetPassword(BuildContext context) async {
-    if (formKey.currentState?.validate() ?? false) {
-      setLoading(true);
+    if (!(formKey.currentState?.validate() ?? false)) return;
+    setLoading(true);
 
-      final result = await _resetPasswordUseCase(
-        identifier: identifier,
-        otp: otp,
-        newPassword: passwordController.text,
-      );
+    final result = await _resetPasswordUseCase(
+      identifier: identifier,
+      otp: otp,
+      newPassword: passwordController.text,
+    );
 
-      setLoading(false);
+    setLoading(false);
 
-      if (context.mounted) {
-        result.fold(
-          onSuccess: (_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!.passwordUpdateSuccess,
-                ),
-              ),
-            );
-            context.go('/login');
-          },
-          onFailure: (failure) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text(failure.message)));
-          },
-        );
-      }
-    }
+    if (!context.mounted) return;
+    result.fold(
+      onSuccess: (_) => _handleSuccess(context),
+      onFailure: (failure) => _handleFailure(context, failure),
+    );
+  }
+
+  void _handleSuccess(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.passwordUpdateSuccess),
+      ),
+    );
+    context.go('/login');
+  }
+
+  void _handleFailure(BuildContext context, Failure failure) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(failure.message)));
   }
 
   @override

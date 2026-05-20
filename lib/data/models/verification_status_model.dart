@@ -8,7 +8,7 @@ class VerificationStatusModel {
   final bool emailVerified;
   final bool phoneVerified;
   final bool onboardingCompleted;
-  final bool isFullyVerified;
+  final bool? isFullyVerified;
   final String? email;
   final String? phone;
   final String? unverifiedMethod;
@@ -17,7 +17,7 @@ class VerificationStatusModel {
     required this.emailVerified,
     required this.phoneVerified,
     required this.onboardingCompleted,
-    required this.isFullyVerified,
+    this.isFullyVerified,
     this.email,
     this.phone,
     this.unverifiedMethod,

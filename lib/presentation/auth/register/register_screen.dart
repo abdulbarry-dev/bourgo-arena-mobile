@@ -201,10 +201,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             value: 'female',
                             child: Text(l10n.commonGenderFemale),
                           ),
-                          DropdownMenuItem(
-                            value: 'other',
-                            child: Text(l10n.commonGenderOther),
-                          ),
                         ],
                         onChanged: _viewModel.setGender,
                         validator: (value) =>

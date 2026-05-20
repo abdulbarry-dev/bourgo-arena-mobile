@@ -123,5 +123,65 @@ void main() {
       check(find.text('error').evaluate()).isNotEmpty();
       check(viewModel.isLoading).isFalse();
     });
+
+    testWidgets('sendCode redirects to /otp with isPasswordReset: false '
+        'if error is pending_verification', (tester) async {
+      viewModel.identifierController.text = 'test@example.com';
+      when(() => mockForgotPasswordUseCase(any())).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(
+            AppErrorCode.invalidCredentials,
+            'email_not_verified',
+            'pending_verification',
+          ),
+        ),
+      );
+
+      String? capturedPath;
+      Object? capturedExtra;
+
+      final router = GoRouter(
+        initialLocation: '/',
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => Scaffold(
+              body: Form(
+                key: viewModel.formKey,
+                child: TextFormField(
+                  controller: viewModel.identifierController,
+                  validator: (value) => value!.isEmpty ? 'error' : null,
+                ),
+              ),
+            ),
+          ),
+          GoRoute(
+            path: '/otp',
+            builder: (context, state) {
+              capturedPath = '/otp';
+              capturedExtra = state.extra;
+              return const SizedBox();
+            },
+          ),
+        ],
+      );
+
+      await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+      final context = tester.element(find.byType(Form));
+
+      await viewModel.sendCode(context);
+      await tester.pumpAndSettle();
+
+      check(capturedPath).equals('/otp');
+      final extraMap = check(capturedExtra).isA<Map<String, dynamic>>();
+      extraMap
+          .has((m) => m['destination'], 'destination')
+          .isA<String>()
+          .equals('test@example.com');
+      extraMap
+          .has((m) => m['isPasswordReset'], 'isPasswordReset')
+          .isA<bool>()
+          .isFalse();
+    });
   });
 }

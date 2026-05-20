@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -38,6 +39,9 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
 
   @override
   Widget build(BuildContext context) {
+    developer.log(
+      'VerificationMethodScreen: registrationData = ${widget.registrationData}',
+    );
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final email = widget.registrationData['email'] as String;

@@ -1,4 +1,6 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_notifications_enabled_use_case.dart';
@@ -12,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 /// ViewModel for managing application-wide settings.
-class SettingsViewModel extends ChangeNotifier {
+class SettingsViewModel extends BaseViewModel {
   final GetThemeModeUseCase _getThemeModeUseCase;
   final SetThemeModeUseCase _setThemeModeUseCase;
   final GetLocaleUseCase _getLocaleUseCase;
@@ -22,6 +24,7 @@ class SettingsViewModel extends ChangeNotifier {
   final GetNotificationsEnabledUseCase _getNotificationsEnabledUseCase;
   final SetNotificationsEnabledUseCase _setNotificationsEnabledUseCase;
   final DeviceTokenRegistrar _deviceTokenRegistrar;
+  final DeleteAccountUseCase _deleteAccountUseCase;
 
   ThemeMode _themeMode = ThemeMode.system;
   Locale _locale = const Locale('en');
@@ -29,9 +32,6 @@ class SettingsViewModel extends ChangeNotifier {
   bool _languageSelected = false;
   String _appVersion = '';
 
-  /// Creates a new [SettingsViewModel] with sensible defaults.
-  ///
-  /// Call [initialize] after construction to load persisted values.
   SettingsViewModel(
     this._getThemeModeUseCase,
     this._setThemeModeUseCase,
@@ -42,7 +42,24 @@ class SettingsViewModel extends ChangeNotifier {
     this._getNotificationsEnabledUseCase,
     this._setNotificationsEnabledUseCase,
     this._deviceTokenRegistrar,
+    this._deleteAccountUseCase,
   );
+
+  /// Deletes the user's account.
+  Future<bool> deleteAccount({required String password}) async {
+    clearError();
+    notifyListeners();
+
+    final result = await _deleteAccountUseCase.execute(password: password);
+    return result.fold(
+      onSuccess: (_) => true,
+      onFailure: (failure) {
+        setErrorMessage(failure.message);
+        notifyListeners();
+        return false;
+      },
+    );
+  }
 
   /// The current [ThemeMode].
   ThemeMode get themeMode => _themeMode;

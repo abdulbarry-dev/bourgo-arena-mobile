@@ -1,6 +1,9 @@
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/onboarding_setup_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// ViewModel for the Login screen.
 class LoginViewModel extends ChangeNotifier {
@@ -71,7 +74,14 @@ class LoginViewModel extends ChangeNotifier {
           } else {
             await _sessionRepository.clearRememberedIdentifier();
           }
-          // Note: GoRouter redirect in router.dart will handle navigation based on session.state
+
+          if (session.state == AuthState.pendingOnboarding && context.mounted) {
+            final shouldComplete = await OnboardingSetupModal.show(context);
+            if (shouldComplete == true && context.mounted) {
+              context.push('/account-setup');
+            }
+          }
+          // Note: For other states, GoRouter redirect in router.dart will handle navigation
         },
       );
     }

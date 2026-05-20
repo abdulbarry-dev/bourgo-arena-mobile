@@ -14,4 +14,8 @@ enum AuthState {
 
   /// User is fully authenticated and has completed all requirements.
   authenticated,
+
+  /// User attempted login while their account is scheduled for deletion and must
+  /// verify an OTP to cancel the deletion window.
+  pendingDeletionCancellation,
 }

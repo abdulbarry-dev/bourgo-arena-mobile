@@ -100,15 +100,66 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   }
 
   void _saveChanges() {
+    _syncDataFromControllers();
+    if (!_hasRequiredOnboardingData()) {
+      _showValidationError();
+      return;
+    }
+
     setState(() {
-      _data['firstName'] = _firstNameController.text.trim();
-      _data['lastName'] = _lastNameController.text.trim();
-      _data['email'] = _emailController.text.trim();
-      _data['phone'] = _phoneController.text.trim();
-      _data['birthDate'] = _selectedBirthDate;
-      _data['gender'] = _selectedGender;
       _isEditing = false;
     });
+  }
+
+  void _syncDataFromControllers() {
+    _data['firstName'] = _firstNameController.text.trim();
+    _data['lastName'] = _lastNameController.text.trim();
+    _data['email'] = _emailController.text.trim();
+    _data['phone'] = _phoneController.text.trim();
+    _data['birthDate'] = _selectedBirthDate;
+    _data['gender'] = _selectedGender;
+  }
+
+  bool _hasRequiredOnboardingData() {
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final birthDate = _selectedBirthDate;
+    final gender = _selectedGender;
+
+    final isEmailValid = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+
+    return firstName.isNotEmpty &&
+        lastName.isNotEmpty &&
+        email.isNotEmpty &&
+        isEmailValid &&
+        phone.isNotEmpty &&
+        birthDate != null &&
+        birthDate.isBefore(DateTime.now()) &&
+        (gender == 'male' || gender == 'female');
+  }
+
+  void _showValidationError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Please complete all required onboarding fields before continuing.',
+        ),
+      ),
+    );
+  }
+
+  void _onContinue() {
+    _syncDataFromControllers();
+    if (!_hasRequiredOnboardingData()) {
+      setState(() {
+        _isEditing = true;
+      });
+      _showValidationError();
+      return;
+    }
+    context.push('/pin-setup', extra: _data);
   }
 
   Future<void> _selectBirthDate() async {
@@ -373,7 +424,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
 
                 if (!_isEditing)
                   ElevatedButton(
-                    onPressed: () => context.push('/pin-setup', extra: _data),
+                    onPressed: _onContinue,
                     child: Text(l10n.authConfirmContinue),
                   ),
 

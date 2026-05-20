@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 
@@ -49,7 +50,14 @@ abstract interface class AuthRepository {
   Future<Result<VerificationStatus, Failure>> getVerificationStatus();
 
   /// Requests an OTP for enabling family account mode.
-  Future<Result<void, Failure>> requestFamilyAccountOtp();
+  ///
+  /// Returns the backend response message to display in UI feedback.
+  Future<Result<String, Failure>> requestFamilyAccountOtp({
+    OtpDeliveryMethod? method,
+  });
+
+  /// Requests account deletion. Requires the user's current password for confirmation.
+  Future<Result<void, Failure>> deleteAccount({required String password});
 
   /// Signs out the current user.
   Future<Result<void, Failure>> logout();

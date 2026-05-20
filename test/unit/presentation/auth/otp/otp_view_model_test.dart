@@ -165,5 +165,60 @@ void main() {
 
       expect(viewModel.errorMessage, 'Rate limit exceeded');
     });
+    test('requestFamilyOtp sends OTP if method is not verified', () async {
+      when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+        (_) async => const Success(
+          VerificationStatus(
+            emailVerified: false,
+            phoneVerified: true,
+            onboardingCompleted: true,
+            isFullyVerified: false,
+            email: 'test@example.com',
+            phone: '+1234567890',
+          ),
+        ),
+      );
+      when(
+        () => mockSendOtpUseCase(any()),
+      ).thenAnswer((_) async => const Success(null));
+
+      bool successCalled = false;
+      await viewModel.requestFamilyOtp(
+        isEmail: true,
+        onSuccess: () => successCalled = true,
+        onError: (_) {},
+      );
+
+      verify(() => mockSendOtpUseCase('test@example.com')).called(1);
+      expect(successCalled, isTrue);
+    });
+
+    test(
+      'requestFamilyOtp reports error if email is already verified',
+      () async {
+        when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+          (_) async => const Success(
+            VerificationStatus(
+              emailVerified: true,
+              phoneVerified: true,
+              onboardingCompleted: true,
+              isFullyVerified: true,
+              email: 'test@example.com',
+              phone: '+1234567890',
+            ),
+          ),
+        );
+
+        String? error;
+        await viewModel.requestFamilyOtp(
+          isEmail: true,
+          onSuccess: () {},
+          onError: (err) => error = err,
+        );
+
+        expect(error, 'This email address is already verified.');
+        verifyNever(() => mockSendOtpUseCase(any()));
+      },
+    );
   });
 }

@@ -12,7 +12,7 @@ VerificationStatusModel _$VerificationStatusModelFromJson(
   emailVerified: json['email_verified'] as bool,
   phoneVerified: json['phone_verified'] as bool,
   onboardingCompleted: json['onboarding_completed'] as bool,
-  isFullyVerified: json['is_fully_verified'] as bool,
+  isFullyVerified: json['is_fully_verified'] as bool?,
   email: json['email'] as String?,
   phone: json['phone'] as String?,
   unverifiedMethod: json['unverified_method'] as String?,

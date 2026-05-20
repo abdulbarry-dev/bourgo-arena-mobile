@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.da
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:developer' as developer;
 
 /// Screen for setting up a gym entry PIN.
@@ -27,6 +28,38 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
   bool _isLoading = false;
 
+  DateTime? _parseBirthDate(dynamic value) {
+    if (value is DateTime) {
+      return value;
+    }
+    if (value is String && value.isNotEmpty) {
+      return DateTime.tryParse(value);
+    }
+    return null;
+  }
+
+  bool _hasRequiredOnboardingData() {
+    final firstName = (widget.registrationData['firstName'] as String? ?? '')
+        .trim();
+    final lastName = (widget.registrationData['lastName'] as String? ?? '')
+        .trim();
+    final email = (widget.registrationData['email'] as String? ?? '').trim();
+    final phone = (widget.registrationData['phone'] as String? ?? '').trim();
+    final gender = widget.registrationData['gender'] as String?;
+    final birthDate = _parseBirthDate(widget.registrationData['birthDate']);
+
+    final isEmailValid = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+
+    return firstName.isNotEmpty &&
+        lastName.isNotEmpty &&
+        email.isNotEmpty &&
+        isEmailValid &&
+        phone.isNotEmpty &&
+        birthDate != null &&
+        birthDate.isBefore(DateTime.now()) &&
+        (gender == 'male' || gender == 'female');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -41,9 +74,24 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
     developer.log('_onFinish called with PIN length: ${_pin.length}');
     final pin = _pin;
     if (pin.length == 4) {
+      if (!_hasRequiredOnboardingData()) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Please complete your account information before setting your PIN.',
+              ),
+            ),
+          );
+          context.go('/account-setup', extra: widget.registrationData);
+        }
+        return;
+      }
+
       setState(() => _isLoading = true);
 
       try {
+        final birthDate = _parseBirthDate(widget.registrationData['birthDate']);
         final user = User(
           id: 'temp-id-${DateTime.now().millisecondsSinceEpoch}',
           firstName: widget.registrationData['firstName'] ?? '',
@@ -56,7 +104,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
           subscriptionExpiry: 'N/A',
           totalCheckIns: 0,
           gender: widget.registrationData['gender'],
-          birthDate: widget.registrationData['birthDate'],
+          birthDate: birthDate,
           isParentAccount: widget.registrationData['isParentAccount'] ?? false,
           children:
               (widget.registrationData['familyMembers']
@@ -79,9 +127,10 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
         result.fold(
           onSuccess: (_) {
-            developer.log(
-              'Registration complete. Redirect logic will handle navigation.',
-            );
+            developer.log('Registration complete. Redirecting to home.');
+            if (mounted) {
+              GoRouter.of(context).go('/home');
+            }
           },
           onFailure: (failure) {
             developer.log('Registration failed: ${failure.message}');
