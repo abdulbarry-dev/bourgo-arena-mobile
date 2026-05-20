@@ -52,7 +52,10 @@ void main() {
 
     test('ValidationFailure should store message and have correct type', () {
       const message = 'Invalid email format';
-      final failure = Failure.validation(AppErrorCode.validationFailed, message);
+      final failure = Failure.validation(
+        AppErrorCode.validationFailed,
+        message,
+      );
 
       check(failure).isA<ValidationFailure>();
       check(failure.message).equals(message);

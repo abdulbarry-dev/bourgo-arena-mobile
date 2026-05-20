@@ -9,6 +9,7 @@ class ApiClient {
   final String baseUrl;
   final http.Client _client;
   String? _token;
+  void Function(String? state)? onAuthError;
 
   ApiClient({required this.baseUrl, http.Client? client})
     : _client = client ?? http.Client();
@@ -19,12 +20,20 @@ class ApiClient {
   }
 
   /// Sends a GET request to the specified [path].
-  Future<dynamic> get(String path) async {
+  Future<dynamic> get(
+    String path, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+  }) async {
     try {
       final response = await _client
           .get(Uri.parse('$baseUrl$path'), headers: _headers)
           .timeout(const Duration(seconds: 15));
-      return _handleResponse(response);
+      return _handleResponse(
+        response,
+        fullResponse: fullResponse,
+        skipAuthError: skipAuthError,
+      );
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -35,7 +44,12 @@ class ApiClient {
   }
 
   /// Sends a POST request to the specified [path] with [body].
-  Future<dynamic> post(String path, dynamic body) async {
+  Future<dynamic> post(
+    String path,
+    dynamic body, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+  }) async {
     try {
       final response = await _client
           .post(
@@ -44,7 +58,11 @@ class ApiClient {
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
-      return _handleResponse(response);
+      return _handleResponse(
+        response,
+        fullResponse: fullResponse,
+        skipAuthError: skipAuthError,
+      );
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -55,7 +73,12 @@ class ApiClient {
   }
 
   /// Sends a PUT request to the specified [path] with [body].
-  Future<dynamic> put(String path, dynamic body) async {
+  Future<dynamic> put(
+    String path,
+    dynamic body, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+  }) async {
     try {
       final response = await _client
           .put(
@@ -64,7 +87,11 @@ class ApiClient {
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
-      return _handleResponse(response);
+      return _handleResponse(
+        response,
+        fullResponse: fullResponse,
+        skipAuthError: skipAuthError,
+      );
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -75,12 +102,12 @@ class ApiClient {
   }
 
   /// Sends a DELETE request to the specified [path].
-  Future<void> delete(String path) async {
+  Future<void> delete(String path, {bool skipAuthError = false}) async {
     try {
       final response = await _client
           .delete(Uri.parse('$baseUrl$path'), headers: _headers)
           .timeout(const Duration(seconds: 15));
-      _handleResponse(response);
+      _handleResponse(response, skipAuthError: skipAuthError);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -101,7 +128,11 @@ class ApiClient {
     return headers;
   }
 
-  dynamic _handleResponse(http.Response response) {
+  dynamic _handleResponse(
+    http.Response response, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+  }) {
     dynamic decoded;
     if (response.body.isNotEmpty) {
       try {
@@ -129,7 +160,7 @@ class ApiClient {
         (response.statusCode >= 200 && response.statusCode < 300);
 
     if (success) {
-      if (body.containsKey('data')) {
+      if (!fullResponse && body.containsKey('data') && body['data'] != null) {
         final data = body['data'];
         if (data is Map<String, dynamic>) {
           final dataMap = Map<String, dynamic>.from(data);
@@ -169,6 +200,9 @@ class ApiClient {
       switch (response.statusCode) {
         case 401:
         case 403:
+          if (!skipAuthError) {
+            onAuthError?.call(state);
+          }
           throw AuthException(message, state, token);
         case 404:
           throw NotFoundException(message, state, token);

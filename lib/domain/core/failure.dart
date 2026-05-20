@@ -64,8 +64,12 @@ class ServerFailure extends Failure {
 
 /// Represents a failure due to a resource not being found.
 class NotFoundFailure extends Failure {
-  const NotFoundFailure(super.code, super.message, [String? state, String? token])
-    : super(state: state, token: token);
+  const NotFoundFailure(
+    super.code,
+    super.message, [
+    String? state,
+    String? token,
+  ]) : super(state: state, token: token);
 }
 
 /// Represents a failure due to local caching issues.
@@ -75,6 +79,10 @@ class CacheFailure extends Failure {
 
 /// Represents a failure due to invalid input.
 class ValidationFailure extends Failure {
-  const ValidationFailure(super.code, super.message, [String? state, String? token])
-    : super(state: state, token: token);
+  const ValidationFailure(
+    super.code,
+    super.message, [
+    String? state,
+    String? token,
+  ]) : super(state: state, token: token);
 }

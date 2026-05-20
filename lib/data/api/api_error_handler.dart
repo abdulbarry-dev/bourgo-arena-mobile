@@ -15,10 +15,17 @@ Future<Result<T, Failure>> executeApiCall<T>(
       AuthFailure(AppErrorCode.invalidCredentials, e.message, e.state, e.token),
     );
   } on NetworkException catch (e) {
-    return FailureResult(NetworkFailure(AppErrorCode.networkUnavailable, e.message));
+    return FailureResult(
+      NetworkFailure(AppErrorCode.networkUnavailable, e.message),
+    );
   } on ValidationException catch (e) {
     return FailureResult(
-      ValidationFailure(AppErrorCode.validationFailed, e.message, e.state, e.token),
+      ValidationFailure(
+        AppErrorCode.validationFailed,
+        e.message,
+        e.state,
+        e.token,
+      ),
     );
   } on NotFoundException catch (e) {
     return FailureResult(
@@ -33,4 +40,3 @@ Future<Result<T, Failure>> executeApiCall<T>(
     return FailureResult(ServerFailure(AppErrorCode.serverError, e.toString()));
   }
 }
-
