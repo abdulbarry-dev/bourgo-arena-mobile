@@ -1,11 +1,15 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for adding/editing a child profile.
-class AddEditChildViewModel extends ChangeNotifier {
+class AddEditChildViewModel extends BaseViewModel {
   final AddChildUseCase _addChildUseCase;
+  final UpdateChildUseCase _updateChildUseCase;
+  final ChildProfile? _existingChild;
 
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -14,7 +18,6 @@ class AddEditChildViewModel extends ChangeNotifier {
   String? _selectedGender;
   DateTime? _selectedBirthDate;
   bool _isSubmitting = false;
-  String? _errorMessage;
 
   bool _hasFirstNameError = false;
   bool _hasLastNameError = false;
@@ -23,8 +26,11 @@ class AddEditChildViewModel extends ChangeNotifier {
 
   AddEditChildViewModel({
     required AddChildUseCase addChildUseCase,
+    required UpdateChildUseCase updateChildUseCase,
     ChildProfile? child,
-  }) : _addChildUseCase = addChildUseCase {
+  }) : _addChildUseCase = addChildUseCase,
+       _updateChildUseCase = updateChildUseCase,
+       _existingChild = child {
     if (child != null) {
       _initializeFromChild(child);
     }
@@ -34,17 +40,15 @@ class AddEditChildViewModel extends ChangeNotifier {
   String? get selectedGender => _selectedGender;
   DateTime? get selectedBirthDate => _selectedBirthDate;
   bool get isSubmitting => _isSubmitting;
-  String? get errorMessage => _errorMessage;
+  bool get isEditing => _existingChild != null;
   bool get hasFirstNameError => _hasFirstNameError;
   bool get hasLastNameError => _hasLastNameError;
   bool get hasGenderError => _hasGenderError;
   bool get hasBirthDateError => _hasBirthDateError;
 
   void _initializeFromChild(ChildProfile child) {
-    firstNameController.text = child.name.split(' ').first;
-    lastNameController.text = child.name.split(' ').length > 1
-        ? child.name.split(' ').skip(1).join(' ')
-        : '';
+    firstNameController.text = child.firstName;
+    lastNameController.text = child.lastName;
     _selectedGender = child.gender;
     _selectedBirthDate = child.birthDate;
     birthDateController.text = child.birthDate.toString().split(' ')[0];
@@ -87,40 +91,42 @@ class AddEditChildViewModel extends ChangeNotifier {
     try {
       final firstName = firstNameController.text.trim();
       final lastName = lastNameController.text.trim();
-      final fullName = '$firstName $lastName';
 
-      final result = await _addChildUseCase.execute(
-        firstName: firstName,
-        lastName: lastName,
-        gender: _selectedGender!,
-        birthDate: _selectedBirthDate!,
-      );
+      final result = isEditing
+          ? await _updateChildUseCase.execute(
+              id: _existingChild!.id,
+              firstName: firstName,
+              lastName: lastName,
+              gender: _selectedGender!,
+              birthDate: _selectedBirthDate!,
+            )
+          : await _addChildUseCase.execute(
+              firstName: firstName,
+              lastName: lastName,
+              gender: _selectedGender!,
+              birthDate: _selectedBirthDate!,
+            );
 
       bool success = false;
       result.when(
         success: (_) {
           success = true;
-          _errorMessage = null;
+          clearError();
         },
         failure: (failure) {
-          _errorMessage = failure.message;
-          developer.log('Failed to add child: ${failure.message}');
+          setErrorMessage(failure.message);
+          developer.log('Failed to save child: ${failure.message}');
         },
       );
       return success;
     } catch (e) {
-      _errorMessage = 'Failed to add child';
-      developer.log('Error adding child: $e');
+      setErrorMessage('Failed to save child');
+      developer.log('Error saving child: $e');
       return false;
     } finally {
       _isSubmitting = false;
       notifyListeners();
     }
-  }
-
-  void clearError() {
-    _errorMessage = null;
-    notifyListeners();
   }
 
   @override

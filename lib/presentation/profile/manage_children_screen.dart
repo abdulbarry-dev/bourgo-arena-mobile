@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/manage_children_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -40,48 +41,49 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.profileConfirmDeleteChild),
+      builder: (context) => AppModal(
+        title: l10n.profileConfirmDeleteChild,
+        subtitle: childName,
+        icon: Symbols.delete,
         content: Text(
           l10n.profileConfirmDeleteChildMessage(childName),
           style: theme.textTheme.bodyMedium,
         ),
         actions: [
-          TextButton(
+          AppModalAction(
+            label: l10n.commonCancel,
             onPressed: () => Navigator.pop(context),
-            child: Text(
-              l10n.commonCancel,
-              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-            ),
           ),
-          TextButton(
+          AppModalAction(
+            label: l10n.profileDelete,
+            isPrimary: true,
+            isDestructive: true,
             onPressed: () async {
               Navigator.pop(context);
               final success = await _viewModel.removeChild(childId);
-              if (!mounted) return;
 
               if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.profileChildRemoved),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      _viewModel.errorMessage ?? l10n.commonErrorOccurred,
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.profileChildRemoved),
+                      backgroundColor: Colors.green,
                     ),
-                    backgroundColor: theme.colorScheme.error,
-                  ),
-                );
+                  );
+                }
+              } else {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        _viewModel.errorMessage ?? l10n.commonErrorOccurred,
+                      ),
+                      backgroundColor: theme.colorScheme.error,
+                    ),
+                  );
+                }
               }
             },
-            style: TextButton.styleFrom(
-              foregroundColor: theme.colorScheme.error,
-            ),
-            child: Text(l10n.profileDelete),
           ),
         ],
       ),
@@ -251,7 +253,15 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
           Row(
             children: [
               IconButton(
-                onPressed: () => context.push('/edit-child/${child.id}'),
+                onPressed: () async {
+                  final updated = await context.push<bool>(
+                    '/edit-child/${child.id}',
+                    extra: child,
+                  );
+                  if (updated == true) {
+                    _viewModel.reloadChildren();
+                  }
+                },
                 icon: Icon(Symbols.edit, color: theme.colorScheme.primary),
                 tooltip: l10n.profileEdit,
               ),

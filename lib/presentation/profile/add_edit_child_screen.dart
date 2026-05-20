@@ -1,6 +1,8 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/add_edit_child_view_model.dart';
@@ -12,8 +14,9 @@ import 'package:material_symbols_icons/symbols.dart';
 /// Screen for adding/editing a child profile.
 class AddEditChildScreen extends StatefulWidget {
   final String? childId;
+  final ChildProfile? child;
 
-  const AddEditChildScreen({super.key, this.childId});
+  const AddEditChildScreen({super.key, this.childId, this.child});
 
   @override
   State<AddEditChildScreen> createState() => _AddEditChildScreenState();
@@ -27,7 +30,8 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
     super.initState();
     _viewModel = AddEditChildViewModel(
       addChildUseCase: locator<AddChildUseCase>(),
-      child: null, // TODO: Load child if editing
+      updateChildUseCase: locator<UpdateChildUseCase>(),
+      child: widget.child,
     );
   }
 
@@ -61,7 +65,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          l10n.profileAddChild,
+          _viewModel.isEditing ? l10n.profileEditChild : l10n.profileAddChild,
           style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
         ),
         centerTitle: true,
@@ -211,13 +215,19 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                           if (!mounted) return;
 
                           if (success) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(l10n.profileChildAdded),
-                                backgroundColor: Colors.green,
-                              ),
-                            );
-                            context.pop(true);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    _viewModel.isEditing
+                                        ? l10n.profileChildUpdated
+                                        : l10n.profileChildAdded,
+                                  ),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              context.pop(true);
+                            }
                           }
                         },
                   style: ElevatedButton.styleFrom(
@@ -229,7 +239,11 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : Text(l10n.profileAddChild),
+                      : Text(
+                          _viewModel.isEditing
+                              ? l10n.commonSave
+                              : l10n.profileAddChild,
+                        ),
                 ),
                 SizedBox(height: spacing.xl),
               ],

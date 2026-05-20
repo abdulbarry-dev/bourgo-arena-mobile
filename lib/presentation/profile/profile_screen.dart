@@ -1,10 +1,12 @@
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/widgets/tier_badge.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
@@ -28,13 +30,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _viewModel = ProfileViewModel(
       authRepository: locator<AuthRepository>(),
       logoutUseCase: locator<LogoutUseCase>(),
+      deleteAccountUseCase: locator<DeleteAccountUseCase>(),
       authStateNotifier: locator<AuthStateNotifier>(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return ListenableBuilder(
       listenable: _viewModel,
@@ -47,7 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         final user = _viewModel.user;
         if (user == null) {
-          return Scaffold(body: Center(child: Text(l10n!.commonLoadingError)));
+          return Scaffold(body: Center(child: Text(l10n.commonLoadingError)));
         }
 
         return Scaffold(
@@ -336,24 +339,23 @@ class _LogoutButton extends StatelessWidget {
         showDialog(
           context: context,
           builder: (BuildContext dialogContext) {
-            return AlertDialog(
-              title: Text(l10n.profileLogoutTitle),
+            return AppModal(
+              title: l10n.profileLogoutTitle,
+              subtitle: l10n.profileLogout,
+              icon: Symbols.logout,
               content: Text(l10n.profileLogoutMessage),
               actions: [
-                TextButton(
+                AppModalAction(
+                  label: l10n.commonCancel,
                   onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: Text(
-                    l10n.commonCancel,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
                 ),
-                TextButton(
+                AppModalAction(
+                  label: l10n.profileLogoutConfirm,
+                  isPrimary: true,
+                  isDestructive: true,
                   onPressed: () {
                     Navigator.of(dialogContext).pop();
                     onLogout();
-                    // Show toast message
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(l10n.profileLogoutSuccess),
@@ -363,10 +365,6 @@ class _LogoutButton extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Text(
-                    l10n.profileLogoutConfirm,
-                    style: const TextStyle(color: Colors.redAccent),
-                  ),
                 ),
               ],
             );

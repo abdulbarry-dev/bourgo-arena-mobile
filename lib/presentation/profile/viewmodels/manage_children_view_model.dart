@@ -1,17 +1,16 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
-import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for managing children profiles.
-class ManageChildrenViewModel extends ChangeNotifier {
+class ManageChildrenViewModel extends BaseViewModel {
   final GetChildrenUseCase _getChildrenUseCase;
   final RemoveChildUseCase _removeChildUseCase;
 
   List<ChildProfile> _children = [];
   bool _isLoading = false;
-  String? _errorMessage;
 
   ManageChildrenViewModel({
     required GetChildrenUseCase getChildrenUseCase,
@@ -23,7 +22,6 @@ class ManageChildrenViewModel extends ChangeNotifier {
 
   List<ChildProfile> get children => _children;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
 
   /// Public method to reload children list from external triggers
   Future<void> reloadChildren() async {
@@ -39,15 +37,15 @@ class ManageChildrenViewModel extends ChangeNotifier {
       result.when(
         success: (children) {
           _children = children;
-          _errorMessage = null;
+          clearError();
         },
         failure: (failure) {
-          _errorMessage = failure.message;
+          setErrorMessage(failure.message);
           developer.log('Failed to load children: ${failure.message}');
         },
       );
     } catch (e) {
-      _errorMessage = 'An unexpected error occurred';
+      setErrorMessage('An unexpected error occurred');
       developer.log('Error loading children: $e');
     } finally {
       _isLoading = false;
@@ -63,24 +61,19 @@ class ManageChildrenViewModel extends ChangeNotifier {
         success: (_) {
           _children.removeWhere((child) => child.id == childId);
           success = true;
-          _errorMessage = null;
+          clearError();
           notifyListeners();
         },
         failure: (failure) {
-          _errorMessage = failure.message;
+          setErrorMessage(failure.message);
           developer.log('Failed to remove child: ${failure.message}');
         },
       );
       return success;
     } catch (e) {
-      _errorMessage = 'Failed to remove child';
+      setErrorMessage('Failed to remove child');
       developer.log('Error removing child: $e');
       return false;
     }
-  }
-
-  void clearError() {
-    _errorMessage = null;
-    notifyListeners();
   }
 }

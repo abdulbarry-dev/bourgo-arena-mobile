@@ -1,19 +1,17 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
-import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the Subscription screen.
-class SubscriptionViewModel extends ChangeNotifier {
+class SubscriptionViewModel extends BaseViewModel {
   final GetActiveSubscriptionUseCase _getActiveSubscriptionUseCase;
 
   Subscription? _subscription;
   bool _isLoading = false;
-  String? _errorMessage;
 
   Subscription? get subscription => _subscription;
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
 
   SubscriptionViewModel({
     required GetActiveSubscriptionUseCase getActiveSubscriptionUseCase,
@@ -23,7 +21,7 @@ class SubscriptionViewModel extends ChangeNotifier {
 
   Future<void> loadSubscription() async {
     _isLoading = true;
-    _errorMessage = null;
+    clearError();
     notifyListeners();
 
     try {
@@ -33,12 +31,11 @@ class SubscriptionViewModel extends ChangeNotifier {
           _subscription = data;
         },
         failure: (failure) {
-          _errorMessage = failure.message;
+          setErrorMessage(failure.message);
           developer.log('Error loading subscription: ${failure.message}');
         },
       );
     } catch (e, stackTrace) {
-      _errorMessage = null;
       developer.log(
         'Error loading subscription',
         error: e,

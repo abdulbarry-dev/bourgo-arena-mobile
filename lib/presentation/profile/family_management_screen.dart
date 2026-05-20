@@ -1,14 +1,10 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:flutter/material.dart';
@@ -26,18 +22,37 @@ class FamilyManagementScreen extends StatefulWidget {
 class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
   late final FamilyManagementViewModel _viewModel;
 
+  List<_OtpMethodOption> _buildOtpMethodOptions(VerificationStatus status) {
+    final user = _viewModel.user;
+    final options = <_OtpMethodOption>[];
+
+    final emailIdentifier = (status.email ?? user?.email ?? '').trim();
+    if (status.emailVerified && emailIdentifier.isNotEmpty) {
+      options.add(
+        _OtpMethodOption(
+          method: OtpDeliveryMethod.email,
+          identifier: emailIdentifier,
+        ),
+      );
+    }
+
+    final phoneIdentifier = (status.phone ?? user?.phone ?? '').trim();
+    if (status.phoneVerified && phoneIdentifier.isNotEmpty) {
+      options.add(
+        _OtpMethodOption(
+          method: OtpDeliveryMethod.phone,
+          identifier: phoneIdentifier,
+        ),
+      );
+    }
+
+    return options;
+  }
+
   @override
   void initState() {
     super.initState();
-    _viewModel = FamilyManagementViewModel(
-      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
-      updateUserProfileUseCase: locator<UpdateUserProfileUseCase>(),
-      verifyOtpUseCase: locator<VerifyOtpUseCase>(),
-      requestFamilyAccountOtpUseCase: locator<RequestFamilyAccountOtpUseCase>(),
-      getChildrenUseCase: locator<GetChildrenUseCase>(),
-      addChildUseCase: locator<AddChildUseCase>(),
-      removeChildUseCase: locator<RemoveChildUseCase>(),
-    );
+    _viewModel = locator<FamilyManagementViewModel>();
   }
 
   @override
@@ -48,36 +63,115 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
 
   Future<void> _toggleFamilyAccount(bool value) async {
     if (value) {
-      final success = await _viewModel.requestFamilyAccountOtp();
-      if (success && mounted) {
-        _showOtpDialog();
+      final l10n = AppLocalizations.of(context)!;
+      final status = await _viewModel.getVerificationStatus();
+      if (status == null) return;
+
+      final options = _buildOtpMethodOptions(status);
+      if (options.isEmpty && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.profileNoVerifiedOtpMethod)),
+        );
+        return;
       }
+
+      _showOtpMethodChoiceDialog(options, status);
     } else {
       _showDisableFamilyDialog();
     }
+  }
+
+  void _showOtpMethodChoiceDialog(
+    List<_OtpMethodOption> options,
+    VerificationStatus status,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AppModal(
+        title: l10n.authVerificationMethodTitle,
+        subtitle: l10n.authVerificationMethodSubtitle,
+        icon: Symbols.verified_user,
+        showCloseButton: true,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: options.map((option) {
+            final isVerified = option.method == OtpDeliveryMethod.email
+                ? status.emailVerified
+                : status.phoneVerified;
+
+            return ListTile(
+              enabled: isVerified,
+              title: Text(
+                option.method == OtpDeliveryMethod.email
+                    ? l10n.authEmailLabel
+                    : l10n.authPhoneLabel,
+              ),
+              subtitle: Text(option.identifier),
+              onTap: isVerified
+                  ? () async {
+                      Navigator.pop(dialogContext);
+                      _showOtpDialog();
+                      final success = await _viewModel.requestFamilyAccountOtp(
+                        method: option.method,
+                        identifier: option.identifier,
+                      );
+                      if (!mounted) return;
+
+                      if (!success) {
+                        Navigator.pop(context); // Close the OTP dialog
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              _viewModel.errorMessage ??
+                                  l10n.commonErrorOccurred,
+                            ),
+                            backgroundColor: Theme.of(
+                              context,
+                            ).colorScheme.error,
+                          ),
+                        );
+                      }
+                    }
+                  : () {
+                      // If somehow an unverified option is shown, give feedback.
+                      Navigator.pop(dialogContext);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(l10n.profileNoVerifiedOtpMethod),
+                        ),
+                      );
+                    },
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
   void _showDisableFamilyDialog() {
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.profileDisableFamilyTitle),
+      builder: (context) => AppModal(
+        title: l10n.profileDisableFamilyTitle,
+        subtitle: l10n.profileFamilyAccount,
+        icon: Symbols.family_restroom,
         content: Text(l10n.profileDisableFamilyContent),
         actions: [
-          TextButton(
+          AppModalAction(
+            label: l10n.commonCancel,
             onPressed: () => Navigator.pop(context),
-            child: Text(l10n.commonCancel),
           ),
-          TextButton(
+          AppModalAction(
+            label: l10n.profileDisableConfirm,
+            isPrimary: true,
+            isDestructive: true,
             onPressed: () async {
               await _viewModel.disableFamilyAccount();
               if (context.mounted) Navigator.pop(context);
             },
-            style: TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            ),
-            child: Text(l10n.profileDisableConfirm),
           ),
         ],
       ),
@@ -87,30 +181,22 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
   void _showOtpDialog() {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
     final otpController = TextEditingController();
 
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: appColors.bgElevated,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-        title: Text(
-          l10n.profileVerifyFamilyTitle,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      builder: (context) => AppModal(
+        title: l10n.profileVerifyFamilyTitle,
+        subtitle: l10n.authMethodAccessInstruction,
+        icon: Symbols.shield_person,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               l10n.profileVerifyFamilySubtitle(
-                _viewModel.user?.phone?.isNotEmpty == true
-                    ? _viewModel.user!.phone!
-                    : _viewModel.user?.email ?? '',
+                _viewModel.selectedOtpIdentifier ?? '',
               ),
 
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -127,7 +213,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
             ),
           ],
         ),
-        actions: [
+        actionWidgets: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: Text(
@@ -157,7 +243,6 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                             backgroundColor: Colors.green,
                           ),
                         );
-                        // Navigate to manage children
                         if (context.mounted) {
                           context.push('/manage-children');
                         }
@@ -173,6 +258,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
             ),
           ),
         ],
+        showCloseButton: true,
       ),
     );
   }
@@ -269,4 +355,11 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
       ),
     );
   }
+}
+
+class _OtpMethodOption {
+  const _OtpMethodOption({required this.method, required this.identifier});
+
+  final OtpDeliveryMethod method;
+  final String identifier;
 }

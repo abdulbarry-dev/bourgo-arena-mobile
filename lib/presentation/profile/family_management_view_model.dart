@@ -1,29 +1,36 @@
-import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/auth_use_cases.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/disable_family_feature_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/enable_family_feature_use_case.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for managing family account and children profiles.
-class FamilyManagementViewModel extends ChangeNotifier {
+class FamilyManagementViewModel extends BaseViewModel {
   final GetUserProfileUseCase _getUserProfileUseCase;
-  final UpdateUserProfileUseCase _updateUserProfileUseCase;
+  final GetVerificationStatusUseCase _getVerificationStatusUseCase;
+  final EnableFamilyFeatureUseCase _enableFamilyFeatureUseCase;
   final VerifyOtpUseCase _verifyOtpUseCase;
   final RequestFamilyAccountOtpUseCase _requestFamilyAccountOtpUseCase;
   final GetChildrenUseCase _getChildrenUseCase;
   final AddChildUseCase _addChildUseCase;
   final RemoveChildUseCase _removeChildUseCase;
+  final DisableFamilyFeatureUseCase _disableFamilyFeatureUseCase;
 
   User? _user;
   bool _isLoading = true;
   bool _isOtpSent = false;
   bool _isVerifyingOtp = false;
+  OtpDeliveryMethod? _selectedOtpMethod;
+  String? _selectedOtpIdentifier;
+  String? _otpRequestMessage;
 
   // --- Family Member Form State ---
   final childFirstNameController = TextEditingController();
@@ -36,24 +43,27 @@ class FamilyManagementViewModel extends ChangeNotifier {
   bool _hasChildLastNameError = false;
   bool _hasChildGenderError = false;
   bool _hasChildBirthDateError = false;
-  String? _errorMessage;
 
   /// Creates a new [FamilyManagementViewModel] instance.
   FamilyManagementViewModel({
     required GetUserProfileUseCase getUserProfileUseCase,
-    required UpdateUserProfileUseCase updateUserProfileUseCase,
+    required GetVerificationStatusUseCase getVerificationStatusUseCase,
+    required EnableFamilyFeatureUseCase enableFamilyFeatureUseCase,
     required VerifyOtpUseCase verifyOtpUseCase,
     required RequestFamilyAccountOtpUseCase requestFamilyAccountOtpUseCase,
     required GetChildrenUseCase getChildrenUseCase,
     required AddChildUseCase addChildUseCase,
     required RemoveChildUseCase removeChildUseCase,
+    required DisableFamilyFeatureUseCase disableFamilyFeatureUseCase,
   }) : _getUserProfileUseCase = getUserProfileUseCase,
-       _updateUserProfileUseCase = updateUserProfileUseCase,
+       _getVerificationStatusUseCase = getVerificationStatusUseCase,
+       _enableFamilyFeatureUseCase = enableFamilyFeatureUseCase,
        _verifyOtpUseCase = verifyOtpUseCase,
        _requestFamilyAccountOtpUseCase = requestFamilyAccountOtpUseCase,
        _getChildrenUseCase = getChildrenUseCase,
        _addChildUseCase = addChildUseCase,
-       _removeChildUseCase = removeChildUseCase {
+       _removeChildUseCase = removeChildUseCase,
+       _disableFamilyFeatureUseCase = disableFamilyFeatureUseCase {
     _loadProfile();
   }
 
@@ -68,32 +78,113 @@ class FamilyManagementViewModel extends ChangeNotifier {
 
   /// Whether an OTP is currently being verified.
   bool get isVerifyingOtp => _isVerifyingOtp;
+  OtpDeliveryMethod? get selectedOtpMethod => _selectedOtpMethod;
+  String? get selectedOtpIdentifier => _selectedOtpIdentifier;
+  String? get otpRequestMessage => _otpRequestMessage;
 
-  /// Selected gender for the child being added.
   String? get selectedChildGender => _selectedChildGender;
-
-  /// Selected birth date for the child being added.
   DateTime? get selectedChildBirthDate => _selectedChildBirthDate;
-
-  /// Whether the child's first name has an error.
   bool get hasChildFirstNameError => _hasChildFirstNameError;
-
-  /// Whether the child's last name has an error.
   bool get hasChildLastNameError => _hasChildLastNameError;
-
-  /// Whether the child's gender selection has an error.
   bool get hasChildGenderError => _hasChildGenderError;
-
-  /// Whether the child's birth date has an error.
   bool get hasChildBirthDateError => _hasChildBirthDateError;
 
-  /// Last error message encountered.
-  String? get errorMessage => _errorMessage;
-
-  /// Sets the error message manually.
-  void setErrorMessage(String? message) {
-    _errorMessage = message;
+  void setChildGender(String? gender) {
+    _selectedChildGender = gender;
+    _hasChildGenderError = false;
     notifyListeners();
+  }
+
+  void setChildBirthDate(DateTime birthDate) {
+    _selectedChildBirthDate = birthDate;
+    _hasChildBirthDateError = false;
+    childBirthDateController.text = birthDate.toIso8601String().split('T')[0];
+    notifyListeners();
+  }
+
+  bool _validateChildForm() {
+    _hasChildFirstNameError = childFirstNameController.text.trim().isEmpty;
+    _hasChildLastNameError = childLastNameController.text.trim().isEmpty;
+    _hasChildGenderError = _selectedChildGender == null;
+    _hasChildBirthDateError = _selectedChildBirthDate == null;
+    notifyListeners();
+    return !_hasChildFirstNameError &&
+        !_hasChildLastNameError &&
+        !_hasChildGenderError &&
+        !_hasChildBirthDateError;
+  }
+
+  /// Fetches the user's current verification status.
+  Future<VerificationStatus?> getVerificationStatus() async {
+    final result = await _getVerificationStatusUseCase();
+    return result.fold(
+      onSuccess: (status) => status,
+      onFailure: (failure) {
+        setErrorMessage(failure.message);
+        return null;
+      },
+    );
+  }
+
+  Future<bool> addChildFromForm() async {
+    if (_user == null || !_validateChildForm()) return false;
+
+    final result = await _addChildUseCase.execute(
+      firstName: childFirstNameController.text.trim(),
+      lastName: childLastNameController.text.trim(),
+      birthDate: _selectedChildBirthDate!,
+      gender: _selectedChildGender!,
+    );
+
+    bool success = false;
+    result.when(
+      success: (child) {
+        _user = _user!.copyWith(children: [..._user!.children, child]);
+        childFirstNameController.clear();
+        childLastNameController.clear();
+        childBirthDateController.clear();
+        _selectedChildGender = null;
+        _selectedChildBirthDate = null;
+        _hasChildFirstNameError = false;
+        _hasChildLastNameError = false;
+        _hasChildGenderError = false;
+        _hasChildBirthDateError = false;
+        clearError();
+        success = true;
+      },
+      failure: (failure) {
+        setErrorMessage(failure.message);
+        developer.log('Failed to add child: ${failure.message}');
+      },
+    );
+
+    notifyListeners();
+    return success;
+  }
+
+  Future<bool> removeChild(String childId) async {
+    if (_user == null) return false;
+
+    final result = await _removeChildUseCase.execute(childId);
+    bool success = false;
+    result.when(
+      success: (_) {
+        _user = _user!.copyWith(
+          children: _user!.children
+              .where((child) => child.id != childId)
+              .toList(),
+        );
+        clearError();
+        success = true;
+      },
+      failure: (failure) {
+        setErrorMessage(failure.message);
+        developer.log('Failed to remove child: ${failure.message}');
+      },
+    );
+
+    notifyListeners();
+    return success;
   }
 
   Future<void> _loadProfile() async {
@@ -104,8 +195,6 @@ class FamilyManagementViewModel extends ChangeNotifier {
     result.when(
       success: (user) async {
         _user = user;
-        // Optionally sync children separately if needed,
-        // though /user/profile should include them.
         if (user.isParentAccount) {
           await _refreshChildren();
         }
@@ -136,20 +225,48 @@ class FamilyManagementViewModel extends ChangeNotifier {
   }
 
   /// Requests an OTP to enable family account.
-  Future<bool> requestFamilyAccountOtp() async {
+  Future<bool> requestFamilyAccountOtp({
+    required OtpDeliveryMethod method,
+    required String identifier,
+  }) async {
     if (_user == null) return false;
 
-    final result = await _requestFamilyAccountOtpUseCase();
+    final normalizedIdentifier = identifier.trim();
+    if (normalizedIdentifier.isEmpty) {
+      setErrorMessage('No verified contact is available for this method.');
+      return false;
+    }
+
+    // Defensive: ensure the method is currently verified for this user
+    final verificationResult = await _getVerificationStatusUseCase();
+    final isMethodVerified = verificationResult.fold(
+      onSuccess: (status) {
+        if (method == OtpDeliveryMethod.email) return status.emailVerified;
+        if (method == OtpDeliveryMethod.phone) return status.phoneVerified;
+        return false;
+      },
+      onFailure: (_) => false,
+    );
+
+    if (!isMethodVerified) {
+      setErrorMessage('Selected contact method is not verified.');
+      return false;
+    }
+
+    final result = await _requestFamilyAccountOtpUseCase(method: method);
     return result.fold(
-      onSuccess: (_) {
+      onSuccess: (message) {
+        _selectedOtpMethod = method;
+        _selectedOtpIdentifier = normalizedIdentifier;
+        _otpRequestMessage = message;
         _isOtpSent = true;
-        _errorMessage = null;
+        clearError();
         notifyListeners();
         return true;
       },
       onFailure: (failure) {
-        _errorMessage = failure.message;
-        notifyListeners();
+        _otpRequestMessage = null;
+        setErrorMessage(failure.message);
         return false;
       },
     );
@@ -162,36 +279,51 @@ class FamilyManagementViewModel extends ChangeNotifier {
     _isVerifyingOtp = true;
     notifyListeners();
 
-    final identifier = _user!.phone?.isNotEmpty == true
-        ? _user!.phone!
-        : _user!.email;
+    final identifier = _selectedOtpIdentifier;
+    if (identifier == null || identifier.isEmpty) {
+      setErrorMessage('Please request a verification code first.');
+      _isVerifyingOtp = false;
+      notifyListeners();
+      return false;
+    }
 
     final result = await _verifyOtpUseCase(identifier, otp);
 
     return result.fold(
       onSuccess: (success) async {
-        if (success) {
-          final updatedUser = _user!.copyWith(isParentAccount: true);
-          final updateResult = await _updateUserProfileUseCase(updatedUser);
-
-          updateResult.when(
-            success: (user) {
-              _user = user;
-              _isOtpSent = false;
-            },
-            failure: (failure) {
-              developer.log(
-                'Failed to update parent status: ${failure.message}',
-              );
-            },
-          );
+        if (!success) {
+          _isVerifyingOtp = false;
+          notifyListeners();
+          return false;
         }
+
+        final enableResult = await _enableFamilyFeatureUseCase();
+        final finalSuccess = enableResult.fold(
+          onSuccess: (_) {
+            // Justification: _user is checked non-null at the start of
+            // verifyFamilyAccountOtp.
+            _user = _user!.copyWith(isParentAccount: true);
+            _isOtpSent = false;
+            _selectedOtpMethod = null;
+            _selectedOtpIdentifier = null;
+            _otpRequestMessage = null;
+            return true;
+          },
+          onFailure: (failure) {
+            setErrorMessage(failure.message);
+            developer.log(
+              'Failed to enable family feature: ${failure.message}',
+            );
+            return false;
+          },
+        );
+
         _isVerifyingOtp = false;
         notifyListeners();
-        return success;
+        return finalSuccess;
       },
       onFailure: (failure) {
-        _errorMessage = failure.message;
+        setErrorMessage(failure.message);
         _isVerifyingOtp = false;
         notifyListeners();
         return false;
@@ -202,113 +334,15 @@ class FamilyManagementViewModel extends ChangeNotifier {
   Future<bool> disableFamilyAccount() async {
     if (_user == null) return false;
 
-    final updatedUser = _user!.copyWith(isParentAccount: false, children: []);
-
-    final result = await _updateUserProfileUseCase(updatedUser);
-    return result.fold(
-      onSuccess: (user) {
-        _user = user;
-        _errorMessage = null;
-        notifyListeners();
-        return true;
-      },
-      onFailure: (failure) {
-        _errorMessage = failure.message;
-        notifyListeners();
-        return false;
-      },
-    );
-  }
-
-  /// Sets the selected gender for the child.
-  void setChildGender(String? gender) {
-    _selectedChildGender = gender;
-    notifyListeners();
-  }
-
-  /// Sets the selected birth date for the child.
-  void setChildBirthDate(DateTime date) {
-    _selectedChildBirthDate = date;
-    notifyListeners();
-  }
-
-  /// Clears the child addition form.
-  void clearChildForm() {
-    childFirstNameController.clear();
-    childLastNameController.clear();
-    childBirthDateController.clear();
-    _selectedChildGender = null;
-    _selectedChildBirthDate = null;
-    _hasChildFirstNameError = false;
-    _hasChildLastNameError = false;
-    _hasChildGenderError = false;
-    _hasChildBirthDateError = false;
-    notifyListeners();
-  }
-
-  /// Validates and adds a child from the form state.
-  Future<bool> addChildFromForm() async {
-    if (_user == null) return false;
-
-    _hasChildFirstNameError = childFirstNameController.text.trim().isEmpty;
-    _hasChildLastNameError = childLastNameController.text.trim().isEmpty;
-    _hasChildBirthDateError = _selectedChildBirthDate == null;
-    _hasChildGenderError = _selectedChildGender == null;
-
-    if (_hasChildFirstNameError ||
-        _hasChildLastNameError ||
-        _hasChildBirthDateError ||
-        _hasChildGenderError) {
-      notifyListeners();
-      return false;
-    }
-
-    final result = await _addChildUseCase.execute(
-      firstName: childFirstNameController.text.trim(),
-      lastName: childLastNameController.text.trim(),
-      birthDate: _selectedChildBirthDate!,
-      gender: _selectedChildGender!,
-    );
-
-    return result.fold(
-      onSuccess: (newChild) {
-        if (_user != null) {
-          final updatedChildren = List<ChildProfile>.from(_user!.children)
-            ..add(newChild);
-          _user = _user!.copyWith(children: updatedChildren);
-        }
-        _errorMessage = null;
-        clearChildForm();
-        return true;
-      },
-      onFailure: (failure) {
-        _errorMessage = failure.message;
-        notifyListeners();
-        return false;
-      },
-    );
-  }
-
-  Future<bool> removeChild(String childId) async {
-    if (_user == null) return false;
-
-    final result = await _removeChildUseCase.execute(childId);
-
+    final result = await _disableFamilyFeatureUseCase();
     return result.fold(
       onSuccess: (_) {
-        if (_user != null) {
-          final updatedChildren = _user!.children
-              .where((c) => c.id != childId)
-              .toList();
-          _user = _user!.copyWith(children: updatedChildren);
-        }
-        _errorMessage = null;
-        notifyListeners();
+        _user = _user!.copyWith(isParentAccount: false, children: []);
+        clearError();
         return true;
       },
       onFailure: (failure) {
-        _errorMessage = failure.message;
-        notifyListeners();
+        setErrorMessage(failure.message);
         return false;
       },
     );

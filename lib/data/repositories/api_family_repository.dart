@@ -55,9 +55,51 @@ class ApiFamilyRepository implements FamilyRepository {
   }
 
   @override
+  Future<Result<ChildProfile, Failure>> updateChild({
+    required String id,
+    required String firstName,
+    required String lastName,
+    required DateTime birthDate,
+    required String gender,
+    String? avatarUrl,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.put('/family/members/$id', {
+                'first_name': firstName,
+                'last_name': lastName,
+                'birth_date': birthDate.toIso8601String().split('T').first,
+                'gender': gender,
+                'avatar_url': avatarUrl,
+              })
+              as Map<String, dynamic>;
+
+      return Result.success(
+        ChildMapper.toEntity(ChildProfileModel.fromJson(response)),
+      );
+    });
+  }
+
+  @override
   Future<Result<void, Failure>> removeChild(String id) {
     return executeApiCall(() async {
       await _apiClient.delete('/family/children/$id');
+      return Result.success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> disableFamilyFeature() {
+    return executeApiCall(() async {
+      await _apiClient.post('/family/disable-feature', {});
+      return Result.success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> enableFamilyFeature() {
+    return executeApiCall(() async {
+      await _apiClient.post('/family/enable-feature', {});
       return Result.success(null);
     });
   }
