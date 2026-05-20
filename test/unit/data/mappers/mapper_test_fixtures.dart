@@ -109,7 +109,7 @@ CourseModel testCourseModel({
 }
 
 NotificationModel testNotificationModel({
-  String id = 'notification-1',
+  int id = 1,
   String title = 'Booking confirmed',
   String message = 'Your booking is confirmed.',
   String timestamp = '2026-05-08T10:30:00.000Z',

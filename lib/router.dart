@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
@@ -7,11 +8,11 @@ import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_pas
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/new_password/new_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/register/account_setup_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/register/family_onboarding_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/register/pin_setup_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/verification_method_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/register/family_onboarding_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/register/pin_setup_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/register/account_setup_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_method_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_flow_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_success_screen.dart';
@@ -46,6 +47,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:developer' as developer;
 
 /// App routing configuration using GoRouter.
 /// Extension to safely extract extra data from [GoRouterState].
@@ -92,6 +94,7 @@ GoRouter createRouter(
     // 3. Auth Redirection
     final authState = authStateNotifier.state;
     final location = state.matchedLocation;
+    developer.log('Router.redirect: authState=$authState, location=$location');
 
     // Truly public routes accessible to everyone
     final bool isAlwaysPublic =
@@ -127,9 +130,7 @@ GoRouter createRouter(
 
       case AuthState.pendingVerification:
         // Force OTP if not on a verification/setup screen
-        if (location == '/otp' ||
-            location == '/verification-method' ||
-            location == '/family-onboarding') {
+        if (location == '/otp' || location == '/family-onboarding') {
           return null;
         }
         return '/otp';
@@ -141,8 +142,19 @@ GoRouter createRouter(
         return '/verify-additional-method';
 
       case AuthState.pendingOnboarding:
-        // Force account setup if not on a setup screen
-        if (location == '/account-setup' ||
+      case AuthState.pendingDeletionCancellation:
+        // Force OTP cancellation flow when account is pending deletion.
+        if (authState == AuthState.pendingDeletionCancellation &&
+            location == '/otp') {
+          return null;
+        } else if (authState == AuthState.pendingDeletionCancellation) {
+          return '/otp';
+        }
+
+        // Allow staying on login or otp to show the "Account Setup Required" modal
+        if (location == '/login' ||
+            location == '/otp' ||
+            location == '/account-setup' ||
             location == '/pin-setup' ||
             location == '/family-onboarding') {
           return null;
@@ -209,6 +221,13 @@ GoRouter createRouter(
       },
     ),
     GoRoute(
+      path: '/verification-method',
+      builder: (context, state) => VerificationMethodScreen(
+        registrationData: state.extraAsMap,
+        sendOtpUseCase: locator<SendOtpUseCase>(),
+      ),
+    ),
+    GoRoute(
       path: '/verify-additional-method',
       builder: (context, state) {
         final verificationData = authStateNotifier.session.verificationData;
@@ -223,13 +242,6 @@ GoRouter createRouter(
           authStateNotifier: authStateNotifier,
         );
       },
-    ),
-    GoRoute(
-      path: '/verification-method',
-      builder: (context, state) => VerificationMethodScreen(
-        registrationData: state.extraAsMap,
-        sendOtpUseCase: locator<SendOtpUseCase>(),
-      ),
     ),
     GoRoute(
       path: '/family-onboarding',
@@ -247,7 +259,7 @@ GoRouter createRouter(
         // Fallback for users who just logged in and need onboarding
         final user = authStateNotifier.session.user;
         final registrationData = {
-          'firstName': user?.firstName ?? 'User',
+          'firstName': user?.firstName ?? '',
           'lastName': user?.lastName ?? '',
           'email': user?.email ?? '',
           'phone': user?.phone ?? '',
@@ -341,7 +353,8 @@ GoRouter createRouter(
       path: '/edit-child/:id',
       builder: (context, state) {
         final childId = state.pathParameters['id'];
-        return AddEditChildScreen(childId: childId);
+        final child = state.extra as ChildProfile?;
+        return AddEditChildScreen(childId: childId, child: child);
       },
     ),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),

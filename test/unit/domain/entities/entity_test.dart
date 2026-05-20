@@ -174,7 +174,7 @@ void main() {
     group('Notification', () {
       final now = DateTime.now();
       final notification1 = Notification(
-        id: 'n1',
+        id: 1,
         title: 'Title',
         message: 'Message',
         timestamp: now,

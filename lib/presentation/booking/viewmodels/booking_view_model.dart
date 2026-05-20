@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
@@ -14,11 +15,10 @@ import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the multi-step booking flow.
-class BookingViewModel extends ChangeNotifier {
+class BookingViewModel extends BaseViewModel {
   final GetActivitiesUseCase _getActivitiesUseCase;
   final GetTimeSlotsUseCase _getTimeSlotsUseCase;
   final GetUserBookingsUseCase _getUserBookingsUseCase;
@@ -47,7 +47,6 @@ class BookingViewModel extends ChangeNotifier {
   double? _contextualPrice;
   bool _isPricingLoading = false;
   bool _isLoading = false;
-  String? _error;
 
   /// Creates a new [BookingViewModel] instance.
   BookingViewModel({
@@ -113,9 +112,6 @@ class BookingViewModel extends ChangeNotifier {
 
   bool get isPricingLoading => _isPricingLoading;
 
-  /// Current error message if any.
-  String? get error => _error;
-
   double get priceToPay =>
       _contextualPrice ?? _selectedActivity?.basePrice ?? 0;
   bool get hasContextualPrice => _contextualPrice != null;
@@ -179,7 +175,7 @@ class BookingViewModel extends ChangeNotifier {
   /// Fetches the list of bookings for the current user.
   Future<void> loadUserBookings() async {
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final result = await _getUserBookingsUseCase();
@@ -188,7 +184,7 @@ class BookingViewModel extends ChangeNotifier {
         _userBookings = bookings;
       },
       failure: (failure) {
-        _error = 'bookings_loading_failed';
+        setErrorMessage('bookings_loading_failed');
         developer.log('Error loading bookings: ${failure.message}');
       },
     );
@@ -200,7 +196,7 @@ class BookingViewModel extends ChangeNotifier {
   /// Cancels an existing booking by its [id].
   Future<void> cancelBooking(String id) async {
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final result = await _cancelBookingUseCase(id);
@@ -209,7 +205,7 @@ class BookingViewModel extends ChangeNotifier {
         loadUserBookings();
       },
       failure: (failure) {
-        _error = 'booking_cancellation_failed';
+        setErrorMessage('booking_cancellation_failed');
         developer.log('Error cancelling booking: ${failure.message}');
       },
     );
@@ -225,18 +221,16 @@ class BookingViewModel extends ChangeNotifier {
     final member = _selectedMember;
 
     if (activity == null || slot == null) {
-      _error = 'missing_selection';
-      notifyListeners();
+      setErrorMessage('missing_selection');
       return false;
     }
     if (_isFamilyAccount && member == null) {
-      _error = 'missing_member';
-      notifyListeners();
+      setErrorMessage('missing_member');
       return false;
     }
 
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final reservation = Reservation(
@@ -264,7 +258,7 @@ class BookingViewModel extends ChangeNotifier {
         _resetForm();
       },
       failure: (failure) {
-        _error = 'reservation_failed';
+        setErrorMessage('reservation_failed');
         developer.log('Error making reservation: ${failure.message}');
       },
     );
@@ -284,7 +278,7 @@ class BookingViewModel extends ChangeNotifier {
 
   Future<void> _loadActivities() async {
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final result = await _getActivitiesUseCase();
@@ -293,7 +287,7 @@ class BookingViewModel extends ChangeNotifier {
         _activities = activities;
       },
       failure: (failure) {
-        _error = 'activities_loading_failed';
+        setErrorMessage('activities_loading_failed');
         developer.log('Error loading activities: ${failure.message}');
       },
     );
@@ -307,7 +301,7 @@ class BookingViewModel extends ChangeNotifier {
     if (activity == null) return;
 
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     try {
@@ -324,7 +318,7 @@ class BookingViewModel extends ChangeNotifier {
           );
         },
         failure: (failure) {
-          _error = 'slots_loading_failed';
+          setErrorMessage('slots_loading_failed');
           _availableSlots = [];
           developer.log('Error loading slots: ${failure.message}');
         },
@@ -335,7 +329,7 @@ class BookingViewModel extends ChangeNotifier {
         error: e,
         stackTrace: stack,
       );
-      _error = 'slots_loading_failed';
+      setErrorMessage('slots_loading_failed');
       _availableSlots = [];
     } finally {
       _isLoading = false;

@@ -119,7 +119,7 @@ Reservation testReservation({
 }
 
 Notification testNotification({
-  String id = 'notification-1',
+  int id = 1,
   String title = 'Booking confirmed',
   String message = 'Your booking is confirmed.',
   DateTime? timestamp,

@@ -56,7 +56,7 @@ void main() {
     // Default mock behaviors
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.isFamilyAccount).thenReturn(false);
-    when(() => mockViewModel.error).thenReturn(null);
+    when(() => mockViewModel.errorMessage).thenReturn(null);
     when(() => mockViewModel.activities).thenReturn([testActivity]);
     when(() => mockViewModel.availableSlots).thenReturn([testSlot]);
     when(() => mockViewModel.currentStep).thenReturn(0);

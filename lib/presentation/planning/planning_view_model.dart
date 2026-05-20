@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
@@ -10,7 +11,6 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_us
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:flutter/material.dart';
 
 class PlanningEntry {
   final String id;
@@ -35,7 +35,7 @@ class PlanningEntry {
 enum PlanningEntryType { course, reservation }
 
 /// ViewModel for the Planning (Course Schedule) screen.
-class PlanningViewModel extends ChangeNotifier {
+class PlanningViewModel extends BaseViewModel {
   final GetCoursesUseCase _getCoursesUseCase;
   final GetUserBookingsUseCase _getUserBookingsUseCase;
   final GetFamilyMembersUseCase _getFamilyMembersUseCase;
@@ -51,7 +51,6 @@ class PlanningViewModel extends ChangeNotifier {
   MemberTier _selectedMemberTier = MemberTier.public;
   bool _isLoading = false;
   int _selectedDay = 1; // Monday by default
-  String? _errorMessage;
 
   /// List of courses filtered by the selected day.
   List<Course> get courses => _coursesForDay();
@@ -68,9 +67,6 @@ class PlanningViewModel extends ChangeNotifier {
 
   /// Whether data is currently being loaded.
   bool get isLoading => _isLoading;
-
-  /// Any error message from loading.
-  String? get errorMessage => _errorMessage;
 
   /// Currently selected day of the week (1-7).
   int get selectedDay => _selectedDay;
@@ -93,7 +89,7 @@ class PlanningViewModel extends ChangeNotifier {
   /// Loads courses + reservations + family members for unified planning.
   Future<void> loadPlanning() async {
     _isLoading = true;
-    _errorMessage = null;
+    clearError();
     notifyListeners();
 
     try {
@@ -112,7 +108,7 @@ class PlanningViewModel extends ChangeNotifier {
       coursesResult.when(
         success: (data) => _allCourses = data,
         failure: (failure) {
-          _errorMessage = failure.message;
+          setErrorMessage(failure.message);
           _allCourses = [];
         },
       );
@@ -144,7 +140,7 @@ class PlanningViewModel extends ChangeNotifier {
 
       _buildUnified();
     } catch (e) {
-      _errorMessage = e.toString();
+      setErrorMessage(e.toString());
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -9,13 +9,13 @@ import 'dart:developer' as developer;
 class HomeViewModel extends ChangeNotifier {
   final GetActivitiesUseCase _getActivitiesUseCase;
   final GetCoursesUseCase _getCoursesUseCase;
+  bool _isDisposed = false;
 
   HomeViewModel({
     required GetActivitiesUseCase getActivitiesUseCase,
     required GetCoursesUseCase getCoursesUseCase,
   }) : _getActivitiesUseCase = getActivitiesUseCase,
        _getCoursesUseCase = getCoursesUseCase;
-
   int _currentIndex = 0;
   int get currentIndex => _currentIndex;
 
@@ -30,33 +30,49 @@ class HomeViewModel extends ChangeNotifier {
 
   void setTab(int index) {
     _currentIndex = index;
-    notifyListeners();
+    if (!_isDisposed) {
+      notifyListeners();
+    }
   }
 
   /// Loads all data required for the home screen.
   Future<void> loadHomeData() async {
     developer.log('HomeViewModel: loadHomeData() started');
+    if (_isDisposed) {
+      developer.log(
+        'HomeViewModel: loadHomeData() called on disposed instance, skipping',
+      );
+      return;
+    }
+
     _isLoading = true;
-    notifyListeners();
+    if (!_isDisposed) {
+      notifyListeners();
+    }
 
     try {
       // Load activities via Use Case
       final activitiesResult = await _getActivitiesUseCase();
-      activitiesResult.when(
-        success: (data) => _activities = data,
-        failure: (failure) =>
-            developer.log('Error loading activities: $failure'),
-      );
+      if (!_isDisposed) {
+        activitiesResult.when(
+          success: (data) => _activities = data,
+          failure: (failure) =>
+              developer.log('Error loading activities: $failure'),
+        );
+      }
 
       // Load courses via Use Case
       final coursesResult = await _getCoursesUseCase();
-      coursesResult.when(
-        success: (data) {
-          final today = DateTime.now().weekday;
-          _todayCourses = data.where((c) => c.dayOfWeek == today).toList();
-        },
-        failure: (failure) => developer.log('Error loading courses: $failure'),
-      );
+      if (!_isDisposed) {
+        coursesResult.when(
+          success: (data) {
+            final today = DateTime.now().weekday;
+            _todayCourses = data.where((c) => c.dayOfWeek == today).toList();
+          },
+          failure: (failure) =>
+              developer.log('Error loading courses: $failure'),
+        );
+      }
 
       developer.log(
         'Home Data Loaded: ${_activities.length} activities, ${_todayCourses.length} courses',
@@ -64,8 +80,16 @@ class HomeViewModel extends ChangeNotifier {
     } catch (e, stack) {
       developer.log('Error loading home data: $e', error: e, stackTrace: stack);
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      if (!_isDisposed) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }

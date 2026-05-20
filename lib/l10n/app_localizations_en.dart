@@ -66,10 +66,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonGenderFemale => 'Female';
 
   @override
-  String get commonGenderOther => 'Other';
+  String get commonErrorOccurred => 'An error occurred. Please try again.';
 
   @override
-  String get commonErrorOccurred => 'An error occurred. Please try again.';
+  String get commonSave => 'SAVE';
 
   @override
   String get commonMissingContactInfo => 'Missing contact information.';
@@ -190,6 +190,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordLabel => 'Password';
 
   @override
+  String get authDeletionCancelSubtitle =>
+      'Your account is set to be deleted. Enter the code sent to your email/phone to cancel this request.';
+
+  @override
   String get authRememberMe => 'Remember me';
 
   @override
@@ -292,6 +296,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileHistory => 'Access & History';
+
+  @override
+  String get profileDeleteAccount => 'Delete Account';
+
+  @override
+  String get profileDeleteAccountTitle => 'Delete Account';
+
+  @override
+  String get profileDeleteAccountSubtitle => 'This action is permanent';
+
+  @override
+  String get profileDeleteAccountMessage =>
+      'Are you sure you want to delete your account? This action cannot be undone and your account will be processed for deletion.';
+
+  @override
+  String get profileDeleteAccountConfirm => 'Delete My Account';
 
   @override
   String get profileNotifications => 'Notifications';
@@ -611,6 +631,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This action cannot be undone. All your data will be permanently removed.';
 
   @override
+  String get settingsEnterPasswordFirst =>
+      'Please enter your current password to confirm deletion.';
+
+  @override
   String get settingsDelete => 'DELETE';
 
   @override
@@ -679,6 +703,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAddChild => 'Add Child';
 
   @override
+  String get profileEditChild => 'Edit Child';
+
+  @override
   String get profileNoChildren => 'No children profiles added.';
 
   @override
@@ -726,6 +753,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileChildAdded => 'Child profile added successfully.';
 
   @override
+  String get profileChildUpdated => 'Child profile updated successfully.';
+
+  @override
   String get profileFirstName => 'First Name';
 
   @override
@@ -762,6 +792,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authVerificationMethodSubtitle =>
       'Choose a method to receive your verification code.';
+
+  @override
+  String get profileNoVerifiedOtpMethod =>
+      'You need at least one verified contact method (email or phone) before enabling a family account.';
 
   @override
   String get authEmailMethod => 'Email Address';
@@ -819,6 +853,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get authCompleteRegistration => 'Complete Registration';
+
+  @override
+  String get authSetupRequiredTitle => 'Account Setup Required';
+
+  @override
+  String get authSetupRequiredMessage =>
+      'Account setup is not completed. Please complete your profile to unlock your account.';
+
+  @override
+  String get authCompleteSetup => 'Complete Setup';
 
   @override
   String get languageSelectionTitle => 'Welcome to Bourgo Arena';

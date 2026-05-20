@@ -206,17 +206,17 @@ abstract class AppLocalizations {
   /// **'Femme'**
   String get commonGenderFemale;
 
-  /// No description provided for @commonGenderOther.
-  ///
-  /// In fr, this message translates to:
-  /// **'Autre'**
-  String get commonGenderOther;
-
   /// No description provided for @commonErrorOccurred.
   ///
   /// In fr, this message translates to:
   /// **'Une erreur est survenue. Veuillez réessayer.'**
   String get commonErrorOccurred;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'ENREGISTRER'**
+  String get commonSave;
 
   /// No description provided for @commonMissingContactInfo.
   ///
@@ -446,6 +446,12 @@ abstract class AppLocalizations {
   /// **'Mot de passe'**
   String get authPasswordLabel;
 
+  /// No description provided for @authDeletionCancelSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre compte est programmé pour suppression. Entrez le code envoyé à votre e-mail/téléphone pour annuler la demande.'**
+  String get authDeletionCancelSubtitle;
+
   /// No description provided for @authRememberMe.
   ///
   /// In fr, this message translates to:
@@ -641,8 +647,38 @@ abstract class AppLocalizations {
   /// No description provided for @profileHistory.
   ///
   /// In fr, this message translates to:
-  /// **'Accès & Historique'**
+  /// **'Accès et historique'**
   String get profileHistory;
+
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @profileDeleteAccountTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte'**
+  String get profileDeleteAccountTitle;
+
+  /// No description provided for @profileDeleteAccountSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette action est permanente'**
+  String get profileDeleteAccountSubtitle;
+
+  /// No description provided for @profileDeleteAccountMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et votre compte sera traité pour suppression.'**
+  String get profileDeleteAccountMessage;
+
+  /// No description provided for @profileDeleteAccountConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer mon compte'**
+  String get profileDeleteAccountConfirm;
 
   /// No description provided for @profileNotifications.
   ///
@@ -1262,6 +1298,12 @@ abstract class AppLocalizations {
   /// **'Cette action est irréversible. Toutes vos données seront définitivement supprimées.'**
   String get settingsConfirmDeleteMessage;
 
+  /// No description provided for @settingsEnterPasswordFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir votre mot de passe actuel pour confirmer la suppression.'**
+  String get settingsEnterPasswordFirst;
+
   /// No description provided for @settingsDelete.
   ///
   /// In fr, this message translates to:
@@ -1394,6 +1436,12 @@ abstract class AppLocalizations {
   /// **'Ajouter un enfant'**
   String get profileAddChild;
 
+  /// No description provided for @profileEditChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l\'enfant'**
+  String get profileEditChild;
+
   /// No description provided for @profileNoChildren.
   ///
   /// In fr, this message translates to:
@@ -1478,6 +1526,12 @@ abstract class AppLocalizations {
   /// **'Profil d\'enfant ajouté avec succès.'**
   String get profileChildAdded;
 
+  /// No description provided for @profileChildUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil d\'enfant mis à jour avec succès.'**
+  String get profileChildUpdated;
+
   /// No description provided for @profileFirstName.
   ///
   /// In fr, this message translates to:
@@ -1549,6 +1603,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Choisissez une méthode pour recevoir votre code de vérification.'**
   String get authVerificationMethodSubtitle;
+
+  /// No description provided for @profileNoVerifiedOtpMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez avoir au moins une méthode de contact vérifiée (e-mail ou téléphone) avant d\'activer un compte famille.'**
+  String get profileNoVerifiedOtpMethod;
 
   /// No description provided for @authEmailMethod.
   ///
@@ -1651,6 +1711,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Terminer l\'inscription'**
   String get authCompleteRegistration;
+
+  /// No description provided for @authSetupRequiredTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configuration du compte requise'**
+  String get authSetupRequiredTitle;
+
+  /// No description provided for @authSetupRequiredMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'La configuration du compte n\'est pas terminée. Veuillez compléter votre profil pour déverrouiller votre compte.'**
+  String get authSetupRequiredMessage;
+
+  /// No description provided for @authCompleteSetup.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compléter la configuration'**
+  String get authCompleteSetup;
 
   /// No description provided for @languageSelectionTitle.
   ///

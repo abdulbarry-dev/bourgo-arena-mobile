@@ -16,8 +16,9 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
-    const MethodChannel('dev.fluttercommunity.plus/package_info')
-        .setMockMethodCallHandler((MethodCall methodCall) async {
+    const MethodChannel(
+      'dev.fluttercommunity.plus/package_info',
+    ).setMockMethodCallHandler((MethodCall methodCall) async {
       if (methodCall.method == 'getAll') {
         return <String, dynamic>{
           'appName': 'Bourgo Arena',

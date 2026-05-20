@@ -130,7 +130,7 @@ Course testCourseEntity({
 }
 
 Notification testNotificationEntity({
-  String id = 'notification-1',
+  int id = 1,
   String title = 'Booking confirmed',
   String message = 'Your booking is confirmed.',
   DateTime? timestamp,
@@ -282,7 +282,7 @@ Map<String, dynamic> testCourseJson({
 }
 
 Map<String, dynamic> testNotificationJson({
-  String id = 'notification-1',
+  int id = 1,
   String title = 'Booking confirmed',
   String message = 'Your booking is confirmed.',
   String timestamp = '2026-05-08T10:30:00.000Z',
@@ -296,6 +296,34 @@ Map<String, dynamic> testNotificationJson({
     'timestamp': timestamp,
     'type': type,
     'is_read': isRead,
+  };
+}
+
+Map<String, dynamic> testPaginatedNotificationsJson({
+  required List<Map<String, dynamic>> data,
+  int currentPage = 1,
+  int lastPage = 1,
+  int total = 1,
+}) {
+  return {
+    'data': data,
+    'links': {
+      'first': 'https://example.com/notifications?page=1',
+      'last': 'https://example.com/notifications?page=$lastPage',
+      'prev': null,
+      'next': currentPage < lastPage
+          ? 'https://example.com/notifications?page=${currentPage + 1}'
+          : null,
+    },
+    'meta': {
+      'current_page': currentPage,
+      'from': 1,
+      'last_page': lastPage,
+      'path': 'https://example.com/notifications',
+      'per_page': 20,
+      'to': data.length,
+      'total': total,
+    },
   };
 }
 
