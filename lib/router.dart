@@ -158,16 +158,26 @@ GoRouter createRouter(
         return '/verification-method';
 
       case AuthState.pendingAdditionalVerification:
-        if (authStateNotifier.session.verificationData?.onboardingCompleted ==
-                false &&
-            location != '/account-setup' &&
-            location != '/onboarding') {
-          return '/account-setup';
+        final onboardingCompleted =
+            authStateNotifier.session.verificationData?.onboardingCompleted ??
+            true;
+
+        if (!onboardingCompleted) {
+          if (location == '/verification-method' ||
+              location == '/otp' ||
+              location == '/account-setup' ||
+              location == '/pin-setup' ||
+              location == '/family-onboarding') {
+            return null;
+          }
+
+          return '/verification-method';
         }
 
-        if (isSetupRoute || location == '/onboarding') {
+        if (location == '/verify-additional-method' || location == '/otp') {
           return null;
         }
+
         return '/verify-additional-method';
 
       case AuthState.pendingOnboarding:

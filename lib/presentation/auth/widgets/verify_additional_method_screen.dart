@@ -6,7 +6,6 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/widgets/onboarding_setup_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -54,9 +53,6 @@ class _VerifyAdditionalMethodScreenState
     extends State<VerifyAdditionalMethodScreen> {
   bool _isLoading = false;
   bool _isFetchingStatus = false;
-  bool _onboardingCompleted = true;
-  bool _onboardingPromptShown = false;
-  bool _divertingToOnboarding = false;
   String? _email;
   String? _phone;
   late String _unverifiedMethod;
@@ -84,36 +80,29 @@ class _VerifyAdditionalMethodScreenState
 
       result.when(
         success: (status) {
+          // If onboarding is incomplete, hand off to the normal onboarding
+          // verification flow instead of staying on the additional verification
+          // screen used for regular login sessions.
+          if (!status.onboardingCompleted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              context.push(
+                '/verification-method',
+                extra: _buildOnboardingData(),
+              );
+            });
+            return;
+          }
+
           setState(() {
             _email = status.email;
             _phone = status.phone;
-            _onboardingCompleted = status.onboardingCompleted;
             if (!status.emailVerified) {
               _unverifiedMethod = 'email';
             } else if (!status.phoneVerified) {
               _unverifiedMethod = 'phone';
             }
           });
-
-          if (!status.onboardingCompleted && !_onboardingPromptShown) {
-            _onboardingPromptShown = true;
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              if (!mounted) return;
-
-              setState(() {
-                _divertingToOnboarding = true;
-              });
-
-              final shouldComplete = await OnboardingSetupModal.show(context);
-              if (!mounted) return;
-
-              if (shouldComplete == true) {
-                context.push('/account-setup', extra: _buildOnboardingData());
-              } else {
-                context.go('/login');
-              }
-            });
-          }
         },
         failure: (failure) {
           ScaffoldMessenger.of(
@@ -130,19 +119,22 @@ class _VerifyAdditionalMethodScreenState
     });
   }
 
+  Map<String, dynamic> _buildOnboardingData() {
+    final user = widget.authStateNotifier.session.user;
+
+    return {
+      'firstName': user?.firstName ?? '',
+      'lastName': user?.lastName ?? '',
+      'email': _email ?? user?.email ?? '',
+      'phone': _phone ?? user?.phone ?? '',
+      'gender': user?.gender,
+      'birthDate': user?.birthDate,
+      'isParentAccount': user?.isParentAccount ?? false,
+      'familyMembers': user?.children ?? const [],
+    };
+  }
+
   void _verifyNow() async {
-    if (!_onboardingCompleted) {
-      final shouldComplete = await OnboardingSetupModal.show(context);
-      if (!mounted) return;
-
-      if (shouldComplete == true) {
-        context.push('/account-setup', extra: _buildOnboardingData());
-      } else {
-        context.go('/login');
-      }
-      return;
-    }
-
     _setLoading(true);
     final identifier = _unverifiedMethod == 'email' ? _email : _phone;
 
@@ -179,27 +171,10 @@ class _VerifyAdditionalMethodScreenState
   }
 
   void _skipForNow() {
-    if (!_onboardingCompleted) {
-      _verifyNow();
-      return;
-    }
-
     widget.authStateNotifier.skipForSession();
   }
 
   void _skipForever() async {
-    if (!_onboardingCompleted) {
-      final shouldComplete = await OnboardingSetupModal.show(context);
-      if (!mounted) return;
-
-      if (shouldComplete == true) {
-        context.push('/account-setup', extra: _buildOnboardingData());
-      } else {
-        context.go('/login');
-      }
-      return;
-    }
-
     _setLoading(true);
     try {
       // Synchronize with backend if possible
@@ -216,28 +191,13 @@ class _VerifyAdditionalMethodScreenState
     }
   }
 
-  Map<String, dynamic> _buildOnboardingData() {
-    final user = widget.authStateNotifier.session.user;
-
-    return {
-      'firstName': user?.firstName ?? '',
-      'lastName': user?.lastName ?? '',
-      'email': _email ?? user?.email ?? '',
-      'phone': _phone ?? user?.phone ?? '',
-      'gender': user?.gender,
-      'birthDate': user?.birthDate,
-      'isParentAccount': user?.isParentAccount ?? false,
-      'familyMembers': user?.children ?? const [],
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final spacing = context.spacing;
 
-    if (_isFetchingStatus || !_onboardingCompleted || _divertingToOnboarding) {
+    if (_isFetchingStatus) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
