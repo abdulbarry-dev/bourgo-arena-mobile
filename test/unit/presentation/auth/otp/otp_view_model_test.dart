@@ -57,6 +57,7 @@ void main() {
         code: '123456',
         onSuccess: () => successCalled = true,
         onAdditionalVerificationNeeded: (method, email, phone) {},
+        onOnboardingIncomplete: () {},
       );
 
       verify(
@@ -78,7 +79,7 @@ void main() {
             VerificationStatus(
               emailVerified: false,
               phoneVerified: true,
-              onboardingCompleted: false,
+              onboardingCompleted: true,
               isFullyVerified: false,
               email: 'test@example.com',
               phone: '+1234567890',
@@ -100,6 +101,7 @@ void main() {
             additionalEmail = email;
             additionalPhone = phone;
           },
+          onOnboardingIncomplete: () {},
         );
 
         expect(successCalled, isFalse);
@@ -119,6 +121,7 @@ void main() {
         code: '123456',
         onSuccess: () {},
         onAdditionalVerificationNeeded: (method, email, phone) {},
+        onOnboardingIncomplete: () {},
       );
 
       expect(viewModel.errorMessage, 'authInvalidVerificationCode');
@@ -137,6 +140,7 @@ void main() {
         code: '123456',
         onSuccess: () {},
         onAdditionalVerificationNeeded: (method, email, phone) {},
+        onOnboardingIncomplete: () {},
       );
 
       expect(viewModel.errorMessage, 'Server error');

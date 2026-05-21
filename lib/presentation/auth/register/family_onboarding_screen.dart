@@ -1,4 +1,9 @@
+import 'dart:async';
+
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/viewmodels/family_onboarding_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -21,17 +26,75 @@ class FamilyOnboardingScreen extends StatefulWidget {
 
 class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
   late final FamilyOnboardingViewModel _viewModel;
+  late final SessionRepository _sessionRepository;
 
   @override
   void initState() {
     super.initState();
+    _sessionRepository = locator<SessionRepository>();
     _viewModel = FamilyOnboardingViewModel();
+    _viewModel.addListener(_persistDraft);
+    _viewModel.firstNameController.addListener(_persistDraft);
+    _viewModel.lastNameController.addListener(_persistDraft);
+    _viewModel.birthDateController.addListener(_persistDraft);
+    _restoreDraft();
+    _persistDraft();
   }
 
   @override
   void dispose() {
+    _viewModel.removeListener(_persistDraft);
+    _viewModel.firstNameController.removeListener(_persistDraft);
+    _viewModel.lastNameController.removeListener(_persistDraft);
+    _viewModel.birthDateController.removeListener(_persistDraft);
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _restoreDraft() {
+    final draft = widget.registrationData;
+    final storedMembers = draft['familyMembers'];
+    if (storedMembers is List<ChildProfile>) {
+      _viewModel.setMembers(storedMembers);
+    } else if (storedMembers is List) {
+      final members = storedMembers.whereType<ChildProfile>().toList(
+        growable: false,
+      );
+      if (members.isNotEmpty) {
+        _viewModel.setMembers(members);
+      }
+    }
+
+    _viewModel.firstNameController.text =
+        draft['pendingFirstName'] as String? ?? '';
+    _viewModel.lastNameController.text =
+        draft['pendingLastName'] as String? ?? '';
+
+    final pendingBirthDate = draft['pendingBirthDate'];
+    if (pendingBirthDate is DateTime) {
+      _viewModel.setBirthDate(pendingBirthDate);
+      _viewModel.birthDateController.text = DateFormat.yMMMd().format(
+        pendingBirthDate,
+      );
+    }
+
+    _viewModel.setGender(draft['pendingGender'] as String?);
+  }
+
+  void _persistDraft() {
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': '/family-onboarding',
+        'extra': {
+          ...widget.registrationData,
+          'familyMembers': _viewModel.members,
+          'pendingFirstName': _viewModel.firstNameController.text,
+          'pendingLastName': _viewModel.lastNameController.text,
+          'pendingBirthDate': _viewModel.selectedBirthDate,
+          'pendingGender': _viewModel.selectedGender,
+        },
+      }),
+    );
   }
 
   Future<void> _selectBirthDate() async {
@@ -47,10 +110,12 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
     if (picked != null) {
       _viewModel.setBirthDate(picked);
       _viewModel.birthDateController.text = DateFormat.yMMMd().format(picked);
+      _persistDraft();
     }
   }
 
   void _onContinue() {
+    _persistDraft();
     context.push(
       '/verification-method',
       extra: {...widget.registrationData, 'familyMembers': _viewModel.members},

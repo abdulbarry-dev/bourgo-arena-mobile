@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
@@ -72,13 +73,14 @@ void main() {
     locator.reset();
   });
 
-  Widget createWidgetUnderTest({String? destination}) {
+  Widget createWidgetUnderTest({String? destination, bool autoSendOtp = true}) {
     final router = GoRouter(
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) => OtpScreen(
             destination: destination,
+            autoSendOtp: autoSendOtp,
             verifyOtpUseCase: mockVerifyOtpUseCase,
             sendOtpUseCase: mockSendOtpUseCase,
             getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
@@ -200,6 +202,41 @@ void main() {
 
       // Called once in initState and once on tap
       verify(() => mockSendOtpUseCase('test@example.com')).called(2);
+    });
+
+    testWidgets(
+      'uses the pending email from auth state when no destination is provided',
+      (tester) async {
+        await setupScreenSize(tester);
+        when(
+          () => mockAuthStateNotifier.state,
+        ).thenReturn(AuthState.pendingDeletionCancellation);
+        when(() => mockAuthStateNotifier.session).thenReturn(
+          const AuthSession(
+            state: AuthState.pendingDeletionCancellation,
+            pendingEmail: 'cancel@example.com',
+          ),
+        );
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        verify(() => mockSendOtpUseCase('cancel@example.com')).called(1);
+      },
+    );
+
+    testWidgets('does not auto send when autoSendOtp is false', (tester) async {
+      await setupScreenSize(tester);
+
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          destination: 'test@example.com',
+          autoSendOtp: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      verifyNever(() => mockSendOtpUseCase(any()));
     });
   });
 }

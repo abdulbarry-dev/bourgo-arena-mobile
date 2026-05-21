@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -24,6 +27,7 @@ class AccountSetupScreen extends StatefulWidget {
 
 class _AccountSetupScreenState extends State<AccountSetupScreen> {
   late final Map<String, dynamic> _data;
+  late final SessionRepository _sessionRepository;
   bool _isEditing = false;
 
   late final TextEditingController _firstNameController;
@@ -37,6 +41,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   @override
   void initState() {
     super.initState();
+    _sessionRepository = locator<SessionRepository>();
     _data = Map<String, dynamic>.from(widget.registrationData);
 
     // Fallback to AuthStateNotifier if data is missing
@@ -69,16 +74,39 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
           ? DateFormat.yMMMd().format(_selectedBirthDate!)
           : '',
     );
+
+    _firstNameController.addListener(_persistDraft);
+    _lastNameController.addListener(_persistDraft);
+    _emailController.addListener(_persistDraft);
+    _phoneController.addListener(_persistDraft);
+    _birthDateController.addListener(_persistDraft);
+
+    _persistDraft();
   }
 
   @override
   void dispose() {
+    _firstNameController.removeListener(_persistDraft);
+    _lastNameController.removeListener(_persistDraft);
+    _emailController.removeListener(_persistDraft);
+    _phoneController.removeListener(_persistDraft);
+    _birthDateController.removeListener(_persistDraft);
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _birthDateController.dispose();
     super.dispose();
+  }
+
+  void _persistDraft() {
+    _syncDataFromControllers();
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': '/account-setup',
+        'extra': Map<String, dynamic>.from(_data)..['isEditing'] = _isEditing,
+      }),
+    );
   }
 
   void _toggleEdit() {
@@ -97,6 +125,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
             : '';
       }
     });
+    _persistDraft();
   }
 
   void _saveChanges() {
@@ -109,6 +138,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
     setState(() {
       _isEditing = false;
     });
+    _persistDraft();
   }
 
   void _syncDataFromControllers() {
@@ -157,8 +187,15 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
         _isEditing = true;
       });
       _showValidationError();
+      _persistDraft();
       return;
     }
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': '/pin-setup',
+        'extra': Map<String, dynamic>.from(_data),
+      }),
+    );
     context.push('/pin-setup', extra: _data);
   }
 
@@ -175,6 +212,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
         _selectedBirthDate = picked;
         _birthDateController.text = DateFormat.yMMMd().format(picked);
       });
+      _persistDraft();
     }
   }
 
@@ -362,15 +400,19 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                             _GenderOption(
                               label: l10n.commonGenderMale,
                               isSelected: _selectedGender == 'male',
-                              onTap: () =>
-                                  setState(() => _selectedGender = 'male'),
+                              onTap: () {
+                                setState(() => _selectedGender = 'male');
+                                _persistDraft();
+                              },
                             ),
                             SizedBox(width: spacing.sm),
                             _GenderOption(
                               label: l10n.commonGenderFemale,
                               isSelected: _selectedGender == 'female',
-                              onTap: () =>
-                                  setState(() => _selectedGender = 'female'),
+                              onTap: () {
+                                setState(() => _selectedGender = 'female');
+                                _persistDraft();
+                              },
                             ),
                           ],
                         ),

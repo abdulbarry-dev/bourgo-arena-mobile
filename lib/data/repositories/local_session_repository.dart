@@ -1,16 +1,19 @@
+import 'dart:convert';
+
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 /// Local implementation of [SessionRepository] using [SharedPreferences].
-///
+
 /// This is the single authoritative source for all local persistence in the app.
 /// All storage keys are private constants here; no raw key strings may appear
 /// elsewhere in the codebase.
-///
+
 /// The [clearSession] method performs an atomic wipe of all session-scoped keys.
 /// Every new session field MUST be added to [_sessionKeys] — this is a hard rule.
 class LocalSessionRepository implements SessionRepository {
@@ -38,6 +41,9 @@ class LocalSessionRepository implements SessionRepository {
   // Remember Me
   static const String _rememberedIdentifierKey = 'remembered_identifier';
 
+  // Registration Draft
+  static const String _registrationDraftKey = 'registration_draft';
+
   // Login OTP Verification
   static const String _skipLoginOtpForeverKey = 'skip_login_otp_forever';
 
@@ -51,6 +57,7 @@ class LocalSessionRepository implements SessionRepository {
     _deviceTokenKey,
     _devicePlatformKey,
     _onboardingCompletedKey,
+    _registrationDraftKey,
   ];
 
   final SharedPreferences _prefs;
@@ -441,6 +448,137 @@ class LocalSessionRepository implements SessionRepository {
         CacheFailure(
           AppErrorCode.cacheError,
           'Failed to clear remembered identifier: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  dynamic _encodeDraftValue(dynamic value) {
+    if (value == null || value is num || value is bool || value is String) {
+      return value;
+    }
+
+    if (value is DateTime) {
+      return {'__type': 'DateTime', 'value': value.toIso8601String()};
+    }
+
+    if (value is ChildProfile) {
+      return {
+        '__type': 'ChildProfile',
+        'value': {
+          'id': value.id,
+          'firstName': value.firstName,
+          'lastName': value.lastName,
+          'birthDate': value.birthDate.toIso8601String(),
+          'gender': value.gender,
+          'avatarUrl': value.avatarUrl,
+        },
+      };
+    }
+
+    if (value is Map) {
+      return value.map(
+        (key, entry) => MapEntry(key.toString(), _encodeDraftValue(entry)),
+      );
+    }
+
+    if (value is Iterable) {
+      return value.map(_encodeDraftValue).toList();
+    }
+
+    return value.toString();
+  }
+
+  dynamic _decodeDraftValue(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      final type = value['__type'];
+
+      if (type == 'DateTime') {
+        final raw = value['value'] as String?;
+        return raw == null ? null : DateTime.tryParse(raw);
+      }
+
+      if (type == 'ChildProfile') {
+        final raw = value['value'];
+        if (raw is Map<String, dynamic>) {
+          return ChildProfile(
+            id: raw['id'] as String? ?? '',
+            firstName: raw['firstName'] as String? ?? '',
+            lastName: raw['lastName'] as String? ?? '',
+            birthDate:
+                DateTime.tryParse(raw['birthDate'] as String? ?? '') ??
+                DateTime.fromMillisecondsSinceEpoch(0),
+            gender: raw['gender'] as String?,
+            avatarUrl: raw['avatarUrl'] as String?,
+          );
+        }
+      }
+
+      return value.map((key, entry) => MapEntry(key, _decodeDraftValue(entry)));
+    }
+
+    if (value is List) {
+      return value.map(_decodeDraftValue).toList();
+    }
+
+    return value;
+  }
+
+  @override
+  Future<Result<void, Failure>> saveRegistrationDraft(
+    Map<String, dynamic> draft,
+  ) async {
+    try {
+      await _prefs.setString(
+        _registrationDraftKey,
+        jsonEncode(_encodeDraftValue(draft)),
+      );
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save registration draft: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<Map<String, dynamic>?, Failure>> getRegistrationDraft() async {
+    try {
+      final rawDraft = _prefs.getString(_registrationDraftKey);
+      if (rawDraft == null || rawDraft.isEmpty) {
+        return const Success(null);
+      }
+
+      final decoded = jsonDecode(rawDraft);
+      final draft = _decodeDraftValue(decoded);
+      if (draft is Map) {
+        return Success(Map<String, dynamic>.from(draft));
+      }
+
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load registration draft: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> clearRegistrationDraft() async {
+    try {
+      await _prefs.remove(_registrationDraftKey);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to clear registration draft: ${e.toString()}',
         ),
       );
     }

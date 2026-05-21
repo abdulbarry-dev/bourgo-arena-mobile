@@ -102,6 +102,12 @@ void main() {
       when(
         () => mockSessionRepository.shouldSkipLoginOtpForever(),
       ).thenAnswer((_) async => const Success(false));
+      when(() => mockSessionRepository.getRegistrationDraft()).thenAnswer(
+        (_) async => const Success({
+          'route': '/family-onboarding',
+          'extra': {'firstName': 'John', 'lastName': 'Doe'},
+        }),
+      );
       when(
         () => mockAuthRepository.getToken(),
       ).thenAnswer((_) async => const Success('onboarding-token'));
@@ -117,6 +123,8 @@ void main() {
       check(notifier.state).equals(AuthState.pendingOnboarding);
       check(notifier.session.token).equals('onboarding-token');
       check(notifier.session.pendingEmail).equals('john@example.com');
+      check(notifier.registrationRoute).equals('/family-onboarding');
+      check(notifier.registrationData?['firstName']).equals('John');
       verifyNever(() => mockAuthRepository.getUserProfile());
     });
   });

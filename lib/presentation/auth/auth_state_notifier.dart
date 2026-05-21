@@ -18,6 +18,7 @@ class AuthStateNotifier extends ChangeNotifier {
   AuthSession _session = AuthSession.unauthenticated();
   StreamSubscription<AuthSession>? _authSubscription;
   bool _skippedForSession = false;
+  Map<String, dynamic>? _registrationDraft;
 
   AuthStateNotifier(
     this._authRepository,
@@ -48,6 +49,7 @@ class AuthStateNotifier extends ChangeNotifier {
       'AuthStateNotifier._applySession: state=${session.state}, token=${session.token}, user=${session.user}',
     );
     if (_skippedForSession &&
+        session.user != null &&
         (session.state == AuthState.pendingAdditionalVerification ||
             session.needsLoginVerification)) {
       _session = session.copyWith(
@@ -105,6 +107,12 @@ class AuthStateNotifier extends ChangeNotifier {
     _skippedForSession = skipResult.fold(
       onSuccess: (v) => v,
       onFailure: (_) => false,
+    );
+
+    final draftResult = await _sessionRepository.getRegistrationDraft();
+    _registrationDraft = draftResult.fold(
+      onSuccess: (draft) => draft,
+      onFailure: (_) => null,
     );
 
     final stateResult = await _sessionRepository.getAuthState();
@@ -173,6 +181,21 @@ class AuthStateNotifier extends ChangeNotifier {
 
   /// The current authentication state.
   AuthState get state => _session.state;
+
+  /// The persisted registration draft, if any.
+  Map<String, dynamic>? get registrationDraft => _registrationDraft;
+
+  /// The route that should resume the persisted registration draft, if any.
+  String? get registrationRoute {
+    final route = _registrationDraft?['route'];
+    return route is String && route.isNotEmpty ? route : null;
+  }
+
+  /// The extra payload associated with the persisted registration draft.
+  Map<String, dynamic>? get registrationData {
+    final data = _registrationDraft?['extra'];
+    return data is Map<String, dynamic> ? data : null;
+  }
 
   /// Whether the user is currently authenticated.
   bool get isAuthenticated => _session.isAuthenticated;

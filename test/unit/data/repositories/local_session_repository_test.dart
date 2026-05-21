@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/repositories/local_session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,6 +49,7 @@ void main() {
           'device_token',
           'device_platform',
           'onboarding_completed',
+          'registration_draft',
         ];
 
         for (final key in sessionKeys) {
@@ -323,6 +325,71 @@ void main() {
         verify(
           () => prefs.setBool('settings_notifications_enabled', false),
         ).called(1);
+      });
+
+      test(
+        'saveRegistrationDraft round-trips route, dates, and child profiles',
+        () async {
+          String? storedDraft;
+          final child = ChildProfile(
+            id: 'child-1',
+            firstName: 'Amy',
+            lastName: 'Lee',
+            birthDate: DateTime(2018, 4, 5),
+            gender: 'female',
+          );
+          final birthDate = DateTime(2026, 5, 21, 10, 30);
+
+          when(() => prefs.setString('registration_draft', any())).thenAnswer((
+            invocation,
+          ) async {
+            storedDraft = invocation.positionalArguments[1] as String;
+            return true;
+          });
+          when(
+            () => prefs.getString('registration_draft'),
+          ).thenAnswer((_) => storedDraft);
+
+          final draft = {
+            'route': '/family-onboarding',
+            'extra': {
+              'firstName': 'John',
+              'lastName': 'Doe',
+              'birthDate': birthDate,
+              'familyMembers': [child],
+              'isParentAccount': true,
+            },
+          };
+
+          final saveResult = await repository.saveRegistrationDraft(draft);
+          final loadResult = await repository.getRegistrationDraft();
+
+          expect(saveResult, isA<Success<void, Failure>>());
+          expect(loadResult, isA<Success<Map<String, dynamic>?, Failure>>());
+
+          final restored =
+              (loadResult as Success<Map<String, dynamic>?, Failure>).data!;
+          final restoredExtra = restored['extra'] as Map<String, dynamic>;
+
+          expect(restored['route'], '/family-onboarding');
+          expect(restoredExtra['firstName'], 'John');
+          expect(restoredExtra['lastName'], 'Doe');
+          expect(restoredExtra['birthDate'], birthDate);
+          expect(restoredExtra['isParentAccount'], isTrue);
+          expect(restoredExtra['familyMembers'], hasLength(1));
+          expect(restoredExtra['familyMembers'].first, child);
+        },
+      );
+
+      test('clearRegistrationDraft removes the persisted draft key', () async {
+        when(
+          () => prefs.remove('registration_draft'),
+        ).thenAnswer((_) async => true);
+
+        final result = await repository.clearRegistrationDraft();
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(() => prefs.remove('registration_draft')).called(1);
       });
     });
   });

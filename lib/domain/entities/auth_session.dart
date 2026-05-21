@@ -6,11 +6,13 @@ class VerificationData {
   final String unverifiedMethod;
   final String? email;
   final String? phone;
+  final bool? onboardingCompleted;
 
   const VerificationData({
     required this.unverifiedMethod,
     this.email,
     this.phone,
+    this.onboardingCompleted,
   });
 
   /// Creates a copy of this [VerificationData] but with the given fields replaced.
@@ -18,11 +20,13 @@ class VerificationData {
     String? unverifiedMethod,
     String? email,
     String? phone,
+    bool? onboardingCompleted,
   }) {
     return VerificationData(
       unverifiedMethod: unverifiedMethod ?? this.unverifiedMethod,
       email: email ?? this.email,
       phone: phone ?? this.phone,
+      onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
     );
   }
 }

@@ -49,6 +49,19 @@ import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:developer' as developer;
 
+Map<String, dynamic> _draftExtra(AuthStateNotifier authStateNotifier) {
+  final draft = authStateNotifier.registrationData;
+  return draft ?? <String, dynamic>{};
+}
+
+Map<String, dynamic> _currentOrDraftExtra(
+  GoRouterState state,
+  AuthStateNotifier authStateNotifier,
+) {
+  final extra = state.extraAsMap;
+  return extra.isNotEmpty ? extra : _draftExtra(authStateNotifier);
+}
+
 /// App routing configuration using GoRouter.
 /// Extension to safely extract extra data from [GoRouterState].
 extension GoRouterStateExtraX on GoRouterState {
@@ -123,19 +136,35 @@ GoRouter createRouter(
         location == '/pin-setup' ||
         location == '/family-onboarding';
 
+    final draftRoute = authStateNotifier.registrationRoute;
+    if (authState == AuthState.unauthenticated &&
+        draftRoute != null &&
+        location != draftRoute) {
+      return draftRoute;
+    }
+
     switch (authState) {
       case AuthState.unauthenticated:
         // Allow auth entry and onboarding, otherwise force login
         return (isAuthEntryRoute || isSetupRoute) ? null : '/login';
 
       case AuthState.pendingVerification:
-        // Force OTP if not on a verification/setup screen
-        if (location == '/otp' || location == '/family-onboarding') {
+        // Force the user to choose email or phone verification first.
+        if (location == '/verification-method' ||
+            location == '/otp' ||
+            location == '/family-onboarding') {
           return null;
         }
-        return '/otp';
+        return '/verification-method';
 
       case AuthState.pendingAdditionalVerification:
+        if (authStateNotifier.session.verificationData?.onboardingCompleted ==
+                false &&
+            location != '/account-setup' &&
+            location != '/onboarding') {
+          return '/account-setup';
+        }
+
         if (isSetupRoute || location == '/onboarding') {
           return null;
         }
@@ -200,7 +229,7 @@ GoRouter createRouter(
       path: '/register',
       builder: (context, state) => RegisterScreen(
         registerUseCase: locator<RegisterUseCase>(),
-        initialData: state.extraAsMap,
+        initialData: _currentOrDraftExtra(state, authStateNotifier),
       ),
     ),
     GoRoute(
@@ -210,10 +239,13 @@ GoRouter createRouter(
         final destination =
             data['destination'] as String? ??
             authStateNotifier.session.pendingEmail;
+        final isDeletionCancellation =
+            authStateNotifier.state == AuthState.pendingDeletionCancellation;
         return OtpScreen(
           destination: destination,
           registrationData: data['registrationData'] as Map<String, dynamic>?,
           isPasswordReset: data['isPasswordReset'] as bool? ?? false,
+          autoSendOtp: !isDeletionCancellation,
           sendOtpUseCase: locator<SendOtpUseCase>(),
           verifyOtpUseCase: locator<VerifyOtpUseCase>(),
           getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
@@ -222,10 +254,22 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/verification-method',
-      builder: (context, state) => VerificationMethodScreen(
-        registrationData: state.extraAsMap,
-        sendOtpUseCase: locator<SendOtpUseCase>(),
-      ),
+      builder: (context, state) {
+        final data = _currentOrDraftExtra(state, authStateNotifier);
+        final verificationData = authStateNotifier.session.verificationData;
+        final user = authStateNotifier.session.user;
+
+        final registrationData = <String, dynamic>{
+          ...data,
+          'email': data['email'] ?? verificationData?.email ?? user?.email,
+          'phone': data['phone'] ?? verificationData?.phone ?? user?.phone,
+        };
+
+        return VerificationMethodScreen(
+          registrationData: registrationData,
+          sendOtpUseCase: locator<SendOtpUseCase>(),
+        );
+      },
     ),
     GoRoute(
       path: '/verify-additional-method',
@@ -245,13 +289,14 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/family-onboarding',
-      builder: (context, state) =>
-          FamilyOnboardingScreen(registrationData: state.extraAsMap),
+      builder: (context, state) => FamilyOnboardingScreen(
+        registrationData: _currentOrDraftExtra(state, authStateNotifier),
+      ),
     ),
     GoRoute(
       path: '/account-setup',
       builder: (context, state) {
-        final data = state.extraAsMap;
+        final data = _currentOrDraftExtra(state, authStateNotifier);
         if (data.isNotEmpty) {
           return AccountSetupScreen(registrationData: data);
         }
@@ -272,8 +317,9 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/pin-setup',
-      builder: (context, state) =>
-          PinSetupScreen(registrationData: state.extraAsMap),
+      builder: (context, state) => PinSetupScreen(
+        registrationData: _currentOrDraftExtra(state, authStateNotifier),
+      ),
     ),
     GoRoute(
       path: '/forgot-password',

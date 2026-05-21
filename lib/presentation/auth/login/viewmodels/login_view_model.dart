@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/onboarding_setup_modal.dart';
@@ -78,13 +79,31 @@ class LoginViewModel extends ChangeNotifier {
           if (session.state == AuthState.pendingOnboarding && context.mounted) {
             final shouldComplete = await OnboardingSetupModal.show(context);
             if (shouldComplete == true && context.mounted) {
-              context.push('/account-setup');
+              context.push(
+                '/account-setup',
+                extra: _buildOnboardingData(session),
+              );
             }
           }
           // Note: For other states, GoRouter redirect in router.dart will handle navigation
         },
       );
     }
+  }
+
+  Map<String, dynamic> _buildOnboardingData(AuthSession session) {
+    final user = session.user;
+
+    return {
+      'firstName': user?.firstName ?? '',
+      'lastName': user?.lastName ?? '',
+      'email': user?.email ?? identifierController.text.trim(),
+      'phone': user?.phone ?? '',
+      'gender': user?.gender,
+      'birthDate': user?.birthDate,
+      'isParentAccount': user?.isParentAccount ?? false,
+      'familyMembers': user?.children ?? const [],
+    };
   }
 
   @override

@@ -1,4 +1,8 @@
+import 'dart:async';
 import 'dart:developer' as developer;
+
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -30,11 +34,34 @@ class VerificationMethodScreen extends StatefulWidget {
 
 class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
   bool _isLoading = false;
+  late final SessionRepository _sessionRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionRepository = locator<SessionRepository>();
+    _persistDraft('/verification-method', widget.registrationData);
+  }
+
+  String? _asNonEmptyString(dynamic value) {
+    if (value is! String) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
 
   void _setLoading(bool value) {
     setState(() {
       _isLoading = value;
     });
+  }
+
+  void _persistDraft(String route, Map<String, dynamic> extra) {
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': route,
+        'extra': extra,
+      }),
+    );
   }
 
   @override
@@ -44,8 +71,9 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
     );
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final email = widget.registrationData['email'] as String;
-    final phone = widget.registrationData['phone'] as String;
+    final email = _asNonEmptyString(widget.registrationData['email']);
+    final phone = _asNonEmptyString(widget.registrationData['phone']);
+    final hasAnyMethod = email != null || phone != null;
 
     return AuthBackground(
       child: Stack(
@@ -68,23 +96,35 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
                             subtitle: l10n.authVerificationMethodSubtitle,
                           ),
                           const SizedBox(height: 48),
-                          _MethodCard(
-                            title: l10n.authEmailMethod,
-                            value: email,
-                            icon: Symbols.mail,
-                            onTap: _isLoading
-                                ? () {}
-                                : () => _proceedToOtp(context, email),
-                          ),
-                          const SizedBox(height: 20),
-                          _MethodCard(
-                            title: l10n.authPhoneMethod,
-                            value: phone,
-                            icon: Symbols.call,
-                            onTap: _isLoading
-                                ? () {}
-                                : () => _proceedToOtp(context, phone),
-                          ),
+                          if (email != null)
+                            _MethodCard(
+                              title: l10n.authEmailMethod,
+                              value: email,
+                              icon: Symbols.mail,
+                              onTap: _isLoading
+                                  ? () {}
+                                  : () => _proceedToOtp(context, email),
+                            ),
+                          if (email != null && phone != null)
+                            const SizedBox(height: 20),
+                          if (phone != null)
+                            _MethodCard(
+                              title: l10n.authPhoneMethod,
+                              value: phone,
+                              icon: Symbols.call,
+                              onTap: _isLoading
+                                  ? () {}
+                                  : () => _proceedToOtp(context, phone),
+                            ),
+                          if (!hasAnyMethod)
+                            Text(
+                              'No verification method is available for this account. Please log in again.',
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           const SizedBox(height: 48),
                           Text(
                             l10n.authMethodAccessInstruction,
@@ -113,6 +153,10 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
   }
 
   Future<void> _proceedToOtp(BuildContext context, String destination) async {
+    _persistDraft('/otp', {
+      ...widget.registrationData,
+      'destination': destination,
+    });
     _setLoading(true);
 
     final result = await widget.sendOtpUseCase(destination);

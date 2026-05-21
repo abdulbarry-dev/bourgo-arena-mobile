@@ -93,6 +93,19 @@ abstract interface class SessionRepository {
   /// Clears the persisted identifier for "Remember Me".
   Future<Result<void, Failure>> clearRememberedIdentifier();
 
+  // =========== Registration Draft ===========
+
+  /// Persists the current registration/onboarding draft.
+  Future<Result<void, Failure>> saveRegistrationDraft(
+    Map<String, dynamic> draft,
+  );
+
+  /// Retrieves the current registration/onboarding draft, if any.
+  Future<Result<Map<String, dynamic>?, Failure>> getRegistrationDraft();
+
+  /// Clears the persisted registration/onboarding draft.
+  Future<Result<void, Failure>> clearRegistrationDraft();
+
   // =========== Login OTP Verification ===========
 
   /// Checks if the user has opted out of login OTP verification reminders.

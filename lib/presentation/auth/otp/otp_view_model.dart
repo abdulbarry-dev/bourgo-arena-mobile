@@ -31,6 +31,7 @@ class OtpViewModel extends BaseViewModel {
     required String identifier,
     required String code,
     required VoidCallback onSuccess,
+    required VoidCallback onOnboardingIncomplete,
     required Function(String unverifiedMethod, String? email, String? phone)
     onAdditionalVerificationNeeded,
     bool isPasswordReset = false,
@@ -56,7 +57,9 @@ class OtpViewModel extends BaseViewModel {
             final statusResult = await _getVerificationStatusUseCase();
             statusResult.fold<void>(
               onSuccess: (status) {
-                if (!status.isFullyVerified &&
+                if (!status.onboardingCompleted) {
+                  onOnboardingIncomplete();
+                } else if (!status.isFullyVerified &&
                     status.unverifiedMethod != null) {
                   // Additional verification needed
                   onAdditionalVerificationNeeded(

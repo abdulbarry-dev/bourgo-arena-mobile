@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_screen.dart';
@@ -14,12 +16,36 @@ import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockRegisterUseCase extends Mock implements RegisterUseCase {}
 
+class MockSessionRepository extends Mock implements SessionRepository {}
+
 void main() {
   late MockRegisterUseCase mockRegisterUseCase;
+  late MockSessionRepository mockSessionRepository;
+  Map<String, dynamic>? savedDraft;
 
-  setUp(() {
+  setUpAll(() {
+    registerFallbackValue(<String, dynamic>{});
+  });
+
+  setUp(() async {
     mockRegisterUseCase = MockRegisterUseCase();
+    mockSessionRepository = MockSessionRepository();
+    savedDraft = null;
+    await locator.reset();
+    locator.registerSingleton<SessionRepository>(mockSessionRepository);
     registerFallbackValue(const Success<void, Failure>(null));
+    when(() => mockSessionRepository.saveRegistrationDraft(any())).thenAnswer((
+      invocation,
+    ) async {
+      savedDraft = Map<String, dynamic>.from(
+        invocation.positionalArguments.first as Map,
+      );
+      return const Success(null);
+    });
+  });
+
+  tearDown(() async {
+    await locator.reset();
   });
 
   Widget createWidgetUnderTest() {
@@ -201,6 +227,37 @@ void main() {
       await tester.pump();
 
       expect(tester.widget<Switch>(toggle).value, isTrue);
+    });
+
+    testWidgets('persists registration draft without the password field', (
+      tester,
+    ) async {
+      await setupScreenSize(tester);
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      final textFields = find.byType(TextFormField);
+      await tester.enterText(textFields.at(0), 'John');
+      await tester.enterText(textFields.at(1), 'Doe');
+      await tester.enterText(textFields.at(2), 'john@example.com');
+      await tester.enterText(textFields.at(3), '123456789');
+      await tester.tap(find.byIcon(Symbols.calendar_today));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('gender_dropdown')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Male').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(textFields.at(5), 'password123');
+      await tester.pumpAndSettle();
+
+      expect(savedDraft, isNotNull);
+      expect(savedDraft!['route'], '/register');
+      final extra = savedDraft!['extra'] as Map<String, dynamic>;
+      expect(extra['firstName'], 'John');
+      expect(extra['gender'], 'male');
+      expect(extra.containsKey('password'), isFalse);
     });
   });
 }

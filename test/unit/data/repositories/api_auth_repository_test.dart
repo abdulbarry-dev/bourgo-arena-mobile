@@ -821,6 +821,55 @@ void main() {
       });
     });
 
+    group('deleteAccount', () {
+      test(
+        'sends the resolved identifier and preserves deletion cancellation state',
+        () async {
+          const identifier = 'alex@example.com';
+          final userJson = testUserJson(email: identifier);
+
+          when(
+            () => apiClient.get('/user/profile', skipAuthError: true),
+          ).thenAnswer((_) async => userJson);
+          when(
+            () => apiClient.post('/auth/delete-account', any()),
+          ).thenAnswer((_) async => {'state': 'pending_deletion_cancellation'});
+
+          final eventExpectation = expectLater(
+            repository.onAuthStateChanged,
+            emits(
+              predicate<AuthSession>(
+                (value) =>
+                    value.state == AuthState.pendingDeletionCancellation &&
+                    value.pendingEmail == identifier,
+              ),
+            ),
+          );
+
+          final result = await repository.deleteAccount(password: 'secret123');
+
+          expect(result, isA<Success<void, Failure>>());
+          verify(
+            () => apiClient.get('/user/profile', skipAuthError: true),
+          ).called(1);
+          verify(
+            () => apiClient.post('/auth/delete-account', {
+              'identifier': identifier,
+              'password': 'secret123',
+            }),
+          ).called(1);
+          verify(
+            () => sessionRepository.savePendingVerificationEmail(identifier),
+          ).called(1);
+          verify(
+            () =>
+                sessionRepository.saveAuthState('pendingDeletionCancellation'),
+          ).called(1);
+          await eventExpectation;
+        },
+      );
+    });
+
     group('getToken', () {
       test('returns the persisted token from the session repository', () async {
         const resultToken = 'stored-token';

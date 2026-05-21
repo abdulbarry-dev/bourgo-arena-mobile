@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -127,9 +128,54 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
 
         result.fold(
           onSuccess: (_) {
-            developer.log('Registration complete. Redirecting to home.');
+            developer.log(
+              'Registration flow completed. Evaluating auth state.',
+            );
             if (mounted) {
-              GoRouter.of(context).go('/home');
+              final currentState = authStateNotifier.state;
+              final onboardingCompleted =
+                  authStateNotifier
+                      .session
+                      .verificationData
+                      ?.onboardingCompleted ??
+                  false;
+
+              if (currentState == AuthState.authenticated) {
+                developer.log('Auth state is active, redirecting to home.');
+                GoRouter.of(context).go('/home');
+              } else if (currentState ==
+                      AuthState.pendingAdditionalVerification &&
+                  onboardingCompleted) {
+                developer.log(
+                  'Onboarding complete but additional verification is pending; redirecting to verify additional method.',
+                );
+                GoRouter.of(context).go('/verify-additional-method');
+              } else if (currentState == AuthState.pendingVerification) {
+                developer.log(
+                  'Verification is still pending; redirecting to verification method chooser.',
+                );
+                GoRouter.of(context).go('/verification-method');
+              } else if (currentState == AuthState.pendingOnboarding ||
+                  !onboardingCompleted) {
+                developer.log(
+                  'Onboarding is still incomplete; returning to account setup.',
+                );
+                GoRouter.of(
+                  context,
+                ).go('/account-setup', extra: widget.registrationData);
+              } else {
+                developer.log(
+                  'Auth state is $currentState after onboarding completion; routing to login as a safe fallback.',
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Your session needs to be refreshed. Please log in again.',
+                    ),
+                  ),
+                );
+                GoRouter.of(context).go('/login');
+              }
             }
           },
           onFailure: (failure) {

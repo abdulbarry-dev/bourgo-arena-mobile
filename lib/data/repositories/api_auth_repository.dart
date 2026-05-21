@@ -2,6 +2,7 @@ import 'dart:developer' as developer;
 import 'dart:async';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
+import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/mappers/verification_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
@@ -118,6 +119,40 @@ class ApiAuthRepository implements AuthRepository {
     _authStateController.add(session);
   }
 
+  Future<String?> _currentUserIdentifier() async {
+    final user = _currentSession?.user;
+    final email = user?.email.trim();
+    if (email != null && email.isNotEmpty) {
+      return email;
+    }
+
+    final phone = user?.phone?.trim();
+    if (phone != null && phone.isNotEmpty) {
+      return phone;
+    }
+
+    try {
+      final userResponse =
+          await _apiClient.get('/user/profile', skipAuthError: true)
+              as Map<String, dynamic>;
+      final userModel = UserProfileModel.fromJson(userResponse);
+      final profileUser = UserMapper.toEntity(userModel);
+      final profileEmail = profileUser.email.trim();
+      if (profileEmail.isNotEmpty) {
+        return profileEmail;
+      }
+
+      final profilePhone = profileUser.phone?.trim();
+      if (profilePhone != null && profilePhone.isNotEmpty) {
+        return profilePhone;
+      }
+    } catch (e) {
+      developer.log('Failed to resolve account identifier for deletion: $e');
+    }
+
+    return null;
+  }
+
   AuthState _mapBackendState(String? state) {
     switch (state) {
       case 'pending_verification':
@@ -172,6 +207,7 @@ class ApiAuthRepository implements AuthRepository {
           unverifiedMethod: status['unverified_method'] ?? 'phone',
           email: status['email'],
           phone: status['phone'],
+          onboardingCompleted: status['onboarding_completed'] as bool?,
         );
       } else if (response['verification_status'] != null) {
         final status = response['verification_status'] as Map<String, dynamic>;
@@ -179,6 +215,7 @@ class ApiAuthRepository implements AuthRepository {
           unverifiedMethod: status['unverified_method'] ?? 'phone',
           email: status['email'],
           phone: status['phone'],
+          onboardingCompleted: status['onboarding_completed'] as bool?,
         );
       }
 
@@ -195,8 +232,9 @@ class ApiAuthRepository implements AuthRepository {
 
       User? user;
       AuthState finalState = state;
-      final userData = payload['user'] ?? response['user'] ?? response['member'];
-      
+      final userData =
+          payload['user'] ?? response['user'] ?? response['member'];
+
       if (userData != null) {
         final userModel = UserProfileModel.fromJson(
           userData as Map<String, dynamic>,
@@ -223,7 +261,7 @@ class ApiAuthRepository implements AuthRepository {
         token: token,
         verificationData: verificationData,
       );
-      
+
       final finalSession = await _checkLoginVerification(session);
       await _updateSession(finalSession);
       return Success(finalSession);
@@ -244,7 +282,8 @@ class ApiAuthRepository implements AuthRepository {
           // Try to fetch user profile to populate the session
           try {
             final userResponse =
-                await _apiClient.get('/user/profile', skipAuthError: true) as Map<String, dynamic>;
+                await _apiClient.get('/user/profile', skipAuthError: true)
+                    as Map<String, dynamic>;
             final userModel = UserProfileModel.fromJson(userResponse);
             final user = UserMapper.toEntity(userModel);
 
@@ -269,7 +308,6 @@ class ApiAuthRepository implements AuthRepository {
 
     return result;
   }
-
 
   Future<AuthSession> _checkLoginVerification(AuthSession session) async {
     // We only prompt for second OTP if the user is already "authenticated" (active)
@@ -296,6 +334,7 @@ class ApiAuthRepository implements AuthRepository {
                   unverifiedMethod: status.unverifiedMethod ?? 'phone',
                   email: status.email,
                   phone: status.phone,
+                  onboardingCompleted: status.onboardingCompleted,
                 ),
                 needsLoginVerification: true,
               );
@@ -312,12 +351,54 @@ class ApiAuthRepository implements AuthRepository {
   @override
   Future<Result<void, Failure>> deleteAccount({required String password}) {
     return executeApiCall(() async {
-      await _apiClient.post('/auth/delete-account', {'password': password});
-      // Clear the session locally as the account will be deleted/scheduled for deletion
-      _apiClient.setToken(null);
-      await _sessionRepository.clearSession();
-      _currentSession = null;
-      _authStateController.add(AuthSession.unauthenticated());
+      final identifier = await _currentUserIdentifier();
+      if (identifier == null || identifier.isEmpty) {
+        throw const AuthException(
+          'Unable to determine the account identifier for deletion.',
+        );
+      }
+
+      final rawResponse = await _apiClient.post('/auth/delete-account', {
+        'identifier': identifier,
+        'password': password,
+      });
+
+      final response = rawResponse is Map<String, dynamic>
+          ? rawResponse
+          : <String, dynamic>{};
+
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final stateStr =
+          payload['state'] as String? ?? response['state'] as String?;
+      final token = payload['token'] as String? ?? response['token'] as String?;
+
+      if (stateStr != null) {
+        final state = _mapBackendState(stateStr);
+
+        User? user;
+        final userData =
+            payload['user'] ?? response['user'] ?? response['member'];
+        if (userData is Map<String, dynamic>) {
+          final userModel = UserProfileModel.fromJson(userData);
+          user = UserMapper.toEntity(userModel);
+        }
+
+        await _sessionRepository.savePendingVerificationEmail(identifier);
+        await _updateSession(
+          AuthSession(
+            user: user ?? _currentSession?.user,
+            state: state,
+            token: token ?? _currentSession?.token,
+            pendingEmail: identifier,
+            verificationData: _currentSession?.verificationData,
+          ),
+        );
+      }
+
       return const Success(null);
     });
   }
@@ -353,35 +434,52 @@ class ApiAuthRepository implements AuthRepository {
       // Clear any existing token to ensure registration is unauthenticated
       _apiClient.setToken(null);
 
+      final fullName = '$firstName $lastName'.trim();
+      final dateOfBirth = birthDate.toIso8601String().split('T')[0];
+
       final rawResponse = await _apiClient.post('/auth/register', {
+        'name': fullName,
         'email': email,
         'phone': phone,
         'password': password,
         'password_confirmation': password,
+        'date_of_birth': dateOfBirth,
+        'gender': gender,
+        'is_parent_account': isFamilyAccount,
       });
       final response = rawResponse is Map<String, dynamic>
           ? rawResponse
           : <String, dynamic>{};
 
-      final token = response['token'] as String?;
-      final stateStr = response['state'] as String? ?? 'pending_verification';
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final token = payload['token'] as String? ?? response['token'] as String?;
+      final stateStr =
+          payload['state'] as String? ??
+          response['state'] as String? ??
+          'pending_verification';
       final state = _mapBackendState(stateStr);
 
       User? user;
-      if (response['user'] is Map<String, dynamic>) {
-        final userModel = UserProfileModel.fromJson(
-          response['user'] as Map<String, dynamic>,
-        );
+      final userData =
+          payload['user'] ?? response['user'] ?? response['member'];
+      if (userData is Map<String, dynamic>) {
+        final userModel = UserProfileModel.fromJson(userData);
         user = UserMapper.toEntity(userModel);
       }
 
       VerificationData? verificationData;
-      if (response['verification_status'] is Map<String, dynamic>) {
-        final status = response['verification_status'] as Map<String, dynamic>;
+      final statusData =
+          payload['verification_status'] ?? response['verification_status'];
+      if (statusData is Map<String, dynamic>) {
         verificationData = VerificationData(
-          unverifiedMethod: status['unverified_method'] ?? 'phone',
-          email: status['email'],
-          phone: status['phone'],
+          unverifiedMethod: statusData['unverified_method'] ?? 'phone',
+          email: statusData['email'],
+          phone: statusData['phone'],
+          onboardingCompleted: statusData['onboarding_completed'] as bool?,
         );
       }
 
@@ -422,12 +520,21 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
       final isValid =
-          response['valid'] == true || response.containsKey('state');
+          response['valid'] == true ||
+          payload.containsKey('state') ||
+          response.containsKey('state');
 
       if (isValid) {
-        final token = response['token'] as String?;
-        final stateStr = response['state'] as String?;
+        final token =
+            payload['token'] as String? ?? response['token'] as String?;
+        final stateStr =
+            payload['state'] as String? ?? response['state'] as String?;
 
         if (token != null && stateStr == null) {
           _apiClient.setToken(token);
@@ -441,15 +548,35 @@ class ApiAuthRepository implements AuthRepository {
           await _sessionRepository.saveAuthState(state.name);
 
           User? user;
-          if (response['user'] != null) {
-            final userModel = UserProfileModel.fromJson(
-              response['user'] as Map<String, dynamic>,
-            );
+          final userData =
+              payload['user'] ??
+              response['user'] ??
+              payload['member'] ??
+              response['member'];
+          if (userData is Map<String, dynamic>) {
+            final userModel = UserProfileModel.fromJson(userData);
             user = UserMapper.toEntity(userModel);
           }
 
+          VerificationData? verificationData;
+          final statusData =
+              payload['verification_status'] ?? response['verification_status'];
+          if (statusData is Map<String, dynamic>) {
+            verificationData = VerificationData(
+              unverifiedMethod: statusData['unverified_method'] ?? 'phone',
+              email: statusData['email'],
+              phone: statusData['phone'],
+              onboardingCompleted: statusData['onboarding_completed'] as bool?,
+            );
+          }
+
           await _updateSession(
-            AuthSession(user: user, state: state, token: token),
+            AuthSession(
+              user: user,
+              state: state,
+              token: token,
+              verificationData: verificationData,
+            ),
           );
         }
       }
@@ -495,25 +622,38 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final stateStr = response['state'] as String? ?? 'active';
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final stateStr =
+          payload['state'] as String? ??
+          response['state'] as String? ??
+          'active';
       final state = _mapBackendState(stateStr);
-      final token = response['token'] as String?;
+      final token = payload['token'] as String? ?? response['token'] as String?;
 
       VerificationData? verificationData;
-      if (response['verification_status'] != null) {
-        final status = response['verification_status'] as Map<String, dynamic>;
+      final statusData =
+          payload['verification_status'] ?? response['verification_status'];
+      if (statusData is Map<String, dynamic>) {
         verificationData = VerificationData(
-          unverifiedMethod: status['unverified_method'] ?? 'phone',
-          email: status['email'],
-          phone: status['phone'],
+          unverifiedMethod: statusData['unverified_method'] ?? 'phone',
+          email: statusData['email'],
+          phone: statusData['phone'],
+          onboardingCompleted: statusData['onboarding_completed'] as bool?,
         );
       }
 
       User updatedUser = user;
-      if (response['user'] is Map<String, dynamic>) {
-        final userModel = UserProfileModel.fromJson(
-          response['user'] as Map<String, dynamic>,
-        );
+      final userData =
+          payload['user'] ??
+          response['user'] ??
+          payload['member'] ??
+          response['member'];
+      if (userData is Map<String, dynamic>) {
+        final userModel = UserProfileModel.fromJson(userData);
         updatedUser = UserMapper.toEntity(userModel);
       }
 
