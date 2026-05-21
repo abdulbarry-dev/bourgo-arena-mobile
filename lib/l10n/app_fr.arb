@@ -126,7 +126,6 @@
   "profileQrScanInstruction": "Scannez ce code à l'entrée pour valider votre présence.",
   "profileAccessMethods": "MÉTHODES D'ACCÈS",
   "profileAccessPin": "Code PIN",
-  "profileAccessFingerprint": "Empreinte digitale",
   "profileAccessNfc": "Carte NFC",
   "profileStatusConfigured": "Configuré",
   "profileStatusNotConfigured": "Non configuré",

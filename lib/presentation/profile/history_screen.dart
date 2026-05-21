@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activitie
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -36,6 +37,9 @@ class _HistoryScreenState extends State<HistoryScreen>
     );
     _accessHistoryViewModel = AccessHistoryViewModel(
       getAccessHistoryUseCase: locator<GetAccessHistoryUseCase>(),
+      getPhysicalNfcStatusUseCase: locator(),
+      getDigitalNfcStatusUseCase: locator(),
+      sessionRepository: locator(),
     );
     _reservationsViewModel.loadData();
     _accessHistoryViewModel.loadHistory();
@@ -111,19 +115,26 @@ class _AccessTab extends StatelessWidget {
               _AccessMethodTile(
                 icon: Symbols.pin,
                 label: l10n.profileAccessPin,
-                isSet: true,
-              ),
-              const SizedBox(height: 12),
-              _AccessMethodTile(
-                icon: Symbols.fingerprint,
-                label: l10n.profileAccessFingerprint,
-                isSet: false,
+                isSet: viewModel.isPinConfigured,
               ),
               const SizedBox(height: 12),
               _AccessMethodTile(
                 icon: Symbols.contactless,
                 label: l10n.profileAccessNfc,
-                isSet: true,
+                isSet: viewModel.isPhysicalNfcConfigured,
+              ),
+              const SizedBox(height: 12),
+              _AccessMethodTile(
+                icon: Symbols.smartphone,
+                label: 'Digital NFC Card',
+                isSet: viewModel.isDigitalNfcConfigured,
+                statusOverride: viewModel.digitalNfcStatusLabel,
+                actionLabel: viewModel.canSetupDigitalNfc
+                    ? l10n.commonSetUp
+                    : null,
+                onAction: viewModel.canSetupDigitalNfc
+                    ? () => context.push('/nfc')
+                    : null,
               ),
 
               const SizedBox(height: 40),
@@ -158,11 +169,17 @@ class _AccessMethodTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isSet;
+  final String? statusOverride;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   const _AccessMethodTile({
     required this.icon,
     required this.label,
     required this.isSet,
+    this.statusOverride,
+    this.actionLabel,
+    this.onAction,
   });
 
   @override
@@ -202,9 +219,10 @@ class _AccessMethodTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  isSet
-                      ? l10n.profileStatusConfigured
-                      : l10n.profileStatusNotConfigured,
+                  statusOverride ??
+                      (isSet
+                          ? l10n.profileStatusConfigured
+                          : l10n.profileStatusNotConfigured),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: isSet
                         ? theme.colorScheme.primary
@@ -216,8 +234,8 @@ class _AccessMethodTile extends StatelessWidget {
               ],
             ),
           ),
-          if (!isSet)
-            TextButton(onPressed: () {}, child: Text(l10n.commonSetUp)),
+          if (!isSet && onAction != null)
+            TextButton(onPressed: onAction, child: Text(actionLabel!)),
           if (isSet)
             Icon(
               Symbols.check_circle,

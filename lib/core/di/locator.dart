@@ -26,6 +26,14 @@ import 'package:bourgo_arena_mobile/domain/usecases/search/search_use_case.dart'
 import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_family_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/family_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/nfc_repository_impl.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/nfc_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/nfc_device_info_provider_impl.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/nfc_device_info_provider.dart';
+import 'package:bourgo_arena_mobile/presentation/nfc/nfc_view_model.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/nfc/get_physical_nfc_status_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/nfc/get_digital_nfc_status_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/nfc/setup_digital_nfc_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
@@ -129,6 +137,12 @@ Future<void> initLocator() async {
   locator.registerLazySingleton<DeviceRepository>(
     () => ApiDeviceRepository(locator<ApiClient>()),
   );
+  locator.registerLazySingleton<NfcRepository>(
+    () => NfcRepositoryImpl(locator<ApiClient>()),
+  );
+  locator.registerLazySingleton<NfcDeviceInfoProvider>(
+    () => const NfcDeviceInfoProviderImpl(),
+  );
   // SettingsRepository adapter removed — consumers should use SessionRepository directly.
 
   // Use Cases
@@ -183,6 +197,9 @@ Future<void> initLocator() async {
       locator<RegisterDeviceTokenUseCase>(),
     ),
   );
+  locator.registerLazySingleton(() => GetPhysicalNfcStatusUseCase(locator()));
+  locator.registerLazySingleton(() => GetDigitalNfcStatusUseCase(locator(), locator()));
+  locator.registerLazySingleton(() => SetupDigitalNfcUseCase(locator(), locator()));
 
   // Settings Use Cases
   locator.registerLazySingleton(() => GetThemeModeUseCase(locator()));
@@ -237,6 +254,10 @@ Future<void> initLocator() async {
       removeChildUseCase: locator(),
       disableFamilyFeatureUseCase: locator(),
     ),
+  );
+
+  locator.registerFactory<NfcViewModel>(
+    () => NfcViewModel(locator(), locator(), locator()),
   );
 
   // Wait for all async singletons before the app starts.

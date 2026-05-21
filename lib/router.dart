@@ -44,6 +44,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart'
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/presentation/nfc/nfc_screen.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -426,5 +427,6 @@ GoRouter createRouter(
       path: '/offline',
       builder: (context, state) => const OfflineScreen(),
     ),
+    GoRoute(path: '/nfc', builder: (context, state) => const NfcScreen()),
   ],
 );

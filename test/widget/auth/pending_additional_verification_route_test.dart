@@ -11,7 +11,6 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/verification_method_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_method_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/router.dart';
 import 'package:flutter/material.dart';

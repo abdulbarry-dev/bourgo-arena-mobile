@@ -666,7 +666,11 @@ void main() {
         );
         const pin = '1234';
         when(
-          () => apiClient.post('/auth/complete-registration', any()),
+          () => apiClient.post(
+            '/auth/complete-registration',
+            any(),
+            includeAuth: false,
+          ),
         ).thenAnswer((_) async => {'state': 'active'});
         final eventExpectation = expectLater(
           repository.onAuthStateChanged,
@@ -691,14 +695,18 @@ void main() {
             'gender': 'male',
             'is_parent_account': true,
             'pin': pin,
-          }),
+          }, includeAuth: false),
         ).called(1);
         await eventExpectation;
       });
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.post('/auth/complete-registration', any()),
+          () => apiClient.post(
+            '/auth/complete-registration',
+            any(),
+            includeAuth: false,
+          ),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.completeRegistration(
@@ -715,7 +723,11 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.post('/auth/complete-registration', any()),
+          () => apiClient.post(
+            '/auth/complete-registration',
+            any(),
+            includeAuth: false,
+          ),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.completeRegistration(
@@ -732,7 +744,11 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.post('/auth/complete-registration', any()),
+          () => apiClient.post(
+            '/auth/complete-registration',
+            any(),
+            includeAuth: false,
+          ),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.completeRegistration(

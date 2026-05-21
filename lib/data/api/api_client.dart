@@ -24,10 +24,14 @@ class ApiClient {
     String path, {
     bool fullResponse = false,
     bool skipAuthError = false,
+    bool includeAuth = true,
   }) async {
     try {
+      final headers = includeAuth
+          ? _headers
+          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
       final response = await _client
-          .get(Uri.parse('$baseUrl$path'), headers: _headers)
+          .get(Uri.parse('$baseUrl$path'), headers: headers)
           .timeout(const Duration(seconds: 15));
       return _handleResponse(
         response,
@@ -49,12 +53,16 @@ class ApiClient {
     dynamic body, {
     bool fullResponse = false,
     bool skipAuthError = false,
+    bool includeAuth = true,
   }) async {
     try {
+      final headers = includeAuth
+          ? _headers
+          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
       final response = await _client
           .post(
             Uri.parse('$baseUrl$path'),
-            headers: _headers,
+            headers: headers,
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
@@ -78,12 +86,16 @@ class ApiClient {
     dynamic body, {
     bool fullResponse = false,
     bool skipAuthError = false,
+    bool includeAuth = true,
   }) async {
     try {
+      final headers = includeAuth
+          ? _headers
+          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
       final response = await _client
           .put(
             Uri.parse('$baseUrl$path'),
-            headers: _headers,
+            headers: headers,
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));

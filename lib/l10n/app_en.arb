@@ -126,7 +126,6 @@
   "profileNoHistory": "No past reservations.",
   "profileAccessMethods": "ACCESS METHODS",
   "profileAccessPin": "Security PIN",
-  "profileAccessFingerprint": "Fingerprint",
   "profileAccessNfc": "NFC Card",
   "profileStatusConfigured": "Configured",
   "profileStatusNotConfigured": "Not set",

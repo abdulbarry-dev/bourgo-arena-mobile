@@ -293,7 +293,9 @@ void main() {
     testWidgets('shows setup modal when state is pendingOnboarding', (
       tester,
     ) async {
-      final session = testAuthSession().copyWith(state: AuthState.pendingOnboarding);
+      final session = testAuthSession().copyWith(
+        state: AuthState.pendingOnboarding,
+      );
       when(
         () => mockLoginUseCase(any(), any()),
       ).thenAnswer((_) async => Success(session));

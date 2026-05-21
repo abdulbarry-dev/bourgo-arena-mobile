@@ -129,10 +129,11 @@ class AuthStateNotifier extends ChangeNotifier {
       onFailure: (_) => null,
     );
 
-    if (persistedState == AuthState.pendingVerification ||
-        persistedState == AuthState.pendingAdditionalVerification ||
-        persistedState == AuthState.pendingOnboarding ||
-        persistedState == AuthState.pendingDeletionCancellation) {
+    if (token == null &&
+        (persistedState == AuthState.pendingVerification ||
+            persistedState == AuthState.pendingAdditionalVerification ||
+            persistedState == AuthState.pendingOnboarding ||
+            persistedState == AuthState.pendingDeletionCancellation)) {
       final emailResult = await _sessionRepository
           .getPendingVerificationEmail();
       final pendingEmail = emailResult.fold(
