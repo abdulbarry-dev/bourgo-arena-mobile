@@ -2,12 +2,15 @@ import 'dart:async';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/viewmodels/login_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
 
@@ -293,7 +296,15 @@ void main() {
     testWidgets('shows setup modal when state is pendingOnboarding', (
       tester,
     ) async {
-      final session = testAuthSession().copyWith(
+      final session = testAuthSession(
+        user: testUserEntity(
+          firstName: 'Alex',
+          lastName: 'Morgan',
+          email: 'alex@example.com',
+          phone: '+15550000000',
+          birthDate: DateTime.utc(1992, 7, 8),
+          gender: 'male',
+        ),
         state: AuthState.pendingOnboarding,
       );
       when(
@@ -307,21 +318,64 @@ void main() {
       viewModel.passwordController.text = 'password';
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Form(
-              key: viewModel.formKey,
-              child: TextFormField(controller: viewModel.identifierController),
-            ),
+        MaterialApp.router(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: GoRouter(
+            initialLocation: '/',
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => Scaffold(
+                  body: Form(
+                    key: viewModel.formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: viewModel.identifierController,
+                        ),
+                        TextFormField(controller: viewModel.passwordController),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: '/account-setup',
+                builder: (context, state) {
+                  final payload = state.extra is Map<String, dynamic>
+                      ? state.extra as Map<String, dynamic>
+                      : <String, dynamic>{};
+                  return Scaffold(
+                    body: Text(
+                      '${payload['firstName']} ${payload['lastName']} '
+                      '${payload['email']} ${payload['phone']}',
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       );
 
       final ctx = tester.element(find.byType(Form));
 
-      // Cannot easily test showDialog/push here with mocktail,
-      // focusing on state-based logic in view model is better if decoupled.
-      // Assuming context.mounted is tested implicitly.
+      await viewModel.login(ctx);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Complete Setup'), findsOneWidget);
+
+      await tester.tap(find.text('Complete Setup'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Alex Morgan'), findsOneWidget);
+      expect(find.textContaining('alex@example.com'), findsOneWidget);
     });
   });
 }

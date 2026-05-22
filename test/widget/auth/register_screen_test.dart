@@ -18,6 +18,23 @@ class MockRegisterUseCase extends Mock implements RegisterUseCase {}
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
+Future<void> _fillValidRegistrationForm(WidgetTester tester) async {
+  final textFields = find.byType(TextFormField);
+  await tester.enterText(textFields.at(0), 'John');
+  await tester.enterText(textFields.at(1), 'Doe');
+  await tester.enterText(textFields.at(2), 'john@example.com');
+  await tester.enterText(textFields.at(3), '123456789');
+  await tester.tap(find.byIcon(Symbols.calendar_today));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('OK'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const Key('gender_dropdown')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Male').last);
+  await tester.pumpAndSettle();
+  await tester.enterText(textFields.at(5), 'password123');
+}
+
 void main() {
   late MockRegisterUseCase mockRegisterUseCase;
   late MockSessionRepository mockSessionRepository;
@@ -258,6 +275,88 @@ void main() {
       expect(extra['firstName'], 'John');
       expect(extra['gender'], 'male');
       expect(extra.containsKey('password'), isFalse);
+    });
+
+    testWidgets('routes to verification method after a normal registration', (
+      tester,
+    ) async {
+      await setupScreenSize(tester);
+      when(
+        () => mockRegisterUseCase(
+          firstName: any(named: 'firstName'),
+          lastName: any(named: 'lastName'),
+          email: any(named: 'email'),
+          phone: any(named: 'phone'),
+          password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
+          isFamilyAccount: any(named: 'isFamilyAccount'),
+        ),
+      ).thenAnswer((_) async => const Success(null));
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      await _fillValidRegistrationForm(tester);
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Verification'), findsOneWidget);
+      verify(
+        () => mockRegisterUseCase(
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          phone: '123456789',
+          password: 'password123',
+          gender: 'male',
+          birthDate: any(named: 'birthDate'),
+          isFamilyAccount: false,
+        ),
+      ).called(1);
+      expect(savedDraft?['route'], '/verification-method');
+    });
+
+    testWidgets('routes to family onboarding when family account is selected', (
+      tester,
+    ) async {
+      await setupScreenSize(tester);
+      when(
+        () => mockRegisterUseCase(
+          firstName: any(named: 'firstName'),
+          lastName: any(named: 'lastName'),
+          email: any(named: 'email'),
+          phone: any(named: 'phone'),
+          password: any(named: 'password'),
+          gender: any(named: 'gender'),
+          birthDate: any(named: 'birthDate'),
+          isFamilyAccount: any(named: 'isFamilyAccount'),
+        ),
+      ).thenAnswer((_) async => const Success(null));
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      await _fillValidRegistrationForm(tester);
+      await tester.tap(find.byType(Switch));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Family'), findsOneWidget);
+      verify(
+        () => mockRegisterUseCase(
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+          phone: '123456789',
+          password: 'password123',
+          gender: 'male',
+          birthDate: any(named: 'birthDate'),
+          isFamilyAccount: true,
+        ),
+      ).called(1);
+      expect(savedDraft?['route'], '/family-onboarding');
     });
   });
 }

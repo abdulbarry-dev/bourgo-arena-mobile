@@ -182,6 +182,23 @@ class ApiAuthRepository implements AuthRepository {
     }
   }
 
+  bool _hasCompleteOnboardingProfile(User? user) {
+    if (user == null) return false;
+
+    return user.firstName.trim().isNotEmpty &&
+        user.lastName.trim().isNotEmpty &&
+        user.birthDate != null &&
+        (user.gender?.trim().isNotEmpty ?? false);
+  }
+
+  Future<User?> _fetchUserProfileEntity() async {
+    final userResponse =
+        await _apiClient.get('/user/profile', skipAuthError: true)
+            as Map<String, dynamic>;
+    final userModel = UserProfileModel.fromJson(userResponse);
+    return UserMapper.toEntity(userModel);
+  }
+
   @override
   Future<Result<AuthSession, Failure>> login(
     String identifier,
@@ -233,7 +250,6 @@ class ApiAuthRepository implements AuthRepository {
 
       if (token != null) {
         _apiClient.setToken(token);
-        await _sessionRepository.saveAuthToken(token);
       }
 
       await _sessionRepository.saveAuthState(state.name);
@@ -252,16 +268,20 @@ class ApiAuthRepository implements AuthRepository {
           userData as Map<String, dynamic>,
         );
         user = UserMapper.toEntity(userModel);
-      } else if (token != null) {
+      }
+
+      final shouldRefreshProfile =
+          token != null &&
+          (user == null ||
+              (finalState == AuthState.pendingOnboarding &&
+                  !_hasCompleteOnboardingProfile(user)));
+
+      if (shouldRefreshProfile) {
         // If a token was provided but user data is missing, attempt to fetch
-        // the profile. This helps detect onboarding-incomplete scenarios where
-        // the backend returns a token but the profile isn't yet available.
+        // the profile. This also normalizes partial onboarding sessions where
+        // the backend returns only contact information.
         try {
-          final userResponse =
-              await _apiClient.get('/user/profile', skipAuthError: true)
-                  as Map<String, dynamic>;
-          final userModel = UserProfileModel.fromJson(userResponse);
-          user = UserMapper.toEntity(userModel);
+          user = await _fetchUserProfileEntity();
         } catch (e) {
           developer.log(
             'Profile fetch failed during login while token present. Error: $e',

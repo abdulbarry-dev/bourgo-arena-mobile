@@ -179,6 +179,86 @@ void main() {
       });
 
       test(
+        'refreshes pending onboarding sessions when login returns partial user data',
+        () async {
+          const token = 'onboarding-token';
+          final partialUserJson = testUserJson(
+            name: 'Alex',
+            phone: '+212600000000',
+            birthDate: null,
+            gender: null,
+          );
+          final fullProfileJson = testUserJson(
+            name: 'Alex Morgan',
+            phone: '+212600000000',
+            birthDate: DateTime.utc(1992, 7, 8),
+            gender: 'male',
+            children: [testChildJson(id: 'child-1', firstName: 'Mia')],
+          );
+
+          when(
+            () => apiClient.post('/auth/login', {
+              'email': 'onboarding@example.com',
+              'password': 'secret123',
+            }),
+          ).thenAnswer(
+            (_) async => {
+              'token': token,
+              'state': 'pending_onboarding',
+              'user': partialUserJson,
+            },
+          );
+
+          when(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).thenAnswer((_) async => fullProfileJson);
+          when(
+            () => sessionRepository.saveAuthToken(token),
+          ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+          final eventExpectation = expectLater(
+            repository.onAuthStateChanged,
+            emits(
+              predicate<AuthSession>(
+                (value) =>
+                    value.state == AuthState.pendingOnboarding &&
+                    value.user != null &&
+                    value.user!.firstName == 'Alex' &&
+                    value.user!.lastName == 'Morgan' &&
+                    value.user!.birthDate == DateTime.utc(1992, 7, 8) &&
+                    value.user!.gender == 'male',
+              ),
+            ),
+          );
+
+          final result = await repository.login(
+            'onboarding@example.com',
+            'secret123',
+          );
+
+          expect(result, isA<Success<AuthSession, Failure>>());
+          final session = (result as Success<AuthSession, Failure>).data;
+          expect(session.state, AuthState.pendingOnboarding);
+          expect(session.user?.firstName, 'Alex');
+          expect(session.user?.lastName, 'Morgan');
+          expect(session.user?.birthDate, DateTime.utc(1992, 7, 8));
+          expect(session.user?.gender, 'male');
+          verify(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).called(1);
+          await eventExpectation;
+        },
+      );
+
+      test(
         'returns Failure(AuthFailure) on 401 without mutating session',
         () async {
           when(
