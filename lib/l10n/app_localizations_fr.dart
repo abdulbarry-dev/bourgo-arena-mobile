@@ -386,9 +386,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileAccessPin => 'Code PIN';
 
   @override
-  String get profileAccessNfc => 'Carte NFC';
-
-  @override
   String get profileStatusConfigured => 'Configuré';
 
   @override

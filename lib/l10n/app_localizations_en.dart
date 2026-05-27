@@ -381,9 +381,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileAccessPin => 'Security PIN';
 
   @override
-  String get profileAccessNfc => 'NFC Card';
-
-  @override
   String get profileStatusConfigured => 'Configured';
 
   @override

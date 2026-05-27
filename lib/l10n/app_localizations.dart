@@ -812,12 +812,6 @@ abstract class AppLocalizations {
   /// **'Code PIN'**
   String get profileAccessPin;
 
-  /// No description provided for @profileAccessNfc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Carte NFC'**
-  String get profileAccessNfc;
-
   /// No description provided for @profileStatusConfigured.
   ///
   /// In fr, this message translates to:

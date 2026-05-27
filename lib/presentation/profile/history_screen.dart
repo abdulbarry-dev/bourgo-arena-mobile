@@ -37,8 +37,6 @@ class _HistoryScreenState extends State<HistoryScreen>
     );
     _accessHistoryViewModel = AccessHistoryViewModel(
       getAccessHistoryUseCase: locator<GetAccessHistoryUseCase>(),
-      getPhysicalNfcStatusUseCase: locator(),
-      getDigitalNfcStatusUseCase: locator(),
       sessionRepository: locator(),
     );
     _reservationsViewModel.loadData();
@@ -118,25 +116,8 @@ class _AccessTab extends StatelessWidget {
                 isSet: viewModel.isPinConfigured,
               ),
               const SizedBox(height: 12),
-              _AccessMethodTile(
-                icon: Symbols.contactless,
-                label: l10n.profileAccessNfc,
-                isSet: viewModel.isPhysicalNfcConfigured,
-              ),
-              const SizedBox(height: 12),
-              _AccessMethodTile(
-                icon: Symbols.smartphone,
-                label: 'Digital NFC Card',
-                isSet: viewModel.isDigitalNfcConfigured,
-                statusOverride: viewModel.digitalNfcStatusLabel,
-                actionLabel: viewModel.canSetupDigitalNfc
-                    ? l10n.commonSetUp
-                    : null,
-                onAction: viewModel.canSetupDigitalNfc
-                    ? () => context.push('/nfc')
-                    : null,
-              ),
 
+              // NFC-based access methods removed. Only PIN remains.
               const SizedBox(height: 40),
 
               // Check-in History Section
