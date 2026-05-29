@@ -23,36 +23,34 @@ void main() {
   group('CompleteRegistrationUseCase', () {
     test('returns success when completion succeeds', () async {
       final user = testUser();
-      const pin = '1234';
 
       when(
-        () => repository.completeRegistration(user, pin),
+        () => repository.completeRegistration(user),
       ).thenAnswer((_) async => const Success<void, Failure>(null));
 
-      final result = await useCase(user, pin);
+      final result = await useCase(user);
 
       expect(result, isA<Success<void, Failure>>());
-      verify(() => repository.completeRegistration(user, pin)).called(1);
+      verify(() => repository.completeRegistration(user)).called(1);
       verifyNoMoreInteractions(repository);
     });
 
     test('propagates repository failures unchanged', () async {
       final user = testUser();
-      const pin = '1234';
       const failure = AuthFailure(
         AppErrorCode.invalidCredentials,
         'registration completion failed',
       );
 
       when(
-        () => repository.completeRegistration(user, pin),
+        () => repository.completeRegistration(user),
       ).thenAnswer((_) async => const FailureResult<void, Failure>(failure));
 
-      final result = await useCase(user, pin);
+      final result = await useCase(user);
 
       expect(result, isA<FailureResult<void, Failure>>());
       expect((result as FailureResult<void, Failure>).failure, same(failure));
-      verify(() => repository.completeRegistration(user, pin)).called(1);
+      verify(() => repository.completeRegistration(user)).called(1);
       verifyNoMoreInteractions(repository);
     });
 
@@ -60,16 +58,15 @@ void main() {
       'forwards parent account users with empty children lists unchanged',
       () async {
         final user = testUser(isParentAccount: true);
-        const pin = '1234';
 
         when(
-          () => repository.completeRegistration(user, pin),
+          () => repository.completeRegistration(user),
         ).thenAnswer((_) async => const Success<void, Failure>(null));
 
-        final result = await useCase(user, pin);
+        final result = await useCase(user);
 
         expect(result, isA<Success<void, Failure>>());
-        verify(() => repository.completeRegistration(user, pin)).called(1);
+        verify(() => repository.completeRegistration(user)).called(1);
         verifyNoMoreInteractions(repository);
       },
     );

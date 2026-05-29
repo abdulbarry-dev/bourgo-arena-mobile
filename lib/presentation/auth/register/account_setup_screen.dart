@@ -1,6 +1,10 @@
 import 'dart:async';
 
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -29,6 +33,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   late final Map<String, dynamic> _data;
   late final SessionRepository _sessionRepository;
   bool _isEditing = false;
+  bool _isSubmitting = false;
 
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
@@ -141,6 +146,93 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
     _persistDraft();
   }
 
+  User _buildRegistrationUser() {
+    return User(
+      id: 'temp-id-${DateTime.now().millisecondsSinceEpoch}',
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      email: _emailController.text.trim(),
+      phone: _phoneController.text.trim(),
+      avatarUrl: '',
+      loyaltyPoints: 0,
+      subscriptionLevel: 'FREE',
+      subscriptionExpiry: 'N/A',
+      totalCheckIns: 0,
+      gender: _selectedGender,
+      birthDate: _selectedBirthDate,
+      isParentAccount: _data['isParentAccount'] ?? false,
+      children: (_data['familyMembers'] as List<ChildProfile>?) ?? const [],
+    );
+  }
+
+  Future<void> _submitRegistration() async {
+    _syncDataFromControllers();
+    if (!_hasRequiredOnboardingData()) {
+      setState(() {
+        _isEditing = true;
+      });
+      _showValidationError();
+      _persistDraft();
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final completeRegistrationUseCase = locator<CompleteRegistrationUseCase>();
+    final authStateNotifier = locator<AuthStateNotifier>();
+    final result = await completeRegistrationUseCase(_buildRegistrationUser());
+
+    if (!mounted) {
+      return;
+    }
+
+    result.fold(
+      onSuccess: (_) {
+        final currentState = authStateNotifier.state;
+        final onboardingCompleted =
+            authStateNotifier.session.verificationData?.onboardingCompleted ??
+            false;
+
+        if (currentState == AuthState.authenticated) {
+          GoRouter.of(context).go('/home');
+        } else if (currentState == AuthState.pendingAdditionalVerification &&
+            onboardingCompleted) {
+          GoRouter.of(context).go('/verify-additional-method');
+        } else if (currentState == AuthState.pendingVerification) {
+          GoRouter.of(context).go('/verification-method');
+        } else if (currentState == AuthState.pendingOnboarding ||
+            !onboardingCompleted) {
+          GoRouter.of(context).go('/account-setup', extra: _data);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Your session needs to be refreshed. Please log in again.',
+              ),
+            ),
+          );
+          GoRouter.of(context).go('/login');
+        }
+      },
+      onFailure: (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      },
+    );
+
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
   void _syncDataFromControllers() {
     _data['firstName'] = _firstNameController.text.trim();
     _data['lastName'] = _lastNameController.text.trim();
@@ -181,22 +273,13 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   }
 
   void _onContinue() {
-    _syncDataFromControllers();
-    if (!_hasRequiredOnboardingData()) {
-      setState(() {
-        _isEditing = true;
-      });
-      _showValidationError();
-      _persistDraft();
-      return;
-    }
     unawaited(
       _sessionRepository.saveRegistrationDraft({
-        'route': '/pin-setup',
+        'route': '/account-setup',
         'extra': Map<String, dynamic>.from(_data),
       }),
     );
-    context.push('/pin-setup', extra: _data);
+    unawaited(_submitRegistration());
   }
 
   Future<void> _selectBirthDate() async {
@@ -466,7 +549,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
 
                 if (!_isEditing)
                   ElevatedButton(
-                    onPressed: _onContinue,
+                    onPressed: _isSubmitting ? null : _onContinue,
                     child: Text(l10n.authConfirmContinue),
                   ),
 

@@ -58,7 +58,6 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_e
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/get_access_history_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
@@ -160,7 +159,6 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => MarkNotificationsReadUseCase(locator()));
   locator.registerLazySingleton(() => SearchUseCase(locator()));
   locator.registerLazySingleton(() => GetUserProfileUseCase(locator()));
-  locator.registerLazySingleton(() => GetAccessHistoryUseCase(locator()));
   locator.registerLazySingleton(() => UpdateUserProfileUseCase(locator()));
   locator.registerLazySingleton(() => GetChildrenUseCase(locator()));
   locator.registerLazySingleton(

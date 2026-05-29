@@ -648,7 +648,7 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<void, Failure>> completeRegistration(User user, String pin) {
+  Future<Result<void, Failure>> completeRegistration(User user) {
     return executeApiCall(() async {
       await _ensureApiTokenFromSession();
 
@@ -662,8 +662,7 @@ class ApiAuthRepository implements AuthRepository {
                 )[0],
                 'gender': user.gender,
                 'is_parent_account': user.isParentAccount,
-                'pin': pin,
-              })
+              }, includeAuth: false)
               as Map<String, dynamic>;
 
       Map<String, dynamic> payload = response;

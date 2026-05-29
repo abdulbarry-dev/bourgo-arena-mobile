@@ -126,10 +126,7 @@ void main() {
 
       // Now complete registration (simulate PIN setup)
       final user = userEntity;
-      final completeResult = await repository.completeRegistration(
-        user,
-        '1234',
-      );
+      final completeResult = await repository.completeRegistration(user);
       expect(completeResult, isA<Success<void, dynamic>>());
 
       await expectation;

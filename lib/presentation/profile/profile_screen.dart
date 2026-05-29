@@ -66,7 +66,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 32),
                       _ProfileMenu(
                         onTapAbonnement: () => context.push('/subscription'),
-                        onTapHistorique: () => context.push('/history'),
                         onTapNotifications: () =>
                             context.push('/notifications'),
                         onTapSettings: () => context.push('/settings'),
@@ -236,13 +235,11 @@ class _StatItem extends StatelessWidget {
 
 class _ProfileMenu extends StatelessWidget {
   final VoidCallback onTapAbonnement;
-  final VoidCallback onTapHistorique;
   final VoidCallback onTapNotifications;
   final VoidCallback onTapSettings;
 
   const _ProfileMenu({
     required this.onTapAbonnement,
-    required this.onTapHistorique,
     required this.onTapNotifications,
     required this.onTapSettings,
   });
@@ -255,12 +252,6 @@ class _ProfileMenu extends StatelessWidget {
           icon: Symbols.card_membership,
           label: AppLocalizations.of(context)!.profileMySubscription,
           onTap: onTapAbonnement,
-        ),
-        const SizedBox(height: 12),
-        _MenuItem(
-          icon: Symbols.history,
-          label: AppLocalizations.of(context)!.profileHistory,
-          onTap: onTapHistorique,
         ),
         const SizedBox(height: 12),
         _MenuItem(

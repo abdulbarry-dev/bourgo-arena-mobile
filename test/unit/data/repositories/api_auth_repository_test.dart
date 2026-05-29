@@ -744,7 +744,6 @@ void main() {
           isParentAccount: true,
           birthDate: DateTime.utc(1990, 1, 1),
         );
-        const pin = '1234';
         when(
           () => apiClient.post(
             '/auth/complete-registration',
@@ -763,7 +762,7 @@ void main() {
           ),
         );
 
-        final result = await repository.completeRegistration(user, pin);
+        final result = await repository.completeRegistration(user);
 
         expect(result, isA<Success<void, Failure>>());
         verify(
@@ -774,7 +773,6 @@ void main() {
             'date_of_birth': '1990-01-01',
             'gender': 'male',
             'is_parent_account': true,
-            'pin': pin,
           }, includeAuth: false),
         ).called(1);
         await eventExpectation;
@@ -789,10 +787,7 @@ void main() {
           ),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
-        final result = await repository.completeRegistration(
-          testUserEntity(),
-          '1234',
-        );
+        final result = await repository.completeRegistration(testUserEntity());
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(
@@ -810,10 +805,7 @@ void main() {
           ),
         ).thenThrow(const NetworkException('offline'));
 
-        final result = await repository.completeRegistration(
-          testUserEntity(),
-          '1234',
-        );
+        final result = await repository.completeRegistration(testUserEntity());
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(
@@ -831,10 +823,7 @@ void main() {
           ),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
-        final result = await repository.completeRegistration(
-          testUserEntity(),
-          '1234',
-        );
+        final result = await repository.completeRegistration(testUserEntity());
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(

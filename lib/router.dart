@@ -11,7 +11,6 @@ import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/register_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/verification_method_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/family_onboarding_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/register/pin_setup_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/account_setup_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_method_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_flow_screen.dart';
@@ -23,7 +22,6 @@ import 'package:bourgo_arena_mobile/presentation/notifications/notifications_scr
 import 'package:bourgo_arena_mobile/presentation/onboarding/onboarding_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/change_password_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/edit_profile_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/profile/history_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/manage_children_screen.dart';
@@ -133,7 +131,6 @@ GoRouter createRouter(
         location == '/verification-method' ||
         location == '/verify-additional-method' ||
         location == '/account-setup' ||
-        location == '/pin-setup' ||
         location == '/family-onboarding';
 
     final draftRoute = authStateNotifier.registrationRoute;
@@ -166,7 +163,6 @@ GoRouter createRouter(
           if (location == '/verification-method' ||
               location == '/otp' ||
               location == '/account-setup' ||
-              location == '/pin-setup' ||
               location == '/family-onboarding') {
             return null;
           }
@@ -194,7 +190,6 @@ GoRouter createRouter(
         if (location == '/login' ||
             location == '/otp' ||
             location == '/account-setup' ||
-            location == '/pin-setup' ||
             location == '/family-onboarding') {
           return null;
         }
@@ -326,12 +321,6 @@ GoRouter createRouter(
       },
     ),
     GoRoute(
-      path: '/pin-setup',
-      builder: (context, state) => PinSetupScreen(
-        registrationData: _currentOrDraftExtra(state, authStateNotifier),
-      ),
-    ),
-    GoRoute(
       path: '/forgot-password',
       builder: (context, state) => const ForgotPasswordScreen(),
     ),
@@ -372,10 +361,6 @@ GoRouter createRouter(
     GoRoute(
       path: '/subscription',
       builder: (context, state) => const SubscriptionScreen(),
-    ),
-    GoRoute(
-      path: '/history',
-      builder: (context, state) => const HistoryScreen(),
     ),
     GoRoute(
       path: '/notifications',

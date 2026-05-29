@@ -72,7 +72,7 @@ abstract interface class AuthRepository {
   Future<Result<String?, Failure>> getToken();
 
   /// Completes the registration process and signs the user in.
-  Future<Result<void, Failure>> completeRegistration(User user, String pin);
+  Future<Result<void, Failure>> completeRegistration(User user);
 
   /// Requests a password reset OTP for the given [identifier].
   Future<Result<void, Failure>> forgotPassword(String identifier);
