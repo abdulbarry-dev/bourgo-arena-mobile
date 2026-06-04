@@ -23,7 +23,6 @@ void main() {
       loyaltyPoints: 100,
       subscriptionLevel: 'Premium',
       subscriptionExpiry: '2024-12-31',
-      totalCheckIns: 50,
       birthDate: birthDate,
       isParentAccount: true,
       children: children,
@@ -38,7 +37,6 @@ void main() {
       'loyalty_points': 100,
       'subscription_level': 'Premium',
       'subscription_expiry': '2024-12-31',
-      'total_check_ins': 50,
       'birth_date': birthDate.toIso8601String(),
       'is_parent_account': true,
       'children': [
@@ -62,7 +60,6 @@ void main() {
       expect(result.loyaltyPoints, model.loyaltyPoints);
       expect(result.subscriptionLevel, model.subscriptionLevel);
       expect(result.subscriptionExpiry, model.subscriptionExpiry);
-      expect(result.totalCheckIns, model.totalCheckIns);
       expect(result.birthDate, model.birthDate);
       expect(result.isParentAccount, model.isParentAccount);
       expect(result.children.length, 1);
@@ -80,7 +77,6 @@ void main() {
       expect(result['loyalty_points'], json['loyalty_points']);
       expect(result['subscription_level'], json['subscription_level']);
       expect(result['subscription_expiry'], json['subscription_expiry']);
-      expect(result['total_check_ins'], json['total_check_ins']);
       expect(result['birth_date'], json['birth_date']);
       expect(result['is_parent_account'], json['is_parent_account']);
       expect(result['children'], isA<List>());
@@ -94,7 +90,6 @@ void main() {
         'phone': '123456789',
         'loyalty_points': 0,
         'subscription_level': 'Basic',
-        'total_check_ins': 0,
       };
 
       final result = UserProfileModel.fromJson(minimalJson);

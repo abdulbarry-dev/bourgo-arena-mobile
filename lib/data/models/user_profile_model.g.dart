@@ -18,7 +18,6 @@ UserProfileModel _$UserProfileModelFromJson(Map<String, dynamic> json) =>
       loyaltyPoints: (json['loyalty_points'] as num?)?.toInt() ?? 0,
       subscriptionLevel: json['subscription_level'] as String?,
       subscriptionExpiry: json['subscription_expiry'] as String?,
-      totalCheckIns: (json['total_check_ins'] as num?)?.toInt() ?? 0,
       birthDate: json['birth_date'] == null
           ? null
           : DateTime.parse(json['birth_date'] as String),
@@ -47,7 +46,6 @@ Map<String, dynamic> _$UserProfileModelToJson(UserProfileModel instance) =>
       'loyalty_points': instance.loyaltyPoints,
       'subscription_level': instance.subscriptionLevel,
       'subscription_expiry': instance.subscriptionExpiry,
-      'total_check_ins': instance.totalCheckIns,
       'birth_date': instance.birthDate?.toIso8601String(),
       'gender': instance.gender,
       'status': instance.status,

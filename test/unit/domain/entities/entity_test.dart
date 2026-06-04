@@ -288,7 +288,6 @@ void main() {
         loyaltyPoints: 100,
         subscriptionLevel: 'Gold',
         subscriptionExpiry: '2024-01-01',
-        totalCheckIns: 10,
         children: [
           ChildProfile(
             id: 'c1',
@@ -314,7 +313,6 @@ void main() {
           loyaltyPoints: 100,
           subscriptionLevel: 'Gold',
           subscriptionExpiry: '2024-01-01',
-          totalCheckIns: 10,
           children: [
             ChildProfile(
               id: 'c1',

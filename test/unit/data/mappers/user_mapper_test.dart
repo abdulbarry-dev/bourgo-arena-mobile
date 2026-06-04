@@ -31,7 +31,6 @@ void main() {
       expect(entity.loyaltyPoints, dto.loyaltyPoints);
       expect(entity.subscriptionLevel, dto.subscriptionLevel);
       expect(entity.subscriptionExpiry, dto.subscriptionExpiry);
-      expect(entity.totalCheckIns, dto.totalCheckIns);
       expect(entity.birthDate, dto.birthDate);
       expect(entity.gender, dto.gender);
       expect(entity.isParentAccount, dto.isParentAccount);
@@ -88,7 +87,6 @@ void main() {
         loyaltyPoints: 321,
         subscriptionLevel: 'gold',
         subscriptionExpiry: '2027-02-01',
-        totalCheckIns: 18,
         birthDate: DateTime.utc(1992, 7, 8),
         isParentAccount: true,
         children: [
