@@ -183,12 +183,11 @@ void main() {
           // so we check if the logic matches whatever today is.
           await viewModel.loadHomeData();
 
-          final today = DateTime.now().weekday;
-          if (today == 7) {
-            check(viewModel.todayCourses).length.equals(1);
-          } else {
-            check(viewModel.todayCourses).isEmpty();
-          }
+          // Due to the fallback logic in HomeViewModel, if there are no courses today,
+          // it takes the first 3 available courses. Since we only return sundayCourse,
+          // it will be the only course returned whether today is Sunday or not.
+          check(viewModel.todayCourses).length.equals(1);
+          check(viewModel.todayCourses.first.id).equals('sunday');
         },
       );
     });

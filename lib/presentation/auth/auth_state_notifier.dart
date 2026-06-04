@@ -152,10 +152,19 @@ class AuthStateNotifier extends ChangeNotifier {
 
     if (token != null) {
       final result = await _authRepository.getUserProfile();
-      if (result is FailureResult<AuthSession, Failure>) {
-        _session = AuthSession.unauthenticated();
-        notifyListeners();
-      }
+      result.fold(
+        onSuccess: (session) {
+          _session = session;
+          if (_session.isAuthenticated) {
+            unawaited(_deviceTokenRegistrar.registerIfPossible());
+          }
+          notifyListeners();
+        },
+        onFailure: (_) {
+          _session = AuthSession.unauthenticated();
+          notifyListeners();
+        },
+      );
     } else {
       if (persistedState != AuthState.unauthenticated) {
         final emailResult = await _sessionRepository
