@@ -74,5 +74,26 @@ void main() {
         isA<ServerFailure>(),
       );
     });
+    test('getCourseDetails returns course details on 200', () async {
+      when(
+        () => apiClient.get('/courses/c1'),
+      ).thenAnswer((_) async => {'data': testCourseJson()});
+
+      final result = await repository.getCourseDetails('c1');
+
+      expect((result as Success<Course, Failure>).data.id, 'course-1');
+    });
+
+    test('getCourseSessions returns sessions list on 200', () async {
+      final tSessions = [{'id': 's1', 'date': '2026-06-04'}];
+      when(
+        () => apiClient.get('/courses/c1/sessions'),
+      ).thenAnswer((_) async => tSessions);
+
+      final result = await repository.getCourseSessions('c1');
+
+      expect(result, isA<Success<List<dynamic>, Failure>>());
+      expect((result as Success<List<dynamic>, Failure>).data.length, 1);
+    });
   });
 }

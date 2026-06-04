@@ -26,4 +26,20 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
       return Success(SubscriptionMapper.toEntity(model));
     });
   }
+
+  @override
+  Future<Result<void, Failure>> subscribeToPlan(String planId) {
+    return executeApiCall(() async {
+      await _apiClient.post('/subscriptions', {'plan_id': planId});
+      return Result.success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> cancelSubscription(String subscriptionId) {
+    return executeApiCall(() async {
+      await _apiClient.post('/subscriptions/$subscriptionId/cancel', {});
+      return Result.success(null);
+    });
+  }
 }

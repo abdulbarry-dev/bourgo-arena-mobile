@@ -85,7 +85,6 @@ void main() {
         () => apiClient.post(
           '/auth/complete-registration',
           any(),
-          includeAuth: false,
         ),
       ).thenAnswer(
         (_) async => {

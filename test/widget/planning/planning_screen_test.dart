@@ -92,12 +92,23 @@ void main() {
         icon: 'yoga',
       ),
     ];
-    when(() => mockViewModel.courses).thenReturn(courses);
+    final unified = [
+      PlanningEntry(
+        id: '1',
+        type: PlanningEntryType.course,
+        title: 'Morning Yoga',
+        timeLabel: '08:00-09:00',
+        dayOfWeek: 1,
+        source: courses.first,
+        highlightForTier: false,
+      ),
+    ];
+    when(() => mockViewModel.unified).thenReturn(unified);
 
     await tester.pumpWidget(createWidget());
     await tester.pumpAndSettle();
 
-    check(find.text('MORNING YOGA').evaluate()).isNotEmpty();
+    check(find.text('Morning Yoga').evaluate()).isNotEmpty();
     check(find.text('Alice').evaluate()).isNotEmpty();
   });
 }

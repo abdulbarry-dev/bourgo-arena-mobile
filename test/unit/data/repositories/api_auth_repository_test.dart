@@ -487,10 +487,14 @@ void main() {
         expect(result, isA<Success<void, Failure>>());
         verify(
           () => apiClient.post('/auth/register', {
+            'name': 'Alex Morgan',
             'email': 'alex@example.com',
             'phone': '+15550000000',
+            'gender': 'male',
+            'date_of_birth': '1990-01-01',
             'password': 'secret123',
             'password_confirmation': 'secret123',
+            'is_family_account': false,
           }),
         ).called(1);
       });
