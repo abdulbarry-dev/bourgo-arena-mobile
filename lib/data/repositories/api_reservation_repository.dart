@@ -15,6 +15,9 @@ class ApiReservationRepository implements ReservationRepository {
 
   @override
   Future<Result<List<Reservation>, Failure>> getReservations() {
+    if (!_apiClient.hasToken) {
+      return Future.value(const Success([]));
+    }
     return executeApiCall(() async {
       final response = await _apiClient.get('/reservations');
       final List<dynamic> data = response is List

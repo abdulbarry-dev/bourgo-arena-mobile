@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/mappers/verification_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
 import 'package:bourgo_arena_mobile/data/models/verification_status_model.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
@@ -782,6 +783,11 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<Result<AuthSession, Failure>> getUserProfile() async {
+    if (!_apiClient.hasToken) {
+      return FailureResult(
+        AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+      );
+    }
     final result = await executeApiCall(() async {
       final userResponse =
           await _apiClient.get('/user/profile') as Map<String, dynamic>;
@@ -834,6 +840,13 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<Result<VerificationStatus, Failure>> getVerificationStatus() {
+    if (!_apiClient.hasToken) {
+      return Future.value(
+        FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+        ),
+      );
+    }
     return executeApiCall(() async {
       final response =
           await _apiClient.get('/user/verification-status', skipAuthError: true)

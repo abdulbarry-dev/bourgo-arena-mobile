@@ -108,24 +108,36 @@ class PlanningViewModel extends BaseViewModel {
       final userResult = results[3] as Result<User, Failure>;
 
       coursesResult.when(
-        success: (data) => _allCourses = data,
+        success: (data) {
+          developer.log('PlanningViewModel: Successfully loaded ${data.length} courses');
+          _allCourses = data;
+        },
         failure: (failure) {
+          developer.log('PlanningViewModel: Failed to load courses - ${failure.message}');
           setErrorMessage(failure.message);
           _allCourses = [];
         },
       );
 
       bookingsResult.when(
-        success: (data) => _allReservations = data,
-        failure: (_) => _allReservations = [],
+        success: (data) {
+          developer.log('PlanningViewModel: Successfully loaded ${data.length} bookings');
+          _allReservations = data;
+        },
+        failure: (failure) {
+          developer.log('PlanningViewModel: Failed to load bookings - ${failure.message}');
+          _allReservations = [];
+        },
       );
 
       membersResult.when(
         success: (members) {
+          developer.log('PlanningViewModel: Successfully loaded ${members.length} family members');
           _familyMembers = members;
           _selectedMember ??= members.isNotEmpty ? members.first : null;
         },
-        failure: (_) {
+        failure: (failure) {
+          developer.log('PlanningViewModel: Failed to load family members - ${failure.message}');
           _familyMembers = [];
           _selectedMember = null;
         },
@@ -133,11 +145,15 @@ class PlanningViewModel extends BaseViewModel {
 
       userResult.when(
         success: (user) {
+          developer.log('PlanningViewModel: Successfully loaded user profile');
           _selectedMemberTier = _getMemberTierUseCase(
             subscriptionLevel: user.subscriptionLevel,
           );
         },
-        failure: (_) => _selectedMemberTier = MemberTier.public,
+        failure: (failure) {
+          developer.log('PlanningViewModel: Failed to load user profile - ${failure.message}');
+          _selectedMemberTier = MemberTier.public;
+        },
       );
 
       _buildUnified();
