@@ -1,5 +1,8 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
+import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
@@ -7,16 +10,25 @@ import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
-import 'package:flutter/material.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the multi-step booking flow.
-class BookingViewModel extends ChangeNotifier {
+class BookingViewModel extends BaseViewModel {
   final GetActivitiesUseCase _getActivitiesUseCase;
   final GetTimeSlotsUseCase _getTimeSlotsUseCase;
   final GetUserBookingsUseCase _getUserBookingsUseCase;
   final MakeReservationUseCase _makeReservationUseCase;
   final CancelBookingUseCase _cancelBookingUseCase;
+  final GetFamilyMembersUseCase _getFamilyMembersUseCase;
+  final GetUserProfileUseCase _getUserProfileUseCase;
+  final GetContextualPriceUseCase _getContextualPriceUseCase;
+  final GetMemberTierUseCase _getMemberTierUseCase;
+  final ProjectPointsUseCase _projectPointsUseCase;
 
   int _currentStep = 0;
   Activity? _selectedActivity;
@@ -27,8 +39,14 @@ class BookingViewModel extends ChangeNotifier {
   List<Activity> _activities = [];
   List<TimeSlot> _availableSlots = [];
   List<Reservation> _userBookings = [];
+  List<FamilyMember> _familyMembers = [];
+  FamilyMember? _selectedMember;
+  bool _isFamilyAccount = false;
+  MemberTier _memberTier = MemberTier.public;
+
+  double? _contextualPrice;
+  bool _isPricingLoading = false;
   bool _isLoading = false;
-  String? _error;
 
   /// Creates a new [BookingViewModel] instance.
   BookingViewModel({
@@ -37,27 +55,39 @@ class BookingViewModel extends ChangeNotifier {
     required GetUserBookingsUseCase getUserBookingsUseCase,
     required MakeReservationUseCase makeReservationUseCase,
     required CancelBookingUseCase cancelBookingUseCase,
+    required GetFamilyMembersUseCase getFamilyMembersUseCase,
+    required GetUserProfileUseCase getUserProfileUseCase,
+    required GetContextualPriceUseCase getContextualPriceUseCase,
+    required GetMemberTierUseCase getMemberTierUseCase,
+    required ProjectPointsUseCase projectPointsUseCase,
     Activity? initialActivity,
   }) : _getActivitiesUseCase = getActivitiesUseCase,
        _getTimeSlotsUseCase = getTimeSlotsUseCase,
        _getUserBookingsUseCase = getUserBookingsUseCase,
        _makeReservationUseCase = makeReservationUseCase,
        _cancelBookingUseCase = cancelBookingUseCase,
+       _getFamilyMembersUseCase = getFamilyMembersUseCase,
+       _getUserProfileUseCase = getUserProfileUseCase,
+       _getContextualPriceUseCase = getContextualPriceUseCase,
+       _getMemberTierUseCase = getMemberTierUseCase,
+       _projectPointsUseCase = projectPointsUseCase,
        _selectedActivity = initialActivity {
     loadUserBookings();
-    if (_selectedActivity != null) {
-      _currentStep = 1;
-      _loadSlots();
-    } else {
-      _loadActivities();
-    }
+    _initializeFamilyContext();
   }
 
   /// Current step in the booking flow (0-2).
   int get currentStep => _currentStep;
 
+  int get totalSteps => _isFamilyAccount ? 4 : 3;
+  int get paymentStepIndex => totalSteps - 1;
+
   /// The activity selected for booking.
   Activity? get selectedActivity => _selectedActivity;
+
+  List<FamilyMember> get familyMembers => _familyMembers;
+  FamilyMember? get selectedMember => _selectedMember;
+  bool get isFamilyAccount => _isFamilyAccount;
 
   /// The date selected for booking.
   DateTime get selectedDate => _selectedDate;
@@ -80,12 +110,18 @@ class BookingViewModel extends ChangeNotifier {
   /// Whether data is currently loading.
   bool get isLoading => _isLoading;
 
-  /// Current error message if any.
-  String? get error => _error;
+  bool get isPricingLoading => _isPricingLoading;
+
+  double get priceToPay =>
+      _contextualPrice ?? _selectedActivity?.basePrice ?? 0;
+  bool get hasContextualPrice => _contextualPrice != null;
+  MemberTier get memberTier => _memberTier;
+  int get projectedPoints =>
+      _projectPointsUseCase(amount: priceToPay, tier: _memberTier);
 
   /// Moves to the next step in the flow.
   void nextStep() {
-    if (_currentStep < 2) {
+    if (_currentStep < totalSteps - 1) {
       _currentStep++;
       notifyListeners();
     }
@@ -102,8 +138,9 @@ class BookingViewModel extends ChangeNotifier {
   /// Selects an [activity] and proceeds to the next step.
   void selectActivity(Activity activity) {
     _selectedActivity = activity;
-    _currentStep = 1;
+    _currentStep = _isFamilyAccount ? 2 : 1;
     _loadSlots();
+    _loadContextualPrice();
     notifyListeners();
   }
 
@@ -121,6 +158,14 @@ class BookingViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void selectMember(FamilyMember member) {
+    _selectedMember = member;
+    _contextualPrice = null;
+    _loadContextualPrice();
+    // If selecting member is the first step, allow moving forward.
+    notifyListeners();
+  }
+
   /// Sets the [method] of payment.
   void setPaymentMethod(String method) {
     _paymentMethod = method;
@@ -130,7 +175,7 @@ class BookingViewModel extends ChangeNotifier {
   /// Fetches the list of bookings for the current user.
   Future<void> loadUserBookings() async {
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final result = await _getUserBookingsUseCase();
@@ -139,7 +184,7 @@ class BookingViewModel extends ChangeNotifier {
         _userBookings = bookings;
       },
       failure: (failure) {
-        _error = 'bookings_loading_failed';
+        setErrorMessage('bookings_loading_failed');
         developer.log('Error loading bookings: ${failure.message}');
       },
     );
@@ -151,7 +196,7 @@ class BookingViewModel extends ChangeNotifier {
   /// Cancels an existing booking by its [id].
   Future<void> cancelBooking(String id) async {
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final result = await _cancelBookingUseCase(id);
@@ -160,7 +205,7 @@ class BookingViewModel extends ChangeNotifier {
         loadUserBookings();
       },
       failure: (failure) {
-        _error = 'booking_cancellation_failed';
+        setErrorMessage('booking_cancellation_failed');
         developer.log('Error cancelling booking: ${failure.message}');
       },
     );
@@ -173,27 +218,32 @@ class BookingViewModel extends ChangeNotifier {
   Future<bool> makeReservation() async {
     final activity = _selectedActivity;
     final slot = _selectedSlot;
+    final member = _selectedMember;
 
     if (activity == null || slot == null) {
-      _error = 'missing_selection';
-      notifyListeners();
+      setErrorMessage('missing_selection');
+      return false;
+    }
+    if (_isFamilyAccount && member == null) {
+      setErrorMessage('missing_member');
       return false;
     }
 
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final reservation = Reservation(
       id: '', // Will be assigned by backend
       activityId: activity.id,
       activityTitle: activity.category,
+      memberId: member?.id,
       date: _selectedDate.toIso8601String().split('T')[0],
       time: slot.time,
       duration: activity.id == 'padel-1'
           ? '90 min'
           : '60 min', // Mock logic for demo
-      price: activity.basePrice,
+      price: priceToPay,
       status: 'confirmed',
       paymentStatus: 'paid',
       qrCode: 'mock-qr-code',
@@ -208,7 +258,7 @@ class BookingViewModel extends ChangeNotifier {
         _resetForm();
       },
       failure: (failure) {
-        _error = 'reservation_failed';
+        setErrorMessage('reservation_failed');
         developer.log('Error making reservation: ${failure.message}');
       },
     );
@@ -221,13 +271,14 @@ class BookingViewModel extends ChangeNotifier {
   void _resetForm() {
     _selectedActivity = null;
     _selectedSlot = null;
-    _currentStep = 0;
+    _currentStep = _isFamilyAccount ? 0 : 0;
     _availableSlots = [];
+    _contextualPrice = null;
   }
 
   Future<void> _loadActivities() async {
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     final result = await _getActivitiesUseCase();
@@ -236,7 +287,7 @@ class BookingViewModel extends ChangeNotifier {
         _activities = activities;
       },
       failure: (failure) {
-        _error = 'activities_loading_failed';
+        setErrorMessage('activities_loading_failed');
         developer.log('Error loading activities: ${failure.message}');
       },
     );
@@ -250,7 +301,7 @@ class BookingViewModel extends ChangeNotifier {
     if (activity == null) return;
 
     _isLoading = true;
-    _error = null;
+    clearError();
     notifyListeners();
 
     try {
@@ -267,7 +318,7 @@ class BookingViewModel extends ChangeNotifier {
           );
         },
         failure: (failure) {
-          _error = 'slots_loading_failed';
+          setErrorMessage('slots_loading_failed');
           _availableSlots = [];
           developer.log('Error loading slots: ${failure.message}');
         },
@@ -278,11 +329,77 @@ class BookingViewModel extends ChangeNotifier {
         error: e,
         stackTrace: stack,
       );
-      _error = 'slots_loading_failed';
+      setErrorMessage('slots_loading_failed');
       _availableSlots = [];
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> _initializeFamilyContext() async {
+    try {
+      final userResult = await _getUserProfileUseCase();
+      userResult.when(
+        success: (user) {
+          _isFamilyAccount = user.isParentAccount;
+          _memberTier = _getMemberTierUseCase(
+            subscriptionLevel: user.subscriptionLevel,
+          );
+        },
+        failure: (_) => _isFamilyAccount = false,
+      );
+
+      if (_isFamilyAccount) {
+        final membersResult = await _getFamilyMembersUseCase();
+        membersResult.when(
+          success: (members) {
+            _familyMembers = members;
+            _selectedMember ??= members.isNotEmpty ? members.first : null;
+          },
+          failure: (_) => _familyMembers = [],
+        );
+      }
+
+      if (_selectedActivity != null) {
+        _currentStep = _isFamilyAccount ? 2 : 1;
+        _loadSlots();
+        _loadContextualPrice();
+      } else {
+        _currentStep = _isFamilyAccount ? 0 : 0;
+        _loadActivities();
+      }
+    } catch (_) {
+      _isFamilyAccount = false;
+      _loadActivities();
+    } finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> _loadContextualPrice() async {
+    final activity = _selectedActivity;
+    final member = _selectedMember;
+    if (activity == null) return;
+    if (_isFamilyAccount && member == null) return;
+
+    final memberId = member?.id;
+    if (memberId == null) return;
+
+    _isPricingLoading = true;
+    notifyListeners();
+
+    final result = await _getContextualPriceUseCase(
+      activityId: activity.id,
+      memberId: memberId,
+    );
+
+    result.when(
+      success: (price) => _contextualPrice = price,
+      failure: (_) => _contextualPrice = null,
+    );
+
+    _isPricingLoading = false;
+    notifyListeners();
   }
 }

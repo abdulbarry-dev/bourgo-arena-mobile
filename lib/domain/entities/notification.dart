@@ -1,7 +1,7 @@
 /// Entity representing a user notification.
 class Notification {
   /// Unique identifier.
-  final String id;
+  final int id;
 
   /// Title of the notification.
   final String title;
@@ -12,7 +12,7 @@ class Notification {
   /// When the notification was received.
   final DateTime timestamp;
 
-  /// Type of notification (booking, promotion, system).
+  /// Type of notification (welcome, reservation, system, alert).
   final String type;
 
   /// Whether the notification has been read.
@@ -30,7 +30,7 @@ class Notification {
 
   /// Creates a copy of this [Notification] with the given fields updated.
   Notification copyWith({
-    String? id,
+    int? id,
     String? title,
     String? message,
     DateTime? timestamp,

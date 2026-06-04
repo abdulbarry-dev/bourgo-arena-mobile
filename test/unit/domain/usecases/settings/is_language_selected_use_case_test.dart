@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart'
 import 'package:bourgo_arena_mobile/domain/usecases/settings/is_language_selected_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
@@ -31,7 +32,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = CacheFailure('language state missing');
+      const failure = CacheFailure(
+        AppErrorCode.cacheError,
+        'language state missing',
+      );
 
       when(
         () => repository.isLanguageSelected(),

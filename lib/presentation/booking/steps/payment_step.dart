@@ -45,7 +45,7 @@ class PaymentStep extends StatelessWidget {
               );
             }
           },
-          price: viewModel.selectedActivity?.basePrice ?? 0,
+          price: viewModel.priceToPay,
         ),
       ],
     );
@@ -84,6 +84,7 @@ class _SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final activity = viewModel.selectedActivity;
+    final price = viewModel.priceToPay;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -122,14 +123,16 @@ class _SummaryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${activity?.basePrice.toStringAsFixed(2) ?? '0.00'} ${activity?.currency ?? ''}',
+                      '${price.toStringAsFixed(2)} ${activity?.currency ?? ''}',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                       ),
                     ),
                     Text(
-                      activity?.category ?? '',
+                      viewModel.isPricingLoading
+                          ? '${activity?.category ?? ''} • …'
+                          : (activity?.category ?? ''),
                       style: TextStyle(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 12,
@@ -167,6 +170,13 @@ class _SummaryCard extends StatelessWidget {
             value: activity?.id == 'padel-1'
                 ? AppLocalizations.of(context)!.bookingDurationPadel
                 : AppLocalizations.of(context)!.bookingDurationStandard,
+          ),
+          const SizedBox(height: 12),
+          _SummaryRow(
+            icon: Symbols.stars,
+            label: AppLocalizations.of(context)!.bookingPointsToEarned,
+            value:
+                '${viewModel.projectedPoints} ${AppLocalizations.of(context)!.commonPointsShort}',
           ),
         ],
       ),

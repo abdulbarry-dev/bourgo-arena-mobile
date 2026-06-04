@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
@@ -19,6 +20,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
+
+class MockDeleteAccountUseCase extends Mock implements DeleteAccountUseCase {}
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
@@ -149,6 +153,7 @@ void main() {
     HttpOverrides.global = _MockHttpOverrides(mockHttpClient);
   });
 
+  late MockDeleteAccountUseCase mockDeleteAccountUseCase;
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
   late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
   late MockLogoutUseCase mockLogoutUseCase;
@@ -169,12 +174,14 @@ void main() {
   );
 
   setUp(() {
+    mockDeleteAccountUseCase = MockDeleteAccountUseCase();
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
     mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
     mockLogoutUseCase = MockLogoutUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
     mockAuthRepository = MockAuthRepository();
 
+    locator.registerSingleton<DeleteAccountUseCase>(mockDeleteAccountUseCase);
     locator.registerSingleton<GetUserProfileUseCase>(mockGetUserProfileUseCase);
     locator.registerSingleton<UpdateUserProfileUseCase>(
       mockUpdateUserProfileUseCase,
@@ -243,15 +250,17 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('JOHN DOE'), findsOneWidget);
-      expect(find.text('Gold'), findsOneWidget);
+      expect(find.text('GOLD'), findsOneWidget);
       expect(find.text('100'), findsOneWidget); // Points
-      expect(find.text('42'), findsOneWidget); // Check-ins
+      expect(find.text('42'), findsNothing); // Check-ins removed
     });
 
     testWidgets('shows error message when fetch fails', (tester) async {
       when(() => mockAuthStateNotifier.currentUser).thenReturn(null);
       when(() => mockAuthRepository.getUserProfile()).thenAnswer(
-        (_) async => Result.failure(const ServerFailure('Failed to load')),
+        (_) async => Result.failure(
+          const ServerFailure(AppErrorCode.serverError, 'Failed to load'),
+        ),
       );
 
       await tester.pumpWidget(createWidget());

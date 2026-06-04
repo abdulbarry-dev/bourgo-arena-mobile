@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 
@@ -41,12 +42,22 @@ abstract interface class AuthRepository {
   /// Used when a user has initially verified by email and needs phone verification.
   Future<Result<bool, Failure>> verifyPhone(String phone, String otp);
 
+  /// Allows the user to explicitly skip the secondary verification method.
+  Future<Result<bool, Failure>> skipAdditionalVerification();
+
   /// Retrieves the current verification status for the authenticated user.
   /// Shows which methods (email/phone) have been verified.
   Future<Result<VerificationStatus, Failure>> getVerificationStatus();
 
   /// Requests an OTP for enabling family account mode.
-  Future<Result<void, Failure>> requestFamilyAccountOtp();
+  ///
+  /// Returns the backend response message to display in UI feedback.
+  Future<Result<String, Failure>> requestFamilyAccountOtp({
+    OtpDeliveryMethod? method,
+  });
+
+  /// Requests account deletion. Requires the user's current password for confirmation.
+  Future<Result<void, Failure>> deleteAccount({required String password});
 
   /// Signs out the current user.
   Future<Result<void, Failure>> logout();
@@ -61,7 +72,7 @@ abstract interface class AuthRepository {
   Future<Result<String?, Failure>> getToken();
 
   /// Completes the registration process and signs the user in.
-  Future<Result<void, Failure>> completeRegistration(User user, String pin);
+  Future<Result<void, Failure>> completeRegistration(User user);
 
   /// Requests a password reset OTP for the given [identifier].
   Future<Result<void, Failure>> forgotPassword(String identifier);

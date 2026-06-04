@@ -16,6 +16,7 @@ class ReservationMapper {
       status: model.status,
       paymentStatus: model.paymentStatus,
       qrCode: model.qrCode ?? '',
+      memberId: model.memberId,
     );
   }
 
@@ -25,6 +26,7 @@ class ReservationMapper {
       id: entity.id,
       activityId: entity.activityId,
       activityTitle: entity.activityTitle,
+      memberId: entity.memberId,
       date: entity.date,
       time: entity.time,
       duration: entity.duration,

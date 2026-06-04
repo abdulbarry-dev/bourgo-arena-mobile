@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockActivityRepository extends Mock implements ActivityRepository {}
 
@@ -36,7 +37,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = NotFoundFailure('activity not found');
+      const failure = NotFoundFailure(
+        AppErrorCode.notFound,
+        'activity not found',
+      );
 
       when(() => repository.getTimeSlots('activity-1')).thenAnswer(
         (_) async => const FailureResult<List<TimeSlot>, Failure>(failure),

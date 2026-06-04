@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,7 @@ class AuthHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final spacing = context.spacing;
     final bool effectiveShowBackButton =
         showBackButton ?? Navigator.of(context).canPop();
 
@@ -44,7 +46,7 @@ class AuthHeader extends StatelessWidget {
               padding: EdgeInsets.zero,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: spacing.md),
         ],
         const Center(
           child: BrandLogo(
@@ -54,7 +56,7 @@ class AuthHeader extends StatelessWidget {
             heroTag: 'app_logo',
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: spacing.xl),
         Text(
           title,
           textAlign: TextAlign.center,
@@ -64,9 +66,9 @@ class AuthHeader extends StatelessWidget {
             letterSpacing: -0.5,
           ),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: spacing.sm),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+          padding: EdgeInsets.symmetric(horizontal: spacing.lg),
           child: Text(
             subtitle,
             textAlign: TextAlign.center,

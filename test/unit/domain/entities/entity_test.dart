@@ -174,7 +174,7 @@ void main() {
     group('Notification', () {
       final now = DateTime.now();
       final notification1 = Notification(
-        id: 'n1',
+        id: 1,
         title: 'Title',
         message: 'Message',
         timestamp: now,
@@ -246,7 +246,10 @@ void main() {
         id: 's1',
         name: 'Premium',
         price: 50.0,
-        benefits: ['Pool', 'Gym'],
+        benefits: [
+          Benefit(label: 'Pool'),
+          Benefit(label: 'Gym'),
+        ],
         durationMonths: 1,
       );
 
@@ -255,7 +258,10 @@ void main() {
           id: 's1',
           name: 'Premium',
           price: 50.0,
-          benefits: List.from(['Pool', 'Gym']),
+          benefits: [
+            const Benefit(label: 'Pool'),
+            const Benefit(label: 'Gym'),
+          ],
           durationMonths: 1,
         );
         check(sub1).equals(subSame);

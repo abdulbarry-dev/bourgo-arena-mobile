@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.d
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockReservationRepository extends Mock implements ReservationRepository {}
 
@@ -30,7 +31,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ServerFailure('cancel rejected');
+      const failure = ServerFailure(
+        AppErrorCode.serverError,
+        'cancel rejected',
+      );
 
       when(
         () => repository.cancelReservation('reservation-1'),

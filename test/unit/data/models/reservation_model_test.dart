@@ -9,6 +9,7 @@ void main() {
         id: 'res-1',
         activityId: 'act-1',
         activityTitle: 'Tennis',
+        memberId: 'member-1',
         date: '2026-05-10',
         time: '14:00',
         duration: '60 min',
@@ -24,6 +25,7 @@ void main() {
       check(fromJson.id).equals(model.id);
       check(fromJson.activityId).equals(model.activityId);
       check(fromJson.activityTitle).equals(model.activityTitle);
+      check(fromJson.memberId).equals(model.memberId);
       check(fromJson.date).equals(model.date);
       check(fromJson.time).equals(model.time);
       check(fromJson.duration).equals(model.duration);

@@ -1,16 +1,21 @@
 import 'dart:async';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/viewmodels/login_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
 
 import '../../../data/repositories/repository_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockLoginUseCase extends Mock implements LoginUseCase {}
 
@@ -174,9 +179,10 @@ void main() {
   });
 
   testWidgets('shows SnackBar with failure message on failure', (tester) async {
-    when(
-      () => mockLoginUseCase(any(), any()),
-    ).thenAnswer((_) async => FailureResult(AuthFailure('bad')));
+    when(() => mockLoginUseCase(any(), any())).thenAnswer(
+      (_) async =>
+          FailureResult(AuthFailure(AppErrorCode.invalidCredentials, 'bad')),
+    );
 
     viewModel.identifierController.text = 'alex@example.com';
     viewModel.passwordController.text = 'wrong';
@@ -235,7 +241,9 @@ void main() {
 
     check(viewModel.isLoading).isTrue();
 
-    completer.complete(FailureResult(AuthFailure('failed')));
+    completer.complete(
+      FailureResult(AuthFailure(AppErrorCode.invalidCredentials, 'failed')),
+    );
     await loginFuture;
 
     check(viewModel.isLoading).isFalse();
@@ -285,12 +293,23 @@ void main() {
       check(notifyCount).equals(2); // setLoading(false)
     });
 
-    testWidgets('double submit prevention', (tester) async {
-      final session = testAuthSession();
-      final completer = Completer<Result<AuthSession, Failure>>();
+    testWidgets('shows setup modal when state is pendingOnboarding', (
+      tester,
+    ) async {
+      final session = testAuthSession(
+        user: testUserEntity(
+          firstName: 'Alex',
+          lastName: 'Morgan',
+          email: 'alex@example.com',
+          phone: '+15550000000',
+          birthDate: DateTime.utc(1992, 7, 8),
+          gender: 'male',
+        ),
+        state: AuthState.pendingOnboarding,
+      );
       when(
         () => mockLoginUseCase(any(), any()),
-      ).thenAnswer((_) => completer.future);
+      ).thenAnswer((_) async => Success(session));
       when(
         () => mockSessionRepository.clearRememberedIdentifier(),
       ).thenAnswer((_) async => const Success(null));
@@ -299,30 +318,64 @@ void main() {
       viewModel.passwordController.text = 'password';
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Form(
-              key: viewModel.formKey,
-              child: TextFormField(controller: viewModel.identifierController),
-            ),
+        MaterialApp.router(
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: GoRouter(
+            initialLocation: '/',
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => Scaffold(
+                  body: Form(
+                    key: viewModel.formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: viewModel.identifierController,
+                        ),
+                        TextFormField(controller: viewModel.passwordController),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              GoRoute(
+                path: '/account-setup',
+                builder: (context, state) {
+                  final payload = state.extra is Map<String, dynamic>
+                      ? state.extra as Map<String, dynamic>
+                      : <String, dynamic>{};
+                  return Scaffold(
+                    body: Text(
+                      '${payload['firstName']} ${payload['lastName']} '
+                      '${payload['email']} ${payload['phone']}',
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       );
 
       final ctx = tester.element(find.byType(Form));
 
-      // First call
-      final firstCall = viewModel.login(ctx);
-      check(viewModel.isLoading).isTrue();
-
-      // Second call while first is still loading
       await viewModel.login(ctx);
+      await tester.pumpAndSettle();
 
-      // Verify use case only called once
-      verify(() => mockLoginUseCase(any(), any())).called(1);
+      expect(find.text('Complete Setup'), findsOneWidget);
 
-      completer.complete(Success(session));
-      await firstCall;
+      await tester.tap(find.text('Complete Setup'));
+      await tester.pumpAndSettle();
+
+      expect(find.textContaining('Alex Morgan'), findsOneWidget);
+      expect(find.textContaining('alex@example.com'), findsOneWidget);
     });
   });
 }

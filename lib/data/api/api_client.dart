@@ -9,6 +9,7 @@ class ApiClient {
   final String baseUrl;
   final http.Client _client;
   String? _token;
+  void Function(String? state)? onAuthError;
 
   ApiClient({required this.baseUrl, http.Client? client})
     : _client = client ?? http.Client();
@@ -19,12 +20,24 @@ class ApiClient {
   }
 
   /// Sends a GET request to the specified [path].
-  Future<dynamic> get(String path) async {
+  Future<dynamic> get(
+    String path, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+    bool includeAuth = true,
+  }) async {
     try {
+      final headers = includeAuth
+          ? _headers
+          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
       final response = await _client
-          .get(Uri.parse('$baseUrl$path'), headers: _headers)
+          .get(Uri.parse('$baseUrl$path'), headers: headers)
           .timeout(const Duration(seconds: 15));
-      return _handleResponse(response);
+      return _handleResponse(
+        response,
+        fullResponse: fullResponse,
+        skipAuthError: skipAuthError,
+      );
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -35,16 +48,29 @@ class ApiClient {
   }
 
   /// Sends a POST request to the specified [path] with [body].
-  Future<dynamic> post(String path, dynamic body) async {
+  Future<dynamic> post(
+    String path,
+    dynamic body, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+    bool includeAuth = true,
+  }) async {
     try {
+      final headers = includeAuth
+          ? _headers
+          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
       final response = await _client
           .post(
             Uri.parse('$baseUrl$path'),
-            headers: _headers,
+            headers: headers,
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
-      return _handleResponse(response);
+      return _handleResponse(
+        response,
+        fullResponse: fullResponse,
+        skipAuthError: skipAuthError,
+      );
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -55,16 +81,29 @@ class ApiClient {
   }
 
   /// Sends a PUT request to the specified [path] with [body].
-  Future<dynamic> put(String path, dynamic body) async {
+  Future<dynamic> put(
+    String path,
+    dynamic body, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+    bool includeAuth = true,
+  }) async {
     try {
+      final headers = includeAuth
+          ? _headers
+          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
       final response = await _client
           .put(
             Uri.parse('$baseUrl$path'),
-            headers: _headers,
+            headers: headers,
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
-      return _handleResponse(response);
+      return _handleResponse(
+        response,
+        fullResponse: fullResponse,
+        skipAuthError: skipAuthError,
+      );
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -75,12 +114,12 @@ class ApiClient {
   }
 
   /// Sends a DELETE request to the specified [path].
-  Future<void> delete(String path) async {
+  Future<void> delete(String path, {bool skipAuthError = false}) async {
     try {
       final response = await _client
           .delete(Uri.parse('$baseUrl$path'), headers: _headers)
           .timeout(const Duration(seconds: 15));
-      _handleResponse(response);
+      _handleResponse(response, skipAuthError: skipAuthError);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
     } on http.ClientException catch (e) {
@@ -101,22 +140,54 @@ class ApiClient {
     return headers;
   }
 
-  dynamic _handleResponse(http.Response response) {
-    Map<String, dynamic> body = {};
+  dynamic _handleResponse(
+    http.Response response, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+  }) {
+    dynamic decoded;
     if (response.body.isNotEmpty) {
       try {
-        body = jsonDecode(response.body) as Map<String, dynamic>;
+        decoded = jsonDecode(response.body);
       } catch (_) {
         // If body is not JSON, we'll use the status code and raw body message
       }
     }
+
+    if (decoded is List) {
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        return decoded;
+      }
+      throw ServerException(
+        'API Error: ${response.statusCode} ${response.body}',
+      );
+    }
+
+    final Map<String, dynamic> body = decoded is Map<String, dynamic>
+        ? decoded
+        : {};
 
     final bool success =
         body['success'] ??
         (response.statusCode >= 200 && response.statusCode < 300);
 
     if (success) {
-      return body.containsKey('data') ? body['data'] : body;
+      if (!fullResponse && body.containsKey('data') && body['data'] != null) {
+        final data = body['data'];
+        if (data is Map<String, dynamic>) {
+          final dataMap = Map<String, dynamic>.from(data);
+          // Preserve important top-level fields if they're not already in data
+          if (body.containsKey('token') && !dataMap.containsKey('token')) {
+            dataMap['token'] = body['token'];
+          }
+          if (body.containsKey('state') && !dataMap.containsKey('state')) {
+            dataMap['state'] = body['state'];
+          }
+          return dataMap;
+        }
+        return data;
+      }
+      return body;
     } else {
       final String message =
           body['message'] ??
@@ -141,6 +212,9 @@ class ApiClient {
       switch (response.statusCode) {
         case 401:
         case 403:
+          if (!skipAuthError) {
+            onAuthError?.call(state);
+          }
           throw AuthException(message, state, token);
         case 404:
           throw NotFoundException(message, state, token);

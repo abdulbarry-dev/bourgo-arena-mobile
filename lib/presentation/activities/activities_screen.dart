@@ -87,15 +87,15 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                     color: theme.colorScheme.primary,
                   ),
                 )
-              : _viewModel.error != null
+              : _viewModel.errorMessage != null
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        _viewModel.error == 'loading_failed'
+                        _viewModel.errorMessage == 'loading_failed'
                             ? AppLocalizations.of(context)!.commonLoadingFailed
-                            : _viewModel.error ?? '',
+                            : _viewModel.errorMessage ?? '',
                       ),
                       const SizedBox(height: 16),
                       ElevatedButton(

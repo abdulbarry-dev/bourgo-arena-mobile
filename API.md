@@ -42,8 +42,8 @@ The API uses a state-driven authentication flow to guide users through required 
 
 **Possible States (`state` field):**
 * `pending_verification`: User has just registered or logged in. No methods have been verified yet.
-* `pending_additional_verification`: User has verified one method (email OR phone) but must verify the remaining one. A token with `verification` ability is issued.
-* `pending_onboarding`: Both email and phone are verified. User must complete profile setup (PIN, family members, etc.). A token with `onboarding` ability is issued.
+* `pending_additional_verification`: User has verified one method (email OR phone) but must verify the remaining one. A token with `verification` ability is issued. Note: Users can choose to skip this secondary verification and proceed to onboarding.
+* `pending_onboarding`: At least one method is verified (or both) and the user has proceeded to profile setup. User must complete profile setup (PIN, family members, etc.). A token with `onboarding` ability is issued.
 * `active`: Fully authenticated and onboarded; full access allowed. Token has `*` ability.
 
 **Verification Transition Flow:**
@@ -56,7 +56,7 @@ User verifies first method (email OR phone)
     ↓
 pending_additional_verification (Token with 'verification' ability issued)
     ↓
-User verifies second method (the remaining one)
+User verifies second method (or opts to SKIP)
     ↓
 pending_onboarding (Token with 'onboarding' ability issued)
     ↓
@@ -230,6 +230,24 @@ All API responses must follow a consistent JSON structure.
   * If only one method is verified, `state` is `pending_additional_verification` and the `token` has the `verification` ability.
   * If both methods are verified but onboarding is incomplete, `state` is `pending_onboarding` and the `token` has the `onboarding` ability.
   * If all steps are complete, `state` is `active` and the `token` has the `*` ability.
+
+### POST /auth/skip-additional-verification
+
+* **Description**: Allows the user to explicitly skip the secondary verification method and move directly to the onboarding phase.
+* **Auth Required**: Yes (token with `verification` ability)
+* **Success Response**:
+
+    ```json
+    {
+      "success": true,
+      "data": {
+        "state": "pending_onboarding",
+        "token": "..."
+      }
+    }
+    ```
+
+* **Notes**: Issues a new token with the `onboarding` ability.
 
 ### POST /user/verify-email
 

@@ -17,6 +17,8 @@ class AuthStateNotifier extends ChangeNotifier {
 
   AuthSession _session = AuthSession.unauthenticated();
   StreamSubscription<AuthSession>? _authSubscription;
+  bool _skippedForSession = false;
+  Map<String, dynamic>? _registrationDraft;
 
   AuthStateNotifier(
     this._authRepository,
@@ -28,22 +30,125 @@ class AuthStateNotifier extends ChangeNotifier {
 
   void _init() {
     _authSubscription = _authRepository.onAuthStateChanged.listen((session) {
-      _session = session;
-      if (session.isAuthenticated) {
-        unawaited(_deviceTokenRegistrar.registerIfPossible());
-      }
-      notifyListeners();
+      _applySession(session);
     });
+  }
+
+  void _applySession(AuthSession session) {
+    try {
+      // Log incoming session for debugging redirect issues
+      // ignore: avoid_print
+      // Use developer.log when available
+    } catch (_) {}
+
+    // Developer-visible log for session applied
+    // Note: import of developer is not required here; keep minimal to avoid heavy deps
+    // but we can still print to console for debugging.
+    // ignore: avoid_print
+    print(
+      'AuthStateNotifier._applySession: state=${session.state}, token=${session.token}, user=${session.user}',
+    );
+    if (_skippedForSession &&
+        session.user != null &&
+        (session.state == AuthState.pendingAdditionalVerification ||
+            session.needsLoginVerification)) {
+      _session = session.copyWith(
+        state: AuthState.authenticated,
+        needsLoginVerification: false,
+      );
+    } else {
+      _session = session;
+    }
+
+    if (_session.isAuthenticated) {
+      unawaited(_deviceTokenRegistrar.registerIfPossible());
+    }
+    notifyListeners();
+  }
+
+  AuthState _parsePersistedState(String? stateStr) {
+    switch (stateStr) {
+      case 'pending_verification':
+        return AuthState.pendingVerification;
+      case 'pending_additional_verification':
+        return AuthState.pendingAdditionalVerification;
+      case 'pending_onboarding':
+        return AuthState.pendingOnboarding;
+      case 'pending_deletion_cancellation':
+        return AuthState.pendingDeletionCancellation;
+      default:
+        return AuthState.values.firstWhere(
+          (e) => e.name == stateStr,
+          orElse: () => AuthState.unauthenticated,
+        );
+    }
+  }
+
+  /// Whether the user has skipped the additional verification for this session.
+  bool get skippedForSession => _skippedForSession;
+
+  /// Sets the flag to skip login OTP verification for the current session only.
+  void skipForSession() {
+    _skippedForSession = true;
+    _applySession(_session);
+  }
+
+  /// Sets the persistent preference to skip login OTP verification forever.
+  Future<void> skipForever() async {
+    _skippedForSession = true;
+    await _sessionRepository.setSkipLoginOtpForever(true);
+    _applySession(_session);
   }
 
   /// Initializes the auth state by fetching the current user profile if a
   /// token exists, or restoring a pending state from persistence.
   Future<void> initialize() async {
+    final skipResult = await _sessionRepository.shouldSkipLoginOtpForever();
+    _skippedForSession = skipResult.fold(
+      onSuccess: (v) => v,
+      onFailure: (_) => false,
+    );
+
+    final draftResult = await _sessionRepository.getRegistrationDraft();
+    _registrationDraft = draftResult.fold(
+      onSuccess: (draft) => draft,
+      onFailure: (_) => null,
+    );
+
+    final stateResult = await _sessionRepository.getAuthState();
+    final stateStr = stateResult.fold(
+      onSuccess: (state) => state,
+      onFailure: (_) => null,
+    );
+
+    final persistedState = _parsePersistedState(stateStr);
+
     final tokenResult = await _authRepository.getToken();
     final token = tokenResult.fold(
       onSuccess: (token) => token,
       onFailure: (_) => null,
     );
+
+    if (token == null &&
+        (persistedState == AuthState.pendingVerification ||
+            persistedState == AuthState.pendingAdditionalVerification ||
+            persistedState == AuthState.pendingOnboarding ||
+            persistedState == AuthState.pendingDeletionCancellation)) {
+      final emailResult = await _sessionRepository
+          .getPendingVerificationEmail();
+      final pendingEmail = emailResult.fold(
+        onSuccess: (email) => email,
+        onFailure: (_) => null,
+      );
+
+      _session = AuthSession(
+        state: persistedState,
+        token: token,
+        pendingEmail: pendingEmail,
+      );
+      notifyListeners();
+      return;
+    }
 
     if (token != null) {
       final result = await _authRepository.getUserProfile();
@@ -52,19 +157,7 @@ class AuthStateNotifier extends ChangeNotifier {
         notifyListeners();
       }
     } else {
-      // If no token, check if we have a persisted auth state (e.g. pending_verification)
-      final stateResult = await _sessionRepository.getAuthState();
-      final stateStr = stateResult.fold(
-        onSuccess: (state) => state,
-        onFailure: (_) => null,
-      );
-
-      if (stateStr != null) {
-        final state = AuthState.values.firstWhere(
-          (e) => e.name == stateStr,
-          orElse: () => AuthState.unauthenticated,
-        );
-
+      if (persistedState != AuthState.unauthenticated) {
         final emailResult = await _sessionRepository
             .getPendingVerificationEmail();
         final pendingEmail = emailResult.fold(
@@ -72,7 +165,10 @@ class AuthStateNotifier extends ChangeNotifier {
           onFailure: (_) => null,
         );
 
-        _session = AuthSession(state: state, pendingEmail: pendingEmail);
+        _session = AuthSession(
+          state: persistedState,
+          pendingEmail: pendingEmail,
+        );
         notifyListeners();
       }
     }
@@ -86,6 +182,21 @@ class AuthStateNotifier extends ChangeNotifier {
 
   /// The current authentication state.
   AuthState get state => _session.state;
+
+  /// The persisted registration draft, if any.
+  Map<String, dynamic>? get registrationDraft => _registrationDraft;
+
+  /// The route that should resume the persisted registration draft, if any.
+  String? get registrationRoute {
+    final route = _registrationDraft?['route'];
+    return route is String && route.isNotEmpty ? route : null;
+  }
+
+  /// The extra payload associated with the persisted registration draft.
+  Map<String, dynamic>? get registrationData {
+    final data = _registrationDraft?['extra'];
+    return data is Map<String, dynamic> ? data : null;
+  }
 
   /// Whether the user is currently authenticated.
   bool get isAuthenticated => _session.isAuthenticated;

@@ -16,7 +16,7 @@ void main() {
   setUp(() {
     mockViewModel = MockNotificationsViewModel();
     when(() => mockViewModel.isLoading).thenReturn(true);
-    when(() => mockViewModel.notifications).thenReturn(null);
+    when(() => mockViewModel.notifications).thenReturn([]);
     when(() => mockViewModel.addListener(any())).thenReturn(null);
     when(() => mockViewModel.removeListener(any())).thenReturn(null);
   });
@@ -52,7 +52,7 @@ void main() {
 
   testWidgets('tapping mark all read calls viewModel', (tester) async {
     final n = entity.Notification(
-      id: '1',
+      id: 1,
       title: 't',
       message: 'm',
       timestamp: DateTime.now(),
@@ -62,6 +62,7 @@ void main() {
 
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.notifications).thenReturn([n]);
+    when(() => mockViewModel.hasMore).thenReturn(false);
     when(() => mockViewModel.markAllAsRead()).thenAnswer((_) async {});
 
     await tester.pumpWidget(createWidget());

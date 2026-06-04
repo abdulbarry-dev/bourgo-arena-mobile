@@ -1,3 +1,11 @@
+import 'dart:async';
+
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/complete_registration_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -23,7 +31,9 @@ class AccountSetupScreen extends StatefulWidget {
 
 class _AccountSetupScreenState extends State<AccountSetupScreen> {
   late final Map<String, dynamic> _data;
+  late final SessionRepository _sessionRepository;
   bool _isEditing = false;
+  bool _isSubmitting = false;
 
   late final TextEditingController _firstNameController;
   late final TextEditingController _lastNameController;
@@ -36,6 +46,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   @override
   void initState() {
     super.initState();
+    _sessionRepository = locator<SessionRepository>();
     _data = Map<String, dynamic>.from(widget.registrationData);
 
     // Fallback to AuthStateNotifier if data is missing
@@ -68,16 +79,39 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
           ? DateFormat.yMMMd().format(_selectedBirthDate!)
           : '',
     );
+
+    _firstNameController.addListener(_persistDraft);
+    _lastNameController.addListener(_persistDraft);
+    _emailController.addListener(_persistDraft);
+    _phoneController.addListener(_persistDraft);
+    _birthDateController.addListener(_persistDraft);
+
+    _persistDraft();
   }
 
   @override
   void dispose() {
+    _firstNameController.removeListener(_persistDraft);
+    _lastNameController.removeListener(_persistDraft);
+    _emailController.removeListener(_persistDraft);
+    _phoneController.removeListener(_persistDraft);
+    _birthDateController.removeListener(_persistDraft);
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _birthDateController.dispose();
     super.dispose();
+  }
+
+  void _persistDraft() {
+    _syncDataFromControllers();
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': '/account-setup',
+        'extra': Map<String, dynamic>.from(_data)..['isEditing'] = _isEditing,
+      }),
+    );
   }
 
   void _toggleEdit() {
@@ -96,18 +130,156 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
             : '';
       }
     });
+    _persistDraft();
   }
 
   void _saveChanges() {
+    _syncDataFromControllers();
+    if (!_hasRequiredOnboardingData()) {
+      _showValidationError();
+      return;
+    }
+
     setState(() {
-      _data['firstName'] = _firstNameController.text.trim();
-      _data['lastName'] = _lastNameController.text.trim();
-      _data['email'] = _emailController.text.trim();
-      _data['phone'] = _phoneController.text.trim();
-      _data['birthDate'] = _selectedBirthDate;
-      _data['gender'] = _selectedGender;
       _isEditing = false;
     });
+    _persistDraft();
+  }
+
+  User _buildRegistrationUser() {
+    return User(
+      id: 'temp-id-${DateTime.now().millisecondsSinceEpoch}',
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+      email: _emailController.text.trim(),
+      phone: _phoneController.text.trim(),
+      avatarUrl: '',
+      loyaltyPoints: 0,
+      subscriptionLevel: 'FREE',
+      subscriptionExpiry: 'N/A',
+      totalCheckIns: 0,
+      gender: _selectedGender,
+      birthDate: _selectedBirthDate,
+      isParentAccount: _data['isParentAccount'] ?? false,
+      children: (_data['familyMembers'] as List<ChildProfile>?) ?? const [],
+    );
+  }
+
+  Future<void> _submitRegistration() async {
+    _syncDataFromControllers();
+    if (!_hasRequiredOnboardingData()) {
+      setState(() {
+        _isEditing = true;
+      });
+      _showValidationError();
+      _persistDraft();
+      return;
+    }
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    final completeRegistrationUseCase = locator<CompleteRegistrationUseCase>();
+    final authStateNotifier = locator<AuthStateNotifier>();
+    final result = await completeRegistrationUseCase(_buildRegistrationUser());
+
+    if (!mounted) {
+      return;
+    }
+
+    result.fold(
+      onSuccess: (_) {
+        final currentState = authStateNotifier.state;
+        final onboardingCompleted =
+            authStateNotifier.session.verificationData?.onboardingCompleted ??
+            false;
+
+        if (currentState == AuthState.authenticated) {
+          GoRouter.of(context).go('/home');
+        } else if (currentState == AuthState.pendingAdditionalVerification &&
+            onboardingCompleted) {
+          GoRouter.of(context).go('/verify-additional-method');
+        } else if (currentState == AuthState.pendingVerification) {
+          GoRouter.of(context).go('/verification-method');
+        } else if (currentState == AuthState.pendingOnboarding ||
+            !onboardingCompleted) {
+          GoRouter.of(context).go('/account-setup', extra: _data);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Your session needs to be refreshed. Please log in again.',
+              ),
+            ),
+          );
+          GoRouter.of(context).go('/login');
+        }
+      },
+      onFailure: (failure) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(failure.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      },
+    );
+
+    if (mounted) {
+      setState(() {
+        _isSubmitting = false;
+      });
+    }
+  }
+
+  void _syncDataFromControllers() {
+    _data['firstName'] = _firstNameController.text.trim();
+    _data['lastName'] = _lastNameController.text.trim();
+    _data['email'] = _emailController.text.trim();
+    _data['phone'] = _phoneController.text.trim();
+    _data['birthDate'] = _selectedBirthDate;
+    _data['gender'] = _selectedGender;
+  }
+
+  bool _hasRequiredOnboardingData() {
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final email = _emailController.text.trim();
+    final phone = _phoneController.text.trim();
+    final birthDate = _selectedBirthDate;
+    final gender = _selectedGender;
+
+    final isEmailValid = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
+
+    return firstName.isNotEmpty &&
+        lastName.isNotEmpty &&
+        email.isNotEmpty &&
+        isEmailValid &&
+        phone.isNotEmpty &&
+        birthDate != null &&
+        birthDate.isBefore(DateTime.now()) &&
+        (gender == 'male' || gender == 'female');
+  }
+
+  void _showValidationError() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Please complete all required onboarding fields before continuing.',
+        ),
+      ),
+    );
+  }
+
+  void _onContinue() {
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': '/account-setup',
+        'extra': Map<String, dynamic>.from(_data),
+      }),
+    );
+    unawaited(_submitRegistration());
   }
 
   Future<void> _selectBirthDate() async {
@@ -123,6 +295,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
         _selectedBirthDate = picked;
         _birthDateController.text = DateFormat.yMMMd().format(picked);
       });
+      _persistDraft();
     }
   }
 
@@ -130,6 +303,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final spacing = context.spacing;
 
     return AuthBackground(
       child: Scaffold(
@@ -148,19 +322,20 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
         ),
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: spacing.screenPadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AuthHeader(
                   title: _isEditing
-                      ? 'Edit Profile'
+                      ? l10n.profileEditTitle
                       : l10n.authAccountOverviewTitle,
                   subtitle: _isEditing
-                      ? 'Update your information'
+                      ? l10n.profileEditSubtitle
                       : l10n.authAccountOverviewSubtitle,
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: spacing.xl),
 
                 // Profile Picture Section (only show when not editing for clarity, or keep it)
                 if (!_isEditing) ...[
@@ -217,9 +392,9 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: spacing.md),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: EdgeInsets.symmetric(horizontal: spacing.lg),
                           child: Text(
                             l10n.authProfilePictureRecommendation,
                             textAlign: TextAlign.center,
@@ -232,7 +407,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  SizedBox(height: spacing.xxl),
                 ],
 
                 // Details Section
@@ -252,16 +427,16 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       Expanded(
                         child: AuthTextField(
                           label: l10n.authFirstNameLabel,
-                          hint: 'First name',
+                          hint: l10n.authFirstNameHint,
                           leadingIcon: Symbols.person,
                           controller: _firstNameController,
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: spacing.md),
                       Expanded(
                         child: AuthTextField(
                           label: l10n.authLastNameLabel,
-                          hint: 'Last name',
+                          hint: l10n.authLastNameHint,
                           leadingIcon: Symbols.person,
                           controller: _lastNameController,
                         ),
@@ -270,7 +445,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                   ),
                 ],
 
-                const SizedBox(height: 20),
+                SizedBox(height: spacing.lg),
                 AuthTextField(
                   label: l10n.authEmailLabel,
                   hint: '',
@@ -279,7 +454,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                   readOnly: !_isEditing,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: spacing.lg),
                 AuthTextField(
                   label: l10n.authPhoneLabel,
                   hint: '',
@@ -290,33 +465,37 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                 ),
 
                 if (_isEditing || _selectedGender != null) ...[
-                  const SizedBox(height: 20),
+                  SizedBox(height: spacing.lg),
                   if (_isEditing)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Gender',
+                          l10n.authGenderLabel,
                           style: theme.textTheme.labelLarge?.copyWith(
                             color: theme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: spacing.xs),
                         Row(
                           children: [
                             _GenderOption(
-                              label: 'Male',
+                              label: l10n.commonGenderMale,
                               isSelected: _selectedGender == 'male',
-                              onTap: () =>
-                                  setState(() => _selectedGender = 'male'),
+                              onTap: () {
+                                setState(() => _selectedGender = 'male');
+                                _persistDraft();
+                              },
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: spacing.sm),
                             _GenderOption(
-                              label: 'Female',
+                              label: l10n.commonGenderFemale,
                               isSelected: _selectedGender == 'female',
-                              onTap: () =>
-                                  setState(() => _selectedGender = 'female'),
+                              onTap: () {
+                                setState(() => _selectedGender = 'female');
+                                _persistDraft();
+                              },
                             ),
                           ],
                         ),
@@ -324,7 +503,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                     )
                   else
                     AuthTextField(
-                      label: 'Gender',
+                      label: l10n.authGenderLabel,
                       hint: '',
                       leadingIcon: Symbols.person,
                       controller: TextEditingController(text: _selectedGender),
@@ -333,10 +512,10 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                 ],
 
                 if (_isEditing || _selectedBirthDate != null) ...[
-                  const SizedBox(height: 20),
+                  SizedBox(height: spacing.lg),
                   AuthTextField(
-                    label: 'Birth Date',
-                    hint: 'Select birth date',
+                    label: l10n.authBirthDateLabel,
+                    hint: l10n.authBirthDateHint,
                     leadingIcon: Symbols.calendar_month,
                     controller: _birthDateController,
                     readOnly: true,
@@ -344,7 +523,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                   ),
                 ],
 
-                const SizedBox(height: 32),
+                SizedBox(height: spacing.xl),
 
                 // Edit Action
                 if (!_isEditing)
@@ -363,18 +542,18 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                       backgroundColor: theme.colorScheme.primaryContainer,
                       foregroundColor: theme.colorScheme.onPrimaryContainer,
                     ),
-                    child: const Text('Save Changes'),
+                    child: Text(l10n.profileSave),
                   ),
 
-                const SizedBox(height: 48),
+                SizedBox(height: spacing.xxl),
 
                 if (!_isEditing)
                   ElevatedButton(
-                    onPressed: () => context.push('/pin-setup', extra: _data),
+                    onPressed: _isSubmitting ? null : _onContinue,
                     child: Text(l10n.authConfirmContinue),
                   ),
 
-                const SizedBox(height: 24),
+                SizedBox(height: spacing.lg),
               ],
             ),
           ),
@@ -404,7 +583,7 @@ class _GenderOption extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: EdgeInsets.symmetric(vertical: context.spacing.md),
           decoration: BoxDecoration(
             color: isSelected
                 ? theme.colorScheme.primary

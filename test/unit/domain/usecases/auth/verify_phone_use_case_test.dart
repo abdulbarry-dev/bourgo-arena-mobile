@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_phone_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -40,7 +41,7 @@ void main() {
     });
 
     test('returns failure when phone verification fails', () async {
-      const failure = ServerFailure('Invalid OTP');
+      const failure = ServerFailure(AppErrorCode.serverError, 'Invalid OTP');
 
       when(
         () => repository.verifyPhone('+15550000000', '999999'),
@@ -53,7 +54,10 @@ void main() {
     });
 
     test('propagates auth failures from repository', () async {
-      const failure = AuthFailure('Unauthorized');
+      const failure = AuthFailure(
+        AppErrorCode.invalidCredentials,
+        'Unauthorized',
+      );
 
       when(
         () => repository.verifyPhone('+15550000000', '123456'),
@@ -66,7 +70,10 @@ void main() {
     });
 
     test('propagates network failures from repository', () async {
-      const failure = NetworkFailure('Connection timeout');
+      const failure = NetworkFailure(
+        AppErrorCode.networkUnavailable,
+        'Connection timeout',
+      );
 
       when(
         () => repository.verifyPhone('+15550000000', '123456'),
@@ -79,9 +86,11 @@ void main() {
     });
 
     test('handles empty phone string', () async {
-      when(
-        () => repository.verifyPhone('', '123456'),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('Invalid phone')));
+      when(() => repository.verifyPhone('', '123456')).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Invalid phone'),
+        ),
+      );
 
       final result = await useCase('', '123456');
 
@@ -90,9 +99,11 @@ void main() {
     });
 
     test('handles empty OTP string', () async {
-      when(
-        () => repository.verifyPhone('+15550000000', ''),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('Invalid OTP')));
+      when(() => repository.verifyPhone('+15550000000', '')).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Invalid OTP'),
+        ),
+      );
 
       final result = await useCase('+15550000000', '');
 

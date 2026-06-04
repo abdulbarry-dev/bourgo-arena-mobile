@@ -11,7 +11,7 @@ class NotificationMapper {
       title: model.title,
       message: model.message,
       timestamp: DateTime.parse(model.timestamp),
-      type: model.type ?? 'info',
+      type: model.type,
       isRead: model.isRead,
     );
   }

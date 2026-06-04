@@ -7,35 +7,50 @@ class ProgressStepper extends StatelessWidget {
   /// The current active step (0, 1, or 2).
   final int currentStep;
 
+  /// Whether the booking flow includes a member selection step.
+  final bool isFamilyFlow;
+
   /// Creates a new [ProgressStepper] instance.
-  const ProgressStepper({super.key, required this.currentStep});
+  const ProgressStepper({
+    super.key,
+    required this.currentStep,
+    required this.isFamilyFlow,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final steps = isFamilyFlow
+        ? [
+            (Symbols.person, AppLocalizations.of(context)!.bookingStepMember),
+            (
+              Symbols.sports_soccer,
+              AppLocalizations.of(context)!.bookingStepSport,
+            ),
+            (Symbols.schedule, AppLocalizations.of(context)!.bookingStepTime),
+            (Symbols.payment, AppLocalizations.of(context)!.bookingStepPayment),
+          ]
+        : [
+            (
+              Symbols.sports_soccer,
+              AppLocalizations.of(context)!.bookingStepSport,
+            ),
+            (Symbols.schedule, AppLocalizations.of(context)!.bookingStepTime),
+            (Symbols.payment, AppLocalizations.of(context)!.bookingStepPayment),
+          ];
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Row(
         children: [
-          _StepCircle(
-            icon: Symbols.sports_soccer,
-            label: AppLocalizations.of(context)!.bookingStepSport,
-            isActive: currentStep >= 0,
-            isCompleted: currentStep > 0,
-          ),
-          _StepLine(isCompleted: currentStep > 0),
-          _StepCircle(
-            icon: Symbols.schedule,
-            label: AppLocalizations.of(context)!.bookingStepTime,
-            isActive: currentStep >= 1,
-            isCompleted: currentStep > 1,
-          ),
-          _StepLine(isCompleted: currentStep > 1),
-          _StepCircle(
-            icon: Symbols.payment,
-            label: AppLocalizations.of(context)!.bookingStepPayment,
-            isActive: currentStep >= 2,
-            isCompleted: false,
-          ),
+          for (var i = 0; i < steps.length; i++) ...[
+            _StepCircle(
+              icon: steps[i].$1,
+              label: steps[i].$2,
+              isActive: currentStep >= i,
+              isCompleted: currentStep > i,
+            ),
+            if (i != steps.length - 1) _StepLine(isCompleted: currentStep > i),
+          ],
         ],
       ),
     );

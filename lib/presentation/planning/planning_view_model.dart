@@ -1,88 +1,211 @@
-import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
+import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
-import 'package:flutter/material.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+
+class PlanningEntry {
+  final String id;
+  final PlanningEntryType type;
+  final String title;
+  final String timeLabel;
+  final int dayOfWeek;
+  final Object source;
+  final bool highlightForTier;
+
+  const PlanningEntry({
+    required this.id,
+    required this.type,
+    required this.title,
+    required this.timeLabel,
+    required this.dayOfWeek,
+    required this.source,
+    required this.highlightForTier,
+  });
+}
+
+enum PlanningEntryType { course, reservation }
 
 /// ViewModel for the Planning (Course Schedule) screen.
-class PlanningViewModel extends ChangeNotifier {
+class PlanningViewModel extends BaseViewModel {
   final GetCoursesUseCase _getCoursesUseCase;
+  final GetUserBookingsUseCase _getUserBookingsUseCase;
+  final GetFamilyMembersUseCase _getFamilyMembersUseCase;
+  final GetMemberTierUseCase _getMemberTierUseCase;
+  final GetUserProfileUseCase _getUserProfileUseCase;
 
   List<Course> _allCourses = [];
-  List<Course> _filteredCourses = [];
+  List<Reservation> _allReservations = [];
+  List<PlanningEntry> _unified = [];
+
+  List<FamilyMember> _familyMembers = [];
+  FamilyMember? _selectedMember;
+  MemberTier _selectedMemberTier = MemberTier.public;
   bool _isLoading = false;
   int _selectedDay = 1; // Monday by default
-  String _selectedCategory = AppConstants.planningCategoryAll;
-  String? _errorMessage;
 
-  /// List of courses filtered by the selected day and category.
-  List<Course> get courses => _filteredCourses;
+  /// List of courses filtered by the selected day.
+  List<Course> get courses => _coursesForDay();
+
+  /// List of reservations filtered by selected day.
+  List<Reservation> get reservations => _reservationsForDay();
+
+  /// Unified feed of courses + reservations.
+  List<PlanningEntry> get unified => _unified;
+
+  List<FamilyMember> get familyMembers => _familyMembers;
+  FamilyMember? get selectedMember => _selectedMember;
+  MemberTier get selectedMemberTier => _selectedMemberTier;
 
   /// Whether data is currently being loaded.
   bool get isLoading => _isLoading;
 
-  /// Any error message from loading.
-  String? get errorMessage => _errorMessage;
-
   /// Currently selected day of the week (1-7).
   int get selectedDay => _selectedDay;
 
-  /// Currently selected category filter.
-  String get selectedCategory => _selectedCategory;
-
   /// Creates a new [PlanningViewModel] instance.
-  PlanningViewModel({required GetCoursesUseCase getCoursesUseCase})
-    : _getCoursesUseCase = getCoursesUseCase {
-    loadCourses();
+  PlanningViewModel({
+    required GetCoursesUseCase getCoursesUseCase,
+    required GetUserBookingsUseCase getUserBookingsUseCase,
+    required GetFamilyMembersUseCase getFamilyMembersUseCase,
+    required GetMemberTierUseCase getMemberTierUseCase,
+    required GetUserProfileUseCase getUserProfileUseCase,
+  }) : _getCoursesUseCase = getCoursesUseCase,
+       _getUserBookingsUseCase = getUserBookingsUseCase,
+       _getFamilyMembersUseCase = getFamilyMembersUseCase,
+       _getMemberTierUseCase = getMemberTierUseCase,
+       _getUserProfileUseCase = getUserProfileUseCase {
+    loadPlanning();
   }
 
-  /// Loads courses from the data service.
-  Future<void> loadCourses() async {
+  /// Loads courses + reservations + family members for unified planning.
+  Future<void> loadPlanning() async {
     _isLoading = true;
-    _errorMessage = null;
+    clearError();
     notifyListeners();
 
     try {
-      final result = await _getCoursesUseCase();
-      result.when(
-        success: (data) {
-          _allCourses = data;
-          _filter();
-        },
+      final results = await Future.wait([
+        _getCoursesUseCase(),
+        _getUserBookingsUseCase(),
+        _getFamilyMembersUseCase(),
+        _getUserProfileUseCase(),
+      ]);
+
+      final coursesResult = results[0] as Result<List<Course>, Failure>;
+      final bookingsResult = results[1] as Result<List<Reservation>, Failure>;
+      final membersResult = results[2] as Result<List<FamilyMember>, Failure>;
+      final userResult = results[3] as Result<User, Failure>;
+
+      coursesResult.when(
+        success: (data) => _allCourses = data,
         failure: (failure) {
-          _errorMessage = failure.message;
+          setErrorMessage(failure.message);
           _allCourses = [];
-          _filter();
         },
       );
+
+      bookingsResult.when(
+        success: (data) => _allReservations = data,
+        failure: (_) => _allReservations = [],
+      );
+
+      membersResult.when(
+        success: (members) {
+          _familyMembers = members;
+          _selectedMember ??= members.isNotEmpty ? members.first : null;
+        },
+        failure: (_) {
+          _familyMembers = [];
+          _selectedMember = null;
+        },
+      );
+
+      userResult.when(
+        success: (user) {
+          _selectedMemberTier = _getMemberTierUseCase(
+            subscriptionLevel: user.subscriptionLevel,
+          );
+        },
+        failure: (_) => _selectedMemberTier = MemberTier.public,
+      );
+
+      _buildUnified();
     } catch (e) {
-      _errorMessage = e.toString();
+      setErrorMessage(e.toString());
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /// Updates the selected day and refreshes the filter.
+  /// Updates the selected day and refreshes the data.
   void selectDay(int day) {
     _selectedDay = day;
-    _filter();
     notifyListeners();
   }
 
-  /// Updates the selected category and refreshes the filter.
-  void selectCategory(String category) {
-    _selectedCategory = category;
-    _filter();
+  void selectMember(FamilyMember member) {
+    _selectedMember = member;
     notifyListeners();
   }
 
-  void _filter() {
-    _filteredCourses = _allCourses.where((course) {
-      final matchesDay = course.dayOfWeek == _selectedDay;
-      final matchesCategory =
-          _selectedCategory == AppConstants.planningCategoryAll ||
-          course.category == _selectedCategory;
-      return matchesDay && matchesCategory;
+  List<Course> _coursesForDay() {
+    return _allCourses.where((course) {
+      return course.dayOfWeek == _selectedDay;
     }).toList();
+  }
+
+  List<Reservation> _reservationsForDay() {
+    return _allReservations.where((reservation) {
+      try {
+        final date = DateTime.parse(reservation.date);
+        return date.weekday == _selectedDay;
+      } catch (_) {
+        return false;
+      }
+    }).toList();
+  }
+
+  void _buildUnified() {
+    final courses = _coursesForDay();
+    final reservations = _reservationsForDay();
+
+    final merged = <PlanningEntry>[
+      ...courses.map(
+        (c) => PlanningEntry(
+          id: c.id,
+          type: PlanningEntryType.course,
+          title: c.title,
+          timeLabel: '${c.startTime}–${c.endTime}',
+          dayOfWeek: c.dayOfWeek,
+          source: c,
+          highlightForTier: _selectedMemberTier.rank >= MemberTier.ultra.rank,
+        ),
+      ),
+      ...reservations.map(
+        (r) => PlanningEntry(
+          id: r.id,
+          type: PlanningEntryType.reservation,
+          title: r.activityTitle,
+          timeLabel: r.time,
+          dayOfWeek: _selectedDay,
+          source: r,
+          highlightForTier:
+              _selectedMemberTier.rank >= MemberTier.standard.rank,
+        ),
+      ),
+    ];
+
+    merged.sort((a, b) => a.timeLabel.compareTo(b.timeLabel));
+    _unified = merged;
   }
 }

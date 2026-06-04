@@ -24,6 +24,8 @@ class UserMapper {
       totalCheckIns: model.totalCheckIns,
       birthDate: model.birthDate,
       gender: model.gender,
+      status: model.status ?? 'active',
+      state: model.state ?? 'active',
       isParentAccount: model.isParentAccount,
       children: model.children.map((m) => ChildMapper.toEntity(m)).toList(),
     );
@@ -45,6 +47,8 @@ class UserMapper {
       totalCheckIns: entity.totalCheckIns,
       birthDate: entity.birthDate,
       gender: entity.gender,
+      status: entity.status,
+      state: entity.state,
       isParentAccount: entity.isParentAccount,
       children: entity.children.map((e) => ChildMapper.fromEntity(e)).toList(),
     );

@@ -89,6 +89,14 @@ class FamilyOnboardingViewModel extends ChangeNotifier {
     }
   }
 
+  /// Replaces the current member list with a restored draft.
+  void setMembers(List<ChildProfile> members) {
+    _members
+      ..clear()
+      ..addAll(members);
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     firstNameController.dispose();

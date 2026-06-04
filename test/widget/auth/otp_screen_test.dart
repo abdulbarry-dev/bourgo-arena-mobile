@@ -1,16 +1,21 @@
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockVerifyOtpUseCase extends Mock implements VerifyOtpUseCase {}
 
@@ -19,10 +24,13 @@ class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
 class MockGetVerificationStatusUseCase extends Mock
     implements GetVerificationStatusUseCase {}
 
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
 void main() {
   late MockVerifyOtpUseCase mockVerifyOtpUseCase;
   late MockSendOtpUseCase mockSendOtpUseCase;
   late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
+  late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUpAll(() {
     registerFallbackValue(const Success<bool, Failure>(true));
@@ -33,6 +41,15 @@ void main() {
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockSendOtpUseCase = MockSendOtpUseCase();
     mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
+    mockAuthStateNotifier = MockAuthStateNotifier();
+
+    locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
+
+    when(
+      () => mockAuthStateNotifier.state,
+    ).thenReturn(AuthState.unauthenticated);
+    when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
 
     // Default successful answer for resend which is called in initState
     when(
@@ -43,6 +60,8 @@ void main() {
         VerificationStatus(
           emailVerified: true,
           phoneVerified: true,
+          onboardingCompleted: true,
+          isFullyVerified: true,
           email: 'test@example.com',
           phone: '+1234567890',
         ),
@@ -50,13 +69,18 @@ void main() {
     );
   });
 
-  Widget createWidgetUnderTest({String? destination}) {
+  tearDown(() {
+    locator.reset();
+  });
+
+  Widget createWidgetUnderTest({String? destination, bool autoSendOtp = true}) {
     final router = GoRouter(
       routes: [
         GoRoute(
           path: '/',
           builder: (context, state) => OtpScreen(
             destination: destination,
+            autoSendOtp: autoSendOtp,
             verifyOtpUseCase: mockVerifyOtpUseCase,
             sendOtpUseCase: mockSendOtpUseCase,
             getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
@@ -131,9 +155,11 @@ void main() {
 
     testWidgets('shows error message on failure', (tester) async {
       await setupScreenSize(tester);
-      when(
-        () => mockVerifyOtpUseCase(any(), any()),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('Invalid code')));
+      when(() => mockVerifyOtpUseCase(any(), any())).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Invalid code'),
+        ),
+      );
 
       await tester.pumpWidget(
         createWidgetUnderTest(destination: 'test@example.com'),
@@ -176,6 +202,41 @@ void main() {
 
       // Called once in initState and once on tap
       verify(() => mockSendOtpUseCase('test@example.com')).called(2);
+    });
+
+    testWidgets(
+      'uses the pending email from auth state when no destination is provided',
+      (tester) async {
+        await setupScreenSize(tester);
+        when(
+          () => mockAuthStateNotifier.state,
+        ).thenReturn(AuthState.pendingDeletionCancellation);
+        when(() => mockAuthStateNotifier.session).thenReturn(
+          const AuthSession(
+            state: AuthState.pendingDeletionCancellation,
+            pendingEmail: 'cancel@example.com',
+          ),
+        );
+
+        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpAndSettle();
+
+        verify(() => mockSendOtpUseCase('cancel@example.com')).called(1);
+      },
+    );
+
+    testWidgets('does not auto send when autoSendOtp is false', (tester) async {
+      await setupScreenSize(tester);
+
+      await tester.pumpWidget(
+        createWidgetUnderTest(
+          destination: 'test@example.com',
+          autoSendOtp: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      verifyNever(() => mockSendOtpUseCase(any()));
     });
   });
 }

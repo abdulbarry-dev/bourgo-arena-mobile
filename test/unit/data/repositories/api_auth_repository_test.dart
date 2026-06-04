@@ -54,6 +54,19 @@ void main() {
     when(
       () => sessionRepository.clearSession(),
     ).thenAnswer((_) async => const Success(null));
+
+    when(
+      () => sessionRepository.shouldSkipLoginOtpForever(),
+    ).thenAnswer((_) async => const Success(false));
+
+    // Default mock for verification status endpoint
+    when(() => apiClient.get('/user/verification-status')).thenAnswer(
+      (_) async => {
+        'email_verified': true,
+        'phone_verified': true,
+        'is_fully_verified': true,
+      },
+    );
   });
 
   group('ApiAuthRepository', () {
@@ -77,7 +90,11 @@ void main() {
         ).thenAnswer((_) async => {'token': token, 'state': 'active'});
 
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/user/profile',
+            fullResponse: false,
+            skipAuthError: true,
+          ),
         ).thenAnswer((_) async => userJson);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -115,9 +132,15 @@ void main() {
           }),
         ).called(1);
         verify(() => apiClient.setToken(null)).called(1);
-        verify(() => apiClient.setToken(token)).called(1);
+        verify(() => apiClient.setToken(token)).called(2);
         verify(() => sessionRepository.saveAuthToken(token)).called(1);
-        verify(() => apiClient.get('/user/profile')).called(1);
+        verify(
+          () => apiClient.get(
+            '/user/profile',
+            fullResponse: false,
+            skipAuthError: true,
+          ),
+        ).called(1);
         await eventExpectation;
       });
 
@@ -133,7 +156,11 @@ void main() {
         ).thenAnswer((_) async => {'token': token, 'state': 'active'});
 
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/user/profile',
+            fullResponse: false,
+            skipAuthError: true,
+          ),
         ).thenAnswer((_) async => userJson);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -148,8 +175,88 @@ void main() {
             'password': 'secret123',
           }),
         ).called(1);
-        verify(() => apiClient.setToken(token)).called(1);
+        verify(() => apiClient.setToken(token)).called(2);
       });
+
+      test(
+        'refreshes pending onboarding sessions when login returns partial user data',
+        () async {
+          const token = 'onboarding-token';
+          final partialUserJson = testUserJson(
+            name: 'Alex',
+            phone: '+212600000000',
+            birthDate: null,
+            gender: null,
+          );
+          final fullProfileJson = testUserJson(
+            name: 'Alex Morgan',
+            phone: '+212600000000',
+            birthDate: DateTime.utc(1992, 7, 8),
+            gender: 'male',
+            children: [testChildJson(id: 'child-1', firstName: 'Mia')],
+          );
+
+          when(
+            () => apiClient.post('/auth/login', {
+              'email': 'onboarding@example.com',
+              'password': 'secret123',
+            }),
+          ).thenAnswer(
+            (_) async => {
+              'token': token,
+              'state': 'pending_onboarding',
+              'user': partialUserJson,
+            },
+          );
+
+          when(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).thenAnswer((_) async => fullProfileJson);
+          when(
+            () => sessionRepository.saveAuthToken(token),
+          ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+          final eventExpectation = expectLater(
+            repository.onAuthStateChanged,
+            emits(
+              predicate<AuthSession>(
+                (value) =>
+                    value.state == AuthState.pendingOnboarding &&
+                    value.user != null &&
+                    value.user!.firstName == 'Alex' &&
+                    value.user!.lastName == 'Morgan' &&
+                    value.user!.birthDate == DateTime.utc(1992, 7, 8) &&
+                    value.user!.gender == 'male',
+              ),
+            ),
+          );
+
+          final result = await repository.login(
+            'onboarding@example.com',
+            'secret123',
+          );
+
+          expect(result, isA<Success<AuthSession, Failure>>());
+          final session = (result as Success<AuthSession, Failure>).data;
+          expect(session.state, AuthState.pendingOnboarding);
+          expect(session.user?.firstName, 'Alex');
+          expect(session.user?.lastName, 'Morgan');
+          expect(session.user?.birthDate, DateTime.utc(1992, 7, 8));
+          expect(session.user?.gender, 'male');
+          verify(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).called(1);
+          await eventExpectation;
+        },
+      );
 
       test(
         'returns Failure(AuthFailure) on 401 without mutating session',
@@ -207,6 +314,74 @@ void main() {
           isA<ServerFailure>(),
         );
       });
+
+      test(
+        'converts pendingAdditionalVerification to pendingOnboarding when profile fetch fails',
+        () async {
+          const token = 'incomplete-onboarding-token';
+
+          // Backend returns pendingAdditionalVerification
+          when(
+            () => apiClient.post('/auth/login', {
+              'email': 'incomplete@example.com',
+              'password': 'secret123',
+            }),
+          ).thenAnswer(
+            (_) async => {
+              'token': token,
+              'state': 'pending_additional_verification',
+            },
+          );
+
+          // Profile fetch fails (user hasn't completed onboarding yet)
+          when(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).thenThrow(const ServerException('Forbidden: 403'));
+
+          when(
+            () => sessionRepository.saveAuthToken(token),
+          ).thenAnswer((_) async => const Success<void, Failure>(null));
+
+          final eventExpectation = expectLater(
+            repository.onAuthStateChanged,
+            emits(
+              predicate<AuthSession>(
+                (value) =>
+                    value.state == AuthState.pendingOnboarding &&
+                    value.token == token,
+              ),
+            ),
+          );
+
+          final result = await repository.login(
+            'incomplete@example.com',
+            'secret123',
+          );
+
+          expect(result, isA<Success<AuthSession, Failure>>());
+          final session = (result as Success<AuthSession, Failure>).data;
+          expect(session.state, AuthState.pendingOnboarding);
+          expect(session.token, token);
+          verify(
+            () => apiClient.post('/auth/login', {
+              'email': 'incomplete@example.com',
+              'password': 'secret123',
+            }),
+          ).called(1);
+          verify(
+            () => apiClient.get(
+              '/user/profile',
+              fullResponse: false,
+              skipAuthError: true,
+            ),
+          ).called(1);
+          await eventExpectation;
+        },
+      );
     });
 
     group('logout', () {
@@ -292,9 +467,12 @@ void main() {
 
     group('register', () {
       test('returns Success on 200', () async {
-        when(
-          () => apiClient.post('/auth/register', any()),
-        ).thenAnswer((_) async => null);
+        when(() => apiClient.post('/auth/register', any())).thenAnswer(
+          (_) async => {
+            'token': 'verify-token',
+            'state': 'pending_verification',
+          },
+        );
 
         final result = await repository.register(
           firstName: 'Alex',
@@ -309,14 +487,10 @@ void main() {
         expect(result, isA<Success<void, Failure>>());
         verify(
           () => apiClient.post('/auth/register', {
-            'name': 'Alex Morgan',
             'email': 'alex@example.com',
             'phone': '+15550000000',
             'password': 'secret123',
             'password_confirmation': 'secret123',
-            'gender': 'male',
-            'date_of_birth': '1990-01-01',
-            'is_family_account': false,
           }),
         ).called(1);
       });
@@ -504,13 +678,21 @@ void main() {
 
     group('requestFamilyAccountOtp', () {
       test('returns Success on 200', () async {
-        when(
-          () => apiClient.post('/auth/request-family-otp', {}),
-        ).thenAnswer((_) async => null);
+        when(() => apiClient.post('/auth/request-family-otp', {})).thenAnswer(
+          (_) async => {
+            'success': true,
+            'message': 'OTP code sent to your registered email.',
+            'data': null,
+          },
+        );
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<Success<void, Failure>>());
+        expect(result, isA<Success<String, Failure>>());
+        expect(
+          (result as Success<String, Failure>).data,
+          'OTP code sent to your registered email.',
+        );
       });
 
       test('returns Failure(AuthFailure) on 401', () async {
@@ -520,9 +702,9 @@ void main() {
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<FailureResult<void, Failure>>());
+        expect(result, isA<FailureResult<String, Failure>>());
         expect(
-          (result as FailureResult<void, Failure>).failure,
+          (result as FailureResult<String, Failure>).failure,
           isA<AuthFailure>(),
         );
       });
@@ -534,9 +716,9 @@ void main() {
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<FailureResult<void, Failure>>());
+        expect(result, isA<FailureResult<String, Failure>>());
         expect(
-          (result as FailureResult<void, Failure>).failure,
+          (result as FailureResult<String, Failure>).failure,
           isA<NetworkFailure>(),
         );
       });
@@ -548,9 +730,9 @@ void main() {
 
         final result = await repository.requestFamilyAccountOtp();
 
-        expect(result, isA<FailureResult<void, Failure>>());
+        expect(result, isA<FailureResult<String, Failure>>());
         expect(
-          (result as FailureResult<void, Failure>).failure,
+          (result as FailureResult<String, Failure>).failure,
           isA<ServerFailure>(),
         );
       });
@@ -562,7 +744,6 @@ void main() {
           isParentAccount: true,
           birthDate: DateTime.utc(1990, 1, 1),
         );
-        const pin = '1234';
         when(
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenAnswer((_) async => {'state': 'active'});
@@ -577,7 +758,7 @@ void main() {
           ),
         );
 
-        final result = await repository.completeRegistration(user, pin);
+        final result = await repository.completeRegistration(user);
 
         expect(result, isA<Success<void, Failure>>());
         verify(
@@ -588,7 +769,6 @@ void main() {
             'date_of_birth': '1990-01-01',
             'gender': 'male',
             'is_parent_account': true,
-            'pin': pin,
           }),
         ).called(1);
         await eventExpectation;
@@ -599,10 +779,7 @@ void main() {
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
-        final result = await repository.completeRegistration(
-          testUserEntity(),
-          '1234',
-        );
+        final result = await repository.completeRegistration(testUserEntity());
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(
@@ -616,10 +793,7 @@ void main() {
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const NetworkException('offline'));
 
-        final result = await repository.completeRegistration(
-          testUserEntity(),
-          '1234',
-        );
+        final result = await repository.completeRegistration(testUserEntity());
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(
@@ -633,10 +807,7 @@ void main() {
           () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
-        final result = await repository.completeRegistration(
-          testUserEntity(),
-          '1234',
-        );
+        final result = await repository.completeRegistration(testUserEntity());
 
         expect(result, isA<FailureResult<void, Failure>>());
         expect(
@@ -717,6 +888,55 @@ void main() {
           isA<ServerFailure>(),
         );
       });
+    });
+
+    group('deleteAccount', () {
+      test(
+        'sends the resolved identifier and preserves deletion cancellation state',
+        () async {
+          const identifier = 'alex@example.com';
+          final userJson = testUserJson(email: identifier);
+
+          when(
+            () => apiClient.get('/user/profile', skipAuthError: true),
+          ).thenAnswer((_) async => userJson);
+          when(
+            () => apiClient.post('/auth/delete-account', any()),
+          ).thenAnswer((_) async => {'state': 'pending_deletion_cancellation'});
+
+          final eventExpectation = expectLater(
+            repository.onAuthStateChanged,
+            emits(
+              predicate<AuthSession>(
+                (value) =>
+                    value.state == AuthState.pendingDeletionCancellation &&
+                    value.pendingEmail == identifier,
+              ),
+            ),
+          );
+
+          final result = await repository.deleteAccount(password: 'secret123');
+
+          expect(result, isA<Success<void, Failure>>());
+          verify(
+            () => apiClient.get('/user/profile', skipAuthError: true),
+          ).called(1);
+          verify(
+            () => apiClient.post('/auth/delete-account', {
+              'identifier': identifier,
+              'password': 'secret123',
+            }),
+          ).called(1);
+          verify(
+            () => sessionRepository.savePendingVerificationEmail(identifier),
+          ).called(1);
+          verify(
+            () =>
+                sessionRepository.saveAuthState('pendingDeletionCancellation'),
+          ).called(1);
+          await eventExpectation;
+        },
+      );
     });
 
     group('getToken', () {
@@ -848,6 +1068,7 @@ void main() {
         final verificationStatusJson = testVerificationStatusJson(
           emailVerified: true,
           phoneVerified: true,
+          isFullyVerified: true,
         );
 
         when(
@@ -865,7 +1086,11 @@ void main() {
     group('verifyEmail', () {
       test('returns success and broadcasts auth state on 200', () async {
         const token = 'new-token-123';
-        final responseData = {'valid': true, 'token': token, 'state': 'pending_onboarding'};
+        final responseData = {
+          'valid': true,
+          'token': token,
+          'state': 'pending_onboarding',
+        };
 
         when(
           () => apiClient.post('/user/verify-email', {
@@ -974,7 +1199,11 @@ void main() {
         const token = 'new-token-456';
 
         when(() => apiClient.post('/user/verify-email', any())).thenAnswer(
-          (_) async => {'valid': true, 'token': token, 'state': 'pending_onboarding'},
+          (_) async => {
+            'valid': true,
+            'token': token,
+            'state': 'pending_onboarding',
+          },
         );
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -1087,9 +1316,9 @@ void main() {
       test('saves auth token on successful verification', () async {
         const token = 'phone-token-789';
 
-        when(
-          () => apiClient.post('/user/verify-phone', any()),
-        ).thenAnswer((_) async => {'valid': true, 'token': token, 'state': 'active'});
+        when(() => apiClient.post('/user/verify-phone', any())).thenAnswer(
+          (_) async => {'valid': true, 'token': token, 'state': 'active'},
+        );
         when(
           () => sessionRepository.saveAuthToken(token),
         ).thenAnswer((_) async => const Success<void, Failure>(null));
@@ -1112,7 +1341,11 @@ void main() {
               'otp': '123456',
             }),
           ).thenAnswer(
-            (_) async => {'valid': true, 'token': 'token', 'state': 'authenticated'},
+            (_) async => {
+              'valid': true,
+              'token': 'token',
+              'state': 'authenticated',
+            },
           );
           when(
             () => sessionRepository.saveAuthToken('token'),

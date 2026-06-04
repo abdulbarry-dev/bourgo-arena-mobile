@@ -1,20 +1,21 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
-import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the Profile screen.
-class ProfileViewModel extends ChangeNotifier {
+class ProfileViewModel extends BaseViewModel {
   final AuthRepository _authRepository;
   final LogoutUseCase _logoutUseCase;
+  final DeleteAccountUseCase _deleteAccountUseCase;
   final AuthStateNotifier _authStateNotifier;
 
   bool _isLoading = false;
-  String? _errorMessage;
 
   /// The user's profile data, sourced from the global AuthStateNotifier.
   User? get user => _authStateNotifier.currentUser;
@@ -22,16 +23,15 @@ class ProfileViewModel extends ChangeNotifier {
   /// Whether data is currently being loaded.
   bool get isLoading => _isLoading;
 
-  /// Error message if loading or updating fails.
-  String? get errorMessage => _errorMessage;
-
   /// Creates a new [ProfileViewModel] instance.
   ProfileViewModel({
     required AuthRepository authRepository,
     required LogoutUseCase logoutUseCase,
+    required DeleteAccountUseCase deleteAccountUseCase,
     required AuthStateNotifier authStateNotifier,
   }) : _authRepository = authRepository,
        _logoutUseCase = logoutUseCase,
+       _deleteAccountUseCase = deleteAccountUseCase,
        _authStateNotifier = authStateNotifier {
     _authStateNotifier.addListener(notifyListeners);
     if (user == null) {
@@ -49,22 +49,21 @@ class ProfileViewModel extends ChangeNotifier {
   /// This will trigger an update in the global AuthStateNotifier.
   Future<void> loadProfile() async {
     _isLoading = true;
-    _errorMessage = null;
+    clearError();
     notifyListeners();
 
     try {
       final result = await _authRepository.getUserProfile();
       result.fold(
         onSuccess: (session) {
-          _errorMessage = null;
+          clearError();
         },
         onFailure: (failure) {
-          _errorMessage = failure.message;
+          setErrorMessage(failure.message);
           developer.log('Error loading profile: $failure');
         },
       );
     } catch (e, stackTrace) {
-      _errorMessage = 'An unexpected error occurred';
       developer.log('Error loading profile', error: e, stackTrace: stackTrace);
     } finally {
       _isLoading = false;
@@ -75,5 +74,27 @@ class ProfileViewModel extends ChangeNotifier {
   /// Logs out the user.
   Future<Result<void, Failure>> logout() async {
     return _logoutUseCase();
+  }
+
+  /// Deletes the user's account with confirmation password.
+  Future<bool> deleteAccount({required String password}) async {
+    _isLoading = true;
+    clearError();
+    notifyListeners();
+
+    final result = await _deleteAccountUseCase.execute(password: password);
+    return result.fold(
+      onSuccess: (_) {
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      },
+      onFailure: (failure) {
+        _isLoading = false;
+        setErrorMessage(failure.message);
+        notifyListeners();
+        return false;
+      },
+    );
   }
 }

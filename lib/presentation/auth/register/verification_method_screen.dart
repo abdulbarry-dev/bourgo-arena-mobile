@@ -1,6 +1,12 @@
+import 'dart:async';
+import 'dart:developer' as developer;
+
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +35,34 @@ class VerificationMethodScreen extends StatefulWidget {
 
 class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
   bool _isLoading = false;
+  late final SessionRepository _sessionRepository;
+  bool _redirectedToOnboarding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessionRepository = locator<SessionRepository>();
+    _persistDraft('/verification-method', widget.registrationData);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _redirectedToOnboarding) {
+        return;
+      }
+
+      final email = _asNonEmptyString(widget.registrationData['email']);
+      final phone = _asNonEmptyString(widget.registrationData['phone']);
+
+      if (email == null && phone == null) {
+        _redirectedToOnboarding = true;
+        context.go('/account-setup', extra: _buildOnboardingData());
+      }
+    });
+  }
+
+  String? _asNonEmptyString(dynamic value) {
+    if (value is! String) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
 
   void _setLoading(bool value) {
     setState(() {
@@ -36,79 +70,128 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
     });
   }
 
+  void _persistDraft(String route, Map<String, dynamic> extra) {
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': route,
+        'extra': extra,
+      }),
+    );
+  }
+
+  Map<String, dynamic> _buildOnboardingData() {
+    final user = locator<AuthStateNotifier>().session.user;
+
+    return {
+      'firstName':
+          widget.registrationData['firstName'] ?? user?.firstName ?? '',
+      'lastName': widget.registrationData['lastName'] ?? user?.lastName ?? '',
+      'email': widget.registrationData['email'] ?? user?.email ?? '',
+      'phone': widget.registrationData['phone'] ?? user?.phone ?? '',
+      'gender': widget.registrationData['gender'] ?? user?.gender,
+      'birthDate': widget.registrationData['birthDate'] ?? user?.birthDate,
+      'isParentAccount':
+          widget.registrationData['isParentAccount'] ??
+          user?.isParentAccount ??
+          false,
+      'familyMembers':
+          widget.registrationData['familyMembers'] ??
+          user?.children ??
+          const [],
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
+    developer.log(
+      'VerificationMethodScreen: registrationData = ${widget.registrationData}',
+    );
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final email = widget.registrationData['email'] as String;
-    final phone = widget.registrationData['phone'] as String;
+    final email = _asNonEmptyString(widget.registrationData['email']);
+    final phone = _asNonEmptyString(widget.registrationData['phone']);
+    final hasAnyMethod = email != null || phone != null;
+
+    if (!hasAnyMethod) {
+      return const Scaffold(body: SizedBox.shrink());
+    }
 
     return AuthBackground(
-      child: Stack(
-        children: [
-          SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          AuthHeader(
-                            title: l10n.authVerificationMethodTitle,
-                            subtitle: l10n.authVerificationMethodSubtitle,
-                          ),
-                          const SizedBox(height: 48),
-                          _MethodCard(
-                            title: l10n.authEmailMethod,
-                            value: email,
-                            icon: Symbols.mail,
-                            onTap: _isLoading
-                                ? () {}
-                                : () => _proceedToOtp(context, email),
-                          ),
-                          const SizedBox(height: 20),
-                          _MethodCard(
-                            title: l10n.authPhoneMethod,
-                            value: phone,
-                            icon: Symbols.call,
-                            onTap: _isLoading
-                                ? () {}
-                                : () => _proceedToOtp(context, phone),
-                          ),
-                          const SizedBox(height: 48),
-                          Text(
-                            l10n.authMethodAccessInstruction,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Stack(
+          children: [
+            SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            AuthHeader(
+                              title: l10n.authVerificationMethodTitle,
+                              subtitle: l10n.authVerificationMethodSubtitle,
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
+                            const SizedBox(height: 48),
+                            if (email != null)
+                              _MethodCard(
+                                title: l10n.authEmailMethod,
+                                value: email,
+                                icon: Symbols.mail,
+                                onTap: _isLoading
+                                    ? () {}
+                                    : () => _proceedToOtp(context, email),
+                              ),
+                            if (email != null && phone != null)
+                              const SizedBox(height: 20),
+                            if (phone != null)
+                              _MethodCard(
+                                title: l10n.authPhoneMethod,
+                                value: phone,
+                                icon: Symbols.call,
+                                onTap: _isLoading
+                                    ? () {}
+                                    : () => _proceedToOtp(context, phone),
+                              ),
+                            const SizedBox(height: 48),
+                            Text(
+                              l10n.authMethodAccessInstruction,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withAlpha(76),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-        ],
+            if (_isLoading)
+              Container(
+                color: Colors.black.withAlpha(76),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        ),
       ),
     );
   }
 
   Future<void> _proceedToOtp(BuildContext context, String destination) async {
+    _persistDraft('/otp', {
+      ...widget.registrationData,
+      'destination': destination,
+    });
     _setLoading(true);
 
     final result = await widget.sendOtpUseCase(destination);

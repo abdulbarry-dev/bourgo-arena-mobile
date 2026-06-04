@@ -61,8 +61,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           context.pop();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error updating password'),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.errorUpdatingPassword,
+              ),
               backgroundColor: Colors.red,
             ),
           );

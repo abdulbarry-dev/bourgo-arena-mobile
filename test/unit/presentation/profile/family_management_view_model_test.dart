@@ -1,22 +1,29 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
 import '../../data/repositories/repository_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/enable_family_feature_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/disable_family_feature_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
+
+class MockGetVerificationStatusUseCase extends Mock
+    implements GetVerificationStatusUseCase {}
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
-class MockUpdateUserProfileUseCase extends Mock
-    implements UpdateUserProfileUseCase {}
+class MockEnableFamilyFeatureUseCase extends Mock
+    implements EnableFamilyFeatureUseCase {}
 
 class MockVerifyOtpUseCase extends Mock implements VerifyOtpUseCase {}
 
@@ -29,26 +36,33 @@ class MockAddChildUseCase extends Mock implements AddChildUseCase {}
 
 class MockRemoveChildUseCase extends Mock implements RemoveChildUseCase {}
 
+class MockDisableFamilyFeatureUseCase extends Mock
+    implements DisableFamilyFeatureUseCase {}
+
 void main() {
   late FamilyManagementViewModel viewModel;
+  late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
-  late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
+  late MockEnableFamilyFeatureUseCase mockEnableFamilyFeatureUseCase;
   late MockVerifyOtpUseCase mockVerifyOtpUseCase;
   late MockRequestFamilyAccountOtpUseCase mockRequestFamilyAccountOtpUseCase;
   late MockGetChildrenUseCase mockGetChildrenUseCase;
   late MockAddChildUseCase mockAddChildUseCase;
   late MockRemoveChildUseCase mockRemoveChildUseCase;
+  late MockDisableFamilyFeatureUseCase mockDisableFamilyFeatureUseCase;
 
   final testUser = testUserEntity(id: '1');
 
   setUp(() {
+    mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
-    mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
+    mockEnableFamilyFeatureUseCase = MockEnableFamilyFeatureUseCase();
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockRequestFamilyAccountOtpUseCase = MockRequestFamilyAccountOtpUseCase();
     mockGetChildrenUseCase = MockGetChildrenUseCase();
     mockAddChildUseCase = MockAddChildUseCase();
     mockRemoveChildUseCase = MockRemoveChildUseCase();
+    mockDisableFamilyFeatureUseCase = MockDisableFamilyFeatureUseCase();
 
     when(
       () => mockGetUserProfileUseCase(),
@@ -56,17 +70,25 @@ void main() {
     when(
       () => mockGetChildrenUseCase.execute(),
     ).thenAnswer((_) async => Result.success([]));
+    // By default, assume verification methods are available for tests.
+    when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+      (_) async => Result.success(
+        testVerificationStatusEntity(emailVerified: true, phoneVerified: true),
+      ),
+    );
 
     registerFallbackValue(testUser);
 
     viewModel = FamilyManagementViewModel(
       getUserProfileUseCase: mockGetUserProfileUseCase,
-      updateUserProfileUseCase: mockUpdateUserProfileUseCase,
+      getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
+      enableFamilyFeatureUseCase: mockEnableFamilyFeatureUseCase,
       verifyOtpUseCase: mockVerifyOtpUseCase,
       requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
       getChildrenUseCase: mockGetChildrenUseCase,
       addChildUseCase: mockAddChildUseCase,
       removeChildUseCase: mockRemoveChildUseCase,
+      disableFamilyFeatureUseCase: mockDisableFamilyFeatureUseCase,
     );
   });
 
@@ -80,10 +102,13 @@ void main() {
     test('requestFamilyAccountOtp success', () async {
       await Future.delayed(Duration.zero);
       when(
-        () => mockRequestFamilyAccountOtpUseCase(),
-      ).thenAnswer((_) async => Result.success(null));
+        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+      ).thenAnswer((_) async => Result.success('OTP sent to email.'));
 
-      final result = await viewModel.requestFamilyAccountOtp();
+      final result = await viewModel.requestFamilyAccountOtp(
+        method: OtpDeliveryMethod.email,
+        identifier: 'test@example.com',
+      );
 
       check(result).isTrue();
       check(viewModel.isOtpSent).isTrue();
@@ -92,10 +117,18 @@ void main() {
     test('verifyFamilyAccountOtp success', () async {
       await Future.delayed(Duration.zero);
       when(
+        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+      ).thenAnswer((_) async => Result.success('OTP sent to email.'));
+      when(
         () => mockVerifyOtpUseCase(any(), any()),
       ).thenAnswer((_) async => Result.success(true));
-      when(() => mockUpdateUserProfileUseCase(any())).thenAnswer(
-        (_) async => Result.success(testUser.copyWith(isParentAccount: true)),
+      when(
+        () => mockEnableFamilyFeatureUseCase(),
+      ).thenAnswer((_) async => Result.success(null));
+
+      await viewModel.requestFamilyAccountOtp(
+        method: OtpDeliveryMethod.email,
+        identifier: 'test@example.com',
       );
 
       final result = await viewModel.verifyFamilyAccountOtp('123456');
@@ -148,10 +181,18 @@ void main() {
       'requestFamilyAccountOtp failure sets error message and does not change OTP state',
       () async {
         when(
-          () => mockRequestFamilyAccountOtpUseCase(),
-        ).thenAnswer((_) async => Result.failure(AuthFailure('OTP failed')));
+          () =>
+              mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+        ).thenAnswer(
+          (_) async => Result.failure(
+            AuthFailure(AppErrorCode.invalidCredentials, 'OTP failed'),
+          ),
+        );
 
-        final result = await viewModel.requestFamilyAccountOtp();
+        final result = await viewModel.requestFamilyAccountOtp(
+          method: OtpDeliveryMethod.phone,
+          identifier: '+123456789',
+        );
 
         check(result).isFalse();
         check(viewModel.errorMessage).equals('OTP failed');
@@ -163,8 +204,19 @@ void main() {
       'verifyFamilyAccountOtp failure sets error message and does not proceed',
       () async {
         when(
-          () => mockVerifyOtpUseCase(any(), any()),
-        ).thenAnswer((_) async => Result.failure(AuthFailure('Verify failed')));
+          () =>
+              mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+        ).thenAnswer((_) async => Result.success('OTP sent to phone.'));
+        when(() => mockVerifyOtpUseCase(any(), any())).thenAnswer(
+          (_) async => Result.failure(
+            AuthFailure(AppErrorCode.invalidCredentials, 'Verify failed'),
+          ),
+        );
+
+        await viewModel.requestFamilyAccountOtp(
+          method: OtpDeliveryMethod.phone,
+          identifier: '+123456789',
+        );
 
         final initialIsParent = viewModel.user?.isParentAccount;
         final result = await viewModel.verifyFamilyAccountOtp('123456');
@@ -186,7 +238,9 @@ void main() {
             gender: any(named: 'gender'),
           ),
         ).thenAnswer(
-          (_) async => Result.failure(ServerFailure('Add child failed')),
+          (_) async => Result.failure(
+            ServerFailure(AppErrorCode.serverError, 'Add child failed'),
+          ),
         );
 
         viewModel.childFirstNameController.text = 'Junior';
@@ -212,12 +266,14 @@ void main() {
 
       viewModel = FamilyManagementViewModel(
         getUserProfileUseCase: mockGetUserProfileUseCase,
-        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
+        getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
+        enableFamilyFeatureUseCase: mockEnableFamilyFeatureUseCase,
         verifyOtpUseCase: mockVerifyOtpUseCase,
         requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
         getChildrenUseCase: mockGetChildrenUseCase,
         addChildUseCase: mockAddChildUseCase,
         removeChildUseCase: mockRemoveChildUseCase,
+        disableFamilyFeatureUseCase: mockDisableFamilyFeatureUseCase,
       );
       await Future.delayed(Duration.zero);
 
@@ -242,18 +298,22 @@ void main() {
 
       viewModel = FamilyManagementViewModel(
         getUserProfileUseCase: mockGetUserProfileUseCase,
-        updateUserProfileUseCase: mockUpdateUserProfileUseCase,
+        getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
+        enableFamilyFeatureUseCase: mockEnableFamilyFeatureUseCase,
         verifyOtpUseCase: mockVerifyOtpUseCase,
         requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
         getChildrenUseCase: mockGetChildrenUseCase,
         addChildUseCase: mockAddChildUseCase,
         removeChildUseCase: mockRemoveChildUseCase,
+        disableFamilyFeatureUseCase: mockDisableFamilyFeatureUseCase,
       );
       await Future.delayed(Duration.zero);
 
-      when(
-        () => mockRemoveChildUseCase.execute(any()),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('Remove failed')));
+      when(() => mockRemoveChildUseCase.execute(any())).thenAnswer(
+        (_) async => Result.failure(
+          ServerFailure(AppErrorCode.serverError, 'Remove failed'),
+        ),
+      );
 
       final result = await viewModel.removeChild('child-1');
 

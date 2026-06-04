@@ -109,7 +109,7 @@ CourseModel testCourseModel({
 }
 
 NotificationModel testNotificationModel({
-  String id = 'notification-1',
+  int id = 1,
   String title = 'Booking confirmed',
   String message = 'Your booking is confirmed.',
   String timestamp = '2026-05-08T10:30:00.000Z',
@@ -130,6 +130,7 @@ ReservationModel testReservationModel({
   String id = 'reservation-1',
   String activityId = 'activity-1',
   String activityTitle = 'Football',
+  String? memberId = 'member-1',
   String date = '2026-05-08',
   String time = '18:00',
   String duration = '90 min',
@@ -142,6 +143,7 @@ ReservationModel testReservationModel({
     id: id,
     activityId: activityId,
     activityTitle: activityTitle,
+    memberId: memberId,
     date: date,
     time: time,
     duration: duration,

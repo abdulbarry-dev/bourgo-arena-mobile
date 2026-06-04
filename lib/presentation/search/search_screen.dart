@@ -54,6 +54,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (_viewModel == null) return const SizedBox.shrink();
 
@@ -70,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 focusNode: _focusNode,
                 onChanged: _viewModel!.search,
                 decoration: InputDecoration(
-                  hintText: 'Search activities, courses, settings...',
+                  hintText: l10n.searchHint,
                   border: InputBorder.none,
                   hintStyle: theme.textTheme.bodyLarge?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
@@ -192,8 +193,8 @@ class _RecentSearchesPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EmptyState(
-      title: 'Global Search',
-      message: 'Find activities, courses, or settings across the app.',
+      title: AppLocalizations.of(context)!.searchRecentTitle,
+      message: AppLocalizations.of(context)!.searchRecentSubtitle,
       icon: Symbols.search,
     );
   }
@@ -207,8 +208,8 @@ class _NoResultsPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return EmptyState(
-      title: 'No results for "$query"',
-      message: 'Try different keywords or check spelling.',
+      title: AppLocalizations.of(context)!.searchNoResultsTitle(query),
+      message: AppLocalizations.of(context)!.searchNoResultsSubtitle,
       icon: Symbols.search_off,
     );
   }

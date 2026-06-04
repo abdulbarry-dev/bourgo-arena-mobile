@@ -5,12 +5,16 @@ import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
+
+class MockDeleteAccountUseCase extends Mock implements DeleteAccountUseCase {}
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -22,6 +26,7 @@ class FakeUser extends Fake implements User {}
 
 void main() {
   late ProfileViewModel viewModel;
+  late MockDeleteAccountUseCase mockDeleteAccountUseCase;
   late MockAuthRepository mockAuthRepository;
   late MockLogoutUseCase mockLogoutUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
@@ -59,6 +64,7 @@ void main() {
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     mockLogoutUseCase = MockLogoutUseCase();
+    mockDeleteAccountUseCase = MockDeleteAccountUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
 
     // Default behavior for constructor's loadProfile call
@@ -73,6 +79,7 @@ void main() {
     viewModel = ProfileViewModel(
       authRepository: mockAuthRepository,
       logoutUseCase: mockLogoutUseCase,
+      deleteAccountUseCase: mockDeleteAccountUseCase,
       authStateNotifier: mockAuthStateNotifier,
     );
   });
@@ -93,11 +100,14 @@ void main() {
       viewModel = ProfileViewModel(
         authRepository: mockAuthRepository,
         logoutUseCase: mockLogoutUseCase,
+        deleteAccountUseCase: mockDeleteAccountUseCase,
         authStateNotifier: mockAuthStateNotifier,
       );
 
       when(() => mockAuthRepository.getUserProfile()).thenAnswer(
-        (_) async => Result.failure(const ServerFailure('Server error')),
+        (_) async => Result.failure(
+          const ServerFailure(AppErrorCode.serverError, 'Server error'),
+        ),
       );
 
       await viewModel.loadProfile();

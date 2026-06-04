@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import '../../data/repositories/repository_test_fixtures.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
@@ -32,7 +33,7 @@ void main() {
       check(viewModel.activities).isEmpty();
       check(viewModel.reservations).isEmpty();
       check(viewModel.isLoading).isFalse();
-      check(viewModel.error).isNull();
+      check(viewModel.errorMessage).isNull();
     });
 
     test('loadData handles success path', () async {
@@ -51,33 +52,35 @@ void main() {
       check(viewModel.isLoading).isFalse();
       check(viewModel.activities).equals(activities);
       check(viewModel.reservations).equals(reservations);
-      check(viewModel.error).isNull();
+      check(viewModel.errorMessage).isNull();
     });
 
     test('loadData handles partial failure (activities)', () async {
-      when(
-        () => mockGetActivitiesUseCase(),
-      ).thenAnswer((_) async => FailureResult(Failure.server('fail')));
+      when(() => mockGetActivitiesUseCase()).thenAnswer(
+        (_) async =>
+            FailureResult(Failure.server(AppErrorCode.serverError, 'fail')),
+      );
       when(
         () => mockGetUserBookingsUseCase(),
       ).thenAnswer((_) async => Success([]));
 
       await viewModel.loadData();
 
-      check(viewModel.error).equals('activities_loading_failed');
+      check(viewModel.errorMessage).equals('activities_loading_failed');
     });
 
     test('loadData handles partial failure (bookings)', () async {
       when(
         () => mockGetActivitiesUseCase(),
       ).thenAnswer((_) async => Success([]));
-      when(
-        () => mockGetUserBookingsUseCase(),
-      ).thenAnswer((_) async => FailureResult(Failure.server('fail')));
+      when(() => mockGetUserBookingsUseCase()).thenAnswer(
+        (_) async =>
+            FailureResult(Failure.server(AppErrorCode.serverError, 'fail')),
+      );
 
       await viewModel.loadData();
 
-      check(viewModel.error).equals('bookings_loading_failed');
+      check(viewModel.errorMessage).equals('bookings_loading_failed');
     });
 
     test('loadData handles exception', () async {
@@ -85,7 +88,7 @@ void main() {
 
       await viewModel.loadData();
 
-      check(viewModel.error).equals('loading_failed');
+      check(viewModel.errorMessage).equals('loading_failed');
       check(viewModel.isLoading).isFalse();
     });
   });

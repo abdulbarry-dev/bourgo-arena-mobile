@@ -99,6 +99,7 @@ void main() {
             'id': reservation.id,
             'activity_id': reservation.activityId,
             'activity_title': reservation.activityTitle,
+            'member_id': reservation.memberId,
             'date': reservation.date,
             'time': reservation.time,
             'duration': reservation.duration,

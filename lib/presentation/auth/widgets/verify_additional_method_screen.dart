@@ -1,5 +1,8 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
@@ -20,9 +23,15 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
 
   /// Use case to send OTP
   final SendOtpUseCase sendOtpUseCase;
-  
+
+  /// Repository for auth operations
+  final AuthRepository authRepository;
+
   /// Use case to fetch verification status
   final GetVerificationStatusUseCase getVerificationStatusUseCase;
+
+  /// Auth state notifier for session and persistence management
+  final AuthStateNotifier authStateNotifier;
 
   const VerifyAdditionalMethodScreen({
     super.key,
@@ -30,7 +39,9 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
     this.email,
     this.phone,
     required this.sendOtpUseCase,
+    required this.authRepository,
     required this.getVerificationStatusUseCase,
+    required this.authStateNotifier,
   });
 
   @override
@@ -52,10 +63,7 @@ class _VerifyAdditionalMethodScreenState
     _email = widget.email;
     _phone = widget.phone;
     _unverifiedMethod = widget.unverifiedMethod;
-
-    if (_email == null || _phone == null) {
-      _fetchVerificationStatus();
-    }
+    _fetchVerificationStatus();
   }
 
   Future<void> _fetchVerificationStatus() async {
@@ -64,14 +72,28 @@ class _VerifyAdditionalMethodScreenState
     });
 
     final result = await widget.getVerificationStatusUseCase();
-    
+
     if (mounted) {
       setState(() {
         _isFetchingStatus = false;
       });
-      
+
       result.when(
         success: (status) {
+          // If onboarding is incomplete, hand off to the normal onboarding
+          // verification flow instead of staying on the additional verification
+          // screen used for regular login sessions.
+          if (!status.onboardingCompleted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              context.push(
+                '/verification-method',
+                extra: _buildOnboardingData(),
+              );
+            });
+            return;
+          }
+
           setState(() {
             _email = status.email;
             _phone = status.phone;
@@ -83,9 +105,9 @@ class _VerifyAdditionalMethodScreenState
           });
         },
         failure: (failure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(failure.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(failure.message)));
         },
       );
     }
@@ -97,11 +119,24 @@ class _VerifyAdditionalMethodScreenState
     });
   }
 
+  Map<String, dynamic> _buildOnboardingData() {
+    final user = widget.authStateNotifier.session.user;
+
+    return {
+      'firstName': user?.firstName ?? '',
+      'lastName': user?.lastName ?? '',
+      'email': _email ?? user?.email ?? '',
+      'phone': _phone ?? user?.phone ?? '',
+      'gender': user?.gender,
+      'birthDate': user?.birthDate,
+      'isParentAccount': user?.isParentAccount ?? false,
+      'familyMembers': user?.children ?? const [],
+    };
+  }
+
   void _verifyNow() async {
     _setLoading(true);
-    final identifier = _unverifiedMethod == 'email'
-        ? _email
-        : _phone;
+    final identifier = _unverifiedMethod == 'email' ? _email : _phone;
 
     if (identifier != null && identifier.isNotEmpty) {
       // Send OTP to the unverified method
@@ -118,17 +153,41 @@ class _VerifyAdditionalMethodScreenState
             );
           },
           failure: (failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(failure.message)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(failure.message)));
           },
         );
       }
     } else {
       _setLoading(false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Missing contact information.')),
-      );
+      if (mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.commonMissingContactInfo)));
+      }
+    }
+  }
+
+  void _skipForNow() {
+    widget.authStateNotifier.skipForSession();
+  }
+
+  void _skipForever() async {
+    _setLoading(true);
+    try {
+      // Synchronize with backend if possible
+      await widget.authRepository.skipAdditionalVerification();
+      // Update local state and persistence
+      await widget.authStateNotifier.skipForever();
+    } catch (e) {
+      // Even if backend fails, we respect the user's wish locally
+      await widget.authStateNotifier.skipForever();
+    } finally {
+      if (mounted) {
+        _setLoading(false);
+      }
     }
   }
 
@@ -136,16 +195,13 @@ class _VerifyAdditionalMethodScreenState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    
+    final spacing = context.spacing;
+
     if (_isFetchingStatus) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-    
-    final identifier = _unverifiedMethod == 'email'
-        ? _email
-        : _phone;
+
+    final identifier = _unverifiedMethod == 'email' ? _email : _phone;
 
     final title = _unverifiedMethod == 'email'
         ? l10n.authVerifyEmailTitle
@@ -160,17 +216,20 @@ class _VerifyAdditionalMethodScreenState
         backgroundColor: Colors.transparent,
         body: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: spacing.screenPadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 AuthHeader(
                   title: l10n.authVerifyAdditionalMethodTitle,
                   subtitle: l10n.authVerifyAdditionalMethodMessage(
-                    _unverifiedMethod,
+                    _unverifiedMethod == 'email'
+                        ? l10n.authEmailLabel
+                        : l10n.authPhoneLabel,
                   ),
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: spacing.xxl),
                 // Icon representation of the method
                 Center(
                   child: Container(
@@ -191,7 +250,7 @@ class _VerifyAdditionalMethodScreenState
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: spacing.xl),
                 // Method details
                 Text(
                   title,
@@ -200,7 +259,7 @@ class _VerifyAdditionalMethodScreenState
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: spacing.sm),
                 Text(
                   subtitle,
                   textAlign: TextAlign.center,
@@ -208,22 +267,48 @@ class _VerifyAdditionalMethodScreenState
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                const SizedBox(height: 48),
+                SizedBox(height: spacing.xxl),
                 // Action buttons
                 ElevatedButton(
                   onPressed: _isLoading ? null : _verifyNow,
                   child: _isLoading
-                      ? SizedBox(
+                      ? const SizedBox(
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: theme.colorScheme.onPrimary,
+                            color: Colors.white,
                           ),
                         )
                       : Text(l10n.authVerifyNow),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: spacing.md),
+                OutlinedButton(
+                  onPressed: _isLoading ? null : _skipForNow,
+                  child: Text(l10n.authSkipForNow),
+                ),
+                SizedBox(height: spacing.lg),
+                const Divider(),
+                SizedBox(height: spacing.md),
+                TextButton(
+                  onPressed: _isLoading ? null : _skipForever,
+                  child: Text(
+                    l10n.authDontShowAgain,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(height: spacing.xs),
+                Text(
+                  l10n.authSkipForeverMessage,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: spacing.lg),
                 // Informational text
                 Text(
                   l10n.authMethodAccessInstruction,

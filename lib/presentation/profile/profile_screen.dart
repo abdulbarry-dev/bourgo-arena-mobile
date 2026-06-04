@@ -1,9 +1,12 @@
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/loyalty/widgets/tier_badge.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
@@ -27,13 +30,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _viewModel = ProfileViewModel(
       authRepository: locator<AuthRepository>(),
       logoutUseCase: locator<LogoutUseCase>(),
+      deleteAccountUseCase: locator<DeleteAccountUseCase>(),
       authStateNotifier: locator<AuthStateNotifier>(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return ListenableBuilder(
       listenable: _viewModel,
@@ -46,11 +50,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         final user = _viewModel.user;
         if (user == null) {
-          return Scaffold(
-            body: Center(
-              child: Text(l10n?.commonLoadingError ?? 'Loading error'),
-            ),
-          );
+          return Scaffold(body: Center(child: Text(l10n.commonLoadingError)));
         }
 
         return Scaffold(
@@ -66,7 +66,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 32),
                       _ProfileMenu(
                         onTapAbonnement: () => context.push('/subscription'),
-                        onTapHistorique: () => context.push('/history'),
                         onTapNotifications: () =>
                             context.push('/notifications'),
                         onTapSettings: () => context.push('/settings'),
@@ -93,6 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildAppBar(BuildContext context, User user) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SliverAppBar(
       expandedHeight: 280,
@@ -143,23 +143,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    user.subscriptionLevel ?? 'Standard',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
+                TierBadge(
+                  tierName: user.subscriptionLevel ?? l10n.profileStandardTier,
                 ),
               ],
             ),
@@ -189,18 +174,15 @@ class _StatsRow extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _StatItem(
-            label: AppLocalizations.of(context)?.profilePoints ?? 'Points',
-            value: user.loyaltyPoints.toString(),
-            icon: Symbols.stars,
-          ),
-          Container(width: 1, height: 40, color: theme.colorScheme.outline),
-          _StatItem(
-            label: AppLocalizations.of(context)?.profileCheckins ?? 'Check-ins',
-            value: user.totalCheckIns.toString(),
-            icon: Symbols.qr_code_scanner,
+          GestureDetector(
+            onTap: () => context.push('/loyalty'),
+            child: _StatItem(
+              label: AppLocalizations.of(context)!.profilePoints,
+              value: user.loyaltyPoints.toString(),
+              icon: Symbols.stars,
+            ),
           ),
         ],
       ),
@@ -246,13 +228,11 @@ class _StatItem extends StatelessWidget {
 
 class _ProfileMenu extends StatelessWidget {
   final VoidCallback onTapAbonnement;
-  final VoidCallback onTapHistorique;
   final VoidCallback onTapNotifications;
   final VoidCallback onTapSettings;
 
   const _ProfileMenu({
     required this.onTapAbonnement,
-    required this.onTapHistorique,
     required this.onTapNotifications,
     required this.onTapSettings,
   });
@@ -263,29 +243,19 @@ class _ProfileMenu extends StatelessWidget {
       children: [
         _MenuItem(
           icon: Symbols.card_membership,
-          label:
-              AppLocalizations.of(context)?.profileMySubscription ??
-              'My subscription',
+          label: AppLocalizations.of(context)!.profileMySubscription,
           onTap: onTapAbonnement,
         ),
         const SizedBox(height: 12),
         _MenuItem(
-          icon: Symbols.history,
-          label: AppLocalizations.of(context)?.profileHistory ?? 'History',
-          onTap: onTapHistorique,
-        ),
-        const SizedBox(height: 12),
-        _MenuItem(
           icon: Symbols.notifications,
-          label:
-              AppLocalizations.of(context)?.profileNotifications ??
-              'Notifications',
+          label: AppLocalizations.of(context)!.profileNotifications,
           onTap: onTapNotifications,
         ),
         const SizedBox(height: 12),
         _MenuItem(
           icon: Symbols.settings,
-          label: AppLocalizations.of(context)?.profileSettings ?? 'Settings',
+          label: AppLocalizations.of(context)!.profileSettings,
           onTap: onTapSettings,
         ),
       ],
@@ -353,24 +323,23 @@ class _LogoutButton extends StatelessWidget {
         showDialog(
           context: context,
           builder: (BuildContext dialogContext) {
-            return AlertDialog(
-              title: Text(l10n.profileLogoutTitle),
+            return AppModal(
+              title: l10n.profileLogoutTitle,
+              subtitle: l10n.profileLogout,
+              icon: Symbols.logout,
               content: Text(l10n.profileLogoutMessage),
               actions: [
-                TextButton(
+                AppModalAction(
+                  label: l10n.commonCancel,
                   onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: Text(
-                    l10n.commonCancel,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
                 ),
-                TextButton(
+                AppModalAction(
+                  label: l10n.profileLogoutConfirm,
+                  isPrimary: true,
+                  isDestructive: true,
                   onPressed: () {
                     Navigator.of(dialogContext).pop();
                     onLogout();
-                    // Show toast message
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(l10n.profileLogoutSuccess),
@@ -380,10 +349,6 @@ class _LogoutButton extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Text(
-                    l10n.profileLogoutConfirm,
-                    style: const TextStyle(color: Colors.redAccent),
-                  ),
                 ),
               ],
             );

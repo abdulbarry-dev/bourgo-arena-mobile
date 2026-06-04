@@ -7,6 +7,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
 import '../usecase_test_fixtures.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockCourseRepository extends Mock implements CourseRepository {}
 
@@ -36,7 +37,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ServerFailure('courses unavailable');
+      const failure = ServerFailure(
+        AppErrorCode.serverError,
+        'courses unavailable',
+      );
 
       when(() => repository.getCourses()).thenAnswer(
         (_) async => const FailureResult<List<Course>, Failure>(failure),

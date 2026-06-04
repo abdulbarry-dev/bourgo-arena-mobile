@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -54,7 +55,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = AuthFailure('invalid credentials');
+      const failure = AuthFailure(
+        AppErrorCode.invalidCredentials,
+        'invalid credentials',
+      );
 
       when(
         () => repository.login('alex@example.com', 'bad-password'),

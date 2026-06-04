@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart'
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
@@ -30,7 +31,10 @@ void main() {
     });
 
     test('propagates repository failures unchanged', () async {
-      const failure = ValidationFailure('preference rejected');
+      const failure = ValidationFailure(
+        AppErrorCode.validationFailed,
+        'preference rejected',
+      );
 
       when(
         () => repository.setNotificationsEnabled(true),

@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 
 /// A reusable, premium empty state widget.
@@ -31,6 +32,7 @@ class EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final spacing = context.spacing;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -60,14 +62,16 @@ class EmptyState extends StatelessWidget {
             child: SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
               child: Padding(
-                padding: EdgeInsets.all(isSmall ? 16.0 : 32.0),
+                padding: EdgeInsets.all(isSmall ? spacing.lg : spacing.xl),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     // Icon with soft background
                     Container(
-                      padding: EdgeInsets.all(isSmall ? 16 : 24),
+                      padding: EdgeInsets.all(
+                        isSmall ? spacing.md : spacing.lg,
+                      ),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
@@ -83,7 +87,7 @@ class EmptyState extends StatelessWidget {
                         color: theme.colorScheme.primary.withValues(alpha: 0.8),
                       ),
                     ),
-                    SizedBox(height: isSmall ? 16 : 32),
+                    SizedBox(height: isSmall ? spacing.lg : spacing.xl),
                     // Title
                     Text(
                       title,
@@ -93,7 +97,7 @@ class EmptyState extends StatelessWidget {
                         letterSpacing: 0.5,
                       ),
                     ),
-                    SizedBox(height: isSmall ? 4 : 12),
+                    SizedBox(height: isSmall ? spacing.xs : spacing.sm),
                     // Message
                     Text(
                       message,
@@ -107,15 +111,15 @@ class EmptyState extends StatelessWidget {
                     ),
                     // Action Button
                     if (actionLabel != null && onAction != null) ...[
-                      SizedBox(height: isSmall ? 20 : 40),
+                      SizedBox(height: isSmall ? spacing.lg : spacing.xl),
                       FilledButton.icon(
                         onPressed: onAction,
                         icon: const Icon(Icons.add, size: 20),
                         label: Text(actionLabel!),
                         style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 12,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: spacing.lg,
+                            vertical: spacing.sm,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),

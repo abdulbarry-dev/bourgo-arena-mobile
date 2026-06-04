@@ -20,6 +20,8 @@ class UserProfileModel {
   final int totalCheckIns;
   final DateTime? birthDate;
   final String? gender;
+  final String? status;
+  final String? state;
   final bool isParentAccount;
   final List<ChildProfileModel> children;
 
@@ -39,6 +41,8 @@ class UserProfileModel {
     this.totalCheckIns = 0,
     this.birthDate,
     this.gender,
+    this.status,
+    this.state,
     this.isParentAccount = false,
     this.children = const [],
   });

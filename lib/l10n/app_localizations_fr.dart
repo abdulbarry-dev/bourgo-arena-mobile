@@ -67,15 +67,27 @@ class AppLocalizationsFr extends AppLocalizations {
   String get commonGenderFemale => 'Femme';
 
   @override
-  String get commonGenderOther => 'Autre';
-
-  @override
   String get commonErrorOccurred =>
       'Une erreur est survenue. Veuillez réessayer.';
 
   @override
+  String get commonSave => 'ENREGISTRER';
+
+  @override
+  String get commonMissingContactInfo => 'Informations de contact manquantes.';
+
+  @override
   String get commonImagePickerPlaceholder =>
       'Le sélecteur d\'image s\'ouvrirait ici';
+
+  @override
+  String get commonMe => 'Moi';
+
+  @override
+  String get commonSetUp => 'CONFIGURER';
+
+  @override
+  String get commonPointsShort => 'pts';
 
   @override
   String get navHome => 'ACCUEIL';
@@ -181,6 +193,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authPasswordLabel => 'Mot de passe';
 
   @override
+  String get authDeletionCancelSubtitle =>
+      'Votre compte est programmé pour suppression. Entrez le code envoyé à votre e-mail/téléphone pour annuler la demande.';
+
+  @override
   String get authRememberMe => 'Se souvenir de moi';
 
   @override
@@ -284,7 +300,23 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileMySubscription => 'Mon Adhésion';
 
   @override
-  String get profileHistory => 'Accès & Historique';
+  String get profileHistory => 'Accès et historique';
+
+  @override
+  String get profileDeleteAccount => 'Supprimer le compte';
+
+  @override
+  String get profileDeleteAccountTitle => 'Supprimer le compte';
+
+  @override
+  String get profileDeleteAccountSubtitle => 'Cette action est permanente';
+
+  @override
+  String get profileDeleteAccountMessage =>
+      'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et votre compte sera traité pour suppression.';
+
+  @override
+  String get profileDeleteAccountConfirm => 'Supprimer mon compte';
 
   @override
   String get profileNotifications => 'Notifications';
@@ -312,6 +344,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profilePlanLabel => 'PLAN';
+
+  @override
+  String get months => 'mois';
 
   @override
   String get profileBenefit1 => 'Accès illimité à la salle de sport';
@@ -349,12 +384,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profileAccessPin => 'Code PIN';
-
-  @override
-  String get profileAccessFingerprint => 'Empreinte digitale';
-
-  @override
-  String get profileAccessNfc => 'Carte NFC';
 
   @override
   String get profileStatusConfigured => 'Configuré';
@@ -415,6 +444,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get bookingPay => 'PAYER';
+
+  @override
+  String get bookingStepMember => 'MEMBRE';
+
+  @override
+  String get bookingMemberSelectSubtitle =>
+      'Choisissez un profil pour le tarif et l’éligibilité.';
 
   @override
   String get bookingDateLabel => 'DATE & HEURE';
@@ -593,6 +629,10 @@ class AppLocalizationsFr extends AppLocalizations {
       'Cette action est irréversible. Toutes vos données seront définitivement supprimées.';
 
   @override
+  String get settingsEnterPasswordFirst =>
+      'Veuillez saisir votre mot de passe actuel pour confirmer la suppression.';
+
+  @override
   String get settingsDelete => 'SUPPRIMER';
 
   @override
@@ -600,6 +640,10 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get profileEditTitle => 'MODIFIER LE PROFIL';
+
+  @override
+  String get profileEditSubtitle =>
+      'Mettez à jour vos informations et les détails de votre profil.';
 
   @override
   String get profileSave => 'ENREGISTRER';
@@ -618,6 +662,13 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get passwordUpdateSuccess => 'Mot de passe mis à jour avec succès!';
+
+  @override
+  String get errorUpdatingProfile => 'Erreur lors de la mise à jour du profil';
+
+  @override
+  String get errorUpdatingPassword =>
+      'Erreur lors de la mise à jour du mot de passe';
 
   @override
   String get authFirstNameLabel => 'Prénom';
@@ -651,6 +702,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileAddChild => 'Ajouter un enfant';
 
   @override
+  String get profileEditChild => 'Modifier l\'enfant';
+
+  @override
   String get profileNoChildren => 'Aucun profil d\'enfant ajouté.';
 
   @override
@@ -671,11 +725,76 @@ class AppLocalizationsFr extends AppLocalizations {
   String get profileFamilyEnabled => 'Compte famille activé avec succès !';
 
   @override
+  String get profileFamilyNotEnabled =>
+      'Activez le compte famille pour gérer les profils de vos enfants.';
+
+  @override
+  String get profileManageChildren => 'Gérer les enfants';
+
+  @override
+  String get profileEdit => 'Modifier';
+
+  @override
+  String get profileDelete => 'Supprimer';
+
+  @override
+  String get profileConfirmDeleteChild => 'Supprimer l\'enfant ?';
+
+  @override
+  String profileConfirmDeleteChildMessage(String childName) {
+    return 'Êtes-vous sûr de vouloir supprimer $childName de votre compte famille ? Cette action ne peut pas être annulée.';
+  }
+
+  @override
+  String get profileChildRemoved => 'Profil d\'enfant supprimé avec succès.';
+
+  @override
+  String get profileChildAdded => 'Profil d\'enfant ajouté avec succès.';
+
+  @override
+  String get profileChildUpdated => 'Profil d\'enfant mis à jour avec succès.';
+
+  @override
+  String get profileFirstName => 'Prénom';
+
+  @override
+  String get profileFirstNameHint => 'Entrez le prénom de l\'enfant';
+
+  @override
+  String get profileLastName => 'Nom';
+
+  @override
+  String get profileLastNameHint => 'Entrez le nom de l\'enfant';
+
+  @override
+  String get profileGender => 'Genre';
+
+  @override
+  String get profileMale => 'Garçon';
+
+  @override
+  String get profileFemale => 'Fille';
+
+  @override
+  String get profileBirthDate => 'Date de naissance';
+
+  @override
+  String get profileSelectDate => 'Sélectionnez la date de naissance';
+
+  @override
+  String get profileNoChildrenDescription =>
+      'Commencez par ajouter le profil de votre enfant pour gérer ses activités.';
+
+  @override
   String get authVerificationMethodTitle => 'Vérification de Sécurité';
 
   @override
   String get authVerificationMethodSubtitle =>
       'Choisissez une méthode pour recevoir votre code de vérification.';
+
+  @override
+  String get profileNoVerifiedOtpMethod =>
+      'Vous devez avoir au moins une méthode de contact vérifiée (e-mail ou téléphone) avant d\'activer un compte famille.';
 
   @override
   String get authEmailMethod => 'Adresse E-mail';
@@ -735,6 +854,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authCompleteRegistration => 'Terminer l\'inscription';
 
   @override
+  String get authSetupRequiredTitle => 'Configuration du compte requise';
+
+  @override
+  String get authSetupRequiredMessage =>
+      'La configuration du compte n\'est pas terminée. Veuillez compléter votre profil pour déverrouiller votre compte.';
+
+  @override
+  String get authCompleteSetup => 'Compléter la configuration';
+
+  @override
   String get languageSelectionTitle => 'Bienvenue à Bourgo Arena';
 
   @override
@@ -746,6 +875,79 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get profileStandardTier => 'Standard';
+
+  @override
+  String get authInvalidVerificationCode => 'Code de vérification invalide';
+
+  @override
+  String get searchHint => 'Rechercher des activités, cours, paramètres...';
+
+  @override
+  String get searchRecentTitle => 'Recherche globale';
+
+  @override
+  String get searchRecentSubtitle =>
+      'Trouvez des activités, cours ou paramètres dans l\'app.';
+
+  @override
+  String searchNoResultsTitle(String query) {
+    return 'Aucun résultat pour \"$query\"';
+  }
+
+  @override
+  String get searchNoResultsSubtitle =>
+      'Essayez d\'autres mots-clés ou vérifiez l\'orthographe.';
+
+  @override
+  String get subscriptionSelectPlanTitle => 'Choisissez une offre';
+
+  @override
+  String get subscriptionPlanBasic => 'Basic';
+
+  @override
+  String get subscriptionPlanPremium => 'Premium';
+
+  @override
+  String get subscriptionConfirmPlan => 'CONFIRMER L\'OFFRE';
+
+  @override
+  String subscriptionPricePerMonth(String price) {
+    return '$price TND / mois';
+  }
+
+  @override
+  String get profileOtpCodeLabel => 'Code OTP';
+
+  @override
+  String get profileOtpCodeHint => '000000';
+
+  @override
+  String get bookingPointsToEarned => 'Points à gagner';
+
+  @override
+  String get courseFull => 'COMPLET';
+
+  @override
+  String courseRemaining(String remaining) {
+    return '$remaining RESTANT';
+  }
+
+  @override
+  String get loyaltyDashboardTitle => 'Programme de fidélité';
+
+  @override
+  String get loyaltyTotalPoints => 'Points totaux';
+
+  @override
+  String get loyaltyGoldMember => 'Membre Or';
+
+  @override
+  String loyaltyPointsToPlatinum(String points) {
+    return '$points points avant le niveau Platine';
+  }
 
   @override
   String get profileLogoutTitle => 'Vous déconnecter ?';
@@ -770,6 +972,93 @@ class AppLocalizationsFr extends AppLocalizations {
   String get authGenderHint => 'Sélectionnez le genre';
 
   @override
+  String get legalLastUpdated => 'Dernière mise à jour : mai 2026';
+
+  @override
+  String get privacyPolicySection1Title => '1. Collecte des informations';
+
+  @override
+  String get privacyPolicySection1Content =>
+      'Nous collectons les informations personnelles que vous nous fournissez, comme votre nom, votre adresse e-mail, votre numéro de téléphone et vos informations de paiement lorsque vous vous inscrivez ou utilisez nos services.';
+
+  @override
+  String get privacyPolicySection2Title => '2. Utilisation des informations';
+
+  @override
+  String get privacyPolicySection2Content =>
+      'Vos informations sont utilisées pour fournir et améliorer nos services, traiter les paiements, envoyer des notifications sur vos réservations et communiquer avec vous au sujet des mises à jour ou des offres.';
+
+  @override
+  String get privacyPolicySection3Title => '3. Sécurité des données';
+
+  @override
+  String get privacyPolicySection3Content =>
+      'Nous mettons en place des mesures de sécurité conformes aux normes du secteur pour protéger vos données personnelles. Cependant, aucune méthode de transmission sur Internet n\'est sécurisée à 100 %.';
+
+  @override
+  String get privacyPolicySection4Title => '4. Services tiers';
+
+  @override
+  String get privacyPolicySection4Content =>
+      'Nous pouvons faire appel à des prestataires tiers pour faciliter nos services, comme les processeurs de paiement. Ces tiers n\'ont accès à vos informations que pour effectuer des tâches spécifiques en notre nom.';
+
+  @override
+  String get privacyPolicySection5Title => '5. Vos droits';
+
+  @override
+  String get privacyPolicySection5Content =>
+      'Vous avez le droit d\'accéder à vos informations personnelles, de les mettre à jour ou de les supprimer à tout moment via les paramètres de l\'application ou en contactant notre équipe d\'assistance.';
+
+  @override
+  String get privacyPolicySection6Title => '6. Cookies et suivi';
+
+  @override
+  String get privacyPolicySection6Content =>
+      'Nous utilisons des cookies et des technologies de suivi similaires pour suivre l\'activité sur notre service et conserver certaines informations afin d\'améliorer votre expérience.';
+
+  @override
+  String get termsSection1Title => '1. Acceptation des conditions';
+
+  @override
+  String get termsSection1Content =>
+      'En accédant aux services Bourgo Arena ou en les utilisant, vous acceptez d\'être lié par ces conditions. Si vous n\'êtes pas d\'accord, veuillez ne pas utiliser l\'application.';
+
+  @override
+  String get termsSection2Title => '2. Description du service';
+
+  @override
+  String get termsSection2Content =>
+      'Bourgo Arena fournit une plateforme pour réserver des installations sportives, gérer des adhésions à la salle et participer à des cours de fitness programmés à Djerba, en Tunisie.';
+
+  @override
+  String get termsSection3Title => '3. Responsabilités de l\'utilisateur';
+
+  @override
+  String get termsSection3Content =>
+      'Les utilisateurs sont responsables de la confidentialité de leurs comptes et de toutes les activités effectuées avec leurs identifiants. Vous acceptez de respecter les règles de la salle et les autres membres.';
+
+  @override
+  String get termsSection4Title => '4. Réservations et paiements';
+
+  @override
+  String get termsSection4Content =>
+      'Toutes les réservations sont soumises à disponibilité. Les paiements effectués via l\'application sont traités de manière sécurisée. Les annulations doivent respecter notre politique d\'annulation pour être remboursables.';
+
+  @override
+  String get termsSection5Title => '5. Limitation de responsabilité';
+
+  @override
+  String get termsSection5Content =>
+      'Bourgo Arena n\'est pas responsable des blessures corporelles ou des dommages matériels subis lors de l\'utilisation des installations, sauf en cas de négligence grave de notre part.';
+
+  @override
+  String get termsSection6Title => '6. Modifications des conditions';
+
+  @override
+  String get termsSection6Content =>
+      'Nous nous réservons le droit de modifier ces conditions à tout moment. Le fait de continuer à utiliser l\'application après ces modifications vaut acceptation des nouvelles conditions.';
+
+  @override
   String get errorNotFoundTitle => 'PAGE INTROUVABLE';
 
   @override
@@ -791,6 +1080,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get commonCancel => 'ANNULER';
+
+  @override
+  String get commonContinue => 'CONTINUER';
 
   @override
   String get authVerifyAdditionalMethodTitle => 'Complétez votre vérification';
@@ -842,4 +1134,14 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get authVerificationCompleteMessage =>
       'Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil.';
+
+  @override
+  String get authDontShowAgain => 'Ne plus afficher';
+
+  @override
+  String get authSkipForever => 'PASSER DÉFINITIVEMENT';
+
+  @override
+  String get authSkipForeverMessage =>
+      'Nous recommandons de vérifier les deux méthodes pour une sécurité maximale. Vous pourrez toujours le faire plus tard dans les paramètres.';
 }

@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockVerifyOtpUseCase extends Mock implements VerifyOtpUseCase {}
 
@@ -42,6 +43,8 @@ void main() {
           VerificationStatus(
             emailVerified: true,
             phoneVerified: true,
+            onboardingCompleted: true,
+            isFullyVerified: true,
             email: 'test@example.com',
             phone: '+1234567890',
           ),
@@ -54,6 +57,7 @@ void main() {
         code: '123456',
         onSuccess: () => successCalled = true,
         onAdditionalVerificationNeeded: (method, email, phone) {},
+        onOnboardingIncomplete: () {},
       );
 
       verify(
@@ -75,6 +79,8 @@ void main() {
             VerificationStatus(
               emailVerified: false,
               phoneVerified: true,
+              onboardingCompleted: true,
+              isFullyVerified: false,
               email: 'test@example.com',
               phone: '+1234567890',
             ),
@@ -95,6 +101,7 @@ void main() {
             additionalEmail = email;
             additionalPhone = phone;
           },
+          onOnboardingIncomplete: () {},
         );
 
         expect(successCalled, isFalse);
@@ -114,22 +121,26 @@ void main() {
         code: '123456',
         onSuccess: () {},
         onAdditionalVerificationNeeded: (method, email, phone) {},
+        onOnboardingIncomplete: () {},
       );
 
-      expect(viewModel.errorMessage, 'Invalid verification code');
+      expect(viewModel.errorMessage, 'authInvalidVerificationCode');
       expect(viewModel.isLoading, isFalse);
     });
 
     test('verify propagates failure message', () async {
-      when(
-        () => mockVerifyOtpUseCase(any(), any()),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('Server error')));
+      when(() => mockVerifyOtpUseCase(any(), any())).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Server error'),
+        ),
+      );
 
       await viewModel.verify(
         identifier: 'test@example.com',
         code: '123456',
         onSuccess: () {},
         onAdditionalVerificationNeeded: (method, email, phone) {},
+        onOnboardingIncomplete: () {},
       );
 
       expect(viewModel.errorMessage, 'Server error');
@@ -149,12 +160,69 @@ void main() {
 
     test('resend handles failure', () async {
       when(() => mockSendOtpUseCase(any())).thenAnswer(
-        (_) async => FailureResult(AuthFailure('Rate limit exceeded')),
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Rate limit exceeded'),
+        ),
       );
 
       await viewModel.resend('test@example.com');
 
       expect(viewModel.errorMessage, 'Rate limit exceeded');
     });
+    test('requestFamilyOtp sends OTP if method is not verified', () async {
+      when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+        (_) async => const Success(
+          VerificationStatus(
+            emailVerified: false,
+            phoneVerified: true,
+            onboardingCompleted: true,
+            isFullyVerified: false,
+            email: 'test@example.com',
+            phone: '+1234567890',
+          ),
+        ),
+      );
+      when(
+        () => mockSendOtpUseCase(any()),
+      ).thenAnswer((_) async => const Success(null));
+
+      bool successCalled = false;
+      await viewModel.requestFamilyOtp(
+        isEmail: true,
+        onSuccess: () => successCalled = true,
+        onError: (_) {},
+      );
+
+      verify(() => mockSendOtpUseCase('test@example.com')).called(1);
+      expect(successCalled, isTrue);
+    });
+
+    test(
+      'requestFamilyOtp reports error if email is already verified',
+      () async {
+        when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+          (_) async => const Success(
+            VerificationStatus(
+              emailVerified: true,
+              phoneVerified: true,
+              onboardingCompleted: true,
+              isFullyVerified: true,
+              email: 'test@example.com',
+              phone: '+1234567890',
+            ),
+          ),
+        );
+
+        String? error;
+        await viewModel.requestFamilyOtp(
+          isEmail: true,
+          onSuccess: () {},
+          onError: (err) => error = err,
+        );
+
+        expect(error, 'This email address is already verified.');
+        verifyNever(() => mockSendOtpUseCase(any()));
+      },
+    );
   });
 }

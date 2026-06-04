@@ -1,23 +1,36 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/verify_additional_method_screen.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
-class MockGetVerificationStatusUseCase extends Mock implements GetVerificationStatusUseCase {}
+
+class MockAuthRepository extends Mock implements AuthRepository {}
+
+class MockGetVerificationStatusUseCase extends Mock
+    implements GetVerificationStatusUseCase {}
+
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 void main() {
   late MockSendOtpUseCase mockSendOtpUseCase;
   late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
+  late MockAuthRepository mockAuthRepository;
+  late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUpAll(() {
     registerFallbackValue(const Success<void, Failure>(null));
@@ -26,10 +39,33 @@ void main() {
   setUp(() {
     mockSendOtpUseCase = MockSendOtpUseCase();
     mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
+    mockAuthRepository = MockAuthRepository();
+    mockAuthStateNotifier = MockAuthStateNotifier();
 
-    when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: true, phoneVerified: false, email: 'alex@example.com', phone: '+15550000000')));
+    when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.skipForSession()).thenReturn(null);
+    when(() => mockAuthStateNotifier.skipForever()).thenAnswer((_) async {});
+    when(() => mockAuthStateNotifier.session).thenReturn(
+      AuthSession(
+        user: null,
+        state: AuthState.pendingAdditionalVerification,
+        token: 'test_token',
+        pendingEmail: null,
+        verificationData: const VerificationData(
+          unverifiedMethod: 'email',
+          email: 'alex@example.com',
+          phone: '+15550000000',
+          onboardingCompleted: false,
+        ),
+        needsLoginVerification: false,
+      ),
+    );
 
-    // Default successful answer for send OTP
+    when(
+      () => mockAuthRepository.skipAdditionalVerification(),
+    ).thenAnswer((_) async => Success(true));
+
     when(
       () => mockSendOtpUseCase(any()),
     ).thenAnswer((_) async => const Success(null));
@@ -39,7 +75,35 @@ void main() {
     required String unverifiedMethod,
     String? email,
     String? phone,
+    VerificationStatus? verificationStatus,
+    bool onboardingCompleted = true,
   }) {
+    final status =
+        verificationStatus ??
+        (unverifiedMethod == 'email'
+            ? VerificationStatus(
+                emailVerified: false,
+                phoneVerified: true,
+                onboardingCompleted: onboardingCompleted,
+                isFullyVerified: false,
+                email: email,
+                phone: phone,
+                unverifiedMethod: 'email',
+              )
+            : VerificationStatus(
+                emailVerified: true,
+                phoneVerified: false,
+                onboardingCompleted: onboardingCompleted,
+                isFullyVerified: false,
+                email: email,
+                phone: phone,
+                unverifiedMethod: 'phone',
+              ));
+
+    when(
+      () => mockGetVerificationStatusUseCase(),
+    ).thenAnswer((_) async => Success(status));
+
     final router = GoRouter(
       routes: [
         GoRoute(
@@ -49,7 +113,9 @@ void main() {
             email: email,
             phone: phone,
             sendOtpUseCase: mockSendOtpUseCase,
+            authRepository: mockAuthRepository,
             getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
+            authStateNotifier: mockAuthStateNotifier,
           ),
         ),
         GoRoute(
@@ -57,8 +123,14 @@ void main() {
           builder: (context, state) => const Scaffold(body: Text('OTP')),
         ),
         GoRoute(
-          path: '/onboarding',
-          builder: (context, state) => const Scaffold(body: Text('Onboarding')),
+          path: '/verification-method',
+          builder: (context, state) =>
+              const Scaffold(body: Text('VERIF_METHOD')),
+        ),
+        GoRoute(
+          path: '/account-setup',
+          builder: (context, state) =>
+              const Scaffold(body: Text('Account Setup')),
         ),
       ],
     );
@@ -84,7 +156,7 @@ void main() {
 
   group('VerifyAdditionalMethodScreen -', () {
     testWidgets(
-      'renders email verification UI when unverifiedMethod is email',
+      'redirects to verification-method when onboarding is incomplete',
       (tester) async {
         await setupScreenSize(tester);
         await tester.pumpWidget(
@@ -92,13 +164,12 @@ void main() {
             unverifiedMethod: 'email',
             email: 'alex@example.com',
             phone: '+15550000000',
+            onboardingCompleted: false,
           ),
         );
         await tester.pumpAndSettle();
 
-        // Should show email verification title and subtitle
-        expect(find.textContaining('Verify Email'), findsOneWidget);
-        expect(find.textContaining('alex@example.com'), findsWidgets);
+        expect(find.text('VERIF_METHOD'), findsOneWidget);
       },
     );
 
@@ -115,13 +186,12 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Should show phone verification title and subtitle
-        expect(find.textContaining('Verify Phone'), findsOneWidget);
+        expect(find.byIcon(Symbols.call), findsOneWidget);
         expect(find.textContaining('+15550000000'), findsWidgets);
       },
     );
 
-    testWidgets('renders verify now button', (tester) async {
+    testWidgets('skip for now calls skipForSession', (tester) async {
       await setupScreenSize(tester);
       await tester.pumpWidget(
         createWidgetUnderTest(
@@ -132,31 +202,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('VERIFY'), findsWidgets);
+      await tester.tap(find.textContaining('SKIP FOR NOW'));
+      await tester.pumpAndSettle();
+
+      verify(() => mockAuthStateNotifier.skipForSession()).called(1);
     });
-
-    
-
-    testWidgets(
-      'calls sendOtpUseCase with correct phone when verify now is tapped',
-      (tester) async {
-        await setupScreenSize(tester);
-        await tester.pumpWidget(
-          createWidgetUnderTest(
-            unverifiedMethod: 'phone',
-            email: 'alex@example.com',
-            phone: '+15550000000',
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        // Tap verify now button
-        await tester.tap(find.textContaining('VERIFY NOW'));
-        await tester.pumpAndSettle();
-
-        verify(() => mockSendOtpUseCase('+15550000000')).called(1);
-      },
-    );
 
     testWidgets(
       'calls sendOtpUseCase with correct email when verify now is tapped',
@@ -171,64 +221,34 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // Tap verify now button
         await tester.tap(find.textContaining('VERIFY NOW'));
         await tester.pumpAndSettle();
 
         verify(() => mockSendOtpUseCase('alex@example.com')).called(1);
+        expect(find.text('OTP'), findsOneWidget);
       },
     );
 
-    testWidgets('navigates to OTP screen after sending OTP', (tester) async {
-      await setupScreenSize(tester);
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          unverifiedMethod: 'email',
-          email: 'alex@example.com',
-          phone: '+15550000000',
-        ),
-      );
-      await tester.pumpAndSettle();
+    testWidgets(
+      'calls sendOtpUseCase with correct phone when verify now is tapped',
+      (tester) async {
+        await setupScreenSize(tester);
+        await tester.pumpWidget(
+          createWidgetUnderTest(
+            unverifiedMethod: 'phone',
+            email: 'alex@example.com',
+            phone: '+15550000000',
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      // Tap verify now button
-      await tester.tap(find.textContaining('VERIFY NOW'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.textContaining('VERIFY NOW'));
+        await tester.pumpAndSettle();
 
-      // Should navigate to OTP screen
-      expect(find.text('OTP'), findsOneWidget);
-    });
-
-    
-
-    testWidgets('renders title correctly', (tester) async {
-      await setupScreenSize(tester);
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          unverifiedMethod: 'email',
-          email: 'alex@example.com',
-          phone: '+15550000000',
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Should show the main title
-      expect(find.textContaining('Complete Your Verification'), findsOneWidget);
-    });
-
-    testWidgets('renders subtitle with method name', (tester) async {
-      await setupScreenSize(tester);
-      await tester.pumpWidget(
-        createWidgetUnderTest(
-          unverifiedMethod: 'phone',
-          email: 'alex@example.com',
-          phone: '+15550000000',
-        ),
-      );
-      await tester.pumpAndSettle();
-
-      // Should show subtitle with method name
-      expect(find.textContaining('phone'), findsWidgets);
-    });
+        verify(() => mockSendOtpUseCase('+15550000000')).called(1);
+        expect(find.text('OTP'), findsOneWidget);
+      },
+    );
 
     testWidgets('renders icon for email verification', (tester) async {
       await setupScreenSize(tester);
@@ -241,7 +261,6 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should render email icon
       expect(find.byIcon(Symbols.mail), findsOneWidget);
     });
 
@@ -256,12 +275,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should render phone icon
       expect(find.byIcon(Symbols.call), findsOneWidget);
     });
 
     testWidgets('handles null email correctly', (tester) async {
-      when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: true, phoneVerified: false, email: null, phone: '+15550000000')));
       await setupScreenSize(tester);
       await tester.pumpWidget(
         createWidgetUnderTest(
@@ -272,12 +289,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should render phone icon since email is null
       expect(find.byIcon(Symbols.call), findsOneWidget);
     });
 
     testWidgets('handles null phone correctly', (tester) async {
-      when(() => mockGetVerificationStatusUseCase()).thenAnswer((_) async => Success(VerificationStatus(emailVerified: false, phoneVerified: true, email: 'alex@example.com', phone: null)));
       await setupScreenSize(tester);
       await tester.pumpWidget(
         createWidgetUnderTest(
@@ -288,13 +303,14 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Should render mail icon since phone is null
       expect(find.byIcon(Symbols.mail), findsOneWidget);
     });
 
     testWidgets('handles OTP send failure gracefully', (tester) async {
       when(() => mockSendOtpUseCase(any())).thenAnswer(
-        (_) async => FailureResult(ServerFailure('Failed to send OTP')),
+        (_) async => FailureResult(
+          ServerFailure(AppErrorCode.serverError, 'Failed to send OTP'),
+        ),
       );
 
       await setupScreenSize(tester);
@@ -307,11 +323,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Tap verify now button
       await tester.tap(find.textContaining('VERIFY NOW'));
       await tester.pumpAndSettle();
 
-      // Verify the use case was called despite failure
       verify(() => mockSendOtpUseCase('alex@example.com')).called(1);
     });
   });

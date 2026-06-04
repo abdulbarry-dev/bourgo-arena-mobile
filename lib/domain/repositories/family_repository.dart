@@ -16,6 +16,22 @@ abstract interface class FamilyRepository {
     String? avatarUrl,
   });
 
+  /// Updates an existing child profile.
+  Future<Result<ChildProfile, Failure>> updateChild({
+    required String id,
+    required String firstName,
+    required String lastName,
+    required DateTime birthDate,
+    required String gender,
+    String? avatarUrl,
+  });
+
   /// Removes a child profile by its [id].
   Future<Result<void, Failure>> removeChild(String id);
+
+  /// Disables the family account feature for the current user.
+  Future<Result<void, Failure>> disableFamilyFeature();
+
+  /// Enables the family account feature for the current user.
+  Future<Result<void, Failure>> enableFamilyFeature();
 }

@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_notifications_enabled_use_case.dart';
@@ -11,8 +12,10 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class _MockGetThemeMode extends Mock implements GetThemeModeUseCase {}
 
@@ -34,12 +37,31 @@ class _MockGetNotificationsEnabled extends Mock
 class _MockSetNotificationsEnabled extends Mock
     implements SetNotificationsEnabledUseCase {}
 
+class _MockDeleteAccount extends Mock implements DeleteAccountUseCase {}
+
 class _MockDeviceTokenRegistrar extends Mock implements DeviceTokenRegistrar {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUpAll(() {
     registerFallbackValue(ThemeMode.system);
     registerFallbackValue(const Locale('en'));
+
+    const MethodChannel(
+      'dev.fluttercommunity.plus/package_info',
+    ).setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'getAll') {
+        return <String, dynamic>{
+          'appName': 'Bourgo Arena',
+          'packageName': 'com.example.bourgo',
+          'version': '1.0.0',
+          'buildNumber': '1',
+          'buildSignature': '',
+        };
+      }
+      return null;
+    });
   });
 
   late SettingsViewModel viewModel;
@@ -52,6 +74,7 @@ void main() {
   late _MockGetNotificationsEnabled mockGetNotif;
   late _MockSetNotificationsEnabled mockSetNotif;
   late _MockDeviceTokenRegistrar mockDeviceTokenRegistrar;
+  late _MockDeleteAccount mockDeleteAccount;
 
   setUp(() {
     mockGetTheme = _MockGetThemeMode();
@@ -63,6 +86,7 @@ void main() {
     mockGetNotif = _MockGetNotificationsEnabled();
     mockSetNotif = _MockSetNotificationsEnabled();
     mockDeviceTokenRegistrar = _MockDeviceTokenRegistrar();
+    mockDeleteAccount = _MockDeleteAccount();
 
     when(
       () => mockGetTheme(),
@@ -103,6 +127,7 @@ void main() {
       mockGetNotif,
       mockSetNotif,
       mockDeviceTokenRegistrar,
+      mockDeleteAccount,
     );
   });
 
@@ -126,18 +151,22 @@ void main() {
     });
 
     test('initialize handles failures and keeps defaults', () async {
-      when(
-        () => mockGetTheme(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(
-        () => mockGetLocale(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(
-        () => mockGetNotif(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
-      when(
-        () => mockIsLangSelected(),
-      ).thenAnswer((_) async => Result.failure(ServerFailure('boom')));
+      when(() => mockGetTheme()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
+      when(() => mockGetLocale()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
+      when(() => mockGetNotif()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
+      when(() => mockIsLangSelected()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
 
       var notifyCount = 0;
       viewModel.addListener(() => notifyCount += 1);

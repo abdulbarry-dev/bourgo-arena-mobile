@@ -1,12 +1,17 @@
+import 'dart:developer' as developer;
 import 'dart:async';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
+import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/verification_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
+import 'package:bourgo_arena_mobile/data/models/verification_status_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -16,15 +21,156 @@ import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart'
 class ApiAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
   final SessionRepository _sessionRepository;
+  AuthSession? _currentSession;
   final StreamController<AuthSession> _authStateController =
       StreamController<AuthSession>.broadcast();
 
-  ApiAuthRepository(this._apiClient, this._sessionRepository);
+  ApiAuthRepository(this._apiClient, this._sessionRepository) {
+    _apiClient.onAuthError = (String? state) {
+      _handleAuthError(state, null);
+    };
+  }
+
+  Future<void> _handleAuthError(String? state, String? message) async {
+    developer.log('Handling auth error: state=$state, message=$message');
+    // Don't re-check verification status if we're already in a pending state
+    // (pending onboarding, verification, or additional verification).
+    // These states should be preserved and not overridden by error handling.
+    if (_currentSession != null &&
+        (_currentSession!.state == AuthState.pendingOnboarding ||
+            _currentSession!.state == AuthState.pendingVerification ||
+            _currentSession!.state ==
+                AuthState.pendingAdditionalVerification)) {
+      developer.log(
+        'Already in pending state (${_currentSession!.state}), skipping error verification check',
+      );
+      return;
+    }
+
+    // If state is not provided, try to re-fetch verification status to see if it's an onboarding/verification issue
+    if (state == null) {
+      developer.log('State is null, fetching verification status...');
+      final statusResult = await getVerificationStatus();
+      statusResult.fold(
+        onSuccess: (status) {
+          developer.log(
+            'Verification status: ${status.isFullyVerified ? 'Verified' : 'Unverified'}, method: ${status.unverifiedMethod}',
+          );
+          if (!status.isFullyVerified) {
+            if (_currentSession != null) {
+              _updateSession(
+                _currentSession!.copyWith(state: AuthState.pendingVerification),
+              );
+            } else {
+              _updateSession(
+                const AuthSession(state: AuthState.pendingVerification),
+              );
+            }
+          } else {
+            // If fully verified but still 403, it might be an onboarding issue
+            if (_currentSession != null) {
+              _updateSession(
+                _currentSession!.copyWith(state: AuthState.pendingOnboarding),
+              );
+            } else {
+              _updateSession(
+                const AuthSession(state: AuthState.pendingOnboarding),
+              );
+            }
+          }
+        },
+        onFailure: (failure) {
+          developer.log(
+            'Failed to fetch verification status: ${failure.message}',
+          );
+          // If status check fails, logout
+          _apiClient.setToken(null);
+          _sessionRepository.clearSession();
+          _currentSession = null;
+          _authStateController.add(AuthSession.unauthenticated());
+        },
+      );
+    } else {
+      developer.log('Mapping backend state: $state');
+      final authState = _mapBackendState(state);
+      if (_currentSession != null && _currentSession!.state != authState) {
+        _updateSession(_currentSession!.copyWith(state: authState));
+      } else if (_currentSession == null) {
+        _updateSession(AuthSession(state: authState));
+      }
+    }
+  }
+
+  // Update the onAuthError callback to use _handleAuthError
+  // ApiAuthRepository constructor:
+  // _apiClient.onAuthError = (String? state) => _handleAuthError(state, null);
+  // (Wait, onAuthError doesn't pass message, so just state)
+
+  Future<void> _updateSession(AuthSession session) async {
+    developer.log(
+      'ApiAuthRepository._updateSession: state=${session.state}, token=${session.token}, user=${session.user}',
+    );
+    _currentSession = session;
+    if (session.token != null) {
+      _apiClient.setToken(session.token);
+      await _sessionRepository.saveAuthToken(session.token!);
+    }
+    await _sessionRepository.saveAuthState(session.state.name);
+    _authStateController.add(session);
+  }
+
+  Future<String?> _currentUserIdentifier() async {
+    final user = _currentSession?.user;
+    final email = user?.email.trim();
+    if (email != null && email.isNotEmpty) {
+      return email;
+    }
+
+    final phone = user?.phone?.trim();
+    if (phone != null && phone.isNotEmpty) {
+      return phone;
+    }
+
+    try {
+      final userResponse =
+          await _apiClient.get('/user/profile', skipAuthError: true)
+              as Map<String, dynamic>;
+      final userModel = UserProfileModel.fromJson(userResponse);
+      final profileUser = UserMapper.toEntity(userModel);
+      final profileEmail = profileUser.email.trim();
+      if (profileEmail.isNotEmpty) {
+        return profileEmail;
+      }
+
+      final profilePhone = profileUser.phone?.trim();
+      if (profilePhone != null && profilePhone.isNotEmpty) {
+        return profilePhone;
+      }
+    } catch (e) {
+      developer.log('Failed to resolve account identifier for deletion: $e');
+    }
+
+    return null;
+  }
+
+  Future<void> _ensureApiTokenFromSession() async {
+    final tokenResult = await _sessionRepository.getAuthToken();
+    tokenResult.when(
+      success: (token) {
+        if (token != null && token.isNotEmpty) {
+          _apiClient.setToken(token);
+        }
+      },
+      failure: (_) {},
+    );
+  }
 
   AuthState _mapBackendState(String? state) {
     switch (state) {
       case 'pending_verification':
         return AuthState.pendingVerification;
+      case 'pending_deletion_cancellation':
+        return AuthState.pendingDeletionCancellation;
       case 'pending_additional_verification':
         return AuthState.pendingAdditionalVerification;
       case 'pending_onboarding':
@@ -34,6 +180,23 @@ class ApiAuthRepository implements AuthRepository {
       default:
         return AuthState.unauthenticated;
     }
+  }
+
+  bool _hasCompleteOnboardingProfile(User? user) {
+    if (user == null) return false;
+
+    return user.firstName.trim().isNotEmpty &&
+        user.lastName.trim().isNotEmpty &&
+        user.birthDate != null &&
+        (user.gender?.trim().isNotEmpty ?? false);
+  }
+
+  Future<User?> _fetchUserProfileEntity() async {
+    final userResponse =
+        await _apiClient.get('/user/profile', skipAuthError: true)
+            as Map<String, dynamic>;
+    final userModel = UserProfileModel.fromJson(userResponse);
+    return UserMapper.toEntity(userModel);
   }
 
   @override
@@ -53,13 +216,40 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final token = response['token'] as String?;
-      final stateStr = response['state'] as String?;
+      // Support responses that wrap payload in a `data` object (backend may return
+      // `{ success: true, message: '', data: { token, state } }`). Prefer top-level
+      // values but fall back to `data` if present.
+      Map<String, dynamic>? payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final token = payload['token'] as String? ?? response['token'] as String?;
+      final stateStr =
+          payload['state'] as String? ?? response['state'] as String?;
       final state = _mapBackendState(stateStr);
+
+      VerificationData? verificationData;
+      if (payload['verification_status'] != null) {
+        final status = payload['verification_status'] as Map<String, dynamic>;
+        verificationData = VerificationData(
+          unverifiedMethod: status['unverified_method'] ?? 'phone',
+          email: status['email'],
+          phone: status['phone'],
+          onboardingCompleted: status['onboarding_completed'] as bool?,
+        );
+      } else if (response['verification_status'] != null) {
+        final status = response['verification_status'] as Map<String, dynamic>;
+        verificationData = VerificationData(
+          unverifiedMethod: status['unverified_method'] ?? 'phone',
+          email: status['email'],
+          phone: status['phone'],
+          onboardingCompleted: status['onboarding_completed'] as bool?,
+        );
+      }
 
       if (token != null) {
         _apiClient.setToken(token);
-        await _sessionRepository.saveAuthToken(token);
       }
 
       await _sessionRepository.saveAuthState(state.name);
@@ -69,22 +259,53 @@ class ApiAuthRepository implements AuthRepository {
       }
 
       User? user;
-      if (response['user'] != null) {
+      AuthState finalState = state;
+      final userData =
+          payload['user'] ?? response['user'] ?? response['member'];
+
+      if (userData != null) {
         final userModel = UserProfileModel.fromJson(
-          response['user'] as Map<String, dynamic>,
+          userData as Map<String, dynamic>,
         );
-        user = UserMapper.toEntity(userModel);
-      } else if (token != null) {
-        // Fetch user profile if token exists but user data is missing
-        final userResponse =
-            await _apiClient.get('/user/profile') as Map<String, dynamic>;
-        final userModel = UserProfileModel.fromJson(userResponse);
         user = UserMapper.toEntity(userModel);
       }
 
-      final session = AuthSession(user: user, state: state, token: token);
-      _authStateController.add(session);
-      return Success(session);
+      final shouldRefreshProfile =
+          token != null &&
+          (user == null ||
+              (finalState == AuthState.pendingOnboarding &&
+                  !_hasCompleteOnboardingProfile(user)));
+
+      if (shouldRefreshProfile) {
+        // If a token was provided but user data is missing, attempt to fetch
+        // the profile. This also normalizes partial onboarding sessions where
+        // the backend returns only contact information.
+        try {
+          user = await _fetchUserProfileEntity();
+        } catch (e) {
+          developer.log(
+            'Profile fetch failed during login while token present. Error: $e',
+          );
+          // If the backend indicated pending additional verification but the
+          // profile is not retrievable, treat it as pending onboarding so the
+          // UI can route the user to complete onboarding instead of waiting
+          // for additional verification.
+          if (finalState == AuthState.pendingAdditionalVerification) {
+            finalState = AuthState.pendingOnboarding;
+          }
+        }
+      }
+
+      final session = AuthSession(
+        user: user,
+        state: finalState,
+        token: token,
+        verificationData: verificationData,
+      );
+
+      final finalSession = await _checkLoginVerification(session);
+      await _updateSession(finalSession);
+      return Success(finalSession);
     });
 
     // If the API call failed but returned a state (e.g. pending_onboarding),
@@ -97,36 +318,130 @@ class ApiAuthRepository implements AuthRepository {
         if (failure.token != null) {
           _apiClient.setToken(failure.token);
           await _sessionRepository.saveAuthToken(failure.token!);
+          await _sessionRepository.saveAuthState(state.name);
 
           // Try to fetch user profile to populate the session
           try {
             final userResponse =
-                await _apiClient.get('/user/profile') as Map<String, dynamic>;
+                await _apiClient.get('/user/profile', skipAuthError: true)
+                    as Map<String, dynamic>;
             final userModel = UserProfileModel.fromJson(userResponse);
             final user = UserMapper.toEntity(userModel);
 
-            await _sessionRepository.saveAuthState(state.name);
             final session = AuthSession(
               user: user,
               state: state,
               token: failure.token,
             );
-            _authStateController.add(session);
-            return Success(session);
+            final finalSession = await _checkLoginVerification(session);
+            await _updateSession(finalSession);
+            return Success(finalSession);
           } catch (_) {
             // If profile fetch fails, continue with state only
           }
         }
 
-        await _sessionRepository.saveAuthState(state.name);
-
         final session = AuthSession(state: state, token: failure.token);
-        _authStateController.add(session);
+        await _updateSession(session);
         return Success(session);
       }
     }
 
     return result;
+  }
+
+  Future<AuthSession> _checkLoginVerification(AuthSession session) async {
+    // We only prompt for second OTP if the user is already "authenticated" (active)
+    // and fully onboarded (PIN set).
+    if (session.state == AuthState.authenticated && session.user != null) {
+      final skipForeverResult = await _sessionRepository
+          .shouldSkipLoginOtpForever();
+      final skipForever = skipForeverResult.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => false,
+      );
+
+      if (!skipForever) {
+        final statusResult = await getVerificationStatus();
+        return statusResult.fold(
+          onSuccess: (status) {
+            // If not fully verified, mark as needing login verification
+            if (!status.isFullyVerified) {
+              return AuthSession(
+                user: session.user,
+                state: AuthState.pendingAdditionalVerification,
+                token: session.token,
+                verificationData: VerificationData(
+                  unverifiedMethod: status.unverifiedMethod ?? 'phone',
+                  email: status.email,
+                  phone: status.phone,
+                  onboardingCompleted: status.onboardingCompleted,
+                ),
+                needsLoginVerification: true,
+              );
+            }
+            return session;
+          },
+          onFailure: (_) => session,
+        );
+      }
+    }
+    return session;
+  }
+
+  @override
+  Future<Result<void, Failure>> deleteAccount({required String password}) {
+    return executeApiCall(() async {
+      final identifier = await _currentUserIdentifier();
+      if (identifier == null || identifier.isEmpty) {
+        throw const AuthException(
+          'Unable to determine the account identifier for deletion.',
+        );
+      }
+
+      final rawResponse = await _apiClient.post('/auth/delete-account', {
+        'identifier': identifier,
+        'password': password,
+      });
+
+      final response = rawResponse is Map<String, dynamic>
+          ? rawResponse
+          : <String, dynamic>{};
+
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final stateStr =
+          payload['state'] as String? ?? response['state'] as String?;
+      final token = payload['token'] as String? ?? response['token'] as String?;
+
+      if (stateStr != null) {
+        final state = _mapBackendState(stateStr);
+
+        User? user;
+        final userData =
+            payload['user'] ?? response['user'] ?? response['member'];
+        if (userData is Map<String, dynamic>) {
+          final userModel = UserProfileModel.fromJson(userData);
+          user = UserMapper.toEntity(userModel);
+        }
+
+        await _sessionRepository.savePendingVerificationEmail(identifier);
+        await _updateSession(
+          AuthSession(
+            user: user ?? _currentSession?.user,
+            state: state,
+            token: token ?? _currentSession?.token,
+            pendingEmail: identifier,
+            verificationData: _currentSession?.verificationData,
+          ),
+        );
+      }
+
+      return const Success(null);
+    });
   }
 
   @override
@@ -139,6 +454,7 @@ class ApiAuthRepository implements AuthRepository {
         _apiClient.setToken(null);
         // Clear the persisted session (including the token)
         await _sessionRepository.clearSession();
+        _currentSession = null;
         _authStateController.add(AuthSession.unauthenticated());
       }
     });
@@ -156,25 +472,71 @@ class ApiAuthRepository implements AuthRepository {
     bool isFamilyAccount = false,
   }) {
     return executeApiCall(() async {
-      await _apiClient.post('/auth/register', {
-        'name': '$firstName $lastName',
+      // Clear any existing token to ensure registration is unauthenticated
+      _apiClient.setToken(null);
+
+      final fullName = '$firstName $lastName'.trim();
+      final dateOfBirth = birthDate.toIso8601String().split('T')[0];
+
+      final rawResponse = await _apiClient.post('/auth/register', {
+        'name': fullName,
         'email': email,
         'phone': phone,
         'password': password,
         'password_confirmation': password,
+        'date_of_birth': dateOfBirth,
         'gender': gender,
-        'date_of_birth': birthDate.toIso8601String().split('T')[0],
-        'is_family_account': isFamilyAccount,
+        'is_parent_account': isFamilyAccount,
       });
+      final response = rawResponse is Map<String, dynamic>
+          ? rawResponse
+          : <String, dynamic>{};
 
-      // After successful registration, the user is typically in pending_verification state.
-      await _sessionRepository.saveAuthState(
-        AuthState.pendingVerification.name,
-      );
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final token = payload['token'] as String? ?? response['token'] as String?;
+      final stateStr =
+          payload['state'] as String? ??
+          response['state'] as String? ??
+          'pending_verification';
+      final state = _mapBackendState(stateStr);
+
+      User? user;
+      final userData =
+          payload['user'] ?? response['user'] ?? response['member'];
+      if (userData is Map<String, dynamic>) {
+        final userModel = UserProfileModel.fromJson(userData);
+        user = UserMapper.toEntity(userModel);
+      }
+
+      VerificationData? verificationData;
+      final statusData =
+          payload['verification_status'] ?? response['verification_status'];
+      if (statusData is Map<String, dynamic>) {
+        verificationData = VerificationData(
+          unverifiedMethod: statusData['unverified_method'] ?? 'phone',
+          email: statusData['email'],
+          phone: statusData['phone'],
+          onboardingCompleted: statusData['onboarding_completed'] as bool?,
+        );
+      }
+
+      if (token != null) {
+        _apiClient.setToken(token);
+      }
+
       await _sessionRepository.savePendingVerificationEmail(email);
-
-      _authStateController.add(
-        AuthSession(state: AuthState.pendingVerification, pendingEmail: email),
+      await _updateSession(
+        AuthSession(
+          user: user,
+          state: state,
+          token: token,
+          pendingEmail: email,
+          verificationData: verificationData,
+        ),
       );
 
       return const Success(null);
@@ -199,13 +561,26 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final isValid = response['valid'] == true;
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final isValid =
+          response['valid'] == true ||
+          payload['valid'] == true ||
+          payload.containsKey('state') ||
+          response.containsKey('state');
 
       if (isValid) {
-        final token = response['token'] as String?;
-        final stateStr = response['state'] as String?;
+        final token =
+            payload['token'] as String? ??
+            response['token'] as String? ??
+            _currentSession?.token;
+        final stateStr =
+            payload['state'] as String? ?? response['state'] as String?;
 
-        if (token != null) {
+        if (token != null && token.isNotEmpty) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
         }
@@ -215,15 +590,35 @@ class ApiAuthRepository implements AuthRepository {
           await _sessionRepository.saveAuthState(state.name);
 
           User? user;
-          if (response['user'] != null) {
-            final userModel = UserProfileModel.fromJson(
-              response['user'] as Map<String, dynamic>,
-            );
+          final userData =
+              payload['user'] ??
+              response['user'] ??
+              payload['member'] ??
+              response['member'];
+          if (userData is Map<String, dynamic>) {
+            final userModel = UserProfileModel.fromJson(userData);
             user = UserMapper.toEntity(userModel);
           }
 
-          _authStateController.add(
-            AuthSession(user: user, state: state, token: token),
+          VerificationData? verificationData;
+          final statusData =
+              payload['verification_status'] ?? response['verification_status'];
+          if (statusData is Map<String, dynamic>) {
+            verificationData = VerificationData(
+              unverifiedMethod: statusData['unverified_method'] ?? 'phone',
+              email: statusData['email'],
+              phone: statusData['phone'],
+              onboardingCompleted: statusData['onboarding_completed'] as bool?,
+            );
+          }
+
+          await _updateSession(
+            AuthSession(
+              user: user ?? _currentSession?.user,
+              state: state,
+              token: token,
+              verificationData: verificationData,
+            ),
           );
         }
       }
@@ -233,16 +628,30 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<void, Failure>> requestFamilyAccountOtp() {
+  Future<Result<String, Failure>> requestFamilyAccountOtp({
+    OtpDeliveryMethod? method,
+  }) {
     return executeApiCall(() async {
-      await _apiClient.post('/auth/request-family-otp', {});
-      return const Success(null);
+      final payload = <String, dynamic>{};
+      if (method != null) {
+        payload['method'] = method.value;
+      }
+      final response = await _apiClient.post(
+        '/auth/request-family-otp',
+        payload,
+      );
+      final message = response is Map<String, dynamic>
+          ? response['message'] as String?
+          : null;
+      return Success(message ?? 'OTP code sent successfully.');
     });
   }
 
   @override
-  Future<Result<void, Failure>> completeRegistration(User user, String pin) {
+  Future<Result<void, Failure>> completeRegistration(User user) {
     return executeApiCall(() async {
+      await _ensureApiTokenFromSession();
+
       final response =
           await _apiClient.post('/auth/complete-registration', {
                 'name': '${user.firstName} ${user.lastName}',
@@ -253,30 +662,61 @@ class ApiAuthRepository implements AuthRepository {
                 )[0],
                 'gender': user.gender,
                 'is_parent_account': user.isParentAccount,
-                'pin': pin,
               })
               as Map<String, dynamic>;
 
-      // Check if a token was returned in the response
-      final token = response['token'] as String?;
-      if (token != null) {
-        _apiClient.setToken(token);
-        await _sessionRepository.saveAuthToken(token);
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
 
-        // Fetch the full profile from the server to ensure we have
-        // consistent data (id, roles, etc.)
-        final profileResult = await getUserProfile();
-        return profileResult.when(
-          success: (_) => const Success(null),
-          failure: (failure) => FailureResult(failure),
+      final stateStr =
+          payload['state'] as String? ??
+          response['state'] as String? ??
+          'active';
+      final state = _mapBackendState(stateStr);
+      final token = payload['token'] as String? ?? response['token'] as String?;
+
+      VerificationData? verificationData;
+      final statusData =
+          payload['verification_status'] ?? response['verification_status'];
+      if (statusData is Map<String, dynamic>) {
+        verificationData = VerificationData(
+          unverifiedMethod: statusData['unverified_method'] ?? 'phone',
+          email: statusData['email'],
+          phone: statusData['phone'],
+          onboardingCompleted: statusData['onboarding_completed'] as bool?,
         );
       }
 
-      final stateStr = response['state'] as String? ?? 'active';
-      final state = _mapBackendState(stateStr);
-      await _sessionRepository.saveAuthState(state.name);
+      User updatedUser = user;
+      final userData =
+          payload['user'] ??
+          response['user'] ??
+          payload['member'] ??
+          response['member'];
+      if (userData is Map<String, dynamic>) {
+        final userModel = UserProfileModel.fromJson(userData);
+        updatedUser = UserMapper.toEntity(userModel);
+      }
 
-      _authStateController.add(AuthSession(user: user, state: state));
+      if (token != null) {
+        _apiClient.setToken(token);
+      }
+
+      await _updateSession(
+        AuthSession(
+          user: updatedUser,
+          state: state,
+          token: token ?? _currentSession?.token,
+          verificationData: verificationData,
+        ),
+      );
+
+      final onboardingCompleted =
+          verificationData?.onboardingCompleted ??
+          state == AuthState.authenticated;
+      await _sessionRepository.setOnboardingCompleted(onboardingCompleted);
       return const Success(null);
     });
   }
@@ -345,16 +785,24 @@ class ApiAuthRepository implements AuthRepository {
       );
 
       final session = AuthSession(user: user, state: state, token: token);
-      _authStateController.add(session);
-      return Success(session);
+      final finalSession = await _checkLoginVerification(session);
+      await _updateSession(finalSession);
+      return Success(finalSession);
     });
 
     if (result is FailureResult<AuthSession, Failure>) {
       if (result.failure is AuthFailure) {
+        developer.log(
+          'getUserProfile failed with AuthFailure: ${result.failure.message}',
+        );
         // If profile fetch fails due to auth, clear everything
         _apiClient.setToken(null);
         await _sessionRepository.clearSession();
         _authStateController.add(AuthSession.unauthenticated());
+      } else {
+        developer.log(
+          'getUserProfile failed with: ${result.failure.runtimeType}, ${result.failure.message}',
+        );
       }
     }
 
@@ -373,7 +821,8 @@ class ApiAuthRepository implements AuthRepository {
       final response =
           await _apiClient.get('/user/verification-status')
               as Map<String, dynamic>;
-      final status = VerificationStatus.fromJson(response);
+      final model = VerificationStatusModel.fromJson(response);
+      final status = VerificationMapper.toEntity(model);
       return Success(status);
     });
   }
@@ -388,13 +837,26 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final isValid = response['valid'] == true;
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final isValid =
+          response['valid'] == true ||
+          payload['valid'] == true ||
+          payload.containsKey('state') ||
+          response.containsKey('state');
 
       if (isValid) {
-        final token = response['token'] as String?;
-        final stateStr = response['state'] as String?;
+        final token =
+            payload['token'] as String? ??
+            response['token'] as String? ??
+            _currentSession?.token;
+        final stateStr =
+            payload['state'] as String? ?? response['state'] as String?;
 
-        if (token != null) {
+        if (token != null && token.isNotEmpty) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
         }
@@ -404,15 +866,22 @@ class ApiAuthRepository implements AuthRepository {
           await _sessionRepository.saveAuthState(state.name);
 
           User? user;
-          if (response['user'] != null) {
-            final userModel = UserProfileModel.fromJson(
-              response['user'] as Map<String, dynamic>,
-            );
+          final userData =
+              payload['user'] ??
+              response['user'] ??
+              payload['member'] ??
+              response['member'];
+          if (userData is Map<String, dynamic>) {
+            final userModel = UserProfileModel.fromJson(userData);
             user = UserMapper.toEntity(userModel);
           }
 
-          _authStateController.add(
-            AuthSession(user: user, state: state, token: token),
+          await _updateSession(
+            AuthSession(
+              user: user ?? _currentSession?.user,
+              state: state,
+              token: token,
+            ),
           );
         }
       }
@@ -431,13 +900,26 @@ class ApiAuthRepository implements AuthRepository {
               })
               as Map<String, dynamic>;
 
-      final isValid = response['valid'] == true;
+      Map<String, dynamic> payload = response;
+      if (response['data'] is Map<String, dynamic>) {
+        payload = response['data'] as Map<String, dynamic>;
+      }
+
+      final isValid =
+          response['valid'] == true ||
+          payload['valid'] == true ||
+          payload.containsKey('state') ||
+          response.containsKey('state');
 
       if (isValid) {
-        final token = response['token'] as String?;
-        final stateStr = response['state'] as String?;
+        final token =
+            payload['token'] as String? ??
+            response['token'] as String? ??
+            _currentSession?.token;
+        final stateStr =
+            payload['state'] as String? ?? response['state'] as String?;
 
-        if (token != null) {
+        if (token != null && token.isNotEmpty) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
         }
@@ -447,20 +929,62 @@ class ApiAuthRepository implements AuthRepository {
           await _sessionRepository.saveAuthState(state.name);
 
           User? user;
-          if (response['user'] != null) {
-            final userModel = UserProfileModel.fromJson(
-              response['user'] as Map<String, dynamic>,
-            );
+          final userData =
+              payload['user'] ??
+              response['user'] ??
+              payload['member'] ??
+              response['member'];
+          if (userData is Map<String, dynamic>) {
+            final userModel = UserProfileModel.fromJson(userData);
             user = UserMapper.toEntity(userModel);
           }
 
-          _authStateController.add(
-            AuthSession(user: user, state: state, token: token),
+          await _updateSession(
+            AuthSession(
+              user: user ?? _currentSession?.user,
+              state: state,
+              token: token,
+            ),
           );
         }
       }
 
       return Success(isValid);
+    });
+  }
+
+  @override
+  Future<Result<bool, Failure>> skipAdditionalVerification() {
+    return executeApiCall(() async {
+      developer.log(
+        'Skipping additional verification with token: ${_currentSession?.token != null ? 'Present' : 'Missing'}',
+      );
+      final response =
+          await _apiClient.post('/auth/skip-additional-verification', {})
+              as Map<String, dynamic>;
+
+      final stateStr = response['state'] as String?;
+      final token = response['token'] as String?;
+
+      if (token != null && stateStr == null) {
+        _apiClient.setToken(token);
+        await _sessionRepository.saveAuthToken(token);
+      } else if (token != null) {
+        _apiClient.setToken(token);
+      }
+
+      if (stateStr != null) {
+        final state = _mapBackendState(stateStr);
+        await _updateSession(
+          AuthSession(
+            user: _currentSession?.user,
+            state: state,
+            token: token ?? _currentSession?.token,
+          ),
+        );
+      }
+
+      return Success(true);
     });
   }
 

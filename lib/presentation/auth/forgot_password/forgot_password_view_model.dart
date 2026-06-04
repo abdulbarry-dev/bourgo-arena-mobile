@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/forgot_password_use_case.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -18,43 +19,49 @@ class ForgotPasswordViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Sends the password reset code.
   Future<void> sendCode(BuildContext context) async {
-    if (formKey.currentState?.validate() ?? false) {
-      setLoading(true);
+    if (!(formKey.currentState?.validate() ?? false)) return;
+    setLoading(true);
 
-      final result = await _forgotPasswordUseCase(identifierController.text);
+    final result = await _forgotPasswordUseCase(identifierController.text);
 
-      setLoading(false);
+    setLoading(false);
 
-      if (context.mounted) {
-        result.fold(
-          onSuccess: (_) {
-            context.push(
-              '/otp',
-              extra: {
-                'destination': identifierController.text,
-                'isPasswordReset': true,
-              },
-            );
-          },
-          onFailure: (failure) {
-            // If the error indicates email not verified, we could handle it here.
-            // But based on requirements, if account is not verified, redirect to OTP.
-            // Assuming the backend returns a specific failure or state for this.
-            if (failure.message.contains('verified') ||
-                failure.message.contains('verification')) {
-              context.push(
-                '/otp',
-                extra: {'destination': identifierController.text},
-              );
-            } else {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(failure.message)));
-            }
-          },
-        );
-      }
+    if (!context.mounted) return;
+    result.fold(
+      onSuccess: (_) => _handleSuccess(context),
+      onFailure: (failure) => _handleFailure(context, failure),
+    );
+  }
+
+  void _handleSuccess(BuildContext context) {
+    context.push(
+      '/otp',
+      extra: {
+        'destination': identifierController.text,
+        'isPasswordReset': true,
+      },
+    );
+  }
+
+  void _handleFailure(BuildContext context, Failure failure) {
+    final isUnverified =
+        failure.state == 'pending_verification' ||
+        failure.message.contains('verified') ||
+        failure.message.contains('verification');
+    if (isUnverified) {
+      context.push(
+        '/otp',
+        extra: {
+          'destination': identifierController.text,
+          'isPasswordReset': false,
+        },
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(failure.message)));
     }
   }
 

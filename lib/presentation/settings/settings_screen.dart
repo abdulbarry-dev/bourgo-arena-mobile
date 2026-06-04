@@ -1,4 +1,6 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -109,7 +111,7 @@ class SettingsScreen extends StatelessWidget {
                     icon: Symbols.info,
                     title: l10n.settingsAppVersion,
                     trailing: Text(
-                      '1.0.0 (1)',
+                      viewModel.appVersion,
                       style: TextStyle(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -154,13 +156,15 @@ class SettingsScreen extends StatelessWidget {
   void _showLanguageDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.settingsLanguage),
+      builder: (context) => AppModal(
+        title: l10n.settingsLanguage,
+        icon: Symbols.language,
+        showCloseButton: true,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<String>(
-              title: const Text('English'),
+              title: Text(l10n.languageEnglish),
               value: 'en',
               // ignore: deprecated_member_use
               groupValue: viewModel.locale.languageCode,
@@ -173,7 +177,7 @@ class SettingsScreen extends StatelessWidget {
               },
             ),
             RadioListTile<String>(
-              title: const Text('Français'),
+              title: Text(l10n.languageFrench),
               value: 'fr',
               // ignore: deprecated_member_use
               groupValue: viewModel.locale.languageCode,
@@ -194,8 +198,10 @@ class SettingsScreen extends StatelessWidget {
   void _showThemeDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.settingsTheme),
+      builder: (context) => AppModal(
+        title: l10n.settingsTheme,
+        icon: Symbols.dark_mode,
+        showCloseButton: true,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -245,27 +251,57 @@ class SettingsScreen extends StatelessWidget {
   }
 
   void _showDeleteAccountDialog(BuildContext context, AppLocalizations l10n) {
+    final parentContext = context;
+    final passwordController = TextEditingController();
+
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.settingsConfirmDeleteTitle),
-        content: Text(l10n.settingsConfirmDeleteMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.settingsCancel),
+      context: parentContext,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setState) => AppModal(
+          title: l10n.settingsConfirmDeleteTitle,
+          subtitle: l10n.settingsDeleteAccount,
+          icon: Symbols.warning,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.settingsConfirmDeleteMessage),
+              const SizedBox(height: 12),
+              AuthTextField(
+                label: l10n.passwordCurrentLabel,
+                hint: l10n.passwordCurrentHint,
+                controller: passwordController,
+                isPassword: true,
+                leadingIcon: Symbols.lock,
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              // Handle account deletion
-              Navigator.pop(context);
-            },
-            child: Text(
-              l10n.settingsDelete,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
+          actions: [
+            AppModalAction(
+              label: l10n.settingsCancel,
+              onPressed: () => Navigator.pop(dialogContext),
             ),
-          ),
-        ],
+            AppModalAction(
+              label: l10n.settingsDelete,
+              isPrimary: true,
+              isDestructive: true,
+              onPressed: () async {
+                final pwd = passwordController.text.trim();
+                if (pwd.isEmpty) {
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
+                    SnackBar(content: Text(l10n.settingsEnterPasswordFirst)),
+                  );
+                  return;
+                }
+
+                final success = await viewModel.deleteAccount(password: pwd);
+                if (success && parentContext.mounted) {
+                  Navigator.pop(dialogContext);
+                  parentContext.go('/login');
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

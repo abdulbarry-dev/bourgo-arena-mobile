@@ -18,7 +18,7 @@ class PrivacyPolicyScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Last Updated: May 2026',
+              l10n.legalLastUpdated,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.bold,
@@ -26,34 +26,28 @@ class PrivacyPolicyScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             _Section(
-              title: '1. Information Collection',
-              content:
-                  'We collect personal information that you provide to us, such as your name, email address, phone number, and payment information when you register or use our services.',
+              title: l10n.privacyPolicySection1Title,
+              content: l10n.privacyPolicySection1Content,
             ),
             _Section(
-              title: '2. Use of Information',
-              content:
-                  'Your information is used to provide and improve our services, process payments, send notifications about your bookings, and communicate with you about updates or offers.',
+              title: l10n.privacyPolicySection2Title,
+              content: l10n.privacyPolicySection2Content,
             ),
             _Section(
-              title: '3. Data Security',
-              content:
-                  'We implement industry-standard security measures to protect your personal data. However, no method of transmission over the internet is 100% secure.',
+              title: l10n.privacyPolicySection3Title,
+              content: l10n.privacyPolicySection3Content,
             ),
             _Section(
-              title: '4. Third-Party Services',
-              content:
-                  'We may use third-party service providers to facilitate our services, such as payment processors. These third parties have access to your information only to perform specific tasks on our behalf.',
+              title: l10n.privacyPolicySection4Title,
+              content: l10n.privacyPolicySection4Content,
             ),
             _Section(
-              title: '5. Your Rights',
-              content:
-                  'You have the right to access, update, or delete your personal information at any time through the app settings or by contacting our support team.',
+              title: l10n.privacyPolicySection5Title,
+              content: l10n.privacyPolicySection5Content,
             ),
             _Section(
-              title: '6. Cookies and Tracking',
-              content:
-                  'We use cookies and similar tracking technologies to track activity on our service and hold certain information to improve your experience.',
+              title: l10n.privacyPolicySection6Title,
+              content: l10n.privacyPolicySection6Content,
             ),
             const SizedBox(height: 40),
           ],

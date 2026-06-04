@@ -19,9 +19,13 @@
   "commonLoadingFailed": "Échec du chargement des données. Veuillez réessayer.",
   "commonGenderMale": "Homme",
   "commonGenderFemale": "Femme",
-  "commonGenderOther": "Autre",
   "commonErrorOccurred": "Une erreur est survenue. Veuillez réessayer.",
+  "commonSave": "ENREGISTRER",
+  "commonMissingContactInfo": "Informations de contact manquantes.",
   "commonImagePickerPlaceholder": "Le sélecteur d'image s'ouvrirait ici",
+  "commonMe": "Moi",
+  "commonSetUp": "CONFIGURER",
+  "commonPointsShort": "pts",
   
   "navHome": "ACCUEIL",
   "navActivities": "ACTIVITÉS",
@@ -59,6 +63,7 @@
   "authPasswordHint": "Entrez votre mot de passe",
   "authIdentifierLabel": "E-mail ou Téléphone",
   "authPasswordLabel": "Mot de passe",
+  "authDeletionCancelSubtitle": "Votre compte est programmé pour suppression. Entrez le code envoyé à votre e-mail/téléphone pour annuler la demande.",
   "authRememberMe": "Se souvenir de moi",
   "authLoginTitle": "Connexion",
   "authLoginSubtitle": "Content de vous revoir ! Connectez-vous pour continuer.",
@@ -92,7 +97,13 @@
   "profilePoints": "POINTS BOURGO",
   "profileCheckins": "VISITES",
   "profileMySubscription": "Mon Adhésion",
-  "profileHistory": "Accès & Historique",
+  "profileHistory": "Accès et historique",
+  "profileDeleteAccount": "Supprimer le compte",
+  "profileDeleteAccountTitle": "Supprimer le compte",
+  "profileDeleteAccountSubtitle": "Cette action est permanente",
+  "profileDeleteAccountMessage": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et votre compte sera traité pour suppression.",
+  "profileDeleteAccountConfirm": "Supprimer mon compte",
+
   "profileNotifications": "Notifications",
   "profileSettings": "Paramètres",
   "profileLogout": "DÉCONNEXION",
@@ -102,6 +113,7 @@
   "profileNextBilling": "PROCHAINE FACTURATION",
   "profileMonthlyUsage": "Utilisation mensuelle",
   "profilePlanLabel": "PLAN",
+  "months": "mois",
   "profileBenefit1": "Accès illimité à la salle de sport",
   "profileBenefit2": "Réservation prioritaire des terrains",
   "profileBenefit3": "1 invité gratuit par mois",
@@ -114,8 +126,6 @@
   "profileQrScanInstruction": "Scannez ce code à l'entrée pour valider votre présence.",
   "profileAccessMethods": "MÉTHODES D'ACCÈS",
   "profileAccessPin": "Code PIN",
-  "profileAccessFingerprint": "Empreinte digitale",
-  "profileAccessNfc": "Carte NFC",
   "profileStatusConfigured": "Configuré",
   "profileStatusNotConfigured": "Non configuré",
   "profileCheckinHistory": "HISTORIQUE D'ACCÈS",
@@ -137,6 +147,8 @@
   "bookingViewTicket": "VOIR LE TICKET",
   "bookingNoSlots": "Aucun créneau disponible pour cette date.",
   "bookingPay": "PAYER",
+  "bookingStepMember": "MEMBRE",
+  "bookingMemberSelectSubtitle": "Choisissez un profil pour le tarif et l’éligibilité.",
   "bookingDateLabel": "DATE & HEURE",
   "bookingLocationLabel": "LIEU",
   "bookingSummaryTitle": "RÉSUMÉ",
@@ -200,15 +212,19 @@
   "settingsDeleteAccount": "Supprimer le compte",
   "settingsConfirmDeleteTitle": "Supprimer le compte ?",
   "settingsConfirmDeleteMessage": "Cette action est irréversible. Toutes vos données seront définitivement supprimées.",
+  "settingsEnterPasswordFirst": "Veuillez saisir votre mot de passe actuel pour confirmer la suppression.",
   "settingsDelete": "SUPPRIMER",
   "settingsCancel": "ANNULER",
   "profileEditTitle": "MODIFIER LE PROFIL",
+  "profileEditSubtitle": "Mettez à jour vos informations et les détails de votre profil.",
   "profileSave": "ENREGISTRER",
   "profileUpdateSuccess": "Profil mis à jour avec succès !",
   "passwordChangeTitle": "CHANGER LE MOT DE PASSE",
   "passwordCurrentLabel": "Mot de passe actuel",
   "passwordCurrentHint": "Entrez votre mot de passe actuel",
   "passwordUpdateSuccess": "Mot de passe mis à jour avec succès!",
+  "errorUpdatingProfile": "Erreur lors de la mise à jour du profil",
+  "errorUpdatingPassword": "Erreur lors de la mise à jour du mot de passe",
   "authFirstNameLabel": "Prénom",
   "authFirstNameHint": "Entrez votre prénom",
   "authLastNameLabel": "Nom",
@@ -219,14 +235,42 @@
   "profileEnableFamilyAccount": "Activer le compte famille",
   "profileFamilyAccountDescription": "Gérez les profils et activités de vos enfants.",
   "profileAddChild": "Ajouter un enfant",
+  "profileEditChild": "Modifier l'enfant",
   "profileNoChildren": "Aucun profil d'enfant ajouté.",
   "profileChildName": "Nom de l'enfant",
   "profileChildBirthDate": "Date de naissance de l'enfant",
   "profileVerifyFamilyTitle": "Vérifier le compte famille",
   "profileVerifyFamilySubtitle": "Pour activer le compte famille, nous devons vérifier votre identité. Entrez le code envoyé à votre {identifier}.",
   "profileFamilyEnabled": "Compte famille activé avec succès !",
+  "profileFamilyNotEnabled": "Activez le compte famille pour gérer les profils de vos enfants.",
+  "profileManageChildren": "Gérer les enfants",
+  "profileEdit": "Modifier",
+  "profileDelete": "Supprimer",
+  "profileConfirmDeleteChild": "Supprimer l'enfant ?",
+  "profileConfirmDeleteChildMessage": "Êtes-vous sûr de vouloir supprimer {childName} de votre compte famille ? Cette action ne peut pas être annulée.",
+  "@profileConfirmDeleteChildMessage": {
+    "placeholders": {
+      "childName": {
+        "type": "String"
+      }
+    }
+  },
+  "profileChildRemoved": "Profil d'enfant supprimé avec succès.",
+  "profileChildAdded": "Profil d'enfant ajouté avec succès.",
+  "profileChildUpdated": "Profil d'enfant mis à jour avec succès.",
+  "profileFirstName": "Prénom",
+  "profileFirstNameHint": "Entrez le prénom de l'enfant",
+  "profileLastName": "Nom",
+  "profileLastNameHint": "Entrez le nom de l'enfant",
+  "profileGender": "Genre",
+  "profileMale": "Garçon",
+  "profileFemale": "Fille",
+  "profileBirthDate": "Date de naissance",
+  "profileSelectDate": "Sélectionnez la date de naissance",
+  "profileNoChildrenDescription": "Commencez par ajouter le profil de votre enfant pour gérer ses activités.",
   "authVerificationMethodTitle": "Vérification de Sécurité",
   "authVerificationMethodSubtitle": "Choisissez une méthode pour recevoir votre code de vérification.",
+  "profileNoVerifiedOtpMethod": "Vous devez avoir au moins une méthode de contact vérifiée (e-mail ou téléphone) avant d'activer un compte famille.",
   "authEmailMethod": "Adresse E-mail",
   "authPhoneMethod": "Numéro de Téléphone",
   "authMethodAccessInstruction": "Assurez-vous d'avoir accès à la méthode sélectionnée.",
@@ -244,10 +288,62 @@
   "authPinSetupSubtitle": "Créez un code PIN à 4 chiffres pour votre premier accès.",
   "authPinSetupInstruction": "Ce code PIN sera utilisé aux bornes de la salle.",
   "authCompleteRegistration": "Terminer l'inscription",
+  "authSetupRequiredTitle": "Configuration du compte requise",
+  "authSetupRequiredMessage": "La configuration du compte n'est pas terminée. Veuillez compléter votre profil pour déverrouiller votre compte.",
+  "authCompleteSetup": "Compléter la configuration",
   "languageSelectionTitle": "Bienvenue à Bourgo Arena",
   "languageSelectionSubtitle": "Veuillez sélectionner votre langue préférée pour continuer",
   "languageLabel": "Choisir la langue",
   "languageEnglish": "English",
+  "profileStandardTier": "Standard",
+  "authInvalidVerificationCode": "Code de vérification invalide",
+  "searchHint": "Rechercher des activités, cours, paramètres...",
+  "searchRecentTitle": "Recherche globale",
+  "searchRecentSubtitle": "Trouvez des activités, cours ou paramètres dans l'app.",
+  "searchNoResultsTitle": "Aucun résultat pour \"{query}\"",
+  "@searchNoResultsTitle": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResultsSubtitle": "Essayez d'autres mots-clés ou vérifiez l'orthographe.",
+  "subscriptionSelectPlanTitle": "Choisissez une offre",
+  "subscriptionPlanBasic": "Basic",
+  "subscriptionPlanPremium": "Premium",
+  "subscriptionConfirmPlan": "CONFIRMER L'OFFRE",
+  "subscriptionPricePerMonth": "{price} TND / mois",
+  "@subscriptionPricePerMonth": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "profileOtpCodeLabel": "Code OTP",
+  "profileOtpCodeHint": "000000",
+  "bookingPointsToEarned": "Points à gagner",
+  "courseFull": "COMPLET",
+  "courseRemaining": "{remaining} RESTANT",
+  "@courseRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "loyaltyDashboardTitle": "Programme de fidélité",
+  "loyaltyTotalPoints": "Points totaux",
+  "loyaltyGoldMember": "Membre Or",
+  "loyaltyPointsToPlatinum": "{points} points avant le niveau Platine",
+  "@loyaltyPointsToPlatinum": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
   "profileLogoutTitle": "Vous déconnecter ?",
   "profileLogoutMessage": "Êtes-vous sûr de vouloir vous déconnecter ? Vous devrez vous reconnecter pour accéder à votre compte.",
   "profileLogoutConfirm": "DÉCONNEXION",
@@ -255,6 +351,31 @@
   "languageFrench": "Français",
   "authGenderLabel": "Genre",
   "authGenderHint": "Sélectionnez le genre",
+  "legalLastUpdated": "Dernière mise à jour : mai 2026",
+  "privacyPolicySection1Title": "1. Collecte des informations",
+  "privacyPolicySection1Content": "Nous collectons les informations personnelles que vous nous fournissez, comme votre nom, votre adresse e-mail, votre numéro de téléphone et vos informations de paiement lorsque vous vous inscrivez ou utilisez nos services.",
+  "privacyPolicySection2Title": "2. Utilisation des informations",
+  "privacyPolicySection2Content": "Vos informations sont utilisées pour fournir et améliorer nos services, traiter les paiements, envoyer des notifications sur vos réservations et communiquer avec vous au sujet des mises à jour ou des offres.",
+  "privacyPolicySection3Title": "3. Sécurité des données",
+  "privacyPolicySection3Content": "Nous mettons en place des mesures de sécurité conformes aux normes du secteur pour protéger vos données personnelles. Cependant, aucune méthode de transmission sur Internet n'est sécurisée à 100 %.",
+  "privacyPolicySection4Title": "4. Services tiers",
+  "privacyPolicySection4Content": "Nous pouvons faire appel à des prestataires tiers pour faciliter nos services, comme les processeurs de paiement. Ces tiers n'ont accès à vos informations que pour effectuer des tâches spécifiques en notre nom.",
+  "privacyPolicySection5Title": "5. Vos droits",
+  "privacyPolicySection5Content": "Vous avez le droit d'accéder à vos informations personnelles, de les mettre à jour ou de les supprimer à tout moment via les paramètres de l'application ou en contactant notre équipe d'assistance.",
+  "privacyPolicySection6Title": "6. Cookies et suivi",
+  "privacyPolicySection6Content": "Nous utilisons des cookies et des technologies de suivi similaires pour suivre l'activité sur notre service et conserver certaines informations afin d'améliorer votre expérience.",
+  "termsSection1Title": "1. Acceptation des conditions",
+  "termsSection1Content": "En accédant aux services Bourgo Arena ou en les utilisant, vous acceptez d'être lié par ces conditions. Si vous n'êtes pas d'accord, veuillez ne pas utiliser l'application.",
+  "termsSection2Title": "2. Description du service",
+  "termsSection2Content": "Bourgo Arena fournit une plateforme pour réserver des installations sportives, gérer des adhésions à la salle et participer à des cours de fitness programmés à Djerba, en Tunisie.",
+  "termsSection3Title": "3. Responsabilités de l'utilisateur",
+  "termsSection3Content": "Les utilisateurs sont responsables de la confidentialité de leurs comptes et de toutes les activités effectuées avec leurs identifiants. Vous acceptez de respecter les règles de la salle et les autres membres.",
+  "termsSection4Title": "4. Réservations et paiements",
+  "termsSection4Content": "Toutes les réservations sont soumises à disponibilité. Les paiements effectués via l'application sont traités de manière sécurisée. Les annulations doivent respecter notre politique d'annulation pour être remboursables.",
+  "termsSection5Title": "5. Limitation de responsabilité",
+  "termsSection5Content": "Bourgo Arena n'est pas responsable des blessures corporelles ou des dommages matériels subis lors de l'utilisation des installations, sauf en cas de négligence grave de notre part.",
+  "termsSection6Title": "6. Modifications des conditions",
+  "termsSection6Content": "Nous nous réservons le droit de modifier ces conditions à tout moment. Le fait de continuer à utiliser l'application après ces modifications vaut acceptation des nouvelles conditions.",
 
   "errorNotFoundTitle": "PAGE INTROUVABLE",
   "errorNotFoundSubtitle": "Oups ! La page que vous cherchez n'existe pas ou a été déplacée.",
@@ -263,6 +384,7 @@
   "profileDisableFamilyContent": "Cela masquera tous les profils d'enfants et les fonctionnalités. Êtes-vous sûr de vouloir continuer ?",
   "profileDisableConfirm": "DÉSACTIVER",
   "commonCancel": "ANNULER",
+  "commonContinue": "CONTINUER",
   "authVerifyAdditionalMethodTitle": "Complétez votre vérification",
   "authVerifyAdditionalMethodMessage": "Pour assurer la sécurité de votre compte, veuillez vérifier votre {method}.",
   "authVerifyNow": "VÉRIFIER MAINTENANT",
@@ -276,5 +398,8 @@
   "authVerifyEmailTitle": "Vérifier l'adresse e-mail",
   "authVerifyEmailSubtitle": "Nous enverrons un code à 6 chiffres à votre e-mail {email}.",
   "authVerificationCompleteTitle": "Vérification terminée",
-  "authVerificationCompleteMessage": "Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil."
+  "authVerificationCompleteMessage": "Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil.",
+  "authDontShowAgain": "Ne plus afficher",
+  "authSkipForever": "PASSER DÉFINITIVEMENT",
+  "authSkipForeverMessage": "Nous recommandons de vérifier les deux méthodes pour une sécurité maximale. Vous pourrez toujours le faire plus tard dans les paramètres."
 }

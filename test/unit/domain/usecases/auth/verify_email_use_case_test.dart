@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_email_use_case.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
 
@@ -42,7 +43,7 @@ void main() {
     });
 
     test('returns failure when email verification fails', () async {
-      const failure = ServerFailure('Invalid OTP');
+      const failure = ServerFailure(AppErrorCode.serverError, 'Invalid OTP');
 
       when(
         () => repository.verifyEmail('alex@example.com', '999999'),
@@ -55,7 +56,10 @@ void main() {
     });
 
     test('propagates auth failures from repository', () async {
-      const failure = AuthFailure('Unauthorized');
+      const failure = AuthFailure(
+        AppErrorCode.invalidCredentials,
+        'Unauthorized',
+      );
 
       when(
         () => repository.verifyEmail('alex@example.com', '123456'),
@@ -68,7 +72,10 @@ void main() {
     });
 
     test('propagates network failures from repository', () async {
-      const failure = NetworkFailure('Connection timeout');
+      const failure = NetworkFailure(
+        AppErrorCode.networkUnavailable,
+        'Connection timeout',
+      );
 
       when(
         () => repository.verifyEmail('alex@example.com', '123456'),
@@ -81,9 +88,11 @@ void main() {
     });
 
     test('handles empty email string', () async {
-      when(
-        () => repository.verifyEmail('', '123456'),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('Invalid email')));
+      when(() => repository.verifyEmail('', '123456')).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Invalid email'),
+        ),
+      );
 
       final result = await useCase('', '123456');
 
@@ -92,9 +101,11 @@ void main() {
     });
 
     test('handles empty OTP string', () async {
-      when(
-        () => repository.verifyEmail('alex@example.com', ''),
-      ).thenAnswer((_) async => FailureResult(AuthFailure('Invalid OTP')));
+      when(() => repository.verifyEmail('alex@example.com', '')).thenAnswer(
+        (_) async => FailureResult(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Invalid OTP'),
+        ),
+      );
 
       final result = await useCase('alex@example.com', '');
 

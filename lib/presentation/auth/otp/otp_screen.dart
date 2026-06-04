@@ -9,12 +9,16 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 
 /// High-fidelity OTP verification screen for Bourgo Arena.
 class OtpScreen extends StatefulWidget {
   final String? destination;
   final Map<String, dynamic>? registrationData;
   final bool isPasswordReset;
+  final bool autoSendOtp;
   final VerifyOtpUseCase verifyOtpUseCase;
   final SendOtpUseCase sendOtpUseCase;
   final GetVerificationStatusUseCase getVerificationStatusUseCase;
@@ -24,6 +28,7 @@ class OtpScreen extends StatefulWidget {
     this.destination,
     this.registrationData,
     this.isPasswordReset = false,
+    this.autoSendOtp = true,
     required this.verifyOtpUseCase,
     required this.sendOtpUseCase,
     required this.getVerificationStatusUseCase,
@@ -35,6 +40,7 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreenState extends State<OtpScreen> {
   late final OtpViewModel _viewModel;
+  String? _resolvedDestination;
   final List<TextEditingController> _controllers = List.generate(
     6,
     (_) => TextEditingController(),
@@ -51,16 +57,45 @@ class _OtpScreenState extends State<OtpScreen> {
       widget.sendOtpUseCase,
       widget.getVerificationStatusUseCase,
     );
+    _resolvedDestination = _resolveDestination();
     _viewModel.addListener(_onViewModelChanged);
     _startTimer();
 
     // Trigger initial OTP send if not already handled by the navigation origin
     // or if we want to ensure it's sent upon landing.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.destination != null) {
-        _viewModel.resend(widget.destination!);
+      if (widget.autoSendOtp && _resolvedDestination != null) {
+        _viewModel.resend(_resolvedDestination!);
       }
     });
+  }
+
+  String? _resolveDestination() {
+    final destination = widget.destination?.trim();
+    if (destination != null && destination.isNotEmpty) {
+      return destination;
+    }
+
+    final authNotifier = locator<AuthStateNotifier>();
+    final pendingEmail = authNotifier.session.pendingEmail?.trim();
+    if (pendingEmail != null && pendingEmail.isNotEmpty) {
+      return pendingEmail;
+    }
+
+    final user = authNotifier.session.user;
+    if (user != null) {
+      final email = user.email.trim();
+      if (email.isNotEmpty) {
+        return email;
+      }
+
+      final phone = user.phone?.trim();
+      if (phone != null && phone.isNotEmpty) {
+        return phone;
+      }
+    }
+
+    return null;
   }
 
   @override
@@ -79,9 +114,13 @@ class _OtpScreenState extends State<OtpScreen> {
 
   void _onViewModelChanged() {
     if (_viewModel.errorMessage != null) {
+      final l10n = AppLocalizations.of(context)!;
+      final message = _viewModel.errorMessage == 'authInvalidVerificationCode'
+          ? l10n.authInvalidVerificationCode
+          : _viewModel.errorMessage!;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
@@ -89,26 +128,37 @@ class _OtpScreenState extends State<OtpScreen> {
     final code = _controllers.map((c) => c.text).join();
     if (code.length == 6) {
       _viewModel.verify(
-        identifier: widget.destination ?? '',
+        identifier: _resolvedDestination ?? '',
         code: code,
-        onSuccess: () {
+        onSuccess: () async {
           if (widget.isPasswordReset) {
             context.push(
               '/new-password',
-              extra: {'identifier': widget.destination ?? '', 'otp': code},
+              extra: {'identifier': _resolvedDestination ?? '', 'otp': code},
             );
           } else {
-            context.push(
-              '/account-setup',
-              extra:
-                  widget.registrationData ??
-                  {
-                    'email': widget.destination ?? '',
-                    'phone': '',
-                    'firstName': 'User',
-                    'lastName': '',
-                  },
-            );
+            final authNotifier = locator<AuthStateNotifier>();
+            final authState = authNotifier.state;
+
+            if (authState == AuthState.authenticated) {
+              context.go('/home');
+              return;
+            }
+
+            if (authState == AuthState.pendingAdditionalVerification ||
+                authState == AuthState.pendingVerification) {
+              context.go('/verify-additional-method');
+              return;
+            }
+
+            if (mounted) {
+              context.go('/login');
+            }
+          }
+        },
+        onOnboardingIncomplete: () {
+          if (mounted) {
+            context.push('/account-setup', extra: _buildOnboardingData());
           }
         },
         onAdditionalVerificationNeeded: (unverifiedMethod, email, phone) {
@@ -122,12 +172,18 @@ class _OtpScreenState extends State<OtpScreen> {
             },
           );
         },
+        isPasswordReset: widget.isPasswordReset,
       );
     }
   }
 
   void _onResend() {
-    _viewModel.resend(widget.destination ?? '');
+    final destination = _resolvedDestination;
+    if (destination == null || destination.isEmpty) {
+      return;
+    }
+
+    _viewModel.resend(destination);
     setState(() => _timerCount = 60);
     _startTimer();
   }
@@ -140,6 +196,23 @@ class _OtpScreenState extends State<OtpScreen> {
         setState(() => _timerCount--);
       }
     });
+  }
+
+  Map<String, dynamic> _buildOnboardingData() {
+    final authNotifier = locator<AuthStateNotifier>();
+    final user = authNotifier.session.user;
+
+    return widget.registrationData ??
+        {
+          'firstName': user?.firstName ?? '',
+          'lastName': user?.lastName ?? '',
+          'email': user?.email ?? widget.destination ?? '',
+          'phone': user?.phone ?? '',
+          'gender': user?.gender,
+          'birthDate': user?.birthDate,
+          'isParentAccount': user?.isParentAccount ?? false,
+          'familyMembers': user?.children ?? const [],
+        };
   }
 
   @override
@@ -163,9 +236,16 @@ class _OtpScreenState extends State<OtpScreen> {
               children: [
                 AuthHeader(
                   title: l10n.authVerificationTitle,
-                  subtitle:
-                      '${l10n.authOtpSubtitlePrefix}'
-                      '${widget.destination ?? l10n.authOtpSubtitleDefault}.',
+                  subtitle: () {
+                    final authNotifier = locator<AuthStateNotifier>();
+                    if (authNotifier.state ==
+                        AuthState.pendingDeletionCancellation) {
+                      return l10n.authDeletionCancelSubtitle;
+                    }
+
+                    return '${l10n.authOtpSubtitlePrefix}'
+                        '${_resolvedDestination ?? l10n.authOtpSubtitleDefault}.';
+                  }(),
                 ),
                 const SizedBox(height: 48),
                 Row(

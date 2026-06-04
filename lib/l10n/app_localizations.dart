@@ -206,23 +206,47 @@ abstract class AppLocalizations {
   /// **'Femme'**
   String get commonGenderFemale;
 
-  /// No description provided for @commonGenderOther.
-  ///
-  /// In fr, this message translates to:
-  /// **'Autre'**
-  String get commonGenderOther;
-
   /// No description provided for @commonErrorOccurred.
   ///
   /// In fr, this message translates to:
   /// **'Une erreur est survenue. Veuillez réessayer.'**
   String get commonErrorOccurred;
 
+  /// No description provided for @commonSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'ENREGISTRER'**
+  String get commonSave;
+
+  /// No description provided for @commonMissingContactInfo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations de contact manquantes.'**
+  String get commonMissingContactInfo;
+
   /// No description provided for @commonImagePickerPlaceholder.
   ///
   /// In fr, this message translates to:
   /// **'Le sélecteur d\'image s\'ouvrirait ici'**
   String get commonImagePickerPlaceholder;
+
+  /// No description provided for @commonMe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moi'**
+  String get commonMe;
+
+  /// No description provided for @commonSetUp.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONFIGURER'**
+  String get commonSetUp;
+
+  /// No description provided for @commonPointsShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'pts'**
+  String get commonPointsShort;
 
   /// No description provided for @navHome.
   ///
@@ -422,6 +446,12 @@ abstract class AppLocalizations {
   /// **'Mot de passe'**
   String get authPasswordLabel;
 
+  /// No description provided for @authDeletionCancelSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre compte est programmé pour suppression. Entrez le code envoyé à votre e-mail/téléphone pour annuler la demande.'**
+  String get authDeletionCancelSubtitle;
+
   /// No description provided for @authRememberMe.
   ///
   /// In fr, this message translates to:
@@ -617,8 +647,38 @@ abstract class AppLocalizations {
   /// No description provided for @profileHistory.
   ///
   /// In fr, this message translates to:
-  /// **'Accès & Historique'**
+  /// **'Accès et historique'**
   String get profileHistory;
+
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @profileDeleteAccountTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer le compte'**
+  String get profileDeleteAccountTitle;
+
+  /// No description provided for @profileDeleteAccountSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette action est permanente'**
+  String get profileDeleteAccountSubtitle;
+
+  /// No description provided for @profileDeleteAccountMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible et votre compte sera traité pour suppression.'**
+  String get profileDeleteAccountMessage;
+
+  /// No description provided for @profileDeleteAccountConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer mon compte'**
+  String get profileDeleteAccountConfirm;
 
   /// No description provided for @profileNotifications.
   ///
@@ -673,6 +733,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'PLAN'**
   String get profilePlanLabel;
+
+  /// No description provided for @months.
+  ///
+  /// In fr, this message translates to:
+  /// **'mois'**
+  String get months;
 
   /// No description provided for @profileBenefit1.
   ///
@@ -745,18 +811,6 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Code PIN'**
   String get profileAccessPin;
-
-  /// No description provided for @profileAccessFingerprint.
-  ///
-  /// In fr, this message translates to:
-  /// **'Empreinte digitale'**
-  String get profileAccessFingerprint;
-
-  /// No description provided for @profileAccessNfc.
-  ///
-  /// In fr, this message translates to:
-  /// **'Carte NFC'**
-  String get profileAccessNfc;
 
   /// No description provided for @profileStatusConfigured.
   ///
@@ -871,6 +925,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'PAYER'**
   String get bookingPay;
+
+  /// No description provided for @bookingStepMember.
+  ///
+  /// In fr, this message translates to:
+  /// **'MEMBRE'**
+  String get bookingStepMember;
+
+  /// No description provided for @bookingMemberSelectSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un profil pour le tarif et l’éligibilité.'**
+  String get bookingMemberSelectSubtitle;
 
   /// No description provided for @bookingDateLabel.
   ///
@@ -1220,6 +1286,12 @@ abstract class AppLocalizations {
   /// **'Cette action est irréversible. Toutes vos données seront définitivement supprimées.'**
   String get settingsConfirmDeleteMessage;
 
+  /// No description provided for @settingsEnterPasswordFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir votre mot de passe actuel pour confirmer la suppression.'**
+  String get settingsEnterPasswordFirst;
+
   /// No description provided for @settingsDelete.
   ///
   /// In fr, this message translates to:
@@ -1237,6 +1309,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'MODIFIER LE PROFIL'**
   String get profileEditTitle;
+
+  /// No description provided for @profileEditSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mettez à jour vos informations et les détails de votre profil.'**
+  String get profileEditSubtitle;
 
   /// No description provided for @profileSave.
   ///
@@ -1273,6 +1351,18 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Mot de passe mis à jour avec succès!'**
   String get passwordUpdateSuccess;
+
+  /// No description provided for @errorUpdatingProfile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de la mise à jour du profil'**
+  String get errorUpdatingProfile;
+
+  /// No description provided for @errorUpdatingPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de la mise à jour du mot de passe'**
+  String get errorUpdatingPassword;
 
   /// No description provided for @authFirstNameLabel.
   ///
@@ -1334,6 +1424,12 @@ abstract class AppLocalizations {
   /// **'Ajouter un enfant'**
   String get profileAddChild;
 
+  /// No description provided for @profileEditChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l\'enfant'**
+  String get profileEditChild;
+
   /// No description provided for @profileNoChildren.
   ///
   /// In fr, this message translates to:
@@ -1370,6 +1466,120 @@ abstract class AppLocalizations {
   /// **'Compte famille activé avec succès !'**
   String get profileFamilyEnabled;
 
+  /// No description provided for @profileFamilyNotEnabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activez le compte famille pour gérer les profils de vos enfants.'**
+  String get profileFamilyNotEnabled;
+
+  /// No description provided for @profileManageChildren.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer les enfants'**
+  String get profileManageChildren;
+
+  /// No description provided for @profileEdit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get profileEdit;
+
+  /// No description provided for @profileDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get profileDelete;
+
+  /// No description provided for @profileConfirmDeleteChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer l\'enfant ?'**
+  String get profileConfirmDeleteChild;
+
+  /// No description provided for @profileConfirmDeleteChildMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Êtes-vous sûr de vouloir supprimer {childName} de votre compte famille ? Cette action ne peut pas être annulée.'**
+  String profileConfirmDeleteChildMessage(String childName);
+
+  /// No description provided for @profileChildRemoved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil d\'enfant supprimé avec succès.'**
+  String get profileChildRemoved;
+
+  /// No description provided for @profileChildAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil d\'enfant ajouté avec succès.'**
+  String get profileChildAdded;
+
+  /// No description provided for @profileChildUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Profil d\'enfant mis à jour avec succès.'**
+  String get profileChildUpdated;
+
+  /// No description provided for @profileFirstName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prénom'**
+  String get profileFirstName;
+
+  /// No description provided for @profileFirstNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez le prénom de l\'enfant'**
+  String get profileFirstNameHint;
+
+  /// No description provided for @profileLastName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom'**
+  String get profileLastName;
+
+  /// No description provided for @profileLastNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez le nom de l\'enfant'**
+  String get profileLastNameHint;
+
+  /// No description provided for @profileGender.
+  ///
+  /// In fr, this message translates to:
+  /// **'Genre'**
+  String get profileGender;
+
+  /// No description provided for @profileMale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garçon'**
+  String get profileMale;
+
+  /// No description provided for @profileFemale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fille'**
+  String get profileFemale;
+
+  /// No description provided for @profileBirthDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date de naissance'**
+  String get profileBirthDate;
+
+  /// No description provided for @profileSelectDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionnez la date de naissance'**
+  String get profileSelectDate;
+
+  /// No description provided for @profileNoChildrenDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commencez par ajouter le profil de votre enfant pour gérer ses activités.'**
+  String get profileNoChildrenDescription;
+
   /// No description provided for @authVerificationMethodTitle.
   ///
   /// In fr, this message translates to:
@@ -1381,6 +1591,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Choisissez une méthode pour recevoir votre code de vérification.'**
   String get authVerificationMethodSubtitle;
+
+  /// No description provided for @profileNoVerifiedOtpMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez avoir au moins une méthode de contact vérifiée (e-mail ou téléphone) avant d\'activer un compte famille.'**
+  String get profileNoVerifiedOtpMethod;
 
   /// No description provided for @authEmailMethod.
   ///
@@ -1484,6 +1700,24 @@ abstract class AppLocalizations {
   /// **'Terminer l\'inscription'**
   String get authCompleteRegistration;
 
+  /// No description provided for @authSetupRequiredTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configuration du compte requise'**
+  String get authSetupRequiredTitle;
+
+  /// No description provided for @authSetupRequiredMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'La configuration du compte n\'est pas terminée. Veuillez compléter votre profil pour déverrouiller votre compte.'**
+  String get authSetupRequiredMessage;
+
+  /// No description provided for @authCompleteSetup.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compléter la configuration'**
+  String get authCompleteSetup;
+
   /// No description provided for @languageSelectionTitle.
   ///
   /// In fr, this message translates to:
@@ -1507,6 +1741,132 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'English'**
   String get languageEnglish;
+
+  /// No description provided for @profileStandardTier.
+  ///
+  /// In fr, this message translates to:
+  /// **'Standard'**
+  String get profileStandardTier;
+
+  /// No description provided for @authInvalidVerificationCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code de vérification invalide'**
+  String get authInvalidVerificationCode;
+
+  /// No description provided for @searchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher des activités, cours, paramètres...'**
+  String get searchHint;
+
+  /// No description provided for @searchRecentTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche globale'**
+  String get searchRecentTitle;
+
+  /// No description provided for @searchRecentSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Trouvez des activités, cours ou paramètres dans l\'app.'**
+  String get searchRecentSubtitle;
+
+  /// No description provided for @searchNoResultsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun résultat pour \"{query}\"'**
+  String searchNoResultsTitle(String query);
+
+  /// No description provided for @searchNoResultsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Essayez d\'autres mots-clés ou vérifiez l\'orthographe.'**
+  String get searchNoResultsSubtitle;
+
+  /// No description provided for @subscriptionSelectPlanTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez une offre'**
+  String get subscriptionSelectPlanTitle;
+
+  /// No description provided for @subscriptionPlanBasic.
+  ///
+  /// In fr, this message translates to:
+  /// **'Basic'**
+  String get subscriptionPlanBasic;
+
+  /// No description provided for @subscriptionPlanPremium.
+  ///
+  /// In fr, this message translates to:
+  /// **'Premium'**
+  String get subscriptionPlanPremium;
+
+  /// No description provided for @subscriptionConfirmPlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONFIRMER L\'OFFRE'**
+  String get subscriptionConfirmPlan;
+
+  /// No description provided for @subscriptionPricePerMonth.
+  ///
+  /// In fr, this message translates to:
+  /// **'{price} TND / mois'**
+  String subscriptionPricePerMonth(String price);
+
+  /// No description provided for @profileOtpCodeLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code OTP'**
+  String get profileOtpCodeLabel;
+
+  /// No description provided for @profileOtpCodeHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'000000'**
+  String get profileOtpCodeHint;
+
+  /// No description provided for @bookingPointsToEarned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points à gagner'**
+  String get bookingPointsToEarned;
+
+  /// No description provided for @courseFull.
+  ///
+  /// In fr, this message translates to:
+  /// **'COMPLET'**
+  String get courseFull;
+
+  /// No description provided for @courseRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'{remaining} RESTANT'**
+  String courseRemaining(String remaining);
+
+  /// No description provided for @loyaltyDashboardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Programme de fidélité'**
+  String get loyaltyDashboardTitle;
+
+  /// No description provided for @loyaltyTotalPoints.
+  ///
+  /// In fr, this message translates to:
+  /// **'Points totaux'**
+  String get loyaltyTotalPoints;
+
+  /// No description provided for @loyaltyGoldMember.
+  ///
+  /// In fr, this message translates to:
+  /// **'Membre Or'**
+  String get loyaltyGoldMember;
+
+  /// No description provided for @loyaltyPointsToPlatinum.
+  ///
+  /// In fr, this message translates to:
+  /// **'{points} points avant le niveau Platine'**
+  String loyaltyPointsToPlatinum(String points);
 
   /// No description provided for @profileLogoutTitle.
   ///
@@ -1550,6 +1910,156 @@ abstract class AppLocalizations {
   /// **'Sélectionnez le genre'**
   String get authGenderHint;
 
+  /// No description provided for @legalLastUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière mise à jour : mai 2026'**
+  String get legalLastUpdated;
+
+  /// No description provided for @privacyPolicySection1Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'1. Collecte des informations'**
+  String get privacyPolicySection1Title;
+
+  /// No description provided for @privacyPolicySection1Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous collectons les informations personnelles que vous nous fournissez, comme votre nom, votre adresse e-mail, votre numéro de téléphone et vos informations de paiement lorsque vous vous inscrivez ou utilisez nos services.'**
+  String get privacyPolicySection1Content;
+
+  /// No description provided for @privacyPolicySection2Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'2. Utilisation des informations'**
+  String get privacyPolicySection2Title;
+
+  /// No description provided for @privacyPolicySection2Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos informations sont utilisées pour fournir et améliorer nos services, traiter les paiements, envoyer des notifications sur vos réservations et communiquer avec vous au sujet des mises à jour ou des offres.'**
+  String get privacyPolicySection2Content;
+
+  /// No description provided for @privacyPolicySection3Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'3. Sécurité des données'**
+  String get privacyPolicySection3Title;
+
+  /// No description provided for @privacyPolicySection3Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous mettons en place des mesures de sécurité conformes aux normes du secteur pour protéger vos données personnelles. Cependant, aucune méthode de transmission sur Internet n\'est sécurisée à 100 %.'**
+  String get privacyPolicySection3Content;
+
+  /// No description provided for @privacyPolicySection4Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'4. Services tiers'**
+  String get privacyPolicySection4Title;
+
+  /// No description provided for @privacyPolicySection4Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous pouvons faire appel à des prestataires tiers pour faciliter nos services, comme les processeurs de paiement. Ces tiers n\'ont accès à vos informations que pour effectuer des tâches spécifiques en notre nom.'**
+  String get privacyPolicySection4Content;
+
+  /// No description provided for @privacyPolicySection5Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'5. Vos droits'**
+  String get privacyPolicySection5Title;
+
+  /// No description provided for @privacyPolicySection5Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez le droit d\'accéder à vos informations personnelles, de les mettre à jour ou de les supprimer à tout moment via les paramètres de l\'application ou en contactant notre équipe d\'assistance.'**
+  String get privacyPolicySection5Content;
+
+  /// No description provided for @privacyPolicySection6Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'6. Cookies et suivi'**
+  String get privacyPolicySection6Title;
+
+  /// No description provided for @privacyPolicySection6Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous utilisons des cookies et des technologies de suivi similaires pour suivre l\'activité sur notre service et conserver certaines informations afin d\'améliorer votre expérience.'**
+  String get privacyPolicySection6Content;
+
+  /// No description provided for @termsSection1Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'1. Acceptation des conditions'**
+  String get termsSection1Title;
+
+  /// No description provided for @termsSection1Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'En accédant aux services Bourgo Arena ou en les utilisant, vous acceptez d\'être lié par ces conditions. Si vous n\'êtes pas d\'accord, veuillez ne pas utiliser l\'application.'**
+  String get termsSection1Content;
+
+  /// No description provided for @termsSection2Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'2. Description du service'**
+  String get termsSection2Title;
+
+  /// No description provided for @termsSection2Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bourgo Arena fournit une plateforme pour réserver des installations sportives, gérer des adhésions à la salle et participer à des cours de fitness programmés à Djerba, en Tunisie.'**
+  String get termsSection2Content;
+
+  /// No description provided for @termsSection3Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'3. Responsabilités de l\'utilisateur'**
+  String get termsSection3Title;
+
+  /// No description provided for @termsSection3Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les utilisateurs sont responsables de la confidentialité de leurs comptes et de toutes les activités effectuées avec leurs identifiants. Vous acceptez de respecter les règles de la salle et les autres membres.'**
+  String get termsSection3Content;
+
+  /// No description provided for @termsSection4Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'4. Réservations et paiements'**
+  String get termsSection4Title;
+
+  /// No description provided for @termsSection4Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les réservations sont soumises à disponibilité. Les paiements effectués via l\'application sont traités de manière sécurisée. Les annulations doivent respecter notre politique d\'annulation pour être remboursables.'**
+  String get termsSection4Content;
+
+  /// No description provided for @termsSection5Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'5. Limitation de responsabilité'**
+  String get termsSection5Title;
+
+  /// No description provided for @termsSection5Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bourgo Arena n\'est pas responsable des blessures corporelles ou des dommages matériels subis lors de l\'utilisation des installations, sauf en cas de négligence grave de notre part.'**
+  String get termsSection5Content;
+
+  /// No description provided for @termsSection6Title.
+  ///
+  /// In fr, this message translates to:
+  /// **'6. Modifications des conditions'**
+  String get termsSection6Title;
+
+  /// No description provided for @termsSection6Content.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous nous réservons le droit de modifier ces conditions à tout moment. Le fait de continuer à utiliser l\'application après ces modifications vaut acceptation des nouvelles conditions.'**
+  String get termsSection6Content;
+
   /// No description provided for @errorNotFoundTitle.
   ///
   /// In fr, this message translates to:
@@ -1591,6 +2101,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'ANNULER'**
   String get commonCancel;
+
+  /// No description provided for @commonContinue.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONTINUER'**
+  String get commonContinue;
 
   /// No description provided for @authVerifyAdditionalMethodTitle.
   ///
@@ -1675,6 +2191,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil.'**
   String get authVerificationCompleteMessage;
+
+  /// No description provided for @authDontShowAgain.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ne plus afficher'**
+  String get authDontShowAgain;
+
+  /// No description provided for @authSkipForever.
+  ///
+  /// In fr, this message translates to:
+  /// **'PASSER DÉFINITIVEMENT'**
+  String get authSkipForever;
+
+  /// No description provided for @authSkipForeverMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous recommandons de vérifier les deux méthodes pour une sécurité maximale. Vous pourrez toujours le faire plus tard dans les paramètres.'**
+  String get authSkipForeverMessage;
 }
 
 class _AppLocalizationsDelegate

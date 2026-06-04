@@ -1,8 +1,9 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
 import 'package:flutter/material.dart';
 
 /// ViewModel for the Registration screen.
-class RegisterViewModel extends ChangeNotifier {
+class RegisterViewModel extends BaseViewModel {
   final RegisterUseCase _registerUseCase;
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -26,9 +27,6 @@ class RegisterViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   RegisterViewModel(this._registerUseCase);
-
-  String? _errorMessage;
-  String? get errorMessage => _errorMessage;
 
   void setBirthDate(DateTime? date) {
     _selectedBirthDate = date;
@@ -55,14 +53,12 @@ class RegisterViewModel extends ChangeNotifier {
   }) async {
     if (formKey.currentState?.validate() ?? false) {
       if (_selectedBirthDate == null || _selectedGender == null) {
-        _errorMessage = "Please complete all fields";
-        notifyListeners();
+        setErrorMessage("Please complete all fields");
         return;
       }
 
       setLoading(true);
-      _errorMessage = null;
-      notifyListeners();
+      clearError();
 
       final result = await _registerUseCase(
         firstName: firstNameController.text,
@@ -91,8 +87,7 @@ class RegisterViewModel extends ChangeNotifier {
           onSuccess(registrationData);
         },
         onFailure: (failure) {
-          _errorMessage = failure.message;
-          notifyListeners();
+          setErrorMessage(failure.message);
         },
       );
     }

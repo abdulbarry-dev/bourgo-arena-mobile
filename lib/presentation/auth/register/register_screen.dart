@@ -1,4 +1,8 @@
+import 'dart:async';
+
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/register/viewmodels/register_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -28,16 +32,27 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   late final RegisterViewModel _viewModel;
+  late final SessionRepository _sessionRepository;
 
   @override
   void initState() {
     super.initState();
+    _sessionRepository = locator<SessionRepository>();
     _viewModel = RegisterViewModel(widget.registerUseCase);
     _viewModel.addListener(_onViewModelChanged);
+    _viewModel.addListener(_persistDraft);
+    _viewModel.firstNameController.addListener(_persistDraft);
+    _viewModel.lastNameController.addListener(_persistDraft);
+    _viewModel.emailController.addListener(_persistDraft);
+    _viewModel.phoneController.addListener(_persistDraft);
+    _viewModel.passwordController.addListener(_persistDraft);
+    _viewModel.birthDateController.addListener(_persistDraft);
 
     if (widget.initialData != null) {
       _prefillData();
     }
+
+    _persistDraft();
   }
 
   void _prefillData() {
@@ -59,9 +74,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
+    _viewModel.firstNameController.removeListener(_persistDraft);
+    _viewModel.lastNameController.removeListener(_persistDraft);
+    _viewModel.emailController.removeListener(_persistDraft);
+    _viewModel.phoneController.removeListener(_persistDraft);
+    _viewModel.passwordController.removeListener(_persistDraft);
+    _viewModel.birthDateController.removeListener(_persistDraft);
+    _viewModel.removeListener(_persistDraft);
     _viewModel.removeListener(_onViewModelChanged);
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _persistDraft() {
+    unawaited(
+      _sessionRepository.saveRegistrationDraft({
+        'route': '/register',
+        'extra': {
+          'firstName': _viewModel.firstNameController.text,
+          'lastName': _viewModel.lastNameController.text,
+          'email': _viewModel.emailController.text,
+          'phone': _viewModel.phoneController.text,
+          'gender': _viewModel.selectedGender,
+          'birthDate': _viewModel.selectedBirthDate,
+          'isParentAccount': _viewModel.isParentAccount,
+        },
+      }),
+    );
   }
 
   void _onViewModelChanged() {
@@ -75,6 +114,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _onRegister() {
     _viewModel.register(
       onSuccess: (data) {
+        unawaited(
+          _sessionRepository.saveRegistrationDraft({
+            'route': data['isParentAccount'] as bool
+                ? '/family-onboarding'
+                : '/verification-method',
+            'extra': data,
+          }),
+        );
         if (data['isParentAccount'] as bool) {
           context.push('/family-onboarding', extra: data);
         } else {
@@ -97,6 +144,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (picked != null) {
       _viewModel.setBirthDate(picked);
       _viewModel.birthDateController.text = DateFormat.yMMMd().format(picked);
+      _persistDraft();
     }
   }
 
@@ -200,10 +248,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           DropdownMenuItem(
                             value: 'female',
                             child: Text(l10n.commonGenderFemale),
-                          ),
-                          DropdownMenuItem(
-                            value: 'other',
-                            child: Text(l10n.commonGenderOther),
                           ),
                         ],
                         onChanged: _viewModel.setGender,

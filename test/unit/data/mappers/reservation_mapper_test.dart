@@ -14,6 +14,7 @@ void main() {
       expect(mapped.id, dto.id);
       expect(mapped.activityId, dto.activityId);
       expect(mapped.activityTitle, dto.activityTitle);
+      expect(mapped.memberId, dto.memberId);
       expect(mapped.date, dto.date);
       expect(mapped.time, dto.time);
       expect(mapped.duration, dto.duration);
@@ -58,6 +59,7 @@ void main() {
 
       expect(dto.id, reservation.id);
       expect(dto.qrCode, reservation.qrCode);
+      expect(dto.memberId, reservation.memberId);
     });
 
     test('toEntityList converts a list of DTOs', () {
