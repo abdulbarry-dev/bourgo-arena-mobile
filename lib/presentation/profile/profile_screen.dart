@@ -174,7 +174,7 @@ class _StatsRow extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           GestureDetector(
             onTap: () => context.push('/loyalty'),
@@ -183,13 +183,6 @@ class _StatsRow extends StatelessWidget {
               value: user.loyaltyPoints.toString(),
               icon: Symbols.stars,
             ),
-          ),
-
-          Container(width: 1, height: 40, color: theme.colorScheme.outline),
-          _StatItem(
-            label: AppLocalizations.of(context)!.profileCheckins,
-            value: user.totalCheckIns.toString(),
-            icon: Symbols.qr_code_scanner,
           ),
         ],
       ),

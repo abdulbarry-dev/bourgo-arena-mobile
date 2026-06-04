@@ -745,11 +745,7 @@ void main() {
           birthDate: DateTime.utc(1990, 1, 1),
         );
         when(
-          () => apiClient.post(
-            '/auth/complete-registration',
-            any(),
-            includeAuth: false,
-          ),
+          () => apiClient.post('/auth/complete-registration', any()),
         ).thenAnswer((_) async => {'state': 'active'});
         final eventExpectation = expectLater(
           repository.onAuthStateChanged,
@@ -773,18 +769,14 @@ void main() {
             'date_of_birth': '1990-01-01',
             'gender': 'male',
             'is_parent_account': true,
-          }, includeAuth: false),
+          }),
         ).called(1);
         await eventExpectation;
       });
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.post(
-            '/auth/complete-registration',
-            any(),
-            includeAuth: false,
-          ),
+          () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.completeRegistration(testUserEntity());
@@ -798,11 +790,7 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.post(
-            '/auth/complete-registration',
-            any(),
-            includeAuth: false,
-          ),
+          () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.completeRegistration(testUserEntity());
@@ -816,11 +804,7 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.post(
-            '/auth/complete-registration',
-            any(),
-            includeAuth: false,
-          ),
+          () => apiClient.post('/auth/complete-registration', any()),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.completeRegistration(testUserEntity());

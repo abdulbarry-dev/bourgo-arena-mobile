@@ -662,7 +662,7 @@ class ApiAuthRepository implements AuthRepository {
                 )[0],
                 'gender': user.gender,
                 'is_parent_account': user.isParentAccount,
-              }, includeAuth: false)
+              })
               as Map<String, dynamic>;
 
       Map<String, dynamic> payload = response;

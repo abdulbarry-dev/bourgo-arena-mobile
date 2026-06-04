@@ -252,7 +252,7 @@ void main() {
       expect(find.text('JOHN DOE'), findsOneWidget);
       expect(find.text('GOLD'), findsOneWidget);
       expect(find.text('100'), findsOneWidget); // Points
-      expect(find.text('42'), findsOneWidget); // Check-ins
+      expect(find.text('42'), findsNothing); // Check-ins removed
     });
 
     testWidgets('shows error message when fetch fails', (tester) async {
