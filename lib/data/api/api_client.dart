@@ -15,10 +15,12 @@ class ApiClient {
   ApiClient({required this.baseUrl, http.Client? client})
     : _client = client ?? http.Client();
 
-  /// Updates the authentication token used for requests.
   void setToken(String? token) {
     _token = token;
   }
+
+  /// Returns true if a token is currently set.
+  bool get hasToken => _token != null;
 
   /// Sends a GET request to the specified [path].
   Future<dynamic> get(

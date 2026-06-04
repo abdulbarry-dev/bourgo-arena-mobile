@@ -15,6 +15,9 @@ class ApiFamilyRepository implements FamilyRepository {
 
   @override
   Future<Result<List<ChildProfile>, Failure>> getChildren() {
+    if (!_apiClient.hasToken) {
+      return Future.value(const Success([]));
+    }
     return executeApiCall(() async {
       final response = await _apiClient.get('/family/children');
       final List<dynamic> data = response is List

@@ -63,9 +63,12 @@ class HomeViewModel extends ChangeNotifier {
       final activitiesResult = await _getActivitiesUseCase();
       if (!_isDisposed) {
         activitiesResult.when(
-          success: (data) => _activities = data,
+          success: (data) {
+            developer.log('HomeViewModel: Successfully loaded ${data.length} activities');
+            _activities = data;
+          },
           failure: (failure) =>
-              developer.log('Error loading activities: $failure'),
+              developer.log('HomeViewModel: Error loading activities: ${failure.message}'),
         );
       }
 
@@ -73,9 +76,12 @@ class HomeViewModel extends ChangeNotifier {
       final servicesResult = await _getServicesUseCase();
       if (!_isDisposed) {
         servicesResult.when(
-          success: (data) => _services = data,
+          success: (data) {
+            developer.log('HomeViewModel: Successfully loaded ${data.length} services');
+            _services = data;
+          },
           failure: (failure) =>
-              developer.log('Error loading services: $failure'),
+              developer.log('HomeViewModel: Error loading services: ${failure.message}'),
         );
       }
 
@@ -84,6 +90,7 @@ class HomeViewModel extends ChangeNotifier {
       if (!_isDisposed) {
         coursesResult.when(
           success: (data) {
+            developer.log('HomeViewModel: Successfully loaded ${data.length} courses');
             final today = DateTime.now().weekday;
             final todays = data.where((c) => c.dayOfWeek == today).toList();
             if (todays.isEmpty && data.isNotEmpty) {
@@ -93,7 +100,7 @@ class HomeViewModel extends ChangeNotifier {
             }
           },
           failure: (failure) =>
-              developer.log('Error loading courses: $failure'),
+              developer.log('HomeViewModel: Error loading courses: ${failure.message}'),
         );
       }
 

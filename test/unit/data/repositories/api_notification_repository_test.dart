@@ -18,6 +18,7 @@ void main() {
 
   setUp(() {
     apiClient = MockApiClient();
+    when(() => apiClient.hasToken).thenReturn(true);
     repository = ApiNotificationRepository(apiClient);
   });
 

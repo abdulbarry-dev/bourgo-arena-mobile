@@ -15,6 +15,9 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
 
   @override
   Future<Result<Subscription?, Failure>> getActiveSubscription() {
+    if (!_apiClient.hasToken) {
+      return Future.value(const Success(null));
+    }
     return executeApiCall(() async {
       final response = await _apiClient.get('/member/subscription');
       if (response == null) {

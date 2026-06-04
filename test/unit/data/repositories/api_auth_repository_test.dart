@@ -23,6 +23,7 @@ void main() {
 
   setUp(() {
     apiClient = MockApiClient();
+    when(() => apiClient.hasToken).thenReturn(true);
     sessionRepository = MockSessionRepository();
     repository = ApiAuthRepository(apiClient, sessionRepository);
 

@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
@@ -15,6 +16,13 @@ class ApiUserRepository implements UserRepository {
 
   @override
   Future<Result<User, Failure>> getUserProfile() {
+    if (!_apiClient.hasToken) {
+      return Future.value(
+        Result.failure(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+        ),
+      );
+    }
     return executeApiCall(() async {
       final response =
           await _apiClient.get('/user/profile') as Map<String, dynamic>;
@@ -25,6 +33,13 @@ class ApiUserRepository implements UserRepository {
 
   @override
   Future<Result<User, Failure>> updateUserProfile(User user) {
+    if (!_apiClient.hasToken) {
+      return Future.value(
+        Result.failure(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+        ),
+      );
+    }
     return executeApiCall(() async {
       final model = UserMapper.fromEntity(user);
       final response =

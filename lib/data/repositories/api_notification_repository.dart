@@ -19,6 +19,19 @@ class ApiNotificationRepository implements NotificationRepository {
   Future<Result<PaginatedResult<Notification>, Failure>> getNotifications({
     int page = 1,
   }) {
+    if (!_apiClient.hasToken) {
+      return Future.value(
+        const Success(
+          PaginatedResult(
+            data: [],
+            currentPage: 1,
+            lastPage: 1,
+            total: 0,
+            hasMore: false,
+          ),
+        ),
+      );
+    }
     return executeApiCall(() async {
       final response =
           await _apiClient.get(
