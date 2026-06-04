@@ -49,6 +49,23 @@ class ApiAuthRepository implements AuthRepository {
 
     // If state is not provided, try to re-fetch verification status to see if it's an onboarding/verification issue
     if (state == null) {
+      final tokenResult = await _sessionRepository.getAuthToken();
+      final hasToken = tokenResult.fold(
+        onSuccess: (token) => token != null && token.isNotEmpty,
+        onFailure: (_) => false,
+      );
+
+      if (!hasToken) {
+        developer.log('No token present, clearing session directly.');
+        _apiClient.setToken(null);
+        await _sessionRepository.clearSession();
+        if (_currentSession != null) {
+          _currentSession = null;
+          _authStateController.add(AuthSession.unauthenticated());
+        }
+        return;
+      }
+
       developer.log('State is null, fetching verification status...');
       final statusResult = await getVerificationStatus();
       statusResult.fold(
@@ -86,8 +103,10 @@ class ApiAuthRepository implements AuthRepository {
           // If status check fails, logout
           _apiClient.setToken(null);
           _sessionRepository.clearSession();
-          _currentSession = null;
-          _authStateController.add(AuthSession.unauthenticated());
+          if (_currentSession != null) {
+            _currentSession = null;
+            _authStateController.add(AuthSession.unauthenticated());
+          }
         },
       );
     } else {
@@ -96,7 +115,9 @@ class ApiAuthRepository implements AuthRepository {
       if (_currentSession != null && _currentSession!.state != authState) {
         _updateSession(_currentSession!.copyWith(state: authState));
       } else if (_currentSession == null) {
-        _updateSession(AuthSession(state: authState));
+        if (authState != AuthState.unauthenticated) {
+          _updateSession(AuthSession(state: authState));
+        }
       }
     }
   }
@@ -815,7 +836,7 @@ class ApiAuthRepository implements AuthRepository {
   Future<Result<VerificationStatus, Failure>> getVerificationStatus() {
     return executeApiCall(() async {
       final response =
-          await _apiClient.get('/user/verification-status')
+          await _apiClient.get('/user/verification-status', skipAuthError: true)
               as Map<String, dynamic>;
       final model = VerificationStatusModel.fromJson(response);
       final status = VerificationMapper.toEntity(model);

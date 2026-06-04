@@ -19,8 +19,11 @@ class ApiActivityRepository implements ActivityRepository {
   @override
   Future<Result<List<Activity>, Failure>> getActivities() {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/activities') as List<dynamic>;
-      final entities = response
+      final response = await _apiClient.get('/activities');
+      final List<dynamic> data = response is List
+          ? response
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+      final entities = data
           .map(
             (json) => ActivityMapper.toEntity(
               ActivityModel.fromJson(json as Map<String, dynamic>),
@@ -46,10 +49,11 @@ class ApiActivityRepository implements ActivityRepository {
   @override
   Future<Result<List<TimeSlot>, Failure>> getTimeSlots(String activityId) {
     return executeApiCall(() async {
-      final response =
-          await _apiClient.get('/activities/$activityId/slots')
-              as List<dynamic>;
-      final entities = response
+      final response = await _apiClient.get('/activities/$activityId/slots');
+      final List<dynamic> data = response is List
+          ? response
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+      final entities = data
           .map(
             (json) => TimeSlotMapper.toEntity(
               TimeSlotModel.fromJson(json as Map<String, dynamic>),

@@ -16,8 +16,11 @@ class ApiReservationRepository implements ReservationRepository {
   @override
   Future<Result<List<Reservation>, Failure>> getReservations() {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/reservations') as List<dynamic>;
-      final entities = response
+      final response = await _apiClient.get('/reservations');
+      final List<dynamic> data = response is List
+          ? response
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+      final entities = data
           .map(
             (json) => ReservationMapper.toEntity(
               ReservationModel.fromJson(json as Map<String, dynamic>),

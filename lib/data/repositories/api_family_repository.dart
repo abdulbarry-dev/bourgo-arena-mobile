@@ -16,9 +16,11 @@ class ApiFamilyRepository implements FamilyRepository {
   @override
   Future<Result<List<ChildProfile>, Failure>> getChildren() {
     return executeApiCall(() async {
-      final response =
-          await _apiClient.get('/family/children') as List<dynamic>;
-      final entities = response
+      final response = await _apiClient.get('/family/children');
+      final List<dynamic> data = response is List
+          ? response
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+      final entities = data
           .map(
             (json) => ChildMapper.toEntity(
               ChildProfileModel.fromJson(json as Map<String, dynamic>),

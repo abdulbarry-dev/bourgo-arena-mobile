@@ -16,9 +16,11 @@ class ApiSearchRepository implements SearchRepository {
   @override
   Future<Result<List<SearchResult>, Failure>> search(String query) {
     return executeApiCall(() async {
-      final response =
-          await _apiClient.get('/search?q=$query') as List<dynamic>;
-      final entities = response
+      final response = await _apiClient.get('/search?q=$query');
+      final List<dynamic> data = response is List
+          ? response
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+      final entities = data
           .map(
             (json) => SearchMapper.toEntity(
               SearchResultModel.fromJson(json as Map<String, dynamic>),
