@@ -170,7 +170,6 @@ void main() {
     loyaltyPoints: 100,
     subscriptionLevel: 'Gold',
     subscriptionExpiry: '2026-12-31',
-    totalCheckIns: 42,
   );
 
   setUp(() {

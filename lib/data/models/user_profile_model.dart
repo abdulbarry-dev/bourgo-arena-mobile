@@ -17,7 +17,6 @@ class UserProfileModel {
   final int loyaltyPoints;
   final String? subscriptionLevel;
   final String? subscriptionExpiry;
-  final int totalCheckIns;
   final DateTime? birthDate;
   final String? gender;
   final String? status;
@@ -38,7 +37,6 @@ class UserProfileModel {
     this.loyaltyPoints = 0,
     this.subscriptionLevel,
     this.subscriptionExpiry,
-    this.totalCheckIns = 0,
     this.birthDate,
     this.gender,
     this.status,

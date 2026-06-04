@@ -31,7 +31,6 @@ class User {
   final String? subscriptionExpiry;
 
   /// Total number of check-ins.
-  final int totalCheckIns;
 
   /// Birth date of the user.
   final DateTime? birthDate;
@@ -62,7 +61,6 @@ class User {
     required this.loyaltyPoints,
     this.subscriptionLevel,
     this.subscriptionExpiry,
-    required this.totalCheckIns,
     this.birthDate,
     this.gender,
     this.status = 'active',
@@ -81,7 +79,6 @@ class User {
     int? loyaltyPoints,
     String? subscriptionLevel,
     String? subscriptionExpiry,
-    int? totalCheckIns,
     DateTime? birthDate,
     String? gender,
     String? status,
@@ -99,7 +96,6 @@ class User {
       loyaltyPoints: loyaltyPoints ?? this.loyaltyPoints,
       subscriptionLevel: subscriptionLevel ?? this.subscriptionLevel,
       subscriptionExpiry: subscriptionExpiry ?? this.subscriptionExpiry,
-      totalCheckIns: totalCheckIns ?? this.totalCheckIns,
       birthDate: birthDate ?? this.birthDate,
       gender: gender ?? this.gender,
       status: status ?? this.status,
@@ -126,7 +122,6 @@ class User {
           loyaltyPoints == other.loyaltyPoints &&
           subscriptionLevel == other.subscriptionLevel &&
           subscriptionExpiry == other.subscriptionExpiry &&
-          totalCheckIns == other.totalCheckIns &&
           birthDate == other.birthDate &&
           gender == other.gender &&
           status == other.status &&
@@ -145,7 +140,6 @@ class User {
       loyaltyPoints.hashCode ^
       subscriptionLevel.hashCode ^
       subscriptionExpiry.hashCode ^
-      totalCheckIns.hashCode ^
       birthDate.hashCode ^
       gender.hashCode ^
       status.hashCode ^

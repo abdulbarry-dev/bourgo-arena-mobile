@@ -34,7 +34,6 @@ void main() {
         loyaltyPoints: 120,
         subscriptionLevel: 'premium',
         subscriptionExpiry: '2026-12-31',
-        totalCheckIns: 14,
       );
       const session = AuthSession(
         user: user,
@@ -92,7 +91,6 @@ void main() {
           loyaltyPoints: 0,
           subscriptionLevel: 'basic',
           subscriptionExpiry: '2099-01-01',
-          totalCheckIns: 0,
         ),
       );
 
