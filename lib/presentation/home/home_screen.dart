@@ -2,10 +2,11 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
-import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/bourgo_image_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/ticker_strip.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/today_course_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
@@ -31,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _viewModel = HomeViewModel(
       getActivitiesUseCase: locator<GetActivitiesUseCase>(),
       getCoursesUseCase: locator<GetCoursesUseCase>(),
+      getServicesUseCase: locator<GetServicesUseCase>(),
     );
     _viewModel.loadHomeData();
   }
@@ -238,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 SizedBox(
                   height: 220,
-                  child: _viewModel.activities.isEmpty
+                  child: _viewModel.services.isEmpty
                       ? Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: EmptyState(
@@ -254,14 +256,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       : ListView.builder(
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(horizontal: 24),
-                          itemCount: _viewModel.activities.length,
+                          itemCount: _viewModel.services.length,
                           itemBuilder: (context, index) {
-                            final activity = _viewModel.activities[index];
-                            return ActivityCard(
-                              title: activity.title,
-                              imageUrl: activity.imageUrl,
+                            final service = _viewModel.services[index];
+                            return BourgoImageCard(
+                              title: service.name,
+                              imageUrl: service.imageUrl,
                               onTap: () =>
-                                  context.push('/booking', extra: activity),
+                                  context.push('/services/${service.id}', extra: service),
                             );
                           },
                         ),

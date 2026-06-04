@@ -42,6 +42,11 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart'
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/presentation/service/service_detail_screen.dart';
+import 'package:bourgo_arena_mobile/domain/entities/service.dart';
+import 'package:bourgo_arena_mobile/presentation/planning/course_detail_screen.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/transaction_history_screen.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
@@ -398,6 +403,22 @@ GoRouter createRouter(
         return AddEditChildScreen(childId: childId, child: child);
       },
     ),
+    GoRoute(
+      path: '/services/:id',
+      builder: (context, state) {
+        final serviceId = state.pathParameters['id']!;
+        final service = state.extra as Service?;
+        return ServiceDetailScreen(serviceId: serviceId, service: service);
+      },
+    ),
+    GoRoute(
+      path: '/courses/:id',
+      builder: (context, state) {
+        final courseId = state.pathParameters['id']!;
+        final course = state.extra as Course?;
+        return CourseDetailScreen(courseId: courseId, course: course);
+      },
+    ),
     GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
     GoRoute(
       path: '/terms',
@@ -410,6 +431,10 @@ GoRouter createRouter(
     GoRoute(
       path: '/offline',
       builder: (context, state) => const OfflineScreen(),
+    ),
+    GoRoute(
+      path: '/transactions',
+      builder: (context, state) => const TransactionHistoryScreen(),
     ),
     // NFC screen removed — route intentionally deleted.
   ],

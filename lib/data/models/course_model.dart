@@ -26,6 +26,9 @@ class CourseModel {
   /// Category (Fitness, Academy, Wellness).
   final String category;
 
+  /// Image URL for the course cover
+  final String? imageUrl;
+
   /// Maximum capacity.
   final int capacity;
 
@@ -44,6 +47,7 @@ class CourseModel {
     required this.endTime,
     required this.dayOfWeek,
     required this.category,
+    this.imageUrl,
     required this.capacity,
     required this.enrolled,
     required this.icon,

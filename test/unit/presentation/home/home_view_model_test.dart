@@ -1,9 +1,10 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart' as entity;
-import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,9 +15,12 @@ class _MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 
 class _MockGetCoursesUseCase extends Mock implements GetCoursesUseCase {}
 
+class _MockGetServicesUseCase extends Mock implements GetServicesUseCase {}
+
 void main() {
   late _MockGetActivitiesUseCase mockGetActivities;
   late _MockGetCoursesUseCase mockGetCourses;
+  late _MockGetServicesUseCase mockGetServices;
   late HomeViewModel viewModel;
 
   final testActivities = [
@@ -63,9 +67,11 @@ void main() {
   setUp(() {
     mockGetActivities = _MockGetActivitiesUseCase();
     mockGetCourses = _MockGetCoursesUseCase();
+    mockGetServices = _MockGetServicesUseCase();
     viewModel = HomeViewModel(
       getActivitiesUseCase: mockGetActivities,
       getCoursesUseCase: mockGetCourses,
+      getServicesUseCase: mockGetServices,
     );
   });
 
@@ -96,6 +102,9 @@ void main() {
         when(
           () => mockGetCourses(),
         ).thenAnswer((_) async => Result.success(testCourses));
+        when(
+          () => mockGetServices(),
+        ).thenAnswer((_) async => Result.success([]));
 
         await viewModel.loadHomeData();
 
@@ -118,6 +127,11 @@ void main() {
           const ServerFailure(AppErrorCode.serverError, 'Error'),
         ),
       );
+      when(() => mockGetServices()).thenAnswer(
+        (_) async => Result.failure(
+          const ServerFailure(AppErrorCode.serverError, 'Error'),
+        ),
+      );
 
       await viewModel.loadHomeData();
 
@@ -129,6 +143,7 @@ void main() {
     test('loadHomeData catch block handles unexpected exceptions', () async {
       when(() => mockGetActivities()).thenThrow(Exception('Unexpected'));
       when(() => mockGetCourses()).thenThrow(Exception('Unexpected'));
+      when(() => mockGetServices()).thenThrow(Exception('Unexpected'));
 
       await viewModel.loadHomeData();
 
@@ -160,6 +175,9 @@ void main() {
           when(
             () => mockGetCourses(),
           ).thenAnswer((_) async => Result.success([sundayCourse]));
+          when(
+            () => mockGetServices(),
+          ).thenAnswer((_) async => Result.success([]));
 
           // We can't easily mock DateTime.now() without a wrapper,
           // so we check if the logic matches whatever today is.

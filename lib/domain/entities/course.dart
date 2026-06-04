@@ -21,6 +21,9 @@ class Course {
   /// Category (Fitness, Academy, Wellness).
   final String category;
 
+  /// Image URL for the course cover
+  final String? imageUrl;
+
   /// Maximum capacity.
   final int capacity;
 
@@ -39,6 +42,7 @@ class Course {
     required this.endTime,
     required this.dayOfWeek,
     required this.category,
+    this.imageUrl,
     required this.capacity,
     required this.enrolled,
     required this.icon,
@@ -62,6 +66,7 @@ class Course {
           endTime == other.endTime &&
           dayOfWeek == other.dayOfWeek &&
           category == other.category &&
+          imageUrl == other.imageUrl &&
           capacity == other.capacity &&
           enrolled == other.enrolled &&
           icon == other.icon;
@@ -75,6 +80,7 @@ class Course {
       endTime.hashCode ^
       dayOfWeek.hashCode ^
       category.hashCode ^
+      imageUrl.hashCode ^
       capacity.hashCode ^
       enrolled.hashCode ^
       icon.hashCode;

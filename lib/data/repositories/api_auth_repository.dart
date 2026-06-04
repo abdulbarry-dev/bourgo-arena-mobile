@@ -524,9 +524,7 @@ class ApiAuthRepository implements AuthRepository {
         );
       }
 
-      if (token != null) {
-        _apiClient.setToken(token);
-      }
+
 
       await _sessionRepository.savePendingVerificationEmail(email);
       await _updateSession(
@@ -580,7 +578,7 @@ class ApiAuthRepository implements AuthRepository {
         final stateStr =
             payload['state'] as String? ?? response['state'] as String?;
 
-        if (token != null && token.isNotEmpty) {
+        if (token != null && token.isNotEmpty && stateStr == null) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
         }
@@ -856,7 +854,7 @@ class ApiAuthRepository implements AuthRepository {
         final stateStr =
             payload['state'] as String? ?? response['state'] as String?;
 
-        if (token != null && token.isNotEmpty) {
+        if (token != null && token.isNotEmpty && stateStr == null) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
         }
@@ -919,7 +917,7 @@ class ApiAuthRepository implements AuthRepository {
         final stateStr =
             payload['state'] as String? ?? response['state'] as String?;
 
-        if (token != null && token.isNotEmpty) {
+        if (token != null && token.isNotEmpty && stateStr == null) {
           _apiClient.setToken(token);
           await _sessionRepository.saveAuthToken(token);
         }
@@ -969,8 +967,6 @@ class ApiAuthRepository implements AuthRepository {
       if (token != null && stateStr == null) {
         _apiClient.setToken(token);
         await _sessionRepository.saveAuthToken(token);
-      } else if (token != null) {
-        _apiClient.setToken(token);
       }
 
       if (stateStr != null) {

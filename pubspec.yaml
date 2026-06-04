@@ -49,6 +49,8 @@ dependencies:
   collection: ^1.19.1
   package_info_plus: ^10.1.0
   device_info_plus: ^13.1.0
+  equatable: ^2.0.8
+  cached_network_image: ^3.4.1
 
 
 dev_dependencies:

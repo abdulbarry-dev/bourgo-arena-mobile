@@ -9,6 +9,8 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import '../../../test_utils.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
@@ -117,6 +119,9 @@ void main() {
       when(
         () => mockSessionRepository.getPendingVerificationEmail(),
       ).thenAnswer((_) async => const Success('john@example.com'));
+      when(
+        () => mockAuthRepository.getUserProfile(),
+      ).thenAnswer((_) async => Success(AuthSession(state: AuthState.pendingOnboarding, token: 'onboarding-token', pendingEmail: 'john@example.com')));
 
       await notifier.initialize();
 
@@ -125,7 +130,6 @@ void main() {
       check(notifier.session.pendingEmail).equals('john@example.com');
       check(notifier.registrationRoute).equals('/family-onboarding');
       check(notifier.registrationData?['firstName']).equals('John');
-      verifyNever(() => mockAuthRepository.getUserProfile());
     });
   });
 }

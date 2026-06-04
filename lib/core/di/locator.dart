@@ -26,6 +26,8 @@ import 'package:bourgo_arena_mobile/domain/usecases/search/search_use_case.dart'
 import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_family_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/family_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_service_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/service_repository.dart';
 // NFC-related imports removed — NFC functionality has been excised.
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
@@ -57,6 +59,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
@@ -93,7 +96,15 @@ Future<void> initLocator() async {
     failure: (_) {},
   );
 
-  locator.registerLazySingleton<ApiClient>(() => apiClient);
+  locator.registerLazySingleton<ApiClient>(() {
+    // Lazy setup of onAuthError so it can resolve AuthStateNotifier later
+    apiClient.onAuthError = (state) {
+      if (locator.isRegistered<LogoutUseCase>()) {
+        locator<LogoutUseCase>().call();
+      }
+    };
+    return apiClient;
+  });
 
   // Repositories
   locator.registerLazySingleton<AuthRepository>(
@@ -131,6 +142,9 @@ Future<void> initLocator() async {
   );
   // NFC repository and device provider registrations removed.
   // SettingsRepository adapter removed — consumers should use SessionRepository directly.
+  locator.registerLazySingleton<ServiceRepository>(
+    () => ApiServiceRepository(locator<ApiClient>()),
+  );
 
   // Use Cases
   locator.registerLazySingleton(() => LoginUseCase(locator()));
@@ -138,6 +152,7 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => RegisterUseCase(locator()));
   locator.registerLazySingleton(() => CompleteRegistrationUseCase(locator()));
   locator.registerLazySingleton(() => SendOtpUseCase(locator()));
+  locator.registerLazySingleton(() => GetServicesUseCase(locator()));
   locator.registerLazySingleton(() => VerifyOtpUseCase(locator()));
   locator.registerLazySingleton(() => VerifyEmailUseCase(locator()));
   locator.registerLazySingleton(() => VerifyPhoneUseCase(locator()));

@@ -27,4 +27,23 @@ class ApiCourseRepository implements CourseRepository {
       return Result.success(entities);
     });
   }
+
+  @override
+  Future<Result<Course, Failure>> getCourseDetails(String courseId) {
+    return executeApiCall(() async {
+      final response = await _apiClient.get('/courses/$courseId') as Map<String, dynamic>;
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      final entity = CourseMapper.toEntity(CourseModel.fromJson(data));
+      return Result.success(entity);
+    });
+  }
+
+  @override
+  Future<Result<List<dynamic>, Failure>> getCourseSessions(String courseId) {
+    return executeApiCall(() async {
+      final response = await _apiClient.get('/courses/$courseId/sessions') as List<dynamic>;
+      // For now, return dynamic or map to SessionModel later
+      return Result.success(response);
+    });
+  }
 }
