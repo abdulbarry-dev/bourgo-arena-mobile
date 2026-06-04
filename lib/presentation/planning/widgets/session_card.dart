@@ -54,7 +54,10 @@ class SessionCard extends StatelessWidget {
                   color: appColors.bgSurface,
                   borderRadius: BorderRadius.circular(spacing.sm),
                 ),
-                child: Icon(Icons.fitness_center, color: theme.colorScheme.primary),
+                child: Icon(
+                  Icons.fitness_center,
+                  color: theme.colorScheme.primary,
+                ),
               ),
             SizedBox(width: spacing.md),
             Expanded(

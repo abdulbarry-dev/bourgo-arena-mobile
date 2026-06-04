@@ -35,3 +35,13 @@
 - [x] **Task 6.2:** Upgrade `ApiClient` or equivalent networking layer to catch generic `401 Unauthorized` responses.
 - [x] **Task 6.3:** Implement an auto-logout and redirect-to-login sequence upon a `401` response.
 - [x] **Task 6.4:** Map backend validation errors (like invalid plan IDs in Phase 4) to user-friendly UI alerts utilizing `ApiErrorHandler`.
+
+## Phase 7: Full Testing Coverage
+- [x] **Task 7.1:** Execute the test suite using `flutter test` to ensure stability.
+- [x] **Task 7.2:** Fix broken widget tests due to missing mock configurations or undefined properties.
+- [x] **Task 7.3:** Verify UI tests (e.g., `HomeScreen`) and unit tests for Entities (e.g., `Service`).
+
+## Phase 8: Guest Navigation & Logging
+- [x] **Task 8.1:** Enable Guest Navigation by utilizing `AuthRequiredModal`.
+- [x] **Task 8.2:** Implement `ensureAuthenticated` guard across protected screens (Profile, Activities, Booking, Settings).
+- [x] **Task 8.3:** Implement logging (`dart:developer`) in ViewModels (`HomeViewModel`, `PlanningViewModel`, `ActivitiesViewModel`) to aid in debugging empty lists.

@@ -22,17 +22,16 @@ class TransactionTile extends StatelessWidget {
       padding: spacing.all(spacing.md),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        border: Border(bottom: BorderSide(color: theme.colorScheme.outlineVariant)),
+        border: Border(
+          bottom: BorderSide(color: theme.colorScheme.outlineVariant),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CircleAvatar(
             backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
-            child: Icon(
-              Icons.credit_card,
-              color: theme.colorScheme.primary,
-            ),
+            child: Icon(Icons.credit_card, color: theme.colorScheme.primary),
           ),
           SizedBox(width: spacing.md),
           Expanded(
@@ -71,7 +70,9 @@ class TransactionTile extends StatelessWidget {
                   vertical: spacing.xxs,
                 ),
                 decoration: BoxDecoration(
-                  color: isSuccess ? Colors.green.withOpacity(0.2) : Colors.red.withOpacity(0.2),
+                  color: isSuccess
+                      ? Colors.green.withOpacity(0.2)
+                      : Colors.red.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(spacing.md),
                 ),
                 child: Text(

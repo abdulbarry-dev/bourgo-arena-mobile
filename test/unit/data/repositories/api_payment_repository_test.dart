@@ -32,10 +32,12 @@ void main() {
             'gateway': 'stripe',
             'payment_reference': 'ref123',
             'created_at': '2026-06-04T12:00:00Z',
-          }
-        ]
+          },
+        ],
       };
-      when(() => mockApiClient.get(any())).thenAnswer((_) async => jsonResponse);
+      when(
+        () => mockApiClient.get(any()),
+      ).thenAnswer((_) async => jsonResponse);
 
       // Act
       final result = await repository.getUserPayments(page: 1, limit: 15);
@@ -49,8 +51,10 @@ void main() {
       check(payments.length).equals(1);
       check(payments.first.id).equals('pay_1');
       check(payments.first.amount).equals(50.0);
-      
-      verify(() => mockApiClient.get('/user/payments?page=1&per_page=15')).called(1);
+
+      verify(
+        () => mockApiClient.get('/user/payments?page=1&per_page=15'),
+      ).called(1);
     });
 
     test('getUserPayments returns failure on exception', () async {

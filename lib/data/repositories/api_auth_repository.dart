@@ -524,8 +524,6 @@ class ApiAuthRepository implements AuthRepository {
         );
       }
 
-
-
       await _sessionRepository.savePendingVerificationEmail(email);
       await _updateSession(
         AuthSession(

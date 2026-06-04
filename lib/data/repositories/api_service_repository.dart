@@ -11,14 +11,18 @@ class ApiServiceRepository implements ServiceRepository {
   ApiServiceRepository(this._apiClient);
 
   @override
-  Future<Result<List<Service>, Failure>> getServices({int page = 1, int limit = 15}) {
+  Future<Result<List<Service>, Failure>> getServices({
+    int page = 1,
+    int limit = 15,
+  }) {
     return executeApiCall(() async {
       final response = await _apiClient.get(
         '/services?page=$page&per_page=$limit',
-      ) as Map<String, dynamic>;
+      );
+      final List<dynamic> data = response is List
+          ? response
+          : (response['data'] as List<dynamic>? ?? []);
 
-      final data = response['data'] as List<dynamic>? ?? [];
-      
       final services = data.map((json) {
         final map = json as Map<String, dynamic>;
         return Service(
@@ -36,9 +40,10 @@ class ApiServiceRepository implements ServiceRepository {
   @override
   Future<Result<Service, Failure>> getServiceDetails(int serviceId) {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/services/$serviceId') as Map<String, dynamic>;
+      final response =
+          await _apiClient.get('/services/$serviceId') as Map<String, dynamic>;
       final data = response['data'] as Map<String, dynamic>? ?? response;
-      
+
       final service = Service(
         id: data['id'] as int,
         name: data['name'] as String,

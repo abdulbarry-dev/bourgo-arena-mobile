@@ -103,6 +103,17 @@ class OnboardingScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              SizedBox(height: spacing.md),
+                              TextButton(
+                                onPressed: () => context.go('/home'),
+                                child: Text(
+                                  AppLocalizations.of(context)!.guestBrowse,
+                                  style: TextStyle(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                           SizedBox(height: spacing.xl),

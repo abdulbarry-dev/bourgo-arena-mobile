@@ -23,7 +23,13 @@ void main() {
 
   group('ApiNotificationRepository', () {
     test('returns Success on 200 with mapped notifications', () async {
-      when(() => apiClient.get(any(), fullResponse: any(named: 'fullResponse'), skipAuthError: any(named: 'skipAuthError'))).thenAnswer(
+      when(
+        () => apiClient.get(
+          any(),
+          fullResponse: any(named: 'fullResponse'),
+          skipAuthError: any(named: 'skipAuthError'),
+        ),
+      ).thenAnswer(
         (_) async =>
             testPaginatedNotificationsJson(data: [testNotificationJson()]),
       );
@@ -38,8 +44,13 @@ void main() {
     });
 
     test('returns Failure(AuthFailure) on 401', () async {
-      when(() => apiClient.get(any(), fullResponse: any(named: 'fullResponse'), skipAuthError: any(named: 'skipAuthError')))
-          .thenThrow(const AuthException('API Error: 401 unauthorized'));
+      when(
+        () => apiClient.get(
+          any(),
+          fullResponse: any(named: 'fullResponse'),
+          skipAuthError: any(named: 'skipAuthError'),
+        ),
+      ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
       final result = await repository.getNotifications();
 
@@ -55,7 +66,13 @@ void main() {
     });
 
     test('returns Failure(NetworkFailure) on network error', () async {
-      when(() => apiClient.get(any(), fullResponse: any(named: 'fullResponse'), skipAuthError: any(named: 'skipAuthError'))).thenThrow(const NetworkException('offline'));
+      when(
+        () => apiClient.get(
+          any(),
+          fullResponse: any(named: 'fullResponse'),
+          skipAuthError: any(named: 'skipAuthError'),
+        ),
+      ).thenThrow(const NetworkException('offline'));
 
       final result = await repository.getNotifications();
 
@@ -71,7 +88,13 @@ void main() {
     });
 
     test('returns Failure(ServerFailure) on 500 error', () async {
-      when(() => apiClient.get(any(), fullResponse: any(named: 'fullResponse'), skipAuthError: any(named: 'skipAuthError'))).thenThrow(const ServerException('API Error: 500 server error'));
+      when(
+        () => apiClient.get(
+          any(),
+          fullResponse: any(named: 'fullResponse'),
+          skipAuthError: any(named: 'skipAuthError'),
+        ),
+      ).thenThrow(const ServerException('API Error: 500 server error'));
 
       final result = await repository.getNotifications();
 

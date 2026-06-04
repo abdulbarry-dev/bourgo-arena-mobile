@@ -23,13 +23,13 @@ class Payment extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        type,
-        amount,
-        currency,
-        status,
-        gateway,
-        paymentReference,
-        createdAt,
-      ];
+    id,
+    type,
+    amount,
+    currency,
+    status,
+    gateway,
+    paymentReference,
+    createdAt,
+  ];
 }

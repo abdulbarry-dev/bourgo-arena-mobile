@@ -1,5 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
+import 'package:go_router/go_router.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
@@ -229,6 +231,11 @@ class _UnifiedList extends StatelessWidget {
         final child = switch (entry.type) {
           PlanningEntryType.course => CourseCard(
             course: entry.source as Course,
+            onTap: () {
+              if (ensureAuthenticated(context)) {
+                context.push('/booking', extra: entry.source as Course);
+              }
+            },
           ),
           PlanningEntryType.reservation => ReservationCard(
             reservation: entry.source as Reservation,

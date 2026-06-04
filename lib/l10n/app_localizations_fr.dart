@@ -90,6 +90,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get commonPointsShort => 'pts';
 
   @override
+  String get guestBrowse => 'CONTINUER EN TANT QU\'INVITÉ';
+
+  @override
   String get navHome => 'ACCUEIL';
 
   @override

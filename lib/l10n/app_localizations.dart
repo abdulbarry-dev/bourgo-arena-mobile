@@ -248,6 +248,12 @@ abstract class AppLocalizations {
   /// **'pts'**
   String get commonPointsShort;
 
+  /// No description provided for @guestBrowse.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONTINUER EN TANT QU\'INVITÉ'**
+  String get guestBrowse;
+
   /// No description provided for @navHome.
   ///
   /// In fr, this message translates to:

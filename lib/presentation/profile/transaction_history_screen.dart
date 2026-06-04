@@ -5,7 +5,8 @@ import 'package:bourgo_arena_mobile/presentation/profile/widgets/transaction_til
 import 'package:go_router/go_router.dart';
 
 class TransactionHistoryScreen extends StatelessWidget {
-  final List<Payment>? initialPayments; // Inject from ViewModel usually, doing static for now
+  final List<Payment>?
+  initialPayments; // Inject from ViewModel usually, doing static for now
 
   const TransactionHistoryScreen({super.key, this.initialPayments});
 
@@ -15,28 +16,30 @@ class TransactionHistoryScreen extends StatelessWidget {
     final spacing = AppSpacing.standard;
 
     // Static placeholder data if none provided (for UI demonstration purposes)
-    final payments = initialPayments ?? [
-      Payment(
-        id: '1',
-        type: 'subscription',
-        amount: 29.99,
-        currency: 'USD',
-        status: 'success',
-        gateway: 'stripe',
-        paymentReference: 'TXN-1029384',
-        createdAt: DateTime.now().subtract(const Duration(days: 2)),
-      ),
-      Payment(
-        id: '2',
-        type: 'subscription',
-        amount: 29.99,
-        currency: 'USD',
-        status: 'failed',
-        gateway: 'stripe',
-        paymentReference: 'TXN-1029383',
-        createdAt: DateTime.now().subtract(const Duration(days: 32)),
-      ),
-    ];
+    final payments =
+        initialPayments ??
+        [
+          Payment(
+            id: '1',
+            type: 'subscription',
+            amount: 29.99,
+            currency: 'USD',
+            status: 'success',
+            gateway: 'stripe',
+            paymentReference: 'TXN-1029384',
+            createdAt: DateTime.now().subtract(const Duration(days: 2)),
+          ),
+          Payment(
+            id: '2',
+            type: 'subscription',
+            amount: 29.99,
+            currency: 'USD',
+            status: 'failed',
+            gateway: 'stripe',
+            paymentReference: 'TXN-1029383',
+            createdAt: DateTime.now().subtract(const Duration(days: 32)),
+          ),
+        ];
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,

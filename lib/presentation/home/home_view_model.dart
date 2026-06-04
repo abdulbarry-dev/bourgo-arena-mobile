@@ -85,7 +85,12 @@ class HomeViewModel extends ChangeNotifier {
         coursesResult.when(
           success: (data) {
             final today = DateTime.now().weekday;
-            _todayCourses = data.where((c) => c.dayOfWeek == today).toList();
+            final todays = data.where((c) => c.dayOfWeek == today).toList();
+            if (todays.isEmpty && data.isNotEmpty) {
+              _todayCourses = data.take(3).toList();
+            } else {
+              _todayCourses = todays;
+            }
           },
           failure: (failure) =>
               developer.log('Error loading courses: $failure'),

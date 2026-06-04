@@ -9,7 +9,7 @@ class PlanModel {
   final String description;
   final double price;
   final String billingCycle;
-  
+
   @JsonKey(name: 'service')
   final Map<String, dynamic>? service;
 
@@ -22,7 +22,8 @@ class PlanModel {
     this.service,
   });
 
-  factory PlanModel.fromJson(Map<String, dynamic> json) => _$PlanModelFromJson(json);
+  factory PlanModel.fromJson(Map<String, dynamic> json) =>
+      _$PlanModelFromJson(json);
   Map<String, dynamic> toJson() => _$PlanModelToJson(this);
 
   String? get serviceImageUrl => service?['image_url'] as String?;

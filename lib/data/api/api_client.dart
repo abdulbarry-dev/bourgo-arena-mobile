@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
+import 'dart:developer' as developer;
 
 /// A central client for making HTTP requests to the Laravel backend.
 class ApiClient {
@@ -30,9 +31,13 @@ class ApiClient {
       final headers = includeAuth
           ? _headers
           : {'Content-Type': 'application/json', 'Accept': 'application/json'};
+      developer.log('API GET Request: $baseUrl$path');
       final response = await _client
           .get(Uri.parse('$baseUrl$path'), headers: headers)
           .timeout(const Duration(seconds: 15));
+      developer.log(
+        'API GET Response (${response.statusCode}): ${response.body}',
+      );
       return _handleResponse(
         response,
         fullResponse: fullResponse,
@@ -59,6 +64,9 @@ class ApiClient {
       final headers = includeAuth
           ? _headers
           : {'Content-Type': 'application/json', 'Accept': 'application/json'};
+      developer.log(
+        'API POST Request: $baseUrl$path, Body: ${jsonEncode(body)}',
+      );
       final response = await _client
           .post(
             Uri.parse('$baseUrl$path'),
@@ -66,6 +74,9 @@ class ApiClient {
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
+      developer.log(
+        'API POST Response (${response.statusCode}): ${response.body}',
+      );
       return _handleResponse(
         response,
         fullResponse: fullResponse,
@@ -92,6 +103,9 @@ class ApiClient {
       final headers = includeAuth
           ? _headers
           : {'Content-Type': 'application/json', 'Accept': 'application/json'};
+      developer.log(
+        'API PUT Request: $baseUrl$path, Body: ${jsonEncode(body)}',
+      );
       final response = await _client
           .put(
             Uri.parse('$baseUrl$path'),
@@ -99,6 +113,9 @@ class ApiClient {
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 15));
+      developer.log(
+        'API PUT Response (${response.statusCode}): ${response.body}',
+      );
       return _handleResponse(
         response,
         fullResponse: fullResponse,
@@ -116,9 +133,13 @@ class ApiClient {
   /// Sends a DELETE request to the specified [path].
   Future<void> delete(String path, {bool skipAuthError = false}) async {
     try {
+      developer.log('API DELETE Request: $baseUrl$path');
       final response = await _client
           .delete(Uri.parse('$baseUrl$path'), headers: _headers)
           .timeout(const Duration(seconds: 15));
+      developer.log(
+        'API DELETE Response (${response.statusCode}): ${response.body}',
+      );
       _handleResponse(response, skipAuthError: skipAuthError);
     } on SocketException catch (e) {
       throw NetworkException(e.message);
