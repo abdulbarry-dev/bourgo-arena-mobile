@@ -494,7 +494,7 @@ void main() {
             'date_of_birth': '1990-01-01',
             'password': 'secret123',
             'password_confirmation': 'secret123',
-            'is_family_account': false,
+            'is_parent_account': false,
           }),
         ).called(1);
       });
@@ -1027,7 +1027,7 @@ void main() {
         );
 
         when(
-          () => apiClient.get('/user/verification-status'),
+          () => apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenAnswer((_) async => verificationStatusJson);
 
         final result = await repository.getVerificationStatus();
@@ -1037,12 +1037,12 @@ void main() {
         expect(status.emailVerified, isTrue);
         expect(status.phoneVerified, isFalse);
         expect(status.email, 'alex@example.com');
-        verify(() => apiClient.get('/user/verification-status')).called(1);
+        verify(() => apiClient.get('/user/verification-status', skipAuthError: true)).called(1);
       });
 
       test('returns failure on server error', () async {
         when(
-          () => apiClient.get('/user/verification-status'),
+          () => apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenThrow(const ServerException('Server error'));
 
         final result = await repository.getVerificationStatus();
@@ -1056,7 +1056,7 @@ void main() {
 
       test('returns failure on network error', () async {
         when(
-          () => apiClient.get('/user/verification-status'),
+          () => apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenThrow(const NetworkException('Connection error'));
 
         final result = await repository.getVerificationStatus();
@@ -1076,7 +1076,7 @@ void main() {
         );
 
         when(
-          () => apiClient.get('/user/verification-status'),
+          () => apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenAnswer((_) async => verificationStatusJson);
 
         final result = await repository.getVerificationStatus();
