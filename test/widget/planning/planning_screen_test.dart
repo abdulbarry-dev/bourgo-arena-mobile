@@ -1,3 +1,6 @@
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
@@ -9,10 +12,18 @@ import 'package:checks/checks.dart';
 
 class MockPlanningViewModel extends Mock implements PlanningViewModel {}
 
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
 void main() {
   late MockPlanningViewModel mockViewModel;
 
   setUp(() {
+    final mockAuthStateNotifier = MockAuthStateNotifier();
+    if (!locator.isRegistered<AuthStateNotifier>()) {
+      locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
+    }
+    when(() => mockAuthStateNotifier.state).thenReturn(AuthState.authenticated);
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     mockViewModel = MockPlanningViewModel();
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.errorMessage).thenReturn(null);
@@ -108,7 +119,7 @@ void main() {
     await tester.pumpWidget(createWidget());
     await tester.pumpAndSettle();
 
-    check(find.text('Morning Yoga').evaluate()).isNotEmpty();
+    check(find.text('MORNING YOGA').evaluate()).isNotEmpty();
     check(find.text('Alice').evaluate()).isNotEmpty();
   });
 }

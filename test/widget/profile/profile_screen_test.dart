@@ -190,6 +190,8 @@ void main() {
     locator.registerSingleton<AuthRepository>(mockAuthRepository);
 
     when(() => mockAuthStateNotifier.currentUser).thenReturn(testUser);
+    when(() => mockAuthStateNotifier.state).thenReturn(AuthState.authenticated);
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
     when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
   });
