@@ -13,17 +13,22 @@ class ApiPaymentRepository implements PaymentRepository {
   ApiPaymentRepository(this._apiClient);
 
   @override
-  Future<Result<List<Payment>, Failure>> getUserPayments({int page = 1, int limit = 15}) {
+  Future<Result<List<Payment>, Failure>> getUserPayments({
+    int page = 1,
+    int limit = 15,
+  }) {
     return executeApiCall(() async {
-      final response = await _apiClient.get(
-        '/user/payments?page=$page&per_page=$limit',
-      ) as Map<String, dynamic>;
-      
+      final response =
+          await _apiClient.get('/user/payments?page=$page&per_page=$limit')
+              as Map<String, dynamic>;
+
       final data = response['data'] as List<dynamic>? ?? [];
       final payments = data.map((json) {
-        return PaymentMapper.toEntity(PaymentModel.fromJson(json as Map<String, dynamic>));
+        return PaymentMapper.toEntity(
+          PaymentModel.fromJson(json as Map<String, dynamic>),
+        );
       }).toList();
-      
+
       return Result.success(payments);
     });
   }

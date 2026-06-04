@@ -11,6 +11,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_us
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'dart:developer' as developer;
 
 class PlanningEntry {
   final String id;
@@ -88,6 +89,7 @@ class PlanningViewModel extends BaseViewModel {
 
   /// Loads courses + reservations + family members for unified planning.
   Future<void> loadPlanning() async {
+    developer.log('PlanningViewModel: loadPlanning() started');
     _isLoading = true;
     clearError();
     notifyListeners();
@@ -139,7 +141,9 @@ class PlanningViewModel extends BaseViewModel {
       );
 
       _buildUnified();
-    } catch (e) {
+      developer.log('PlanningViewModel: data loaded, unified length=${_unified.length}');
+    } catch (e, stack) {
+      developer.log('PlanningViewModel: Error loading planning data: $e', error: e, stackTrace: stack);
       setErrorMessage(e.toString());
     } finally {
       _isLoading = false;

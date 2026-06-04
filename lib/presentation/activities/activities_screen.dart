@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -146,7 +147,11 @@ class _ActivitiesTab extends StatelessWidget {
             title: activity.title,
             imageUrl: activity.imageUrl,
             icon: _getIcon(activity.icon),
-            onTap: () => context.push('/booking', extra: activity),
+            onTap: () {
+              if (ensureAuthenticated(context)) {
+                context.push('/booking', extra: activity);
+              }
+            },
           ),
         );
       },

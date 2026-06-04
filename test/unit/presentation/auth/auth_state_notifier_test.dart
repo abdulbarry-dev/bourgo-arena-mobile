@@ -119,9 +119,15 @@ void main() {
       when(
         () => mockSessionRepository.getPendingVerificationEmail(),
       ).thenAnswer((_) async => const Success('john@example.com'));
-      when(
-        () => mockAuthRepository.getUserProfile(),
-      ).thenAnswer((_) async => Success(AuthSession(state: AuthState.pendingOnboarding, token: 'onboarding-token', pendingEmail: 'john@example.com')));
+      when(() => mockAuthRepository.getUserProfile()).thenAnswer(
+        (_) async => Success(
+          AuthSession(
+            state: AuthState.pendingOnboarding,
+            token: 'onboarding-token',
+            pendingEmail: 'john@example.com',
+          ),
+        ),
+      );
 
       await notifier.initialize();
 

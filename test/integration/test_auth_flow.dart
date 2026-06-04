@@ -7,7 +7,9 @@ import 'dart:developer' as developer;
 
 void main() async {
   SharedPreferences.setMockInitialValues({});
-  final sessionRepo = LocalSessionRepository(await SharedPreferences.getInstance());
+  final sessionRepo = LocalSessionRepository(
+    await SharedPreferences.getInstance(),
+  );
   final apiClient = ApiClient(baseUrl: 'http://127.0.0.1:8000/api/v1');
   final authRepo = ApiAuthRepository(apiClient, sessionRepo);
 
@@ -37,9 +39,11 @@ void main() async {
     birthDate: user.birthDate ?? DateTime.now(),
   );
   developer.log('Register: $regRes');
-  
+
   // Hardcode OTP in DB
-  await ApiClient(baseUrl: 'http://127.0.0.1:8000').get('/api/v1/auth/forgot-password'); // just pinging
+  await ApiClient(
+    baseUrl: 'http://127.0.0.1:8000',
+  ).get('/api/v1/auth/forgot-password'); // just pinging
 
   // Since we can't easily execute PHP from Dart here, we'll assume we can skip verification or similar.
 }

@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
@@ -124,6 +125,20 @@ Course testCourseEntity({
     capacity: capacity,
     enrolled: enrolled,
     icon: icon,
+  );
+}
+
+Service testServiceEntity({
+  int id = 1,
+  String name = 'Football Pitch',
+  String description = 'Full size 11v11 pitch',
+  String imageUrl = 'https://example.com/pitch.png',
+}) {
+  return Service(
+    id: id,
+    name: name,
+    description: description,
+    imageUrl: imageUrl,
   );
 }
 
@@ -274,6 +289,20 @@ Map<String, dynamic> testCourseJson({
     'capacity': capacity,
     'enrolled': enrolled,
     'icon': icon,
+  };
+}
+
+Map<String, dynamic> testServiceJson({
+  int id = 1,
+  String name = 'Football Pitch',
+  String description = 'Full size 11v11 pitch',
+  String imageUrl = 'https://example.com/pitch.png',
+}) {
+  return {
+    'id': id,
+    'name': name,
+    'description': description,
+    'image_url': imageUrl,
   };
 }
 

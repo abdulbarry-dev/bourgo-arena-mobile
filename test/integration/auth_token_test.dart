@@ -5,7 +5,7 @@ void main() {
   test('ApiClient sends Authorization header', () async {
     final client = ApiClient(baseUrl: 'http://localhost:8000/api/v1');
     client.setToken('test_token');
-    
+
     try {
       await client.post('/auth/complete-registration', {});
     } catch (e) {

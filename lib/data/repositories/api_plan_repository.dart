@@ -15,10 +15,16 @@ class ApiPlanRepository implements PlanRepository {
   @override
   Future<Result<List<Plan>, Failure>> getPlans() {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/plans') as Map<String, dynamic>;
-      final data = response['data'] as List<dynamic>? ?? [];
+      final response = await _apiClient.get('/plans');
+      final List<dynamic> data = response is List
+          ? response
+          : (response['data'] as List<dynamic>? ?? []);
       final entities = data
-          .map((json) => PlanMapper.toEntity(PlanModel.fromJson(json as Map<String, dynamic>)))
+          .map(
+            (json) => PlanMapper.toEntity(
+              PlanModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
           .toList();
       return Result.success(entities);
     });
@@ -27,7 +33,8 @@ class ApiPlanRepository implements PlanRepository {
   @override
   Future<Result<Plan, Failure>> getPlanDetails(String planId) {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/plans/$planId') as Map<String, dynamic>;
+      final response =
+          await _apiClient.get('/plans/$planId') as Map<String, dynamic>;
       final data = response['data'] as Map<String, dynamic>? ?? response;
       final entity = PlanMapper.toEntity(PlanModel.fromJson(data));
       return Result.success(entity);

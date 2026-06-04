@@ -262,8 +262,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             return BourgoImageCard(
                               title: service.name,
                               imageUrl: service.imageUrl,
-                              onTap: () =>
-                                  context.push('/services/${service.id}', extra: service),
+                              onTap: () => context.push(
+                                '/services/${service.id}',
+                                extra: service,
+                              ),
                             );
                           },
                         ),

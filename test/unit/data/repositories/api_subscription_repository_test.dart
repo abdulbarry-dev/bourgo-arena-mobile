@@ -34,7 +34,9 @@ void main() {
         'id': '1',
         'name': 'Gold',
         'price': 100.0,
-        'benefits': [{'label': 'access'}],
+        'benefits': [
+          {'label': 'access'},
+        ],
         'duration_months': 12,
       };
       when(
@@ -55,7 +57,9 @@ void main() {
       final result = await repository.subscribeToPlan('p1');
 
       expect(result, isA<Success<void, Failure>>());
-      verify(() => apiClient.post('/subscriptions', {'plan_id': 'p1'})).called(1);
+      verify(
+        () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
+      ).called(1);
     });
 
     test('cancelSubscription returns success on API success', () async {

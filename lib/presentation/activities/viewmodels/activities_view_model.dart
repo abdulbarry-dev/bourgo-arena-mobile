@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'dart:developer' as developer;
 
 /// ViewModel for the Activities screen.
 class ActivitiesViewModel extends BaseViewModel {
@@ -33,6 +34,7 @@ class ActivitiesViewModel extends BaseViewModel {
 
   /// Loads all activities and reservations.
   Future<void> loadData() async {
+    developer.log('ActivitiesViewModel: loadData() started');
     _isLoading = true;
     clearError();
     notifyListeners();
@@ -48,14 +50,22 @@ class ActivitiesViewModel extends BaseViewModel {
 
       activitiesResult.when(
         success: (data) => _activities = data,
-        failure: (failure) => setErrorMessage('activities_loading_failed'),
+        failure: (failure) {
+          developer.log('ActivitiesViewModel: Error loading activities: $failure');
+          setErrorMessage('activities_loading_failed');
+        },
       );
 
       bookingsResult.when(
         success: (data) => _reservations = data,
-        failure: (failure) => setErrorMessage('bookings_loading_failed'),
+        failure: (failure) {
+          developer.log('ActivitiesViewModel: Error loading bookings: $failure');
+          setErrorMessage('bookings_loading_failed');
+        },
       );
-    } catch (e) {
+      developer.log('ActivitiesViewModel: loadData() success, activities=${_activities.length}, reservations=${_reservations.length}');
+    } catch (e, stack) {
+      developer.log('ActivitiesViewModel: Error loading data: $e', error: e, stackTrace: stack);
       setErrorMessage('loading_failed');
     } finally {
       _isLoading = false;

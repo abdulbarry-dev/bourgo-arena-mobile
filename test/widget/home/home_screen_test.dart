@@ -13,6 +13,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/bourgo_image_card.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -57,9 +58,7 @@ void main() {
     when(
       () => mockCourses(),
     ).thenAnswer((_) async => Success([testCourseEntity()]));
-    when(
-      () => mockServices(),
-    ).thenAnswer((_) async => const Success([]));
+    when(() => mockServices()).thenAnswer((_) async => Success([testServiceEntity()]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(milliseconds: 500));
@@ -116,6 +115,7 @@ Widget _buildApp(Widget home) {
     locale: AppLocalizations.supportedLocales.first,
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
+    theme: BourgoTheme.darkTheme,
     home: home,
   );
 }

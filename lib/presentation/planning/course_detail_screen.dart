@@ -59,10 +59,7 @@ class CourseDetailScreen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: spacing.lg),
-                  Text(
-                    'Upcoming Sessions',
-                    style: theme.textTheme.titleLarge,
-                  ),
+                  Text('Upcoming Sessions', style: theme.textTheme.titleLarge),
                   SizedBox(height: spacing.md),
                   // Placeholder for dynamic sessions list
                   SessionCard(

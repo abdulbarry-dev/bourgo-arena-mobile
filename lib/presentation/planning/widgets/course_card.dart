@@ -6,8 +6,9 @@ import 'package:material_symbols_icons/symbols.dart';
 /// A card widget representing a group course session.
 class CourseCard extends StatelessWidget {
   final Course course;
+  final VoidCallback? onTap;
 
-  const CourseCard({super.key, required this.course});
+  const CourseCard({super.key, required this.course, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +93,7 @@ class CourseCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          _ActionButton(isFull: course.isFull),
+          _ActionButton(isFull: course.isFull, onTap: onTap),
         ],
       ),
     );
@@ -177,32 +178,37 @@ class _CategoryBadge extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   final bool isFull;
 
-  const _ActionButton({required this.isFull});
+  final VoidCallback? onTap;
+
+  const _ActionButton({required this.isFull, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: isFull
-            ? theme.colorScheme.onSurface.withValues(alpha: 0.1)
-            : theme.colorScheme.primary.withValues(alpha: 0.15),
-        border: Border.all(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
           color: isFull
-              ? theme.colorScheme.outline
-              : theme.colorScheme.primary.withValues(alpha: 0.3),
+              ? theme.colorScheme.onSurface.withValues(alpha: 0.1)
+              : theme.colorScheme.primary.withValues(alpha: 0.15),
+          border: Border.all(
+            color: isFull
+                ? theme.colorScheme.outline
+                : theme.colorScheme.primary.withValues(alpha: 0.3),
+          ),
         ),
-      ),
-      child: Icon(
-        isFull ? Symbols.lock : Symbols.add,
-        size: 20,
-        color: isFull
-            ? theme.colorScheme.onSurfaceVariant
-            : theme.colorScheme.primary,
+        child: Icon(
+          isFull ? Symbols.lock : Symbols.add,
+          size: 20,
+          color: isFull
+              ? theme.colorScheme.onSurfaceVariant
+              : theme.colorScheme.primary,
+        ),
       ),
     );
   }

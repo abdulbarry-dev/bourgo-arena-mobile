@@ -82,10 +82,7 @@ void main() {
 
       // Mock complete-registration response: returns active state and user
       when(
-        () => apiClient.post(
-          '/auth/complete-registration',
-          any(),
-        ),
+        () => apiClient.post('/auth/complete-registration', any()),
       ).thenAnswer(
         (_) async => {
           'state': 'active',

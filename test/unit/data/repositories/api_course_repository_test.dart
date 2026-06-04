@@ -85,7 +85,9 @@ void main() {
     });
 
     test('getCourseSessions returns sessions list on 200', () async {
-      final tSessions = [{'id': 's1', 'date': '2026-06-04'}];
+      final tSessions = [
+        {'id': 's1', 'date': '2026-06-04'},
+      ];
       when(
         () => apiClient.get('/courses/c1/sessions'),
       ).thenAnswer((_) async => tSessions);

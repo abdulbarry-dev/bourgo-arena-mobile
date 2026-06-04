@@ -87,6 +87,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonPointsShort => 'pts';
 
   @override
+  String get guestBrowse => 'CONTINUE AS GUEST';
+
+  @override
   String get navHome => 'HOME';
 
   @override

@@ -11,14 +11,17 @@ Future<Result<T, Failure>> executeApiCall<T>(
   try {
     return await call();
   } on AuthException catch (e) {
+    developer.log('API AuthException: ${e.message}');
     return FailureResult(
       AuthFailure(AppErrorCode.invalidCredentials, e.message, e.state, e.token),
     );
   } on NetworkException catch (e) {
+    developer.log('API NetworkException: ${e.message}');
     return FailureResult(
       NetworkFailure(AppErrorCode.networkUnavailable, e.message),
     );
   } on ValidationException catch (e) {
+    developer.log('API ValidationException: ${e.message}');
     return FailureResult(
       ValidationFailure(
         AppErrorCode.validationFailed,
@@ -28,10 +31,12 @@ Future<Result<T, Failure>> executeApiCall<T>(
       ),
     );
   } on NotFoundException catch (e) {
+    developer.log('API NotFoundException: ${e.message}');
     return FailureResult(
       NotFoundFailure(AppErrorCode.notFound, e.message, e.state, e.token),
     );
   } on ServerException catch (e) {
+    developer.log('API ServerException: ${e.message}');
     return FailureResult(
       ServerFailure(AppErrorCode.serverError, e.message, e.state, e.token),
     );

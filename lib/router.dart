@@ -130,6 +130,16 @@ GoRouter createRouter(
         location == '/onboarding' ||
         location == '/';
 
+    // Routes that can be browsed by guests without authentication
+    final bool isGuestAccessibleRoute =
+        location == '/home' ||
+        location == '/planning' ||
+        location == '/search' ||
+        location.startsWith('/services/') ||
+        location.startsWith('/courses/') ||
+        location.startsWith('/activities/') ||
+        location.startsWith('/events/');
+
     // Routes that are part of the verification/onboarding flow
     final bool isSetupRoute =
         location == '/otp' ||
@@ -147,8 +157,10 @@ GoRouter createRouter(
 
     switch (authState) {
       case AuthState.unauthenticated:
-        // Allow auth entry and onboarding, otherwise force login
-        return (isAuthEntryRoute || isSetupRoute) ? null : '/login';
+        // Allow auth entry, onboarding, and guest accessible routes, otherwise force login
+        return (isAuthEntryRoute || isSetupRoute || isGuestAccessibleRoute)
+            ? null
+            : '/login';
 
       case AuthState.pendingVerification:
         // Force the user to choose email or phone verification first.

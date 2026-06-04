@@ -27,10 +27,12 @@ void main() {
             'name': 'Service A',
             'image_url': 'https://example.com/img.png',
             'description': 'Description A',
-          }
-        ]
+          },
+        ],
       };
-      when(() => mockApiClient.get(any())).thenAnswer((_) async => jsonResponse);
+      when(
+        () => mockApiClient.get(any()),
+      ).thenAnswer((_) async => jsonResponse);
 
       // Act
       final result = await repository.getServices(page: 1, limit: 15);
@@ -44,7 +46,7 @@ void main() {
       check(services.length).equals(1);
       check(services.first.id).equals(1);
       check(services.first.name).equals('Service A');
-      
+
       verify(() => mockApiClient.get('/services?page=1&per_page=15')).called(1);
     });
 
@@ -56,9 +58,11 @@ void main() {
           'name': 'Service A',
           'image_url': 'https://example.com/img.png',
           'description': 'Description A',
-        }
+        },
       };
-      when(() => mockApiClient.get(any())).thenAnswer((_) async => jsonResponse);
+      when(
+        () => mockApiClient.get(any()),
+      ).thenAnswer((_) async => jsonResponse);
 
       // Act
       final result = await repository.getServiceDetails(1);
@@ -71,7 +75,7 @@ void main() {
       );
       check(service.id).equals(1);
       check(service.name).equals('Service A');
-      
+
       verify(() => mockApiClient.get('/services/1')).called(1);
     });
 

@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/presentation/loyalty/widgets/tier_badge.dart
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -49,6 +50,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
 
         final user = _viewModel.user;
+        final authState = locator<AuthStateNotifier>().state;
+
+        if (authState == AuthState.unauthenticated) {
+          return Scaffold(
+            appBar: AppBar(title: Text(l10n.navProfile)),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Symbols.person,
+                      size: 80,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withValues(alpha: 0.5),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      l10n.authLoginSubtitle,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => context.push('/login'),
+                        child: Text(l10n.authLogin),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => context.push('/register'),
+                        child: Text(l10n.authRegister),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         if (user == null) {
           return Scaffold(body: Center(child: Text(l10n.commonLoadingError)));
         }

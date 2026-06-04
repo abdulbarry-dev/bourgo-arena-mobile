@@ -24,6 +24,7 @@ class PaymentModel {
     required this.createdAt,
   });
 
-  factory PaymentModel.fromJson(Map<String, dynamic> json) => _$PaymentModelFromJson(json);
+  factory PaymentModel.fromJson(Map<String, dynamic> json) =>
+      _$PaymentModelFromJson(json);
   Map<String, dynamic> toJson() => _$PaymentModelToJson(this);
 }
