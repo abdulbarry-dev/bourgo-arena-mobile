@@ -52,6 +52,8 @@ class ProfileViewModel extends BaseViewModel {
     _authStateNotifier.addListener(notifyListeners);
     if (user == null) {
       loadProfile();
+    } else {
+      _fetchTier();
     }
     _loadCounts();
   }
@@ -78,6 +80,16 @@ class ProfileViewModel extends BaseViewModel {
     notifyListeners();
   }
 
+  Future<void> _fetchTier() async {
+    final tierResult = await _authRepository.getMemberTier();
+    tierResult.fold(
+      onSuccess: (_) {},
+      onFailure: (failure) {
+        developer.log('Failed to fetch member tier: $failure');
+      },
+    );
+  }
+
   @override
   void dispose() {
     _authStateNotifier.removeListener(notifyListeners);
@@ -98,6 +110,7 @@ class ProfileViewModel extends BaseViewModel {
       result.fold(
         onSuccess: (session) {
           clearError();
+          _fetchTier();
         },
         onFailure: (failure) {
           setErrorMessage(failure.message);

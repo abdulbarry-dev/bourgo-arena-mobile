@@ -93,6 +93,9 @@ abstract interface class AuthRepository {
   /// Deletes the current profile avatar.
   Future<Result<AuthSession, Failure>> deleteAvatar();
 
+  /// Fetches the authenticated member's tier information.
+  Future<Result<AuthSession, Failure>> getMemberTier();
+
   /// Stream of authentication state changes.
   Stream<AuthSession> get onAuthStateChanged;
 }

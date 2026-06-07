@@ -18,6 +18,15 @@ class LoyaltyDashboardViewModel extends ChangeNotifier {
   LoyaltyLoadState _state = LoyaltyLoadState.idle;
   LoyaltyBalance? _balance;
   String? _errorMessage;
+  bool _hasEverLoaded = false;
+  bool _isRefreshing = false;
+  String? _refreshError;
+
+  void clearRefreshError() {
+    _refreshError = null;
+  }
+
+  String? get refreshError => _refreshError;
 
   /// Creates a new [LoyaltyDashboardViewModel] instance.
   LoyaltyDashboardViewModel({
@@ -36,13 +45,13 @@ class LoyaltyDashboardViewModel extends ChangeNotifier {
   }
 
   void _onAuthChanged() {
-    // Reload balance if user changes
-    if (_state != LoyaltyLoadState.loading) {
+    if (!_isRefreshing && _state != LoyaltyLoadState.loading) {
       loadBalance();
     }
   }
 
-  bool get isLoading => _state == LoyaltyLoadState.loading;
+  bool get isLoading => _state == LoyaltyLoadState.loading && !_hasEverLoaded;
+  bool get isRefreshing => _isRefreshing;
   String? get errorMessage => _errorMessage;
 
   /// The currently authenticated user.
@@ -121,6 +130,7 @@ class LoyaltyDashboardViewModel extends ChangeNotifier {
 
   /// Fetches the real loyalty balance from API.
   Future<void> loadBalance() async {
+    _isRefreshing = _hasEverLoaded;
     _state = LoyaltyLoadState.loading;
     _errorMessage = null;
     notifyListeners();
@@ -130,13 +140,18 @@ class LoyaltyDashboardViewModel extends ChangeNotifier {
       success: (balance) {
         _balance = balance;
         _state = LoyaltyLoadState.loaded;
+        _hasEverLoaded = true;
       },
       failure: (failure) {
         developer.log('LoyaltyDashboardViewModel error: ${failure.message}');
         _errorMessage = failure.message;
         _state = LoyaltyLoadState.error;
+        if (_hasEverLoaded) {
+          _refreshError = failure.message;
+        }
       },
     );
+    _isRefreshing = false;
     notifyListeners();
   }
 }

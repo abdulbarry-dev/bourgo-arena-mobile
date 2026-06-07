@@ -19,11 +19,30 @@ class ApiReservationRepository implements ReservationRepository {
       return Future.value(const Success([]));
     }
     return executeApiCall(() async {
-      final response =
-          await _apiClient.get('/reservations', fullResponse: true)
-              as Map<String, dynamic>;
-      final data = response['data'] as List<dynamic>? ?? [];
-      final entities = data
+      final ongoingFuture = _apiClient.get(
+        '/reservations/ongoing',
+        fullResponse: true,
+        queryParameters: {'page': '1', 'per_page': '50'},
+      );
+      final historyFuture = _apiClient.get(
+        '/reservations/history',
+        fullResponse: true,
+        queryParameters: {'page': '1', 'per_page': '50'},
+      );
+
+      final results = await Future.wait([ongoingFuture, historyFuture]);
+      final ongoingResp = results[0] as Map<String, dynamic>;
+      final historyResp = results[1] as Map<String, dynamic>;
+
+      final allData = <dynamic>[];
+      for (final resp in [ongoingResp, historyResp]) {
+        final data = resp['data'] as List<dynamic>?;
+        if (data != null) {
+          allData.addAll(data);
+        }
+      }
+
+      final entities = allData
           .map(
             (json) => ReservationMapper.toEntity(
               ReservationModel.fromJson(json as Map<String, dynamic>),

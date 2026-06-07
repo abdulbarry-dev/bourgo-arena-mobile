@@ -84,6 +84,10 @@ void main() {
       () => mockAuthRepository.getUserProfile(),
     ).thenAnswer((_) async => Result.success(testSession));
 
+    when(
+      () => mockAuthRepository.getMemberTier(),
+    ).thenAnswer((_) async => Result.success(testSession));
+
     when(() => mockAuthStateNotifier.currentUser).thenReturn(testUser);
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);

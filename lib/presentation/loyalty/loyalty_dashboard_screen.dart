@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:shimmer/shimmer.dart';
 
 ({String label, IconData icon}) _mapSourceType(String sourceType) {
   switch (sourceType) {
@@ -24,10 +25,50 @@ import 'package:material_symbols_icons/symbols.dart';
   }
 }
 
-class LoyaltyDashboardScreen extends StatelessWidget {
+class LoyaltyDashboardScreen extends StatefulWidget {
   final LoyaltyDashboardViewModel viewModel;
 
   const LoyaltyDashboardScreen({super.key, required this.viewModel});
+
+  @override
+  State<LoyaltyDashboardScreen> createState() => _LoyaltyDashboardScreenState();
+}
+
+class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
+  LoyaltyDashboardViewModel get _viewModel => widget.viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel.addListener(_onViewModelChanged);
+  }
+
+  @override
+  void dispose() {
+    _viewModel.removeListener(_onViewModelChanged);
+    super.dispose();
+  }
+
+  void _onViewModelChanged() {
+    if (_viewModel.refreshError != null && mounted) {
+      final error = _viewModel.refreshError;
+      _viewModel.clearRefreshError();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(error!),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Theme.of(context).colorScheme.error,
+            action: SnackBarAction(
+              label: 'RÉESSAYER',
+              textColor: Theme.of(context).colorScheme.onError,
+              onPressed: () => _viewModel.loadBalance(),
+            ),
+          ),
+        );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,28 +96,35 @@ class LoyaltyDashboardScreen extends StatelessWidget {
         ),
       ),
       body: AnimatedBuilder(
-        animation: viewModel,
+        animation: _viewModel,
         builder: (context, _) {
-          if (viewModel.isLoading && viewModel.currentPoints == 0 && viewModel.recentTransactions.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
+          if (_viewModel.isLoading) {
+            return _buildShimmerSkeleton(context, theme, spacing);
           }
 
-          if (viewModel.errorMessage != null && viewModel.currentPoints == 0 && viewModel.recentTransactions.isEmpty) {
+          if (_viewModel.errorMessage != null && _viewModel.currentPoints == 0 && _viewModel.recentTransactions.isEmpty) {
             return _buildErrorState(context, theme, spacing);
           }
 
-          final points = viewModel.currentPoints;
-          final currentTier = viewModel.currentTier;
-          final nextTier = viewModel.nextTier;
-          final pointsToNext = viewModel.pointsToNextTier;
-          final progress = viewModel.progressToNextTier;
+          final points = _viewModel.currentPoints;
+          final currentTier = _viewModel.currentTier;
+          final nextTier = _viewModel.nextTier;
+          final pointsToNext = _viewModel.pointsToNextTier;
+          final progress = _viewModel.progressToNextTier;
 
           return RefreshIndicator(
-            onRefresh: () => viewModel.loadBalance(),
+            onRefresh: () => _viewModel.loadBalance(),
             color: theme.colorScheme.primary,
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
+                if (_viewModel.isRefreshing)
+                  const SliverAppBar(
+                    pinned: true,
+                    toolbarHeight: 3,
+                    automaticallyImplyLeading: false,
+                    flexibleSpace: LinearProgressIndicator(minHeight: 3),
+                  ),
                 SliverPadding(
                   padding: EdgeInsets.all(spacing.lg),
                   sliver: SliverList(
@@ -93,7 +141,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
                     ]),
                   ),
                 ),
-                if (viewModel.recentTransactions.isEmpty)
+                if (_viewModel.recentTransactions.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: _buildEmptyState(context, theme, spacing),
@@ -104,10 +152,10 @@ class LoyaltyDashboardScreen extends StatelessWidget {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
                         (context, index) {
-                          final tx = viewModel.recentTransactions[index];
+                          final tx = _viewModel.recentTransactions[index];
                           return _buildTransactionItem(context, theme, spacing, tx);
                         },
-                        childCount: viewModel.recentTransactions.length,
+                        childCount: _viewModel.recentTransactions.length,
                       ),
                     ),
                   ),
@@ -383,6 +431,196 @@ class LoyaltyDashboardScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildShimmerSkeleton(BuildContext context, ThemeData theme, AppSpacing spacing) {
+    return Shimmer.fromColors(
+      baseColor: theme.colorScheme.surfaceContainerHighest,
+      highlightColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(spacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildShimmerCard(theme, spacing),
+            SizedBox(height: spacing.lg),
+            _buildShimmerProgressCard(theme, spacing),
+            SizedBox(height: spacing.xl),
+            _buildShimmerSectionTitle(theme, spacing),
+            SizedBox(height: spacing.md),
+            ...List.generate(5, (_) => _buildShimmerTransactionItem(theme, spacing)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShimmerCard(ThemeData theme, AppSpacing spacing) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(spacing.lg),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 72,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.xl),
+          Container(
+            width: 140,
+            height: 12,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          SizedBox(height: spacing.xs),
+          Container(
+            width: 200,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerProgressCard(ThemeData theme, AppSpacing spacing) {
+    return Container(
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 160,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              Container(
+                width: 60,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.sm),
+          Container(
+            width: double.infinity,
+            height: 8,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildShimmerSectionTitle(ThemeData theme, AppSpacing spacing) {
+    return Container(
+      width: 180,
+      height: 12,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+
+  Widget _buildShimmerTransactionItem(ThemeData theme, AppSpacing spacing) {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: spacing.sm),
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          SizedBox(width: spacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 150,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                SizedBox(height: spacing.xxs),
+                Container(
+                  width: 100,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            width: 44,
+            height: 18,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildErrorState(BuildContext context, ThemeData theme, AppSpacing spacing) {
     return Center(
       child: Padding(
@@ -410,14 +648,14 @@ class LoyaltyDashboardScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: spacing.xl),
               child: Text(
-                viewModel.errorMessage ?? 'Impossible de charger vos points.',
+                _viewModel.errorMessage ?? 'Impossible de charger vos points.',
                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 textAlign: TextAlign.center,
               ),
             ),
             SizedBox(height: spacing.xl),
             FilledButton.icon(
-              onPressed: () => viewModel.loadBalance(),
+              onPressed: () => _viewModel.loadBalance(),
               icon: const Icon(Symbols.refresh, size: 20),
               label: const Text('Réessayer'),
               style: FilledButton.styleFrom(
