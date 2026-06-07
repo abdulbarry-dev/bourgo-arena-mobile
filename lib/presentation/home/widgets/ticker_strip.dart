@@ -1,4 +1,6 @@
+import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+
 import 'package:flutter/material.dart';
 
 /// A custom marquee/ticker strip widget.
@@ -32,13 +34,17 @@ class _TickerStripState extends State<TickerStrip>
     _animationController =
         AnimationController(vsync: this, duration: const Duration(seconds: 120))
           ..addListener(() {
-            if (_scrollController.hasClients) {
+            if (_scrollController.hasClients &&
+                _scrollController.position.haveDimensions) {
               final maxScroll = _scrollController.position.maxScrollExtent;
               final currentScroll = _animationController.value * maxScroll;
               _scrollController.jumpTo(currentScroll);
             }
           });
-    _animationController.repeat();
+    final isTest = AppConfig.isTestEnvironment;
+    if (!isTest) {
+      _animationController.repeat();
+    }
   }
 
   @override

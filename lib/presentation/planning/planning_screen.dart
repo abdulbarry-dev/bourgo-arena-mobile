@@ -17,6 +17,7 @@ import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.da
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// The course planning/schedule screen.
@@ -160,30 +161,33 @@ class _DaySelector extends StatelessWidget {
           final isSelected = viewModel.selectedDay == dayIndex;
 
           return GestureDetector(
-            onTap: () => viewModel.selectDay(dayIndex),
-            child: Container(
-              width: 50,
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? theme.colorScheme.primary
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Text(
-                  days[index],
-                  style: TextStyle(
+                onTap: () => viewModel.selectDay(dayIndex),
+                child: Container(
+                  width: 50,
+                  margin: const EdgeInsets.only(right: 12),
+                  decoration: BoxDecoration(
                     color: isSelected
-                        ? theme.colorScheme.onPrimary
-                        : theme.colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+                        ? theme.colorScheme.primary
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      days[index],
+                      style: TextStyle(
+                        color: isSelected
+                            ? theme.colorScheme.onPrimary
+                            : theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          );
+              )
+              .animate(delay: (index * 40).ms)
+              .fade(duration: 300.ms)
+              .scale(begin: const Offset(0.9, 0.9), curve: Curves.easeOutBack);
         },
       ),
     );
@@ -200,51 +204,56 @@ class _PlanningControls extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(
-            color: theme.colorScheme.outline.withValues(alpha: 0.5),
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          if (viewModel.familyMembers.length > 1)
-            Expanded(
-              child: DropdownButtonFormField<String>(
-                initialValue: viewModel.selectedMember?.id,
-                isExpanded: true,
-                decoration: const InputDecoration(
-                  isDense: true,
-                  border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                ),
-                items: viewModel.familyMembers
-                    .map(
-                      (m) => DropdownMenuItem(
-                        value: m.id,
-                        child: Text(m.isPrimary ? '${m.name} (Me)' : m.name),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (id) {
-                  if (id == null) return;
-                  final member = viewModel.familyMembers.firstWhere(
-                    (m) => m.id == id,
-                    orElse: () => viewModel.familyMembers.first,
-                  );
-                  viewModel.selectMember(member);
-                },
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            border: Border(
+              bottom: BorderSide(
+                color: theme.colorScheme.outline.withValues(alpha: 0.5),
               ),
             ),
-        ],
-      ),
-    );
+          ),
+          child: Row(
+            children: [
+              if (viewModel.familyMembers.length > 1)
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    initialValue: viewModel.selectedMember?.id,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                    ),
+                    items: viewModel.familyMembers
+                        .map(
+                          (m) => DropdownMenuItem(
+                            value: m.id,
+                            child: Text(
+                              m.isPrimary ? '${m.name} (Me)' : m.name,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (id) {
+                      if (id == null) return;
+                      final member = viewModel.familyMembers.firstWhere(
+                        (m) => m.id == id,
+                        orElse: () => viewModel.familyMembers.first,
+                      );
+                      viewModel.selectMember(member);
+                    },
+                  ),
+                ),
+            ],
+          ),
+        )
+        .animate()
+        .fade(duration: 400.ms)
+        .slideY(begin: -0.2, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -383,10 +392,10 @@ class _UnifiedList extends StatelessWidget {
             reservation: entry.source as Reservation,
           ),
         };
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 16),
-          child: child,
-        );
+        return Padding(padding: const EdgeInsets.only(bottom: 16), child: child)
+            .animate(delay: (index * 50).ms)
+            .fade(duration: 400.ms)
+            .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
       },
     );
   }

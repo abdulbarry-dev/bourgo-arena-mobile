@@ -13,6 +13,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.da
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:intl/intl.dart';
@@ -329,235 +330,257 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
             padding: spacing.screenPadding(context),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AuthHeader(
-                  title: _isEditing
-                      ? l10n.profileEditTitle
-                      : l10n.authAccountOverviewTitle,
-                  subtitle: _isEditing
-                      ? l10n.profileEditSubtitle
-                      : l10n.authAccountOverviewSubtitle,
-                ),
-                SizedBox(height: spacing.xl),
+              children:
+                  [
+                        AuthHeader(
+                          title: _isEditing
+                              ? l10n.profileEditTitle
+                              : l10n.authAccountOverviewTitle,
+                          subtitle: _isEditing
+                              ? l10n.profileEditSubtitle
+                              : l10n.authAccountOverviewSubtitle,
+                        ),
+                        SizedBox(height: spacing.xl),
 
-                // Profile Picture Section (only show when not editing for clarity, or keep it)
-                if (!_isEditing) ...[
-                  Center(
-                    child: Column(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  l10n.commonImagePickerPlaceholder,
+                        // Profile Picture Section (only show when not editing for clarity, or keep it)
+                        if (!_isEditing) ...[
+                          Center(
+                            child: Column(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          l10n.commonImagePickerPlaceholder,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  borderRadius: BorderRadius.circular(60),
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          color: theme
+                                              .colorScheme
+                                              .surfaceContainer,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: theme
+                                                .colorScheme
+                                                .outlineVariant,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Symbols.person,
+                                          size: 64,
+                                          color: theme
+                                              .colorScheme
+                                              .onSurfaceVariant
+                                              .withValues(alpha: 0.5),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            color: theme.colorScheme.primary,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Symbols.add_a_photo,
+                                            size: 20,
+                                            color: theme.colorScheme.onPrimary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          borderRadius: BorderRadius.circular(60),
-                          child: Stack(
+                                SizedBox(height: spacing.md),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: spacing.lg,
+                                  ),
+                                  child: Text(
+                                    l10n.authProfilePictureRecommendation,
+                                    textAlign: TextAlign.center,
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(
+                                          color: theme.colorScheme.primary,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: spacing.xxl),
+                        ],
+
+                        // Details Section
+                        if (!_isEditing) ...[
+                          AuthTextField(
+                            label: l10n.authFullNameLabel,
+                            hint: '',
+                            leadingIcon: Symbols.person,
+                            controller: TextEditingController(
+                              text:
+                                  '${_data['firstName']} ${_data['lastName']}',
+                            ),
+                            readOnly: true,
+                          ),
+                        ] else ...[
+                          Row(
                             children: [
-                              Container(
-                                width: 120,
-                                height: 120,
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.surfaceContainer,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: theme.colorScheme.outlineVariant,
-                                    width: 2,
-                                  ),
-                                ),
-                                child: Icon(
-                                  Symbols.person,
-                                  size: 64,
-                                  color: theme.colorScheme.onSurfaceVariant
-                                      .withValues(alpha: 0.5),
+                              Expanded(
+                                child: AuthTextField(
+                                  label: l10n.authFirstNameLabel,
+                                  hint: l10n.authFirstNameHint,
+                                  leadingIcon: Symbols.person,
+                                  controller: _firstNameController,
                                 ),
                               ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(8),
-                                  decoration: BoxDecoration(
-                                    color: theme.colorScheme.primary,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Symbols.add_a_photo,
-                                    size: 20,
-                                    color: theme.colorScheme.onPrimary,
-                                  ),
+                              SizedBox(width: spacing.md),
+                              Expanded(
+                                child: AuthTextField(
+                                  label: l10n.authLastNameLabel,
+                                  hint: l10n.authLastNameHint,
+                                  leadingIcon: Symbols.person,
+                                  controller: _lastNameController,
                                 ),
                               ),
                             ],
                           ),
+                        ],
+
+                        SizedBox(height: spacing.lg),
+                        AuthTextField(
+                          label: l10n.authEmailLabel,
+                          hint: '',
+                          leadingIcon: Symbols.mail,
+                          controller: _emailController,
+                          readOnly: !_isEditing,
+                          keyboardType: TextInputType.emailAddress,
                         ),
-                        SizedBox(height: spacing.md),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: spacing.lg),
-                          child: Text(
-                            l10n.authProfilePictureRecommendation,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.labelMedium?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontStyle: FontStyle.italic,
+                        SizedBox(height: spacing.lg),
+                        AuthTextField(
+                          label: l10n.authPhoneLabel,
+                          hint: '',
+                          leadingIcon: Symbols.call,
+                          controller: _phoneController,
+                          readOnly: !_isEditing,
+                          keyboardType: TextInputType.phone,
+                        ),
+
+                        if (_isEditing || _selectedGender != null) ...[
+                          SizedBox(height: spacing.lg),
+                          if (_isEditing)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.authGenderLabel,
+                                  style: theme.textTheme.labelLarge?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(height: spacing.xs),
+                                Row(
+                                  children: [
+                                    _GenderOption(
+                                      label: l10n.commonGenderMale,
+                                      isSelected: _selectedGender == 'male',
+                                      onTap: () {
+                                        setState(
+                                          () => _selectedGender = 'male',
+                                        );
+                                        _persistDraft();
+                                      },
+                                    ),
+                                    SizedBox(width: spacing.sm),
+                                    _GenderOption(
+                                      label: l10n.commonGenderFemale,
+                                      isSelected: _selectedGender == 'female',
+                                      onTap: () {
+                                        setState(
+                                          () => _selectedGender = 'female',
+                                        );
+                                        _persistDraft();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            )
+                          else
+                            AuthTextField(
+                              label: l10n.authGenderLabel,
+                              hint: '',
+                              leadingIcon: Symbols.person,
+                              controller: TextEditingController(
+                                text: _selectedGender,
+                              ),
+                              readOnly: true,
                             ),
+                        ],
+
+                        if (_isEditing || _selectedBirthDate != null) ...[
+                          SizedBox(height: spacing.lg),
+                          AuthTextField(
+                            label: l10n.authBirthDateLabel,
+                            hint: l10n.authBirthDateHint,
+                            leadingIcon: Symbols.calendar_month,
+                            controller: _birthDateController,
+                            readOnly: true,
+                            onTap: _isEditing ? _selectBirthDate : null,
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: spacing.xxl),
-                ],
+                        ],
 
-                // Details Section
-                if (!_isEditing) ...[
-                  AuthTextField(
-                    label: l10n.authFullNameLabel,
-                    hint: '',
-                    leadingIcon: Symbols.person,
-                    controller: TextEditingController(
-                      text: '${_data['firstName']} ${_data['lastName']}',
-                    ),
-                    readOnly: true,
-                  ),
-                ] else ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: AuthTextField(
-                          label: l10n.authFirstNameLabel,
-                          hint: l10n.authFirstNameHint,
-                          leadingIcon: Symbols.person,
-                          controller: _firstNameController,
-                        ),
-                      ),
-                      SizedBox(width: spacing.md),
-                      Expanded(
-                        child: AuthTextField(
-                          label: l10n.authLastNameLabel,
-                          hint: l10n.authLastNameHint,
-                          leadingIcon: Symbols.person,
-                          controller: _lastNameController,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                        SizedBox(height: spacing.xl),
 
-                SizedBox(height: spacing.lg),
-                AuthTextField(
-                  label: l10n.authEmailLabel,
-                  hint: '',
-                  leadingIcon: Symbols.mail,
-                  controller: _emailController,
-                  readOnly: !_isEditing,
-                  keyboardType: TextInputType.emailAddress,
-                ),
-                SizedBox(height: spacing.lg),
-                AuthTextField(
-                  label: l10n.authPhoneLabel,
-                  hint: '',
-                  leadingIcon: Symbols.call,
-                  controller: _phoneController,
-                  readOnly: !_isEditing,
-                  keyboardType: TextInputType.phone,
-                ),
-
-                if (_isEditing || _selectedGender != null) ...[
-                  SizedBox(height: spacing.lg),
-                  if (_isEditing)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.authGenderLabel,
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.w600,
+                        // Edit Action
+                        if (!_isEditing)
+                          TextButton.icon(
+                            onPressed: _toggleEdit,
+                            icon: const Icon(Symbols.edit, size: 18),
+                            label: Text(l10n.authEditInformation),
+                            style: TextButton.styleFrom(
+                              foregroundColor: theme.colorScheme.primary,
+                            ),
+                          )
+                        else
+                          ElevatedButton(
+                            onPressed: _saveChanges,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  theme.colorScheme.primaryContainer,
+                              foregroundColor:
+                                  theme.colorScheme.onPrimaryContainer,
+                            ),
+                            child: Text(l10n.profileSave),
                           ),
-                        ),
-                        SizedBox(height: spacing.xs),
-                        Row(
-                          children: [
-                            _GenderOption(
-                              label: l10n.commonGenderMale,
-                              isSelected: _selectedGender == 'male',
-                              onTap: () {
-                                setState(() => _selectedGender = 'male');
-                                _persistDraft();
-                              },
-                            ),
-                            SizedBox(width: spacing.sm),
-                            _GenderOption(
-                              label: l10n.commonGenderFemale,
-                              isSelected: _selectedGender == 'female',
-                              onTap: () {
-                                setState(() => _selectedGender = 'female');
-                                _persistDraft();
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
-                    )
-                  else
-                    AuthTextField(
-                      label: l10n.authGenderLabel,
-                      hint: '',
-                      leadingIcon: Symbols.person,
-                      controller: TextEditingController(text: _selectedGender),
-                      readOnly: true,
-                    ),
-                ],
 
-                if (_isEditing || _selectedBirthDate != null) ...[
-                  SizedBox(height: spacing.lg),
-                  AuthTextField(
-                    label: l10n.authBirthDateLabel,
-                    hint: l10n.authBirthDateHint,
-                    leadingIcon: Symbols.calendar_month,
-                    controller: _birthDateController,
-                    readOnly: true,
-                    onTap: _isEditing ? _selectBirthDate : null,
-                  ),
-                ],
+                        SizedBox(height: spacing.xxl),
 
-                SizedBox(height: spacing.xl),
+                        if (!_isEditing)
+                          ElevatedButton(
+                            onPressed: _isSubmitting ? null : _onContinue,
+                            child: Text(l10n.authConfirmContinue),
+                          ),
 
-                // Edit Action
-                if (!_isEditing)
-                  TextButton.icon(
-                    onPressed: _toggleEdit,
-                    icon: const Icon(Symbols.edit, size: 18),
-                    label: Text(l10n.authEditInformation),
-                    style: TextButton.styleFrom(
-                      foregroundColor: theme.colorScheme.primary,
-                    ),
-                  )
-                else
-                  ElevatedButton(
-                    onPressed: _saveChanges,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.colorScheme.primaryContainer,
-                      foregroundColor: theme.colorScheme.onPrimaryContainer,
-                    ),
-                    child: Text(l10n.profileSave),
-                  ),
-
-                SizedBox(height: spacing.xxl),
-
-                if (!_isEditing)
-                  ElevatedButton(
-                    onPressed: _isSubmitting ? null : _onContinue,
-                    child: Text(l10n.authConfirmContinue),
-                  ),
-
-                SizedBox(height: spacing.lg),
-              ],
+                        SizedBox(height: spacing.lg),
+                      ]
+                      .animate(interval: 50.ms)
+                      .fade(duration: 300.ms)
+                      .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
             ),
           ),
         ),

@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// High-fidelity OTP verification screen for Bourgo Arena.
@@ -279,82 +280,93 @@ class _OtpScreenState extends State<OtpScreen> {
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AuthHeader(
-                  title: l10n.authVerificationTitle,
-                  subtitle: () {
-                    final authNotifier = locator<AuthStateNotifier>();
-                    if (authNotifier.state ==
-                        AuthState.pendingDeletionCancellation) {
-                      return l10n.authDeletionCancelSubtitle;
-                    }
+              children:
+                  [
+                        AuthHeader(
+                          title: l10n.authVerificationTitle,
+                          subtitle: () {
+                            final authNotifier = locator<AuthStateNotifier>();
+                            if (authNotifier.state ==
+                                AuthState.pendingDeletionCancellation) {
+                              return l10n.authDeletionCancelSubtitle;
+                            }
 
-                    return '${l10n.authOtpSubtitlePrefix}'
-                        '${_resolvedDestination ?? l10n.authOtpSubtitleDefault}.';
-                  }(),
-                ),
-                const SizedBox(height: 48),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List.generate(6, (index) => _buildOTPField(index)),
-                ),
-                const SizedBox(height: 16),
-                Center(
-                  child: TextButton.icon(
-                    onPressed: _pasteFromClipboard,
-                    icon: const Icon(Symbols.content_paste, size: 20),
-                    label: const Text(
-                      'Paste Code',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      ),
-                    ),
-                    style: TextButton.styleFrom(
-                      foregroundColor: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Center(
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.authOtpResendTimer(_timerCount.toString()),
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                            return '${l10n.authOtpSubtitlePrefix}'
+                                '${_resolvedDestination ?? l10n.authOtpSubtitleDefault}.';
+                          }(),
                         ),
-                      ),
-                      if (_timerCount == 0)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: TextButton(
-                            onPressed: _viewModel.isLoading ? null : _onResend,
-                            child: Text(
-                              l10n.authSendCode,
+                        const SizedBox(height: 48),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(
+                            6,
+                            (index) => _buildOTPField(index),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Center(
+                          child: TextButton.icon(
+                            onPressed: _pasteFromClipboard,
+                            icon: const Icon(Symbols.content_paste, size: 20),
+                            label: const Text(
+                              'Paste Code',
                               style: TextStyle(
-                                color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
+                                letterSpacing: 1.0,
                               ),
+                            ),
+                            style: TextButton.styleFrom(
+                              foregroundColor: theme.colorScheme.primary,
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  onPressed: _viewModel.isLoading ? null : _onVerify,
-                  child: _viewModel.isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : Text(l10n.authVerify),
-                ),
-              ],
+                        const SizedBox(height: 16),
+                        Center(
+                          child: Column(
+                            children: [
+                              Text(
+                                l10n.authOtpResendTimer(_timerCount.toString()),
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                              if (_timerCount == 0)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16),
+                                  child: TextButton(
+                                    onPressed: _viewModel.isLoading
+                                        ? null
+                                        : _onResend,
+                                    child: Text(
+                                      l10n.authSendCode,
+                                      style: TextStyle(
+                                        color: theme.colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        ElevatedButton(
+                          onPressed: _viewModel.isLoading ? null : _onVerify,
+                          child: _viewModel.isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(l10n.authVerify),
+                        ),
+                      ]
+                      .animate(interval: 50.ms)
+                      .fade(duration: 300.ms)
+                      .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
             ),
           ),
         ),

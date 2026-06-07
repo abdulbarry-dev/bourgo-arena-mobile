@@ -52,48 +52,46 @@ class _MainLayoutState extends State<MainLayout> {
 
     return Scaffold(
       body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: theme.colorScheme.outline.withValues(alpha: 0.3),
-              width: 1,
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) =>
+            MainLayout.tabController.value = index,
+        backgroundColor: theme.colorScheme.surface,
+        indicatorColor: theme.colorScheme.primaryContainer,
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Symbols.home),
+            selectedIcon: Icon(
+              Symbols.home,
+              color: theme.colorScheme.onPrimaryContainer,
             ),
+            label: AppLocalizations.of(context)!.navHome,
           ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (index) => MainLayout.tabController.value = index,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: theme.colorScheme.surface,
-          selectedItemColor: theme.colorScheme.primary,
-          unselectedItemColor: theme.colorScheme.onSurfaceVariant.withValues(
-            alpha: 0.6,
+          NavigationDestination(
+            icon: const Icon(Symbols.sports_soccer),
+            selectedIcon: Icon(
+              Symbols.sports_soccer,
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
+            label: AppLocalizations.of(context)!.navActivities,
           ),
-          selectedLabelStyle: const TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.bold,
+          NavigationDestination(
+            icon: const Icon(Symbols.calendar_month),
+            selectedIcon: Icon(
+              Symbols.calendar_month,
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
+            label: AppLocalizations.of(context)!.navPlanning,
           ),
-          unselectedLabelStyle: const TextStyle(fontSize: 10),
-          items: [
-            BottomNavigationBarItem(
-              icon: const Icon(Symbols.home),
-              label: AppLocalizations.of(context)!.navHome,
+          NavigationDestination(
+            icon: const Icon(Symbols.person),
+            selectedIcon: Icon(
+              Symbols.person,
+              color: theme.colorScheme.onPrimaryContainer,
             ),
-            BottomNavigationBarItem(
-              icon: const Icon(Symbols.sports_soccer),
-              label: AppLocalizations.of(context)!.navActivities,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Symbols.calendar_month),
-              label: AppLocalizations.of(context)!.navPlanning,
-            ),
-            BottomNavigationBarItem(
-              icon: const Icon(Symbols.person),
-              label: AppLocalizations.of(context)!.navProfile,
-            ),
-          ],
-        ),
+            label: AppLocalizations.of(context)!.navProfile,
+          ),
+        ],
       ),
     );
   }

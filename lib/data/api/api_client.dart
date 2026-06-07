@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:dio/dio.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'dart:developer' as developer;
 
@@ -11,7 +13,9 @@ class ApiClient {
   String? _token;
   void Function(String? state)? onAuthError;
 
-  ApiClient({required this.baseUrl, Dio? dio}) {
+  final SharedPreferences? sharedPreferences;
+
+  ApiClient({required this.baseUrl, Dio? dio, this.sharedPreferences}) {
     _dio =
         dio ??
         Dio(
@@ -25,6 +29,19 @@ class ApiClient {
             },
           ),
         );
+
+    _dio.interceptors.add(
+      RetryInterceptor(
+        dio: _dio,
+        logPrint: developer.log,
+        retries: 3,
+        retryDelays: const [
+          Duration(seconds: 1),
+          Duration(seconds: 2),
+          Duration(seconds: 3),
+        ],
+      ),
+    );
 
     _dio.interceptors.add(
       QueuedInterceptorsWrapper(
@@ -42,14 +59,74 @@ class ApiClient {
           developer.log(
             'API ${response.requestOptions.method} Response (${response.statusCode}): ${response.data}',
           );
+
+          // Cache successful GET requests
+          if (response.requestOptions.method == 'GET' &&
+              response.statusCode != null &&
+              response.statusCode! >= 200 &&
+              response.statusCode! < 300) {
+            _cacheResponse(
+              response.requestOptions.uri.toString(),
+              response.data,
+            );
+          }
+
           return handler.next(response);
         },
-        onError: (DioException e, handler) {
+        onError: (DioException e, handler) async {
           developer.log('API Error: ${e.message}');
+
+          // If offline/network error, try to fetch from cache for GET requests
+          if ((e.type == DioExceptionType.connectionTimeout ||
+                  e.type == DioExceptionType.receiveTimeout ||
+                  e.type == DioExceptionType.sendTimeout ||
+                  e.type == DioExceptionType.connectionError) &&
+              e.requestOptions.method == 'GET') {
+            final cachedData = _getCachedResponse(
+              e.requestOptions.uri.toString(),
+            );
+            if (cachedData != null) {
+              developer.log(
+                'Returning cached response for ${e.requestOptions.uri}',
+              );
+              return handler.resolve(
+                Response(
+                  requestOptions: e.requestOptions,
+                  data: cachedData,
+                  statusCode: 200,
+                  statusMessage: 'OK from Cache',
+                ),
+              );
+            }
+          }
+
           return handler.next(e);
         },
       ),
     );
+  }
+
+  void _cacheResponse(String url, dynamic data) {
+    if (sharedPreferences == null) return;
+    try {
+      final String jsonString = jsonEncode(data);
+      sharedPreferences!.setString('api_cache_$url', jsonString);
+    } catch (e) {
+      developer.log('Failed to cache response: $e');
+    }
+  }
+
+  dynamic _getCachedResponse(String url) {
+    if (sharedPreferences == null) return null;
+    try {
+      final String? jsonString = sharedPreferences!.getString('api_cache_$url');
+      if (jsonString != null) {
+        return jsonDecode(jsonString);
+      }
+    } catch (e) {
+      developer.log('Failed to read cache: $e');
+    }
+    return null;
   }
 
   void setToken(String? token) {

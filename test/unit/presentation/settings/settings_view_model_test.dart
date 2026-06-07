@@ -136,6 +136,21 @@ void main() {
     when(
       () => mockSessionRepository.areAccountNotificationsEnabled(),
     ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockSessionRepository.areReservationsNotificationsEnabled(),
+    ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockSessionRepository.areSubscriptionsNotificationsEnabled(),
+    ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockSessionRepository.areCoursesNotificationsEnabled(),
+    ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockSessionRepository.areLoyaltyNotificationsEnabled(),
+    ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockSessionRepository.areFamilyNotificationsEnabled(),
+    ).thenAnswer((_) async => Result.success(true));
 
     when(
       () => mockSetTheme(any()),

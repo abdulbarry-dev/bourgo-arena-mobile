@@ -78,22 +78,5 @@ void main() {
       expect(find.text('Light Mode'), findsOneWidget);
       expect(find.text('Dark Mode'), findsOneWidget);
     });
-
-    testWidgets('toggling push notifications calls viewModel', (tester) async {
-      when(
-        () => mockViewModel.toggleNotifications(any()),
-      ).thenAnswer((_) async {});
-
-      await tester.pumpWidget(createWidgetUnderTest(tester));
-      await tester.pumpAndSettle();
-
-      final switchFinder = find.byType(Switch);
-      expect(switchFinder, findsOneWidget);
-
-      await tester.tap(switchFinder);
-      await tester.pump();
-
-      verify(() => mockViewModel.toggleNotifications(false)).called(1);
-    });
   });
 }

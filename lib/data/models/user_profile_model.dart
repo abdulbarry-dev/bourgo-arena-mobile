@@ -4,26 +4,24 @@ import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
 part 'user_profile_model.freezed.dart';
 part 'user_profile_model.g.dart';
 
-/// DTO for the user profile data.
 @freezed
-@JsonSerializable(fieldRename: FieldRename.snake)
 abstract class UserProfileModel with _$UserProfileModel {
   const factory UserProfileModel({
     @JsonKey(fromJson: _idFromJson) required String id,
-    String? firstName,
-    String? lastName,
+    @JsonKey(name: 'first_name') String? firstName,
+    @JsonKey(name: 'last_name') String? lastName,
     String? name,
     required String email,
     String? phone,
-    String? avatarUrl,
-    @Default(0) int loyaltyPoints,
-    String? subscriptionLevel,
-    String? subscriptionExpiry,
-    DateTime? birthDate,
+    @JsonKey(name: 'avatar_url') String? avatarUrl,
+    @JsonKey(name: 'loyalty_points') @Default(0) int loyaltyPoints,
+    @JsonKey(name: 'subscription_level') String? subscriptionLevel,
+    @JsonKey(name: 'subscription_expiry') String? subscriptionExpiry,
+    @JsonKey(name: 'birth_date') DateTime? birthDate,
     String? gender,
     String? status,
     String? state,
-    @Default(false) bool isParentAccount,
+    @JsonKey(name: 'is_parent_account') @Default(false) bool isParentAccount,
     @Default([]) List<ChildProfileModel> children,
     Map<String, dynamic>? preferences,
   }) = _UserProfileModel;
