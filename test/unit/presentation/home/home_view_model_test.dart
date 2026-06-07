@@ -45,6 +45,7 @@ void main() {
   final testCourses = [
     entity.Course(
       id: 'c1',
+      name: 'Tennis Training',
       title: 'Tennis Training',
       instructor: 'Coach John',
       startTime: '10:00',

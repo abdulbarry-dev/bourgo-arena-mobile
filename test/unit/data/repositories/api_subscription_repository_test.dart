@@ -16,52 +16,56 @@ void main() {
     apiClient = MockApiClient();
     when(() => apiClient.hasToken).thenReturn(true);
     repository = ApiSubscriptionRepository(apiClient);
-    test('subscribeToPlan returns success on API success', () async {
-      when(
-        () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
-      ).thenAnswer((_) async => {});
-
-      final result = await repository.subscribeToPlan('p1');
-
-      expect(result, isA<Success<void, Failure>>());
-      verify(
-        () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
-      ).called(1);
-    });
   });
 
   group('ApiSubscriptionRepository', () {
-    test('getActiveSubscription returns null when API returns null', () async {
-      when(
-        () => apiClient.get('/member/subscription'),
-      ).thenAnswer((_) async => null);
+    test(
+      'getActiveSubscriptions returns empty list when API returns empty data',
+      () async {
+        when(
+          () => apiClient.get('/member/subscription', fullResponse: any(named: "fullResponse")),
+        ).thenAnswer((_) async => {'data': []});
 
-      final result = await repository.getActiveSubscription();
+        final result = await repository.getActiveSubscriptions();
 
-      expect(result, isA<Success<Subscription?, Failure>>());
-      expect((result as Success<Subscription?, Failure>).data, isNull);
-    });
+        expect(result, isA<Success<List<Subscription>, Failure>>());
+        expect((result as Success<List<Subscription>, Failure>).data, isEmpty);
+      },
+    );
 
-    test('getActiveSubscription returns Subscription on 200', () async {
-      final tSubJson = {
-        'id': '1',
-        'name': 'Gold',
-        'price': 100.0,
-        'benefits': [
-          {'label': 'access'},
-        ],
-        'duration_months': 12,
-      };
-      when(
-        () => apiClient.get('/member/subscription'),
-      ).thenAnswer((_) async => tSubJson);
+    test(
+      'getActiveSubscriptions returns list of Subscriptions on success',
+      () async {
+        final tSubJson = {
+          'data': [
+            {
+              'id': 1,
+              'plan': {'id': 2, 'name': 'Gold', 'price': 100.0},
+              'service': {'id': 1, 'name': 'Fitness & Gym', 'slug': 'fitness-gym'},
+              'status': 'active',
+              'starts_at': '2026-06-01',
+              'ends_at': '2026-12-31',
+              'days_remaining': 207,
+              'payment_method': 'cash',
+              'amount_paid': 129,
+              'is_active': true,
+              'receipt_url': null,
+            },
+          ],
+        };
+        when(
+          () => apiClient.get('/member/subscription', fullResponse: any(named: "fullResponse")),
+        ).thenAnswer((_) async => tSubJson);
 
-      final result = await repository.getActiveSubscription();
+        final result = await repository.getActiveSubscriptions();
 
-      expect(result, isA<Success<Subscription?, Failure>>());
-      final data = (result as Success<Subscription?, Failure>).data;
-      expect(data?.name, 'Gold');
-    });
+        expect(result, isA<Success<List<Subscription>, Failure>>());
+        final data = (result as Success<List<Subscription>, Failure>).data;
+        expect(data, isNotEmpty);
+        expect(data.first.plan?.name, 'Gold');
+      },
+    );
+
     test('subscribeToPlan returns success on API success', () async {
       when(
         () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
@@ -77,13 +81,13 @@ void main() {
 
     test('cancelSubscription returns success on API success', () async {
       when(
-        () => apiClient.post('/subscriptions/sub1/cancel', {}),
+        () => apiClient.delete('/subscriptions/sub1'),
       ).thenAnswer((_) async => {});
 
       final result = await repository.cancelSubscription('sub1');
 
       expect(result, isA<Success<void, Failure>>());
-      verify(() => apiClient.post('/subscriptions/sub1/cancel', {})).called(1);
+      verify(() => apiClient.delete('/subscriptions/sub1')).called(1);
     });
   });
 }

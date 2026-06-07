@@ -24,7 +24,7 @@ void main() {
 
   group('LoginUseCase', () {
     test('returns the authenticated session on success', () async {
-      const user = User(
+      final user = User(
         id: 'user-1',
         firstName: 'Alex',
         lastName: 'Morgan',
@@ -33,9 +33,9 @@ void main() {
         avatarUrl: 'https://example.com/avatar.png',
         loyaltyPoints: 120,
         subscriptionLevel: 'premium',
-        subscriptionExpiry: '2026-12-31',
+        subscriptionExpiry: DateTime.utc(2026, 12, 31),
       );
-      const session = AuthSession(
+      final session = AuthSession(
         user: user,
         state: AuthState.authenticated,
         token: 'token-123',
@@ -43,7 +43,7 @@ void main() {
 
       when(
         () => repository.login('alex@example.com', 'secret123'),
-      ).thenAnswer((_) async => const Success<AuthSession, Failure>(session));
+      ).thenAnswer((_) async => Success<AuthSession, Failure>(session));
 
       final result = await useCase('alex@example.com', 'secret123');
 
@@ -79,7 +79,7 @@ void main() {
     });
 
     test('forwards empty credentials without altering them', () async {
-      const session = AuthSession(
+      final session = AuthSession(
         state: AuthState.authenticated,
         user: User(
           id: 'user-2',
@@ -90,13 +90,13 @@ void main() {
           avatarUrl: '',
           loyaltyPoints: 0,
           subscriptionLevel: 'basic',
-          subscriptionExpiry: '2099-01-01',
+          subscriptionExpiry: DateTime.utc(2099, 1, 1),
         ),
       );
 
       when(
         () => repository.login('', ''),
-      ).thenAnswer((_) async => const Success<AuthSession, Failure>(session));
+      ).thenAnswer((_) async => Success<AuthSession, Failure>(session));
 
       final result = await useCase('', '');
 

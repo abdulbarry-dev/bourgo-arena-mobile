@@ -10,6 +10,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 
 class MockPaymentRepository extends Mock implements PaymentRepository {}
@@ -24,9 +25,9 @@ void main() {
     mockPaymentRepository = MockPaymentRepository();
     final mockAuthNotifier = MockAuthStateNotifier();
 
-    when(
-      () => mockAuthNotifier.session,
-    ).thenReturn(const AuthSession(user: null));
+    when(() => mockAuthNotifier.session).thenReturn(
+      const AuthSession(user: null, state: AuthState.unauthenticated),
+    );
 
     locator.allowReassignment = true;
     if (!locator.isRegistered<AuthStateNotifier>()) {

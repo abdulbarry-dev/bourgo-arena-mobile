@@ -19,7 +19,7 @@ User testUserEntity({
   String avatarUrl = 'https://example.com/avatar.png',
   int loyaltyPoints = 120,
   String subscriptionLevel = 'premium',
-  String subscriptionExpiry = '2026-12-31',
+  DateTime? subscriptionExpiry,
   DateTime? birthDate,
   String? gender = 'male',
   bool isParentAccount = false,
@@ -104,6 +104,7 @@ Activity testActivityEntity({
 
 Course testCourseEntity({
   String id = 'course-1',
+  String name = 'CrossFit Beginners',
   String title = 'CrossFit Beginners',
   String instructor = 'Coach Lee',
   String startTime = '18:00',
@@ -116,6 +117,7 @@ Course testCourseEntity({
 }) {
   return Course(
     id: id,
+    name: name,
     title: title,
     instructor: instructor,
     startTime: startTime,
@@ -125,20 +127,6 @@ Course testCourseEntity({
     capacity: capacity,
     enrolled: enrolled,
     icon: icon,
-  );
-}
-
-Service testServiceEntity({
-  int id = 1,
-  String name = 'Football Pitch',
-  String description = 'Full size 11v11 pitch',
-  String imageUrl = 'https://example.com/pitch.png',
-}) {
-  return Service(
-    id: id,
-    name: name,
-    description: description,
-    imageUrl: imageUrl,
   );
 }
 
@@ -303,20 +291,6 @@ Map<String, dynamic> testCourseJson({
     'capacity': capacity,
     'enrolled': enrolled,
     'icon': icon,
-  };
-}
-
-Map<String, dynamic> testServiceJson({
-  int id = 1,
-  String name = 'Football Pitch',
-  String description = 'Full size 11v11 pitch',
-  String imageUrl = 'https://example.com/pitch.png',
-}) {
-  return {
-    'id': id,
-    'name': name,
-    'description': description,
-    'image_url': imageUrl,
   };
 }
 

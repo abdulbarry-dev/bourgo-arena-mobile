@@ -11,6 +11,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/bourgo_image_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/unified_offering_card.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';

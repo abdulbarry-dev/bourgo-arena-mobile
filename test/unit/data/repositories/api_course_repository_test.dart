@@ -3,9 +3,12 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_course_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+
+import 'repository_test_fixtures.dart';
 
 class MockApiClient extends Mock implements ApiClient {}
 
@@ -16,9 +19,12 @@ void main() {
   setUp(() {
     mockApiClient = MockApiClient();
     repository = ApiCourseRepository(mockApiClient);
+  });
+
+  group('ApiCourseRepository', () {
     test('getCourseDetails returns course details on 200', () async {
       when(
-        () => apiClient.get('/courses/c1'),
+        () => mockApiClient.get('/courses/c1'),
       ).thenAnswer((_) async => {'data': testCourseJson()});
 
       final result = await repository.getCourseDetails('c1');
@@ -31,7 +37,7 @@ void main() {
         {'id': 's1', 'date': '2026-06-04'},
       ];
       when(
-        () => apiClient.get('/courses/c1/sessions'),
+        () => mockApiClient.get('/courses/c1/sessions'),
       ).thenAnswer((_) async => tSessions);
 
       final result = await repository.getCourseSessions('c1');
@@ -39,9 +45,7 @@ void main() {
       expect(result, isA<Success<List<dynamic>, Failure>>());
       expect((result as Success<List<dynamic>, Failure>).data.length, 1);
     });
-  });
 
-  group('ApiCourseRepository', () {
     test('getCourses returns list of courses', () async {
       // Arrange
       final jsonResponse = [
@@ -102,7 +106,7 @@ void main() {
       final result = await repository.getCourseDetails('c1');
 
       // Assert
-      check(result).isA<SuccessResult>();
+      check(result).isA<Success>();
       final course = result.fold(
         onSuccess: (val) => val,
         onFailure: (_) => fail('Expected success'),
@@ -125,7 +129,7 @@ void main() {
       final result = await repository.getCourseSessions('c1');
 
       // Assert
-      check(result).isA<SuccessResult>();
+      check(result).isA<Success>();
       final sessions = result.fold(
         onSuccess: (val) => val,
         onFailure: (_) => fail('Expected success'),

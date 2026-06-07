@@ -107,7 +107,7 @@ void main() {
       (tester) async {
         when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
 
-        await tester.pumpWidget(createWidgetUnderTest());
+        await tester.pumpWidget(createWidgetUnderTest(tester));
         await tester.pump(const Duration(seconds: 1));
 
         // Tap on Reservations tab

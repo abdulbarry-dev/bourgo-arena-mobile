@@ -11,7 +11,7 @@ User createTestUser({
   String avatarUrl = 'https://example.com/avatar.png',
   int loyaltyPoints = 100,
   String subscriptionLevel = 'Gold',
-  String subscriptionExpiry = '2025-01-01',
+  DateTime? subscriptionExpiry,
   DateTime? birthDate,
   bool isParentAccount = false,
   List<ChildProfile> children = const [],

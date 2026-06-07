@@ -120,6 +120,7 @@ void main() {
     group('Course', () {
       const course1 = Course(
         id: 'course1',
+        name: 'Yoga',
         title: 'Yoga',
         instructor: 'Sarah',
         startTime: '08:00',
@@ -133,6 +134,7 @@ void main() {
 
       const courseFull = Course(
         id: 'course2',
+        name: 'Pilates',
         title: 'Pilates',
         instructor: 'Emma',
         startTime: '10:00',
@@ -157,6 +159,7 @@ void main() {
       test('equality should work correctly', () {
         const course2 = Course(
           id: 'course1',
+          name: 'Yoga',
           title: 'Yoga',
           instructor: 'Sarah',
           startTime: '08:00',
@@ -242,18 +245,10 @@ void main() {
     });
 
     group('Subscription', () {
-      const sub1 = Subscription(
-        id: 's1',
-        planName: 'Premium',
-        status: 'active',
-      );
+      const sub1 = Subscription(id: 's1', status: 'active');
 
       test('equality should work', () {
-        const subSame = Subscription(
-          id: 's1',
-          planName: 'Premium',
-          status: 'active',
-        );
+        const subSame = Subscription(id: 's1', status: 'active');
         check(sub1).equals(subSame);
       });
     });
@@ -277,7 +272,7 @@ void main() {
         avatarUrl: 'url',
         loyaltyPoints: 100,
         subscriptionLevel: 'Gold',
-        subscriptionExpiry: '2024-01-01',
+        subscriptionExpiry: DateTime.utc(2024, 1, 1),
         children: [
           ChildProfile(
             id: 'c1',
@@ -302,7 +297,8 @@ void main() {
           avatarUrl: 'url',
           loyaltyPoints: 100,
           subscriptionLevel: 'Gold',
-          subscriptionExpiry: '2024-01-01',
+          subscriptionExpiry: DateTime.utc(2024, 1, 1),
+
           children: [
             ChildProfile(
               id: 'c1',

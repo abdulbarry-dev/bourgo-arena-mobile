@@ -32,7 +32,7 @@ UserProfileModel testUserProfileModel({
   String? avatarUrl = 'https://example.com/avatar.png',
   int loyaltyPoints = 120,
   String subscriptionLevel = 'premium',
-  String? subscriptionExpiry = '2026-12-31',
+  DateTime? subscriptionExpiry,
   DateTime? birthDate,
   bool isParentAccount = false,
   List<ChildProfileModel> children = const [],
@@ -82,6 +82,7 @@ ActivityModel testActivityModel({
 
 CourseModel testCourseModel({
   String id = 'course-1',
+  String name = 'CrossFit Beginners',
   String title = 'CrossFit Beginners',
   String instructor = 'Coach Lee',
   String startTime = '18:00',
@@ -94,6 +95,7 @@ CourseModel testCourseModel({
 }) {
   return CourseModel(
     id: id,
+    name: name,
     title: title,
     instructor: instructor,
     startTime: startTime,
