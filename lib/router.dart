@@ -50,11 +50,13 @@ import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/course_detail_screen.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/transaction_history_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/transaction_history_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/presentation/events/events_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/events/event_detail_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/payment_gateway_screen.dart';
 
+import 'package:bourgo_arena_mobile/presentation/booking/reservations_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:developer' as developer;
@@ -408,6 +410,10 @@ GoRouter createRouter(
       builder: (context, state) => const NotificationsScreen(),
     ),
     GoRoute(
+      path: '/bookings',
+      builder: (context, state) => const ReservationsScreen(),
+    ),
+    GoRoute(
       path: '/settings',
       builder: (context, state) => SettingsScreen(viewModel: settingsViewModel),
     ),
@@ -475,7 +481,9 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/transactions',
-      builder: (context, state) => const TransactionHistoryScreen(),
+      builder: (context, state) => PaymentHistoryScreen(
+        viewModel: locator<PaymentHistoryViewModel>(),
+      ),
     ),
     GoRoute(path: '/events', builder: (context, state) => const EventsScreen()),
     GoRoute(

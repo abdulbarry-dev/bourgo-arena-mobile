@@ -2215,6 +2215,36 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Nous recommandons de vérifier les deux méthodes pour une sécurité maximale. Vous pourrez toujours le faire plus tard dans les paramètres.'**
   String get authSkipForeverMessage;
+
+  /// No description provided for @loyaltyRecentTransactions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Transactions récentes'**
+  String get loyaltyRecentTransactions;
+
+  /// No description provided for @loyaltyNoTransactions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune transaction'**
+  String get loyaltyNoTransactions;
+
+  /// No description provided for @loyaltyNoTransactionsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'avez pas encore gagné ou dépensé de points. Commencez à réserver des cours pour gagner des points !'**
+  String get loyaltyNoTransactionsSubtitle;
+
+  /// No description provided for @themeSelectionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez votre style'**
+  String get themeSelectionTitle;
+
+  /// No description provided for @themeSelectionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Personnalisez l\'apparence de l\'application selon vos préférences.'**
+  String get themeSelectionSubtitle;
 }
 
 class _AppLocalizationsDelegate

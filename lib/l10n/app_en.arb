@@ -27,8 +27,7 @@
   "commonSetUp": "SET UP",
   "commonPointsShort": "pts",
   "guestBrowse": "CONTINUE AS GUEST",
-  "guestBrowse": "CONTINUE AS GUEST",
-  
+
   "navHome": "HOME",
   "navActivities": "ACTIVITIES",
   "navPlanning": "PLANNING",
@@ -405,5 +404,8 @@
   "authVerificationCompleteMessage": "All verification methods have been successfully verified. Let's continue with your profile setup.",
   "authDontShowAgain": "Don't show again",
   "authSkipForever": "SKIP FOREVER",
-  "authSkipForeverMessage": "We recommend verifying both methods for maximum security. You can always do this later in settings."
+  "authSkipForeverMessage": "We recommend verifying both methods for maximum security. You can always do this later in settings.",
+  "loyaltyRecentTransactions": "Recent Transactions",
+  "loyaltyNoTransactions": "No Transactions Yet",
+  "loyaltyNoTransactionsSubtitle": "You haven't earned or spent any points yet. Start booking courses to earn points!"
 }

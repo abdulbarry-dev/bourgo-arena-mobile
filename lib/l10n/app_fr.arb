@@ -403,5 +403,10 @@
   "authVerificationCompleteMessage": "Toutes les méthodes de vérification ont été vérifiées avec succès. Poursuivons avec la configuration de votre profil.",
   "authDontShowAgain": "Ne plus afficher",
   "authSkipForever": "PASSER DÉFINITIVEMENT",
-  "authSkipForeverMessage": "Nous recommandons de vérifier les deux méthodes pour une sécurité maximale. Vous pourrez toujours le faire plus tard dans les paramètres."
+  "authSkipForeverMessage": "Nous recommandons de vérifier les deux méthodes pour une sécurité maximale. Vous pourrez toujours le faire plus tard dans les paramètres.",
+  "loyaltyRecentTransactions": "Transactions récentes",
+  "loyaltyNoTransactions": "Aucune transaction",
+  "loyaltyNoTransactionsSubtitle": "Vous n'avez pas encore gagné ou dépensé de points. Commencez à réserver des cours pour gagner des points !",
+  "themeSelectionTitle": "Choisissez votre style",
+  "themeSelectionSubtitle": "Personnalisez l'apparence de l'application selon vos préférences."
 }

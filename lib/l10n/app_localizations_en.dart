@@ -1140,4 +1140,21 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get authSkipForeverMessage =>
       'We recommend verifying both methods for maximum security. You can always do this later in settings.';
+
+  @override
+  String get loyaltyRecentTransactions => 'Recent Transactions';
+
+  @override
+  String get loyaltyNoTransactions => 'No Transactions Yet';
+
+  @override
+  String get loyaltyNoTransactionsSubtitle =>
+      'You haven\'t earned or spent any points yet. Start booking courses to earn points!';
+
+  @override
+  String get themeSelectionTitle => 'Choose Your Style';
+
+  @override
+  String get themeSelectionSubtitle =>
+      'Select a display mode for your application';
 }
