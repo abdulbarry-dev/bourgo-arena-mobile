@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 /// High-fidelity OTP verification screen for Bourgo Arena.
 class OtpScreen extends StatefulWidget {
@@ -215,6 +216,51 @@ class _OtpScreenState extends State<OtpScreen> {
         };
   }
 
+  void _showInvalidPasteToast() {
+    final theme = Theme.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Symbols.warning, color: theme.colorScheme.onError),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Invalid format. Please paste a 6-digit code.',
+                style: TextStyle(color: theme.colorScheme.onError),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: theme.colorScheme.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(24),
+      ),
+    );
+  }
+
+  void _handlePaste(String text) {
+    if (text.length == 6 && RegExp(r'^\d{6}$').hasMatch(text)) {
+      for (int i = 0; i < 6; i++) {
+        _controllers[i].text = text[i];
+      }
+      _focusNodes[5].requestFocus();
+    } else {
+      for (int i = 0; i < 6; i++) {
+        _controllers[i].text = '';
+      }
+      _focusNodes[0].requestFocus();
+      _showInvalidPasteToast();
+    }
+  }
+
+  Future<void> _pasteFromClipboard() async {
+    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    final text = clipboardData?.text?.trim() ?? '';
+    _handlePaste(text);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -252,7 +298,24 @@ class _OtpScreenState extends State<OtpScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(6, (index) => _buildOTPField(index)),
                 ),
-                const SizedBox(height: 48),
+                const SizedBox(height: 16),
+                Center(
+                  child: TextButton.icon(
+                    onPressed: _pasteFromClipboard,
+                    icon: const Icon(Symbols.content_paste, size: 20),
+                    label: const Text(
+                      'Paste Code',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      foregroundColor: theme.colorScheme.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Center(
                   child: Column(
                     children: [
@@ -310,13 +373,17 @@ class _OtpScreenState extends State<OtpScreen> {
         focusNode: _focusNodes[index],
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        maxLength: 1,
+        textAlignVertical: TextAlignVertical.center,
         style: theme.textTheme.headlineMedium?.copyWith(
           fontWeight: FontWeight.bold,
           color: theme.colorScheme.onSurface,
         ),
-        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly,
+          LengthLimitingTextInputFormatter(6),
+        ],
         decoration: InputDecoration(
+          contentPadding: EdgeInsets.zero,
           counterText: '',
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
@@ -333,6 +400,10 @@ class _OtpScreenState extends State<OtpScreen> {
           fillColor: theme.colorScheme.surfaceContainer,
         ),
         onChanged: (value) {
+          if (value.length > 1) {
+            _handlePaste(value);
+            return;
+          }
           if (value.isNotEmpty && index < 5) {
             _focusNodes[index + 1].requestFocus();
           } else if (value.isEmpty && index > 0) {

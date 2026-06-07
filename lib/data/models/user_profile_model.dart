@@ -1,52 +1,35 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
-import 'package:json_annotation/json_annotation.dart';
 
+part 'user_profile_model.freezed.dart';
 part 'user_profile_model.g.dart';
 
 /// DTO for the user profile data.
+@freezed
 @JsonSerializable(fieldRename: FieldRename.snake)
-class UserProfileModel {
-  @JsonKey(fromJson: _idFromJson)
-  final String id;
-  final String? firstName;
-  final String? lastName;
-  final String? name;
-  final String email;
-  final String? phone;
-  final String? avatarUrl;
-  final int loyaltyPoints;
-  final String? subscriptionLevel;
-  final String? subscriptionExpiry;
-  final DateTime? birthDate;
-  final String? gender;
-  final String? status;
-  final String? state;
-  final bool isParentAccount;
-  final List<ChildProfileModel> children;
-
-  static String _idFromJson(dynamic json) => json.toString();
-
-  const UserProfileModel({
-    required this.id,
-    this.firstName,
-    this.lastName,
-    this.name,
-    required this.email,
-    this.phone,
-    this.avatarUrl,
-    this.loyaltyPoints = 0,
-    this.subscriptionLevel,
-    this.subscriptionExpiry,
-    this.birthDate,
-    this.gender,
-    this.status,
-    this.state,
-    this.isParentAccount = false,
-    this.children = const [],
-  });
+abstract class UserProfileModel with _$UserProfileModel {
+  const factory UserProfileModel({
+    @JsonKey(fromJson: _idFromJson) required String id,
+    String? firstName,
+    String? lastName,
+    String? name,
+    required String email,
+    String? phone,
+    String? avatarUrl,
+    @Default(0) int loyaltyPoints,
+    String? subscriptionLevel,
+    String? subscriptionExpiry,
+    DateTime? birthDate,
+    String? gender,
+    String? status,
+    String? state,
+    @Default(false) bool isParentAccount,
+    @Default([]) List<ChildProfileModel> children,
+    Map<String, dynamic>? preferences,
+  }) = _UserProfileModel;
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) =>
       _$UserProfileModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$UserProfileModelToJson(this);
 }
+
+String _idFromJson(dynamic json) => json.toString();

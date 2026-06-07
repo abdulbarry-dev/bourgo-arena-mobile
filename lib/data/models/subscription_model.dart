@@ -2,39 +2,44 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'subscription_model.g.dart';
 
-/// DTO for benefit data.
-@JsonSerializable(fieldRename: FieldRename.snake)
-class BenefitModel {
-  final String label;
-  final String? icon;
-
-  const BenefitModel({required this.label, this.icon});
-
-  factory BenefitModel.fromJson(Map<String, dynamic> json) =>
-      _$BenefitModelFromJson(json);
-
-  Map<String, dynamic> toJson() => _$BenefitModelToJson(this);
-}
-
-/// DTO for subscription plan data.
+/// DTO for an active subscription matching SubscriptionResource.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class SubscriptionModel {
+  @JsonKey(fromJson: _idToString)
   final String id;
-  final String name;
-  final double price;
-  final List<BenefitModel> benefits;
-  final int durationMonths;
+  final String? planName;
+  final String? planDescription;
+  final String? status;
+  final String? startsAt;
+  final String? endsAt;
+  final int? daysRemaining;
+  final String? paymentMethod;
+  final double? amountPaid;
+
+  /// Legacy fields retained for backward compatibility.
+  final String? name;
+  final double? price;
+  final int? durationMonths;
 
   const SubscriptionModel({
     required this.id,
-    required this.name,
-    required this.price,
-    required this.benefits,
-    required this.durationMonths,
+    this.planName,
+    this.planDescription,
+    this.status,
+    this.startsAt,
+    this.endsAt,
+    this.daysRemaining,
+    this.paymentMethod,
+    this.amountPaid,
+    this.name,
+    this.price,
+    this.durationMonths,
   });
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) =>
       _$SubscriptionModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$SubscriptionModelToJson(this);
+
+  static String _idToString(dynamic id) => id.toString();
 }

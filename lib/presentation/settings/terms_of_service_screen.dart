@@ -10,49 +10,62 @@ class TermsOfServiceScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.settingsTerms), centerTitle: true),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.legalLastUpdated,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-              ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Text(
+            l10n.settingsTerms.toUpperCase(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.0,
             ),
-            const SizedBox(height: 24),
-            _Section(
-              title: l10n.termsSection1Title,
-              content: l10n.termsSection1Content,
-            ),
-            _Section(
-              title: l10n.termsSection2Title,
-              content: l10n.termsSection2Content,
-            ),
-            _Section(
-              title: l10n.termsSection3Title,
-              content: l10n.termsSection3Content,
-            ),
-            _Section(
-              title: l10n.termsSection4Title,
-              content: l10n.termsSection4Content,
-            ),
-            _Section(
-              title: l10n.termsSection5Title,
-              content: l10n.termsSection5Content,
-            ),
-            _Section(
-              title: l10n.termsSection6Title,
-              content: l10n.termsSection6Content,
-            ),
-            const SizedBox(height: 40),
-          ],
+          ),
         ),
-      ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.legalLastUpdated,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _Section(
+                  title: l10n.termsSection1Title,
+                  content: l10n.termsSection1Content,
+                ),
+                _Section(
+                  title: l10n.termsSection2Title,
+                  content: l10n.termsSection2Content,
+                ),
+                _Section(
+                  title: l10n.termsSection3Title,
+                  content: l10n.termsSection3Content,
+                ),
+                _Section(
+                  title: l10n.termsSection4Title,
+                  content: l10n.termsSection4Content,
+                ),
+                _Section(
+                  title: l10n.termsSection5Title,
+                  content: l10n.termsSection5Content,
+                ),
+                _Section(
+                  title: l10n.termsSection6Title,
+                  content: l10n.termsSection6Content,
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

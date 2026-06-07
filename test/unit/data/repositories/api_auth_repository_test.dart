@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
@@ -60,6 +61,38 @@ void main() {
       () => sessionRepository.shouldSkipLoginOtpForever(),
     ).thenAnswer((_) async => const Success(false));
 
+    // Default mocks for preferences
+    when(
+      () => sessionRepository.getThemeMode(),
+    ).thenAnswer((_) async => const Success(ThemeMode.system));
+    when(
+      () => sessionRepository.getLocale(),
+    ).thenAnswer((_) async => const Success(Locale('en')));
+    when(
+      () => sessionRepository.areNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.arePromotionalNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areAccountNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areReservationsNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areSubscriptionsNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areCoursesNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areLoyaltyNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areFamilyNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+
     // Default mock for verification status endpoint
     when(() => apiClient.get('/user/verification-status')).thenAnswer(
       (_) async => {
@@ -68,6 +101,19 @@ void main() {
         'is_fully_verified': true,
       },
     );
+
+    // Default mocks for profile requests triggered during auth flows
+    when(
+      () => apiClient.put('/user/profile', any()),
+    ).thenAnswer((_) async => {});
+    when(
+      () => apiClient.get(
+        '/user/profile',
+        skipAuthError: any(named: 'skipAuthError'),
+        fullResponse: any(named: 'fullResponse'),
+        includeAuth: any(named: 'includeAuth'),
+      ),
+    ).thenAnswer((_) async => testUserJson());
   });
 
   group('ApiAuthRepository', () {
@@ -1038,7 +1084,9 @@ void main() {
         expect(status.emailVerified, isTrue);
         expect(status.phoneVerified, isFalse);
         expect(status.email, 'alex@example.com');
-        verify(() => apiClient.get('/user/verification-status', skipAuthError: true)).called(1);
+        verify(
+          () => apiClient.get('/user/verification-status', skipAuthError: true),
+        ).called(1);
       });
 
       test('returns failure on server error', () async {

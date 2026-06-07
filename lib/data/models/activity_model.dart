@@ -2,34 +2,48 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'activity_model.g.dart';
 
-/// DTO for activity data.
+/// DTO for activity data matching ActivityResource.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ActivityModel {
   final String id;
-  final String title;
-  final String category;
-  final double basePrice;
-  final String currency;
-  final String imageUrl;
-  final String icon;
-  final String description;
-  final List<String> features;
-  final double rating;
-  final int reviewCount;
+
+  /// Primary display title.
+  final String? title;
+
+  /// API alias for title — use [displayTitle] to resolve.
+  final String? name;
+
+  final String? category;
+  final double? basePrice;
+  final String? currency;
+  final String? imageUrl;
+  final String? icon;
+  final String? description;
+  final List<String>? features;
+  @JsonKey(defaultValue: 0.0)
+  final double? rating;
+  @JsonKey(defaultValue: 0)
+  final int? reviewCount;
+  final List<String>? images;
 
   const ActivityModel({
     required this.id,
-    required this.title,
-    required this.category,
-    required this.basePrice,
-    required this.currency,
-    required this.imageUrl,
-    required this.icon,
-    required this.description,
-    required this.features,
-    this.rating = 0.0,
-    this.reviewCount = 0,
+    this.title,
+    this.name,
+    this.category,
+    this.basePrice,
+    this.currency,
+    this.imageUrl,
+    this.icon,
+    this.description,
+    this.features,
+    this.rating,
+    this.reviewCount,
+    this.images,
   });
+
+  /// Resolves display title from either `title` or `name`.
+  String get displayTitle => title ?? name ?? '';
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) =>
       _$ActivityModelFromJson(json);

@@ -167,13 +167,19 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                       ),
                     ),
                   ),
-                  if (_viewModel.members.isNotEmpty)
-                    SliverToBoxAdapter(
-                      child: _MembersList(
-                        members: _viewModel.members,
-                        onRemove: _viewModel.removeMember,
-                      ),
+                  SliverToBoxAdapter(
+                    child: AnimatedSize(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeOutCubic,
+                      alignment: Alignment.topCenter,
+                      child: _viewModel.members.isNotEmpty
+                          ? _MembersList(
+                              members: _viewModel.members,
+                              onRemove: _viewModel.removeMember,
+                            )
+                          : const SizedBox.shrink(),
                     ),
+                  ),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24.0,
@@ -204,9 +210,22 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                                 : null,
                           ),
                           const SizedBox(height: 48),
-                          ElevatedButton(
+                          FilledButton(
                             onPressed: _onContinue,
-                            child: Text(l10n.commonStart),
+                            style: FilledButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            child: Text(
+                              l10n.commonStart,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
                           ),
                         ],
                       ),

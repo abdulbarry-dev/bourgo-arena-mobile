@@ -34,6 +34,8 @@ import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/onboarding/language_selection_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/onboarding/theme_selection_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/settings/notifications_preferences_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/login_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/register_use_case.dart';
@@ -41,14 +43,19 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/reset_password_use_case
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_balance_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/service/service_detail_screen.dart';
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/course_detail_screen.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/transaction_history_screen.dart';
+import 'package:bourgo_arena_mobile/domain/entities/event.dart';
+import 'package:bourgo_arena_mobile/presentation/events/events_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/events/event_detail_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/booking/payment_gateway_screen.dart';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:developer' as developer;
 
@@ -102,12 +109,20 @@ GoRouter createRouter(
           : '/language-selection';
     }
 
-    // 2. Prevent accessing language selection once set
-    if (state.matchedLocation == '/language-selection') {
+    // 2. Force Theme Selection if not set
+    if (!settingsViewModel.isThemeSelected) {
+      return state.matchedLocation == '/theme-selection'
+          ? null
+          : '/theme-selection';
+    }
+
+    // 3. Prevent accessing setup screens once set
+    if (state.matchedLocation == '/language-selection' ||
+        state.matchedLocation == '/theme-selection') {
       return '/';
     }
 
-    // 3. Auth Redirection
+    // 4. Auth Redirection
     final authState = authStateNotifier.state;
     final location = state.matchedLocation;
     developer.log('Router.redirect: authState=$authState, location=$location');
@@ -117,7 +132,8 @@ GoRouter createRouter(
         location == '/terms' ||
         location == '/privacy' ||
         location == '/offline' ||
-        location == '/language-selection';
+        location == '/language-selection' ||
+        location == '/theme-selection';
 
     if (isAlwaysPublic) return null;
 
@@ -151,12 +167,14 @@ GoRouter createRouter(
     final draftRoute = authStateNotifier.registrationRoute;
     if (authState == AuthState.unauthenticated &&
         draftRoute != null &&
-        location != draftRoute) {
+        location != draftRoute &&
+        location != '/login') {
       return draftRoute;
     }
 
     switch (authState) {
       case AuthState.unauthenticated:
+      case AuthState.guest:
         // Allow auth entry, onboarding, and guest accessible routes, otherwise force login
         return (isAuthEntryRoute || isSetupRoute || isGuestAccessibleRoute)
             ? null
@@ -234,6 +252,11 @@ GoRouter createRouter(
       path: '/language-selection',
       builder: (context, state) =>
           LanguageSelectionScreen(viewModel: settingsViewModel),
+    ),
+    GoRoute(
+      path: '/theme-selection',
+      builder: (context, state) =>
+          ThemeSelectionScreen(viewModel: settingsViewModel),
     ),
     GoRoute(path: '/', builder: (context, state) => const OnboardingScreen()),
     GoRoute(
@@ -372,6 +395,7 @@ GoRouter createRouter(
       builder: (context, state) => LoyaltyDashboardScreen(
         viewModel: LoyaltyDashboardViewModel(
           authStateNotifier: authStateNotifier,
+          getLoyaltyBalanceUseCase: locator<GetLoyaltyBalanceUseCase>(),
         ),
       ),
     ),
@@ -386,6 +410,11 @@ GoRouter createRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => SettingsScreen(viewModel: settingsViewModel),
+    ),
+    GoRoute(
+      path: '/notifications-preferences',
+      builder: (context, state) =>
+          NotificationsPreferencesScreen(viewModel: settingsViewModel),
     ),
     GoRoute(
       path: '/edit-profile',
@@ -447,6 +476,37 @@ GoRouter createRouter(
     GoRoute(
       path: '/transactions',
       builder: (context, state) => const TransactionHistoryScreen(),
+    ),
+    GoRoute(path: '/events', builder: (context, state) => const EventsScreen()),
+    GoRoute(
+      path: '/events/:id',
+      builder: (context, state) {
+        final eventId = state.pathParameters['id']!;
+        final event = state.extra as Event?;
+        return EventDetailScreen(eventId: eventId, event: event);
+      },
+    ),
+    GoRoute(
+      path: '/payment/:id',
+      builder: (context, state) {
+        final reservationId = state.pathParameters['id']!;
+        return PaymentGatewayScreen(reservationId: reservationId);
+      },
+    ),
+    GoRoute(
+      path: '/activities/:id/slots',
+      builder: (context, state) {
+        // The API directs to slots, which maps to our booking flow.
+        return BookingFlowScreen(initialActivity: state.extraAsActivity);
+      },
+    ),
+    GoRoute(
+      path: '/events/:id/participants',
+      builder: (context, state) {
+        final eventId = state.pathParameters['id']!;
+        final event = state.extra as Event?;
+        return EventDetailScreen(eventId: eventId, event: event);
+      },
     ),
     // NFC screen removed — route intentionally deleted.
   ],

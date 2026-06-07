@@ -18,7 +18,7 @@ class ApiDeviceRepository implements DeviceRepository {
     return executeApiCall(() async {
       final payload = {'token': token};
       if (platform != null && platform.isNotEmpty) {
-        payload['platform'] = platform;
+        payload['device_type'] = platform;
       }
       await _apiClient.post('/device-token', payload);
       return const Success(null);

@@ -22,7 +22,8 @@ class ApiActivityRepository implements ActivityRepository {
       final response = await _apiClient.get('/activities');
       final List<dynamic> data = response is List
           ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
       final entities = data
           .map(
             (json) => ActivityMapper.toEntity(
@@ -52,7 +53,8 @@ class ApiActivityRepository implements ActivityRepository {
       final response = await _apiClient.get('/activities/$activityId/slots');
       final List<dynamic> data = response is List
           ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
       final entities = data
           .map(
             (json) => TimeSlotMapper.toEntity(

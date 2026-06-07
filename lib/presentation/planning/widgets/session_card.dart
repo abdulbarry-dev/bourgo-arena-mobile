@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 
 class SessionCard extends StatelessWidget {
   final String title;
@@ -39,7 +39,7 @@ class SessionCard extends StatelessWidget {
             if (courseImageUrl != null)
               ClipRRect(
                 borderRadius: BorderRadius.circular(spacing.sm),
-                child: CachedNetworkImage(
+                child: PremiumNetworkImage(
                   imageUrl: courseImageUrl!,
                   width: 60,
                   height: 60,

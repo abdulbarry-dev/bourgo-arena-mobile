@@ -19,7 +19,13 @@ class ApiPaymentRepository implements PaymentRepository {
   }) {
     return executeApiCall(() async {
       final response =
-          await _apiClient.get('/user/payments?page=$page&per_page=$limit')
+          await _apiClient.get(
+                '/user/payments',
+                queryParams: {
+                  'page': page.toString(),
+                  'per_page': limit.toString(),
+                },
+              )
               as Map<String, dynamic>;
 
       final data = response['data'] as List<dynamic>? ?? [];
@@ -30,6 +36,49 @@ class ApiPaymentRepository implements PaymentRepository {
       }).toList();
 
       return Result.success(payments);
+    });
+  }
+
+  @override
+  Future<Result<Map<String, dynamic>, Failure>> initiatePayment({
+    required double amount,
+    String? currency = 'TND',
+    String? provider,
+    String? description,
+    String? successUrl,
+    String? failureUrl,
+  }) {
+    return executeApiCall(() async {
+      final body = <String, dynamic>{'amount': amount};
+      if (currency != null) body['currency'] = currency;
+      if (provider != null) body['provider'] = provider;
+      if (description != null) body['description'] = description;
+      if (successUrl != null) body['success_url'] = successUrl;
+      if (failureUrl != null) body['failure_url'] = failureUrl;
+
+      final response =
+          await _apiClient.post('/payments/initiate', body)
+              as Map<String, dynamic>;
+      return Result.success(response);
+    });
+  }
+
+  @override
+  Future<Result<Map<String, dynamic>, Failure>> verifyPayment({
+    String? paymentReference,
+    String? gatewayTransactionId,
+  }) {
+    return executeApiCall(() async {
+      final body = <String, dynamic>{};
+      if (paymentReference != null)
+        body['payment_reference'] = paymentReference;
+      if (gatewayTransactionId != null)
+        body['gateway_transaction_id'] = gatewayTransactionId;
+
+      final response =
+          await _apiClient.post('/payments/verify', body)
+              as Map<String, dynamic>;
+      return Result.success(response);
     });
   }
 }

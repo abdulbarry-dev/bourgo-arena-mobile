@@ -244,25 +244,15 @@ void main() {
     group('Subscription', () {
       const sub1 = Subscription(
         id: 's1',
-        name: 'Premium',
-        price: 50.0,
-        benefits: [
-          Benefit(label: 'Pool'),
-          Benefit(label: 'Gym'),
-        ],
-        durationMonths: 1,
+        planName: 'Premium',
+        status: 'active',
       );
 
-      test('deep equality for benefits list should work', () {
-        final subSame = Subscription(
+      test('equality should work', () {
+        const subSame = Subscription(
           id: 's1',
-          name: 'Premium',
-          price: 50.0,
-          benefits: [
-            const Benefit(label: 'Pool'),
-            const Benefit(label: 'Gym'),
-          ],
-          durationMonths: 1,
+          planName: 'Premium',
+          status: 'active',
         );
         check(sub1).equals(subSame);
       });

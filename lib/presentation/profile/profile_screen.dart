@@ -6,12 +6,15 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/widgets/tier_badge.dart';
-import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/widgets/profile_list_item.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// The user profile screen.
@@ -22,8 +25,10 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late final ProfileViewModel _viewModel;
+  late final AnimationController _animationController;
 
   @override
   void initState() {
@@ -34,11 +39,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
       deleteAccountUseCase: locator<DeleteAccountUseCase>(),
       authStateNotifier: locator<AuthStateNotifier>(),
     );
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
 
     return ListenableBuilder(
       listenable: _viewModel,
@@ -52,48 +71,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final user = _viewModel.user;
         final authState = locator<AuthStateNotifier>().state;
 
-        if (authState == AuthState.unauthenticated) {
+        if (authState == AuthState.unauthenticated ||
+            authState == AuthState.guest) {
           return Scaffold(
-            appBar: AppBar(title: Text(l10n.navProfile)),
-            body: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Symbols.person,
-                      size: 80,
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withValues(alpha: 0.5),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      l10n.authLoginSubtitle,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => context.push('/login'),
-                        child: Text(l10n.authLogin),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () => context.push('/register'),
-                        child: Text(l10n.authRegister),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            backgroundColor: theme.scaffoldBackgroundColor,
+            appBar: AppBar(
+              title: Text(l10n.navProfile),
+              backgroundColor: appColors.bgSurface,
+              elevation: 0,
             ),
+            body: const GuestAuthState(icon: Symbols.person),
           );
         }
 
@@ -102,23 +89,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
 
         return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
           body: CustomScrollView(
             slivers: [
               _buildAppBar(context, user),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _StatsRow(user: user),
+                      const SizedBox(height: 24),
+                      _StatsRow(user: user, animation: _animationController),
                       const SizedBox(height: 32),
+                      Text(
+                        l10n.profileSettings.toUpperCase(),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.35,
+                          ),
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
                       _ProfileMenu(
+                        animation: _animationController,
                         onTapAbonnement: () => context.push('/subscription'),
                         onTapNotifications: () =>
                             context.push('/notifications'),
                         onTapSettings: () => context.push('/settings'),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 48),
                       _LogoutButton(
                         onLogout: () async {
                           await _viewModel.logout();
@@ -127,6 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           }
                         },
                       ),
+                      const SizedBox(height: 40),
                     ],
                   ),
                 ),
@@ -140,25 +143,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildAppBar(BuildContext context, User user) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
     final l10n = AppLocalizations.of(context)!;
 
     return SliverAppBar(
       expandedHeight: 280,
       pinned: true,
-      backgroundColor: theme.colorScheme.surface,
+      backgroundColor: appColors.bgSurface,
+      elevation: 0,
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           alignment: Alignment.center,
           children: [
-            // Background Glow
+            // Ambient Background Glow
             Positioned(
-              top: -50,
+              top: 20,
               child: Container(
-                width: 200,
-                height: 200,
+                width: 240,
+                height: 240,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                  gradient: RadialGradient(
+                    colors: [
+                      theme.colorScheme.primary.withValues(alpha: 0.15),
+                      theme.colorScheme.primary.withValues(alpha: 0.0),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -166,31 +176,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: user.avatarUrl != null
-                      ? NetworkImage(user.avatarUrl!)
-                      : null,
-                  backgroundColor: theme.colorScheme.primary.withValues(
-                    alpha: 0.2,
+                Hero(
+                  tag: 'profile_avatar',
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                        width: 2,
+                      ),
+                      image: user.avatarUrl != null
+                          ? DecorationImage(
+                              image: NetworkImage(user.avatarUrl!),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.2,
+                          ),
+                          blurRadius: 20,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: user.avatarUrl == null
+                        ? Icon(
+                            Symbols.person,
+                            size: 48,
+                            color: theme.colorScheme.primary,
+                          )
+                        : null,
                   ),
-                  child: user.avatarUrl == null
-                      ? Icon(
-                          Symbols.person,
-                          size: 50,
-                          color: theme.colorScheme.primary,
-                        )
-                      : null,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Text(
                   '${user.firstName} ${user.lastName}'.toUpperCase(),
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontFamily: AppConstants.displayFontFamily,
-                    letterSpacing: 1,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.5,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 8),
                 TierBadge(
                   tierName: user.subscriptionLevel ?? l10n.profileStandardTier,
                 ),
@@ -205,71 +237,117 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 class _StatsRow extends StatelessWidget {
   final User user;
+  final Animation<double> animation;
 
-  const _StatsRow({required this.user});
+  const _StatsRow({required this.user, required this.animation});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+    final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.5),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          GestureDetector(
-            onTap: () => context.push('/loyalty'),
-            child: _StatItem(
-              label: AppLocalizations.of(context)!.profilePoints,
-              value: user.loyaltyPoints.toString(),
-              icon: Symbols.stars,
+    return SlideTransition(
+      position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
+          .animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
             ),
           ),
-        ],
+      child: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: animation,
+          curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+          decoration: BoxDecoration(
+            color: appColors.bgElevated,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: appColors.bgBorder, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: theme.shadowColor.withValues(alpha: 0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildStatItem(
+                context,
+                l10n.profilePoints,
+                NumberFormat(
+                  '#,###',
+                ).format(user.loyaltyPoints).replaceAll(',', ' '),
+                Symbols.stars,
+                theme.colorScheme.primary,
+                () => context.push('/loyalty'),
+              ),
+              Container(width: 1, height: 40, color: appColors.bgBorder),
+              _buildStatItem(
+                context,
+                "RÉSERVATIONS",
+                "12", // Placeholder for actual stats
+                Symbols.event_available,
+                theme.colorScheme.onSurface,
+                () => context.push('/bookings'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
-}
 
-class _StatItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  const _StatItem({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildStatItem(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     final theme = Theme.of(context);
 
-    return Column(
-      children: [
-        Icon(icon, color: theme.colorScheme.primary, size: 24),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: color, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  value,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label.toUpperCase(),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.65,
+                ),
+                letterSpacing: 1,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
-        Text(
-          label,
-          style: TextStyle(
-            color: theme.colorScheme.onSurfaceVariant,
-            fontSize: 10,
-            letterSpacing: 1,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -278,80 +356,67 @@ class _ProfileMenu extends StatelessWidget {
   final VoidCallback onTapAbonnement;
   final VoidCallback onTapNotifications;
   final VoidCallback onTapSettings;
+  final Animation<double> animation;
 
   const _ProfileMenu({
     required this.onTapAbonnement,
     required this.onTapNotifications,
     required this.onTapSettings,
+    required this.animation,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       children: [
-        _MenuItem(
-          icon: Symbols.card_membership,
-          label: AppLocalizations.of(context)!.profileMySubscription,
-          onTap: onTapAbonnement,
+        _buildAnimatedItem(
+          0.1,
+          ProfileListItem(
+            icon: Symbols.card_membership,
+            title: l10n.profileMySubscription,
+            subtitle: "Gérer votre forfait et accès",
+            onTap: onTapAbonnement,
+          ),
         ),
-        const SizedBox(height: 12),
-        _MenuItem(
-          icon: Symbols.notifications,
-          label: AppLocalizations.of(context)!.profileNotifications,
-          onTap: onTapNotifications,
+        _buildAnimatedItem(
+          0.2,
+          ProfileListItem(
+            icon: Symbols.notifications,
+            title: l10n.profileNotifications,
+            subtitle: "Gérer vos alertes et rappels",
+            onTap: onTapNotifications,
+          ),
         ),
-        const SizedBox(height: 12),
-        _MenuItem(
-          icon: Symbols.settings,
-          label: AppLocalizations.of(context)!.profileSettings,
-          onTap: onTapSettings,
+        _buildAnimatedItem(
+          0.3,
+          ProfileListItem(
+            icon: Symbols.settings,
+            title: l10n.profileSettings,
+            subtitle: "Informations personnelles, mot de passe",
+            onTap: onTapSettings,
+          ),
         ),
       ],
     );
   }
-}
 
-class _MenuItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _MenuItem({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return ListTile(
-      onTap: onTap,
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: theme.colorScheme.outline.withValues(alpha: 0.5),
+  Widget _buildAnimatedItem(double delay, Widget child) {
+    return SlideTransition(
+      position: Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+          .animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: Interval(delay, delay + 0.5, curve: Curves.easeOutCubic),
+            ),
           ),
+      child: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: animation,
+          curve: Interval(delay, delay + 0.5, curve: Curves.easeIn),
         ),
-        child: Icon(icon, color: theme.colorScheme.primary, size: 20),
-      ),
-      title: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-      ),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: theme.colorScheme.outline.withValues(alpha: 0.5),
-        ),
+        child: child,
       ),
     );
   }
@@ -366,51 +431,140 @@ class _LogoutButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return TextButton(
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext dialogContext) {
-            return AppModal(
-              title: l10n.profileLogoutTitle,
-              subtitle: l10n.profileLogout,
-              icon: Symbols.logout,
-              content: Text(l10n.profileLogoutMessage),
-              actions: [
-                AppModalAction(
-                  label: l10n.commonCancel,
-                  onPressed: () => Navigator.of(dialogContext).pop(),
+    return ProfileListItem(
+      icon: Symbols.logout,
+      title: l10n.profileLogout,
+      isDestructive: true,
+      onTap: () => _showLogoutModal(context, l10n),
+    );
+  }
+
+  void _showLogoutModal(BuildContext context, AppLocalizations l10n) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (dialogContext) {
+        final theme = Theme.of(context);
+        final appColors = theme.extension<AppColors>()!;
+
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(dialogContext).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: appColors.bgElevated,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(32),
+              ),
+              border: Border.all(
+                color: theme.colorScheme.error.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 48,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-                AppModalAction(
-                  label: l10n.profileLogoutConfirm,
-                  isPrimary: true,
-                  isDestructive: true,
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    onLogout();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.profileLogoutSuccess),
-                        duration: const Duration(seconds: 2),
-                        behavior: SnackBarBehavior.floating,
-                        margin: const EdgeInsets.all(16),
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Symbols.logout,
+                    color: theme.colorScheme.error,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.profileLogoutTitle.toUpperCase(),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: theme.colorScheme.error,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  l10n.profileLogoutMessage,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(dialogContext),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide(color: appColors.bgBorder),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.commonCancel.toUpperCase(),
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(dialogContext);
+                          onLogout();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.profileLogoutSuccess),
+                              duration: const Duration(seconds: 2),
+                              behavior: SnackBarBehavior.floating,
+                              margin: const EdgeInsets.all(16),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.error,
+                          foregroundColor: theme.colorScheme.onError,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.profileLogoutConfirm.toUpperCase(),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 16),
               ],
-            );
-          },
+            ),
+          ),
         );
       },
-      child: Text(
-        l10n.profileLogout,
-        style: const TextStyle(
-          color: Colors.redAccent,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1,
-        ),
-      ),
     );
   }
 }

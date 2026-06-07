@@ -142,6 +142,20 @@ Service testServiceEntity({
   );
 }
 
+Service testServiceEntity({
+  int id = 1,
+  String name = 'Football Pitch',
+  String description = 'Full size 11v11 pitch',
+  String imageUrl = 'https://example.com/pitch.png',
+}) {
+  return Service(
+    id: id,
+    name: name,
+    description: description,
+    imageUrl: imageUrl,
+  );
+}
+
 Notification testNotificationEntity({
   int id = 1,
   String title = 'Booking confirmed',
@@ -289,6 +303,20 @@ Map<String, dynamic> testCourseJson({
     'capacity': capacity,
     'enrolled': enrolled,
     'icon': icon,
+  };
+}
+
+Map<String, dynamic> testServiceJson({
+  int id = 1,
+  String name = 'Football Pitch',
+  String description = 'Full size 11v11 pitch',
+  String imageUrl = 'https://example.com/pitch.png',
+}) {
+  return {
+    'id': id,
+    'name': name,
+    'description': description,
+    'image_url': imageUrl,
   };
 }
 

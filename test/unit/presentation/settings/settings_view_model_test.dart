@@ -9,7 +9,11 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/is_language_selecte
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/is_theme_selected_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_theme_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -31,6 +35,11 @@ class _MockIsLanguageSelected extends Mock
 class _MockCompleteLanguageSelection extends Mock
     implements CompleteLanguageSelectionUseCase {}
 
+class _MockIsThemeSelected extends Mock implements IsThemeSelectedUseCase {}
+
+class _MockCompleteThemeSelection extends Mock
+    implements CompleteThemeSelectionUseCase {}
+
 class _MockGetNotificationsEnabled extends Mock
     implements GetNotificationsEnabledUseCase {}
 
@@ -41,6 +50,10 @@ class _MockDeleteAccount extends Mock implements DeleteAccountUseCase {}
 
 class _MockDeviceTokenRegistrar extends Mock implements DeviceTokenRegistrar {}
 
+class _MockSessionRepository extends Mock implements SessionRepository {}
+
+class _MockUserRepository extends Mock implements UserRepository {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -48,20 +61,22 @@ void main() {
     registerFallbackValue(ThemeMode.system);
     registerFallbackValue(const Locale('en'));
 
-    const MethodChannel(
-      'dev.fluttercommunity.plus/package_info',
-    ).setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == 'getAll') {
-        return <String, dynamic>{
-          'appName': 'Bourgo Arena',
-          'packageName': 'com.example.bourgo',
-          'version': '1.0.0',
-          'buildNumber': '1',
-          'buildSignature': '',
-        };
-      }
-      return null;
-    });
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('dev.fluttercommunity.plus/package_info'),
+          (MethodCall methodCall) async {
+            if (methodCall.method == 'getAll') {
+              return <String, dynamic>{
+                'appName': 'Bourgo Arena',
+                'packageName': 'com.example.bourgo',
+                'version': '1.0.0',
+                'buildNumber': '1',
+                'buildSignature': '',
+              };
+            }
+            return null;
+          },
+        );
   });
 
   late SettingsViewModel viewModel;
@@ -71,10 +86,14 @@ void main() {
   late _MockSetLocale mockSetLocale;
   late _MockIsLanguageSelected mockIsLangSelected;
   late _MockCompleteLanguageSelection mockCompleteLangSelection;
+  late _MockIsThemeSelected mockIsThemeSelected;
+  late _MockCompleteThemeSelection mockCompleteThemeSelection;
   late _MockGetNotificationsEnabled mockGetNotif;
   late _MockSetNotificationsEnabled mockSetNotif;
   late _MockDeviceTokenRegistrar mockDeviceTokenRegistrar;
   late _MockDeleteAccount mockDeleteAccount;
+  late _MockSessionRepository mockSessionRepository;
+  late _MockUserRepository mockUserRepository;
 
   setUp(() {
     mockGetTheme = _MockGetThemeMode();
@@ -83,10 +102,14 @@ void main() {
     mockSetLocale = _MockSetLocale();
     mockIsLangSelected = _MockIsLanguageSelected();
     mockCompleteLangSelection = _MockCompleteLanguageSelection();
+    mockIsThemeSelected = _MockIsThemeSelected();
+    mockCompleteThemeSelection = _MockCompleteThemeSelection();
     mockGetNotif = _MockGetNotificationsEnabled();
     mockSetNotif = _MockSetNotificationsEnabled();
     mockDeviceTokenRegistrar = _MockDeviceTokenRegistrar();
     mockDeleteAccount = _MockDeleteAccount();
+    mockSessionRepository = _MockSessionRepository();
+    mockUserRepository = _MockUserRepository();
 
     when(
       () => mockGetTheme(),
@@ -101,6 +124,18 @@ void main() {
     when(
       () => mockCompleteLangSelection(),
     ).thenAnswer((_) async => Result.success(null));
+    when(
+      () => mockIsThemeSelected(),
+    ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockCompleteThemeSelection(),
+    ).thenAnswer((_) async => Result.success(null));
+    when(
+      () => mockSessionRepository.arePromotionalNotificationsEnabled(),
+    ).thenAnswer((_) async => Result.success(true));
+    when(
+      () => mockSessionRepository.areAccountNotificationsEnabled(),
+    ).thenAnswer((_) async => Result.success(true));
 
     when(
       () => mockSetTheme(any()),
@@ -116,6 +151,9 @@ void main() {
         requireNotificationsEnabled: any(named: 'requireNotificationsEnabled'),
       ),
     ).thenAnswer((_) async {});
+    when(
+      () => mockUserRepository.updatePreferences(any()),
+    ).thenAnswer((_) async => Result.success(null));
 
     viewModel = SettingsViewModel(
       mockGetTheme,
@@ -124,10 +162,14 @@ void main() {
       mockSetLocale,
       mockIsLangSelected,
       mockCompleteLangSelection,
+      mockIsThemeSelected,
+      mockCompleteThemeSelection,
       mockGetNotif,
       mockSetNotif,
       mockDeviceTokenRegistrar,
       mockDeleteAccount,
+      mockSessionRepository,
+      mockUserRepository,
     );
   });
 
@@ -142,12 +184,14 @@ void main() {
       expect(viewModel.locale, const Locale('en'));
       expect(viewModel.notificationsEnabled, isTrue);
       expect(viewModel.isLanguageSelected, isTrue);
+      expect(viewModel.isThemeSelected, isTrue);
       expect(notifyCount, 1);
 
       verify(() => mockGetTheme()).called(1);
       verify(() => mockGetLocale()).called(1);
       verify(() => mockGetNotif()).called(1);
       verify(() => mockIsLangSelected()).called(1);
+      verify(() => mockIsThemeSelected()).called(1);
     });
 
     test('initialize handles failures and keeps defaults', () async {
@@ -167,6 +211,10 @@ void main() {
         (_) async =>
             Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
       );
+      when(() => mockIsThemeSelected()).thenAnswer(
+        (_) async =>
+            Result.failure(ServerFailure(AppErrorCode.serverError, 'boom')),
+      );
 
       var notifyCount = 0;
       viewModel.addListener(() => notifyCount += 1);
@@ -178,6 +226,7 @@ void main() {
       expect(viewModel.locale.languageCode, 'en');
       expect(viewModel.notificationsEnabled, isTrue);
       expect(viewModel.isLanguageSelected, isFalse);
+      expect(viewModel.isThemeSelected, isFalse);
       expect(notifyCount, 1);
     });
 
@@ -234,6 +283,24 @@ void main() {
       expect(viewModel.isLanguageSelected, isTrue);
       expect(notifyCount, 1);
       verify(() => mockCompleteLangSelection()).called(1);
+    });
+
+    test('confirmThemeSelection marks as selected and notifies', () async {
+      // Set initial state to false
+      when(
+        () => mockIsThemeSelected(),
+      ).thenAnswer((_) async => Result.success(false));
+      await viewModel.initialize();
+      expect(viewModel.isThemeSelected, isFalse);
+
+      var notifyCount = 0;
+      viewModel.addListener(() => notifyCount += 1);
+
+      await viewModel.confirmThemeSelection();
+
+      expect(viewModel.isThemeSelected, isTrue);
+      expect(notifyCount, 1);
+      verify(() => mockCompleteThemeSelection()).called(1);
     });
 
     test('toggleNotifications updates and calls use case', () async {

@@ -26,6 +26,7 @@ void main() {
     when(() => mockSettingsViewModel.themeMode).thenReturn(ThemeMode.dark);
     when(() => mockSettingsViewModel.locale).thenReturn(const Locale('fr'));
     when(() => mockSettingsViewModel.isLanguageSelected).thenReturn(true);
+    when(() => mockSettingsViewModel.isThemeSelected).thenReturn(true);
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(false);
     when(
       () => mockAuthStateNotifier.state,

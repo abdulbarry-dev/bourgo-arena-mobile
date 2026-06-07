@@ -96,7 +96,9 @@ class CourseCard extends StatelessWidget {
           _ActionButton(isFull: course.isFull, onTap: onTap),
         ],
       ),
+      ),
     );
+      }
   }
 }
 

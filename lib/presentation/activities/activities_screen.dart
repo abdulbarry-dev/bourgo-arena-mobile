@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
+import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -54,14 +55,36 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
         return Scaffold(
           appBar: AppBar(
             backgroundColor: theme.colorScheme.surface,
-            title: Text(
-              AppLocalizations.of(context)!.appName.toUpperCase(),
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontFamily: AppConstants.displayFontFamily,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 2.0,
-                fontSize: 18,
-              ),
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            centerTitle: false,
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer.withValues(
+                      alpha: 0.5,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Symbols.directions_run,
+                    color: theme.colorScheme.primary,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  AppLocalizations.of(context)!.navActivities,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontFamily: AppConstants.displayFontFamily,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
             ),
             bottom: TabBar(
               controller: _tabController,
@@ -111,8 +134,14 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    _ActivitiesTab(viewModel: _viewModel),
-                    _ReservationsTab(viewModel: _viewModel),
+                    RefreshIndicator(
+                      onRefresh: _viewModel.loadData,
+                      child: _ActivitiesTab(viewModel: _viewModel),
+                    ),
+                    RefreshIndicator(
+                      onRefresh: _viewModel.loadData,
+                      child: _ReservationsTab(viewModel: _viewModel),
+                    ),
                   ],
                 ),
         );
@@ -129,14 +158,23 @@ class _ActivitiesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (viewModel.activities.isEmpty) {
-      return EmptyState(
-        title: AppLocalizations.of(context)!.activitiesNoSportsFound,
-        message: AppLocalizations.of(context)!.activitiesNoSportsFoundSubtitle,
-        icon: Symbols.search_off,
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: EmptyState(
+            title: AppLocalizations.of(context)!.activitiesNoSportsFound,
+            message: AppLocalizations.of(
+              context,
+            )!.activitiesNoSportsFoundSubtitle,
+            icon: Symbols.search_off,
+          ),
+        ),
       );
     }
 
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       itemCount: viewModel.activities.length,
       itemBuilder: (context, index) {
@@ -182,18 +220,50 @@ class _ReservationsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isAuthenticated = locator<AuthStateNotifier>().isAuthenticated;
+
+    if (!isAuthenticated) {
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: EmptyState(
+            title: AppLocalizations.of(context)!.authLoginTitle,
+            message: AppLocalizations.of(context)!.authLoginSubtitle,
+            icon: Symbols.login,
+            actionLabel: AppLocalizations.of(context)!.authLogin,
+            onAction: () {
+              ensureAuthenticated(context);
+            },
+          ),
+        ),
+      );
+    }
+
     if (viewModel.reservations.isEmpty) {
-      return EmptyState(
-        title: AppLocalizations.of(context)!.activitiesNoReservations,
-        message: AppLocalizations.of(context)!.activitiesNoReservationsSubtitle,
-        icon: Symbols.calendar_add_on,
-        actionLabel: AppLocalizations.of(context)!.activitiesNoReservationsCTA,
-        onAction: () =>
-            MainLayout.tabController.value = 0, // Go to Explorer tab
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.6,
+          child: EmptyState(
+            title: AppLocalizations.of(context)!.activitiesNoReservations,
+            message: AppLocalizations.of(
+              context,
+            )!.activitiesNoReservationsSubtitle,
+            icon: Symbols.calendar_add_on,
+            actionLabel: AppLocalizations.of(
+              context,
+            )!.activitiesNoReservationsCTA,
+            onAction: () {
+              context.push('/booking');
+            },
+          ),
+        ),
       );
     }
 
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       itemCount: viewModel.reservations.length,
       itemBuilder: (context, index) {

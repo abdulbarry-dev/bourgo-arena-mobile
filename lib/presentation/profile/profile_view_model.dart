@@ -48,6 +48,8 @@ class ProfileViewModel extends BaseViewModel {
   /// Loads the user profile from the auth repository.
   /// This will trigger an update in the global AuthStateNotifier.
   Future<void> loadProfile() async {
+    if (!_authStateNotifier.isAuthenticated) return;
+
     _isLoading = true;
     clearError();
     notifyListeners();

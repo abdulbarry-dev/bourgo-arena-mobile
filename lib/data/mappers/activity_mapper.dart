@@ -7,16 +7,18 @@ class ActivityMapper {
   static Activity toEntity(ActivityModel model) {
     return Activity(
       id: model.id,
-      title: model.title,
-      category: model.category,
-      basePrice: model.basePrice,
-      currency: model.currency,
-      imageUrl: model.imageUrl,
-      icon: model.icon,
-      description: model.description,
-      features: model.features,
-      rating: model.rating,
-      reviewCount: model.reviewCount,
+      title: model.displayTitle,
+      category: model.category ?? '',
+      basePrice: model.basePrice ?? 0.0,
+      currency: model.currency ?? 'TND',
+      imageUrl: (model.images?.isNotEmpty == true)
+          ? model.images!.first
+          : (model.imageUrl ?? ''),
+      icon: model.icon ?? 'sports',
+      description: model.description ?? '',
+      features: model.features ?? const [],
+      rating: model.rating ?? 0.0,
+      reviewCount: model.reviewCount ?? 0,
     );
   }
 

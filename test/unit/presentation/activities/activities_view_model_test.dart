@@ -5,6 +5,7 @@ import '../../data/repositories/repository_test_fixtures.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activities_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
@@ -14,17 +15,25 @@ class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 class MockGetUserBookingsUseCase extends Mock
     implements GetUserBookingsUseCase {}
 
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
 void main() {
   late ActivitiesViewModel viewModel;
   late MockGetActivitiesUseCase mockGetActivitiesUseCase;
   late MockGetUserBookingsUseCase mockGetUserBookingsUseCase;
+  late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUp(() {
     mockGetActivitiesUseCase = MockGetActivitiesUseCase();
     mockGetUserBookingsUseCase = MockGetUserBookingsUseCase();
+    mockAuthStateNotifier = MockAuthStateNotifier();
+
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
+
     viewModel = ActivitiesViewModel(
       getActivitiesUseCase: mockGetActivitiesUseCase,
       getUserBookingsUseCase: mockGetUserBookingsUseCase,
+      authStateNotifier: mockAuthStateNotifier,
     );
   });
 

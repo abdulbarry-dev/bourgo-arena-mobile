@@ -16,20 +16,22 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() {
-    const MethodChannel(
-      'dev.fluttercommunity.plus/package_info',
-    ).setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == 'getAll') {
-        return <String, dynamic>{
-          'appName': 'Bourgo Arena',
-          'packageName': 'com.example.bourgo',
-          'version': '1.0.0',
-          'buildNumber': '1',
-          'buildSignature': '',
-        };
-      }
-      return null;
-    });
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+          const MethodChannel('dev.fluttercommunity.plus/package_info'),
+          (MethodCall methodCall) async {
+            if (methodCall.method == 'getAll') {
+              return <String, dynamic>{
+                'appName': 'Bourgo Arena',
+                'packageName': 'com.example.bourgo',
+                'version': '1.0.0',
+                'buildNumber': '1',
+                'buildSignature': '',
+              };
+            }
+            return null;
+          },
+        );
   });
 
   group('Locator', () {

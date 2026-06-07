@@ -3,6 +3,9 @@ enum AuthState {
   /// User is not logged in.
   unauthenticated,
 
+  /// User is browsing as a guest.
+  guest,
+
   /// User has registered or logged in but needs to verify at least one method (email or phone).
   pendingVerification,
 

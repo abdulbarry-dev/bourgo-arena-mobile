@@ -9,7 +9,7 @@ class ProjectPointsUseCase {
   int call({required double amount, required MemberTier tier}) {
     // Display-only projection rules. Backend remains source of truth.
     final multiplier = switch (tier) {
-      MemberTier.public => 0.0,
+      MemberTier.public => 1.0,
       MemberTier.standard => 1.0,
       MemberTier.ultra => 1.25,
       MemberTier.familyMax => 1.5,

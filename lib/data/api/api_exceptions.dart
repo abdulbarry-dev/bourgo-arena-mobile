@@ -42,9 +42,12 @@ class NetworkException extends ApiException {
 }
 
 class ValidationException extends ApiException {
+  final Map<String, List<String>>? errors;
+
   const ValidationException([
     super.message = 'Validation Error',
     String? state,
     String? token,
+    this.errors,
   ]) : super(state: state, token: token);
 }

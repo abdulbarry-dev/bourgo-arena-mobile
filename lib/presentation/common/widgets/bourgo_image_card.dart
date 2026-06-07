@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 
 /// A foundational UI component for displaying rich imagery cards.
 /// Adheres strictly to Phase 1 UI System Alignment (typography, radii, shadows).
@@ -50,22 +50,7 @@ class BourgoImageCard extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (imageUrl != null && imageUrl!.isNotEmpty)
-              CachedNetworkImage(
-                imageUrl: imageUrl!,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Center(
-                  child: CircularProgressIndicator(
-                    color: appColors.brandPrimaryGlow,
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: appColors.bgSurface,
-                  child: Icon(
-                    Icons.broken_image,
-                    color: theme.colorScheme.error,
-                  ),
-                ),
-              ),
+              PremiumNetworkImage(imageUrl: imageUrl!, fit: BoxFit.cover),
             // Gradient overlay for text readability
             Container(
               decoration: BoxDecoration(

@@ -1,19 +1,56 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:async';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'dart:developer' as developer;
 
 /// A central client for making HTTP requests to the Laravel backend.
 class ApiClient {
   final String baseUrl;
-  final http.Client _client;
+  late final Dio _dio;
   String? _token;
   void Function(String? state)? onAuthError;
 
-  ApiClient({required this.baseUrl, http.Client? client})
-    : _client = client ?? http.Client();
+  ApiClient({required this.baseUrl, Dio? dio}) {
+    _dio =
+        dio ??
+        Dio(
+          BaseOptions(
+            baseUrl: baseUrl,
+            connectTimeout: const Duration(seconds: 15),
+            receiveTimeout: const Duration(seconds: 15),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+          ),
+        );
+
+    _dio.interceptors.add(
+      QueuedInterceptorsWrapper(
+        onRequest: (options, handler) {
+          if (_token != null && (options.extra['includeAuth'] ?? true)) {
+            options.headers['Authorization'] = 'Bearer $_token';
+          }
+          developer.log('API ${options.method} Request: ${options.uri}');
+          if (options.data != null) {
+            developer.log('Body: ${jsonEncode(options.data)}');
+          }
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          developer.log(
+            'API ${response.requestOptions.method} Response (${response.statusCode}): ${response.data}',
+          );
+          return handler.next(response);
+        },
+        onError: (DioException e, handler) {
+          developer.log('API Error: ${e.message}');
+          return handler.next(e);
+        },
+      ),
+    );
+  }
 
   void setToken(String? token) {
     _token = token;
@@ -30,27 +67,13 @@ class ApiClient {
     bool includeAuth = true,
   }) async {
     try {
-      final headers = includeAuth
-          ? _headers
-          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
-      developer.log('API GET Request: $baseUrl$path');
-      final response = await _client
-          .get(Uri.parse('$baseUrl$path'), headers: headers)
-          .timeout(const Duration(seconds: 15));
-      developer.log(
-        'API GET Response (${response.statusCode}): ${response.body}',
+      final response = await _dio.get(
+        path,
+        options: Options(extra: {'includeAuth': includeAuth}),
       );
-      return _handleResponse(
-        response,
-        fullResponse: fullResponse,
-        skipAuthError: skipAuthError,
-      );
-    } on SocketException catch (e) {
-      throw NetworkException(e.message);
-    } on http.ClientException catch (e) {
-      throw NetworkException(e.message);
-    } on TimeoutException catch (e) {
-      throw NetworkException(e.message ?? 'Request timed out');
+      return _handleResponse(response, fullResponse: fullResponse);
+    } on DioException catch (e) {
+      return _handleDioException(e, skipAuthError: skipAuthError);
     }
   }
 
@@ -63,33 +86,14 @@ class ApiClient {
     bool includeAuth = true,
   }) async {
     try {
-      final headers = includeAuth
-          ? _headers
-          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
-      developer.log(
-        'API POST Request: $baseUrl$path, Body: ${jsonEncode(body)}',
+      final response = await _dio.post(
+        path,
+        data: body,
+        options: Options(extra: {'includeAuth': includeAuth}),
       );
-      final response = await _client
-          .post(
-            Uri.parse('$baseUrl$path'),
-            headers: headers,
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 15));
-      developer.log(
-        'API POST Response (${response.statusCode}): ${response.body}',
-      );
-      return _handleResponse(
-        response,
-        fullResponse: fullResponse,
-        skipAuthError: skipAuthError,
-      );
-    } on SocketException catch (e) {
-      throw NetworkException(e.message);
-    } on http.ClientException catch (e) {
-      throw NetworkException(e.message);
-    } on TimeoutException catch (e) {
-      throw NetworkException(e.message ?? 'Request timed out');
+      return _handleResponse(response, fullResponse: fullResponse);
+    } on DioException catch (e) {
+      return _handleDioException(e, skipAuthError: skipAuthError);
     }
   }
 
@@ -102,104 +106,44 @@ class ApiClient {
     bool includeAuth = true,
   }) async {
     try {
-      final headers = includeAuth
-          ? _headers
-          : {'Content-Type': 'application/json', 'Accept': 'application/json'};
-      developer.log(
-        'API PUT Request: $baseUrl$path, Body: ${jsonEncode(body)}',
+      final response = await _dio.put(
+        path,
+        data: body,
+        options: Options(extra: {'includeAuth': includeAuth}),
       );
-      final response = await _client
-          .put(
-            Uri.parse('$baseUrl$path'),
-            headers: headers,
-            body: jsonEncode(body),
-          )
-          .timeout(const Duration(seconds: 15));
-      developer.log(
-        'API PUT Response (${response.statusCode}): ${response.body}',
-      );
-      return _handleResponse(
-        response,
-        fullResponse: fullResponse,
-        skipAuthError: skipAuthError,
-      );
-    } on SocketException catch (e) {
-      throw NetworkException(e.message);
-    } on http.ClientException catch (e) {
-      throw NetworkException(e.message);
-    } on TimeoutException catch (e) {
-      throw NetworkException(e.message ?? 'Request timed out');
+      return _handleResponse(response, fullResponse: fullResponse);
+    } on DioException catch (e) {
+      return _handleDioException(e, skipAuthError: skipAuthError);
     }
   }
 
   /// Sends a DELETE request to the specified [path].
   Future<void> delete(String path, {bool skipAuthError = false}) async {
     try {
-      developer.log('API DELETE Request: $baseUrl$path');
-      final response = await _client
-          .delete(Uri.parse('$baseUrl$path'), headers: _headers)
-          .timeout(const Duration(seconds: 15));
-      developer.log(
-        'API DELETE Response (${response.statusCode}): ${response.body}',
-      );
-      _handleResponse(response, skipAuthError: skipAuthError);
-    } on SocketException catch (e) {
-      throw NetworkException(e.message);
-    } on http.ClientException catch (e) {
-      throw NetworkException(e.message);
-    } on TimeoutException catch (e) {
-      throw NetworkException(e.message ?? 'Request timed out');
+      final response = await _dio.delete(path);
+      _handleResponse(response);
+    } on DioException catch (e) {
+      return _handleDioException(e, skipAuthError: skipAuthError);
     }
   }
 
-  Map<String, String> get _headers {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
-    if (_token != null) {
-      headers['Authorization'] = 'Bearer $_token';
-    }
-    return headers;
-  }
-
-  dynamic _handleResponse(
-    http.Response response, {
-    bool fullResponse = false,
-    bool skipAuthError = false,
-  }) {
-    dynamic decoded;
-    if (response.body.isNotEmpty) {
-      try {
-        decoded = jsonDecode(response.body);
-      } catch (_) {
-        // If body is not JSON, we'll use the status code and raw body message
-      }
-    }
+  dynamic _handleResponse(Response response, {bool fullResponse = false}) {
+    final decoded = response.data;
 
     if (decoded is List) {
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return decoded;
-      }
-      throw ServerException(
-        'API Error: ${response.statusCode} ${response.body}',
-      );
+      return decoded;
     }
 
     final Map<String, dynamic> body = decoded is Map<String, dynamic>
         ? decoded
         : {};
-
-    final bool success =
-        body['success'] ??
-        (response.statusCode >= 200 && response.statusCode < 300);
+    final bool success = body['success'] ?? true;
 
     if (success) {
       if (!fullResponse && body.containsKey('data') && body['data'] != null) {
         final data = body['data'];
         if (data is Map<String, dynamic>) {
           final dataMap = Map<String, dynamic>.from(data);
-          // Preserve important top-level fields if they're not already in data
           if (body.containsKey('token') && !dataMap.containsKey('token')) {
             dataMap['token'] = body['token'];
           }
@@ -212,40 +156,81 @@ class ApiClient {
       }
       return body;
     } else {
-      final String message =
-          body['message'] ??
-          'API Error: ${response.statusCode} ${response.body}';
-      String? state = body['state'] as String?;
-      final String? code = body['code'] as String?;
-      if (state == null && code != null) {
-        switch (code) {
-          case 'EMAIL_NOT_VERIFIED':
-            state = 'pending_verification';
-            break;
-          case 'ADDITIONAL_VERIFICATION_REQUIRED':
-            state = 'pending_additional_verification';
-            break;
-          case 'ONBOARDING_INCOMPLETE':
-            state = 'pending_onboarding';
-            break;
-        }
-      }
-      final String? token = body['token'] as String?;
+      // If success is false but status is 2xx, we still throw
+      final String message = body['message'] ?? body['error'] ?? 'API Error';
+      throw ServerException(message);
+    }
+  }
 
-      switch (response.statusCode) {
-        case 401:
-        case 403:
+  dynamic _handleDioException(DioException e, {bool skipAuthError = false}) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.receiveTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.connectionError) {
+      throw NetworkException(e.message ?? 'Network Error');
+    }
+
+    final response = e.response;
+    if (response == null) {
+      throw NetworkException(e.message ?? 'Unknown Network Error');
+    }
+
+    final decoded = response.data;
+    final Map<String, dynamic> body = decoded is Map<String, dynamic>
+        ? decoded
+        : {};
+
+    final String message =
+        body['message'] ?? body['error'] ?? 'API Error: ${response.statusCode}';
+    String? state = body['state'] as String?;
+    final String? code = body['code'] as String?;
+
+    if (state == null && code != null) {
+      switch (code) {
+        case 'EMAIL_NOT_VERIFIED':
+          state = 'pending_verification';
+          break;
+        case 'ADDITIONAL_VERIFICATION_REQUIRED':
+          state = 'pending_additional_verification';
+          break;
+        case 'ONBOARDING_INCOMPLETE':
+          state = 'pending_onboarding';
+          break;
+      }
+    }
+    final String? token = body['token'] as String?;
+
+    switch (response.statusCode) {
+      case 401:
+        if (!skipAuthError) {
+          onAuthError?.call(state);
+        }
+        throw AuthException(message, state, token);
+      case 403:
+        if (state != null) {
           if (!skipAuthError) {
             onAuthError?.call(state);
           }
           throw AuthException(message, state, token);
-        case 404:
-          throw NotFoundException(message, state, token);
-        case 422:
-          throw ValidationException(message, state, token);
-        default:
-          throw ServerException(message, state, token);
-      }
+        }
+        throw ServerException(message, state, token);
+      case 404:
+        throw NotFoundException(message, state, token);
+      case 422:
+        Map<String, List<String>>? validationErrors;
+        if (body.containsKey('errors') && body['errors'] is Map) {
+          validationErrors = {};
+          (body['errors'] as Map).forEach((key, value) {
+            if (value is List) {
+              validationErrors![key.toString()] = value
+                  .map((e) => e.toString())
+                  .toList();
+            }
+          });
+        }
+        throw ValidationException(message, state, token, validationErrors);
+      default:
+        throw ServerException(message, state, token);
     }
   }
 }

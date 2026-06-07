@@ -1,4 +1,6 @@
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
@@ -71,8 +73,10 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            centerTitle: false,
             backgroundColor: theme.colorScheme.surface,
-            title: Text(AppLocalizations.of(context)!.bookingTitle),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
@@ -83,6 +87,34 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
                   Navigator.of(context).pop();
                 }
               },
+            ),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer.withValues(
+                      alpha: 0.5,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Symbols.book_online,
+                    color: theme.colorScheme.primary,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  AppLocalizations.of(context)!.bookingTitle,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontFamily: AppConstants.displayFontFamily,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
             ),
           ),
           body: Column(

@@ -1,10 +1,13 @@
-/// Pure domain entity representing a user's booking reservation.
+/// Entity representing a user's booking reservation.
 class Reservation {
   /// Unique identifier.
   final String id;
 
   /// ID of the booked activity.
   final String activityId;
+
+  /// ID of the booked activity slot.
+  final String? activitySlotId;
 
   /// Display title of the activity.
   final String activityTitle;
@@ -15,8 +18,14 @@ class Reservation {
   /// Start time of the reservation (HH:mm).
   final String time;
 
-  /// Duration.
-  final String duration;
+  /// Duration string (e.g. "1 hour").
+  final String? duration;
+
+  /// ISO datetime when reservation starts.
+  final String? startsAt;
+
+  /// ISO datetime when reservation ends.
+  final String? endsAt;
 
   /// Total price paid.
   final double price;
@@ -28,7 +37,7 @@ class Reservation {
   final String paymentStatus;
 
   /// QR code string for check-in.
-  final String qrCode;
+  final String? qrCode;
 
   /// Optional member id when booking on behalf of a family member.
   final String? memberId;
@@ -37,14 +46,17 @@ class Reservation {
   const Reservation({
     required this.id,
     required this.activityId,
+    this.activitySlotId,
     required this.activityTitle,
     required this.date,
     required this.time,
-    required this.duration,
+    this.duration,
+    this.startsAt,
+    this.endsAt,
     required this.price,
     required this.status,
     required this.paymentStatus,
-    required this.qrCode,
+    this.qrCode,
     this.memberId,
   });
 
@@ -55,10 +67,10 @@ class Reservation {
           runtimeType == other.runtimeType &&
           id == other.id &&
           activityId == other.activityId &&
+          activitySlotId == other.activitySlotId &&
           activityTitle == other.activityTitle &&
           date == other.date &&
           time == other.time &&
-          duration == other.duration &&
           price == other.price &&
           status == other.status &&
           paymentStatus == other.paymentStatus &&
@@ -69,10 +81,10 @@ class Reservation {
   int get hashCode =>
       id.hashCode ^
       activityId.hashCode ^
+      activitySlotId.hashCode ^
       activityTitle.hashCode ^
       date.hashCode ^
       time.hashCode ^
-      duration.hashCode ^
       price.hashCode ^
       status.hashCode ^
       paymentStatus.hashCode ^

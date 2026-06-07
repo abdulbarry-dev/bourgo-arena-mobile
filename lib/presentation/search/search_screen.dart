@@ -64,32 +64,59 @@ class _SearchScreenState extends State<SearchScreen> {
         return Scaffold(
           appBar: AppBar(
             titleSpacing: 0,
+            elevation: 0,
+            scrolledUnderElevation: 0,
             title: Padding(
               padding: const EdgeInsets.only(right: 16),
-              child: TextField(
-                controller: _searchController,
-                focusNode: _focusNode,
-                onChanged: _viewModel!.search,
-                decoration: InputDecoration(
-                  hintText: l10n.searchHint,
-                  border: InputBorder.none,
-                  hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withAlpha(150),
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.4,
                   ),
+                  borderRadius: BorderRadius.circular(24),
                 ),
-                style: theme.textTheme.bodyLarge,
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _focusNode,
+                  onChanged: _viewModel!.search,
+                  textInputAction: TextInputAction.search,
+                  decoration: InputDecoration(
+                    hintText: l10n.searchHint,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    hintStyle: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.8,
+                      ),
+                    ),
+                    suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: _searchController,
+                      builder: (context, value, _) {
+                        if (value.text.isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+                        return IconButton(
+                          icon: Icon(
+                            Symbols.close,
+                            size: 20,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            _viewModel!.clearSearch();
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  style: theme.textTheme.bodyLarge,
+                ),
               ),
             ),
-            actions: [
-              if (_searchController.text.isNotEmpty)
-                IconButton(
-                  icon: const Icon(Symbols.close),
-                  onPressed: () {
-                    _searchController.clear();
-                    _viewModel!.clearSearch();
-                  },
-                ),
-            ],
           ),
           body: Column(
             children: [
@@ -135,39 +162,81 @@ class _SearchResultTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
-          shape: BoxShape.circle,
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
-        child: Icon(
-          _iconForKey(result.iconKey),
-          size: 20,
-          color: theme.colorScheme.primary,
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withValues(alpha: 0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          leading: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(
+              _iconForKey(result.iconKey),
+              size: 24,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          title: Text(
+            result.title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.2,
+            ),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              result.subtitle,
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ),
+          trailing: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.4,
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Symbols.arrow_forward_ios,
+              size: 14,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          onTap: () {
+            if (result.extra != null) {
+              context.push(result.route, extra: result.extra);
+            }
+          },
         ),
       ),
-      title: Text(
-        result.title,
-        style: theme.textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      subtitle: Text(
-        result.subtitle,
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: theme.colorScheme.onSurfaceVariant,
-        ),
-      ),
-      trailing: const Icon(Symbols.chevron_right, size: 20),
-      onTap: () {
-        if (result.extra != null) {
-          context.push(result.route, extra: result.extra);
-        } else {
-          context.push(result.route);
-        }
-      },
     );
   }
 

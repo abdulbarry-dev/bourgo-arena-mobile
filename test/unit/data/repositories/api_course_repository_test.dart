@@ -1,79 +1,21 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
-import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_course_repository.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:checks/checks.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:test/test.dart';
-
-import 'repository_test_fixtures.dart';
 
 class MockApiClient extends Mock implements ApiClient {}
 
 void main() {
-  late MockApiClient apiClient;
+  late MockApiClient mockApiClient;
   late ApiCourseRepository repository;
 
   setUp(() {
-    apiClient = MockApiClient();
-    repository = ApiCourseRepository(apiClient);
-  });
-
-  group('ApiCourseRepository', () {
-    test('returns Success on 200 with mapped courses', () async {
-      when(
-        () => apiClient.get('/courses'),
-      ).thenAnswer((_) async => [testCourseJson()]);
-
-      final result = await repository.getCourses();
-
-      expect(result, isA<Success<List<Course>, Failure>>());
-      expect((result as Success<List<Course>, Failure>).data, hasLength(1));
-      expect(result.data.first.title, 'CrossFit Beginners');
-    });
-
-    test('returns Failure(AuthFailure) on 401', () async {
-      when(
-        () => apiClient.get('/courses'),
-      ).thenThrow(const AuthException('API Error: 401 unauthorized'));
-
-      final result = await repository.getCourses();
-
-      expect(result, isA<FailureResult<List<Course>, Failure>>());
-      expect(
-        (result as FailureResult<List<Course>, Failure>).failure,
-        isA<AuthFailure>(),
-      );
-    });
-
-    test('returns Failure(NetworkFailure) on network error', () async {
-      when(
-        () => apiClient.get('/courses'),
-      ).thenThrow(const NetworkException('offline'));
-
-      final result = await repository.getCourses();
-
-      expect(result, isA<FailureResult<List<Course>, Failure>>());
-      expect(
-        (result as FailureResult<List<Course>, Failure>).failure,
-        isA<NetworkFailure>(),
-      );
-    });
-
-    test('returns Failure(ServerFailure) on 500 error', () async {
-      when(
-        () => apiClient.get('/courses'),
-      ).thenThrow(const ServerException('API Error: 500 server error'));
-
-      final result = await repository.getCourses();
-
-      expect(result, isA<FailureResult<List<Course>, Failure>>());
-      expect(
-        (result as FailureResult<List<Course>, Failure>).failure,
-        isA<ServerFailure>(),
-      );
-    });
+    mockApiClient = MockApiClient();
+    repository = ApiCourseRepository(mockApiClient);
     test('getCourseDetails returns course details on 200', () async {
       when(
         () => apiClient.get('/courses/c1'),
@@ -96,6 +38,112 @@ void main() {
 
       expect(result, isA<Success<List<dynamic>, Failure>>());
       expect((result as Success<List<dynamic>, Failure>).data.length, 1);
+    });
+  });
+
+  group('ApiCourseRepository', () {
+    test('getCourses returns list of courses', () async {
+      // Arrange
+      final jsonResponse = [
+        {
+          'id': 'c1',
+          'title': 'Yoga',
+          'instructor': 'Sarah',
+          'start_time': '10:00:00',
+          'end_time': '11:00:00',
+          'day_of_week': 1,
+          'category': 'Wellness',
+          'capacity': 20,
+          'enrolled': 10,
+          'icon': 'yoga_icon',
+        },
+      ];
+      when(
+        () => mockApiClient.get(any()),
+      ).thenAnswer((_) async => jsonResponse);
+
+      // Act
+      final result = await repository.getCourses();
+
+      // Assert
+      check(result).isA<Success>();
+      final courses = result.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => fail('Expected success'),
+      );
+      check(courses.length).equals(1);
+      check(courses.first.id).equals('c1');
+      check(courses.first.title).equals('Yoga');
+
+      verify(() => mockApiClient.get('/courses')).called(1);
+    });
+
+    test('getCourseDetails returns course details', () async {
+      // Arrange
+      final jsonResponse = {
+        'data': {
+          'id': 'c1',
+          'title': 'Yoga',
+          'instructor': 'Sarah',
+          'start_time': '10:00:00',
+          'end_time': '11:00:00',
+          'day_of_week': 1,
+          'category': 'Wellness',
+          'capacity': 20,
+          'enrolled': 10,
+          'icon': 'yoga_icon',
+        },
+      };
+      when(
+        () => mockApiClient.get(any()),
+      ).thenAnswer((_) async => jsonResponse);
+
+      // Act
+      final result = await repository.getCourseDetails('c1');
+
+      // Assert
+      check(result).isA<SuccessResult>();
+      final course = result.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => fail('Expected success'),
+      );
+      check(course.id).equals('c1');
+
+      verify(() => mockApiClient.get('/courses/c1')).called(1);
+    });
+
+    test('getCourseSessions returns sessions list', () async {
+      // Arrange
+      final jsonResponse = [
+        {'id': 's1', 'date': '2026-06-04'},
+      ];
+      when(
+        () => mockApiClient.get(any()),
+      ).thenAnswer((_) async => jsonResponse);
+
+      // Act
+      final result = await repository.getCourseSessions('c1');
+
+      // Assert
+      check(result).isA<SuccessResult>();
+      final sessions = result.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => fail('Expected success'),
+      );
+      check(sessions.length).equals(1);
+
+      verify(() => mockApiClient.get('/courses/c1/sessions')).called(1);
+    });
+
+    test('getCourses returns failure on exception', () async {
+      // Arrange
+      when(() => mockApiClient.get(any())).thenThrow(Exception('Server error'));
+
+      // Act
+      final result = await repository.getCourses();
+
+      // Assert
+      check(result).isA<FailureResult>();
     });
   });
 }

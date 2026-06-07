@@ -1,52 +1,47 @@
-import 'package:collection/collection.dart';
-
-/// Represents a single benefit associated with a subscription.
-class Benefit {
-  /// The display text or key for the benefit.
-  final String label;
-
-  /// Optional icon identifier or category for the benefit.
-  final String? icon;
-
-  const Benefit({required this.label, this.icon});
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Benefit &&
-          runtimeType == other.runtimeType &&
-          label == other.label &&
-          icon == other.icon;
-
-  @override
-  int get hashCode => label.hashCode ^ icon.hashCode;
-}
-
-/// Pure domain entity representing a membership subscription plan.
+/// Entity representing an active member subscription matching SubscriptionResource.
 class Subscription {
   /// Unique identifier.
   final String id;
 
-  /// Name of the plan (e.g. Premium, Basic).
-  final String name;
+  /// Plan name (e.g. "Premium", "Basic").
+  final String planName;
 
-  /// Monthly price.
-  final double price;
+  /// Plan description.
+  final String? planDescription;
 
-  /// List of benefits included in this plan.
-  final List<Benefit> benefits;
+  /// Status (active, expired, cancelled).
+  final String status;
 
-  /// Duration of the plan in months.
-  final int durationMonths;
+  /// ISO datetime when the subscription started.
+  final String? startsAt;
+
+  /// ISO datetime when the subscription ends.
+  final String? endsAt;
+
+  /// Remaining days until expiry.
+  final int? daysRemaining;
+
+  /// Payment method used.
+  final String? paymentMethod;
+
+  /// Total amount paid.
+  final double? amountPaid;
 
   /// Creates a new [Subscription] instance.
   const Subscription({
     required this.id,
-    required this.name,
-    required this.price,
-    required this.benefits,
-    required this.durationMonths,
+    required this.planName,
+    this.planDescription,
+    required this.status,
+    this.startsAt,
+    this.endsAt,
+    this.daysRemaining,
+    this.paymentMethod,
+    this.amountPaid,
   });
+
+  /// Returns true when the subscription is currently active.
+  bool get isActive => status == 'active';
 
   @override
   bool operator ==(Object other) =>
@@ -54,18 +49,9 @@ class Subscription {
       other is Subscription &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          name == other.name &&
-          price == other.price &&
-          _listEquality.equals(benefits, other.benefits) &&
-          durationMonths == other.durationMonths;
+          planName == other.planName &&
+          status == other.status;
 
   @override
-  int get hashCode =>
-      id.hashCode ^
-      name.hashCode ^
-      price.hashCode ^
-      _listEquality.hash(benefits) ^
-      durationMonths.hashCode;
-
-  static const _listEquality = ListEquality<Benefit>();
+  int get hashCode => id.hashCode ^ planName.hashCode ^ status.hashCode;
 }

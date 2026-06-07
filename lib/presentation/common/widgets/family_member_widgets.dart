@@ -265,9 +265,15 @@ class FamilyMemberForm extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant, width: 1.5),
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withValues(alpha: 0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -347,13 +353,17 @@ class FamilyMemberForm extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 32),
-          ElevatedButton.icon(
+          FilledButton.icon(
             onPressed: onAdd,
             icon: const Icon(Symbols.add, size: 20),
             label: Text(addButtonLabel ?? l10n.authAddMember),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-              foregroundColor: theme.colorScheme.primary,
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              backgroundColor: theme.colorScheme.primaryContainer,
+              foregroundColor: theme.colorScheme.onPrimaryContainer,
               elevation: 0,
             ),
           ),
@@ -384,18 +394,21 @@ class _GenderButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primary.withValues(alpha: 0.1)
-                : theme.colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
+                ? theme.colorScheme.primaryContainer
+                : theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.4,
+                  ),
+            borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.outlineVariant,
-              width: 1.5,
+                  : Colors.transparent,
+              width: 2,
             ),
           ),
           child: Column(

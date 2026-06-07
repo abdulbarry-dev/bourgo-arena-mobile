@@ -40,6 +40,12 @@ abstract interface class SessionRepository {
   /// Persists the [ThemeMode].
   Future<Result<void, Failure>> setThemeMode(ThemeMode mode);
 
+  /// Checks if the user has explicitly selected a theme.
+  Future<Result<bool, Failure>> isThemeSelected();
+
+  /// Marks the theme selection process as complete.
+  Future<Result<void, Failure>> completeThemeSelection();
+
   // =========== Locale & Onboarding ===========
 
   /// Retrieves the persisted [Locale].
@@ -67,6 +73,20 @@ abstract interface class SessionRepository {
 
   /// Persists notification preference.
   Future<Result<void, Failure>> setNotificationsEnabled(bool enabled);
+
+  /// Retrieves whether promotional notifications are enabled.
+  Future<Result<bool, Failure>> arePromotionalNotificationsEnabled();
+
+  /// Persists promotional notification preference.
+  Future<Result<void, Failure>> setPromotionalNotificationsEnabled(
+    bool enabled,
+  );
+
+  /// Retrieves whether account updates notifications are enabled.
+  Future<Result<bool, Failure>> areAccountNotificationsEnabled();
+
+  /// Persists account updates notification preference.
+  Future<Result<void, Failure>> setAccountNotificationsEnabled(bool enabled);
 
   // =========== Device Token ==========
 

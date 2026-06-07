@@ -51,7 +51,9 @@ class ActivitiesViewModel extends BaseViewModel {
       activitiesResult.when(
         success: (data) => _activities = data,
         failure: (failure) {
-          developer.log('ActivitiesViewModel: Error loading activities: $failure');
+          developer.log(
+            'ActivitiesViewModel: Error loading activities: $failure',
+          );
           setErrorMessage('activities_loading_failed');
         },
       );
@@ -59,13 +61,21 @@ class ActivitiesViewModel extends BaseViewModel {
       bookingsResult.when(
         success: (data) => _reservations = data,
         failure: (failure) {
-          developer.log('ActivitiesViewModel: Error loading bookings: $failure');
+          developer.log(
+            'ActivitiesViewModel: Error loading bookings: $failure',
+          );
           setErrorMessage('bookings_loading_failed');
         },
       );
-      developer.log('ActivitiesViewModel: loadData() success, activities=${_activities.length}, reservations=${_reservations.length}');
+      developer.log(
+        'ActivitiesViewModel: loadData() success, activities=${_activities.length}, reservations=${_reservations.length}',
+      );
     } catch (e, stack) {
-      developer.log('ActivitiesViewModel: Error loading data: $e', error: e, stackTrace: stack);
+      developer.log(
+        'ActivitiesViewModel: Error loading data: $e',
+        error: e,
+        stackTrace: stack,
+      );
       setErrorMessage('loading_failed');
     } finally {
       _isLoading = false;
