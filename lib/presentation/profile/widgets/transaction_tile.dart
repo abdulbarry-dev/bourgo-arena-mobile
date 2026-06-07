@@ -58,7 +58,7 @@ class TransactionTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '\$${payment.amount.toStringAsFixed(2)} ${payment.currency}',
+                '${payment.amount.toStringAsFixed(2)} ${payment.currency}',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

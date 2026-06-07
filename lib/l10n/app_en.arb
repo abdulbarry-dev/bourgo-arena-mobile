@@ -27,6 +27,7 @@
   "commonSetUp": "SET UP",
   "commonPointsShort": "pts",
   "guestBrowse": "CONTINUE AS GUEST",
+  "guestBrowse": "CONTINUE AS GUEST",
   
   "navHome": "HOME",
   "navActivities": "ACTIVITIES",
@@ -297,6 +298,8 @@
   "languageLabel": "Select Language",
   "languageEnglish": "English",
   "languageFrench": "Français",
+  "themeSelectionTitle": "Choose Your Style",
+  "themeSelectionSubtitle": "Select a display mode for your application",
   "profileStandardTier": "Standard",
   "authInvalidVerificationCode": "Invalid verification code",
   "searchHint": "Search activities, courses, settings...",

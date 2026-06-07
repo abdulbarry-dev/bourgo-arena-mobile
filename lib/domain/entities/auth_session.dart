@@ -86,6 +86,9 @@ class AuthSession {
   factory AuthSession.unauthenticated() =>
       const AuthSession(state: AuthState.unauthenticated);
 
+  /// Creates a guest session.
+  factory AuthSession.guest() => const AuthSession(state: AuthState.guest);
+
   /// Whether the session is fully authenticated.
   bool get isAuthenticated => state == AuthState.authenticated && user != null;
 }

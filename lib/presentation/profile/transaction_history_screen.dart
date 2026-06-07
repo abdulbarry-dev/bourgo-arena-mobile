@@ -13,6 +13,7 @@ class TransactionHistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
     final spacing = AppSpacing.standard;
 
     // Static placeholder data if none provided (for UI demonstration purposes)
@@ -23,7 +24,7 @@ class TransactionHistoryScreen extends StatelessWidget {
             id: '1',
             type: 'subscription',
             amount: 29.99,
-            currency: 'USD',
+            currency: 'TND',
             status: 'success',
             gateway: 'stripe',
             paymentReference: 'TXN-1029384',
@@ -33,7 +34,7 @@ class TransactionHistoryScreen extends StatelessWidget {
             id: '2',
             type: 'subscription',
             amount: 29.99,
-            currency: 'USD',
+            currency: 'TND',
             status: 'failed',
             gateway: 'stripe',
             paymentReference: 'TXN-1029383',

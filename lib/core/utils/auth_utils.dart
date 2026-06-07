@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 /// If authenticated, it returns true.
 bool ensureAuthenticated(BuildContext context) {
   final authState = locator<AuthStateNotifier>().state;
-  if (authState == AuthState.unauthenticated) {
+  if (authState == AuthState.unauthenticated || authState == AuthState.guest) {
     showAuthRequiredModal(context);
     return false;
   }

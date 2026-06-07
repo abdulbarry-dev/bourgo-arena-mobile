@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 
 class PlanCard extends StatelessWidget {
   final Plan plan;
@@ -34,7 +34,7 @@ class PlanCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (plan.serviceImageUrl != null)
-            CachedNetworkImage(
+            PremiumNetworkImage(
               imageUrl: plan.serviceImageUrl!,
               height: 120,
               fit: BoxFit.cover,
@@ -58,7 +58,7 @@ class PlanCard extends StatelessWidget {
                 ),
                 SizedBox(height: spacing.xxs),
                 Text(
-                  '\$${plan.price} / ${plan.billingCycle}',
+                  '${plan.price} TND / ${plan.billingCycle}',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: theme.colorScheme.primary,
                     fontWeight: FontWeight.bold,
@@ -66,7 +66,7 @@ class PlanCard extends StatelessWidget {
                 ),
                 SizedBox(height: spacing.md),
                 Text(
-                  plan.description,
+                  plan.description ?? '',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

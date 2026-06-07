@@ -19,7 +19,8 @@ class ApiSearchRepository implements SearchRepository {
       final response = await _apiClient.get('/search?q=$query');
       final List<dynamic> data = response is List
           ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
       final entities = data
           .map(
             (json) => SearchMapper.toEntity(

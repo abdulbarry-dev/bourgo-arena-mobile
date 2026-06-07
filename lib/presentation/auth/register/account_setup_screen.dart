@@ -159,8 +159,12 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
       subscriptionExpiry: 'N/A',
       gender: _selectedGender,
       birthDate: _selectedBirthDate,
-      isParentAccount: _data['isParentAccount'] ?? false,
-      children: (_data['familyMembers'] as List<ChildProfile>?) ?? const [],
+      isParentAccount: _data['isParentAccount'] == true,
+      children:
+          (_data['familyMembers'] as List<dynamic>?)
+              ?.map((e) => e as ChildProfile)
+              .toList() ??
+          const [],
     );
   }
 

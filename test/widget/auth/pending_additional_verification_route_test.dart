@@ -62,6 +62,7 @@ void main() {
     when(() => mockSettingsViewModel.addListener(any())).thenReturn(null);
     when(() => mockSettingsViewModel.removeListener(any())).thenReturn(null);
     when(() => mockSettingsViewModel.isLanguageSelected).thenReturn(true);
+    when(() => mockSettingsViewModel.isThemeSelected).thenReturn(true);
 
     when(
       () => mockSessionRepository.saveRegistrationDraft(any()),

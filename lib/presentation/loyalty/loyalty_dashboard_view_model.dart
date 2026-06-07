@@ -1,33 +1,65 @@
+import 'dart:developer' as developer;
+
 import 'package:bourgo_arena_mobile/core/constants/loyalty_constants.dart';
+import 'package:bourgo_arena_mobile/domain/entities/loyalty_balance.dart';
 import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_balance_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
+
+enum LoyaltyLoadState { idle, loading, loaded, error }
 
 /// ViewModel for the Loyalty Dashboard.
 class LoyaltyDashboardViewModel extends ChangeNotifier {
   final AuthStateNotifier _authStateNotifier;
+  final GetLoyaltyBalanceUseCase _getLoyaltyBalanceUseCase;
+
+  LoyaltyLoadState _state = LoyaltyLoadState.idle;
+  LoyaltyBalance? _balance;
+  String? _errorMessage;
 
   /// Creates a new [LoyaltyDashboardViewModel] instance.
-  LoyaltyDashboardViewModel({required AuthStateNotifier authStateNotifier})
-    : _authStateNotifier = authStateNotifier {
-    _authStateNotifier.addListener(notifyListeners);
+  LoyaltyDashboardViewModel({
+    required AuthStateNotifier authStateNotifier,
+    required GetLoyaltyBalanceUseCase getLoyaltyBalanceUseCase,
+  }) : _authStateNotifier = authStateNotifier,
+       _getLoyaltyBalanceUseCase = getLoyaltyBalanceUseCase {
+    _authStateNotifier.addListener(_onAuthChanged);
+    loadBalance();
   }
 
   @override
   void dispose() {
-    _authStateNotifier.removeListener(notifyListeners);
+    _authStateNotifier.removeListener(_onAuthChanged);
     super.dispose();
   }
+
+  void _onAuthChanged() {
+    // Reload balance if user changes
+    if (_state != LoyaltyLoadState.loading) {
+      loadBalance();
+    }
+  }
+
+  bool get isLoading => _state == LoyaltyLoadState.loading;
+  String? get errorMessage => _errorMessage;
 
   /// The currently authenticated user.
   User? get user => _authStateNotifier.currentUser;
 
   /// The user's current loyalty points.
-  int get currentPoints => user?.loyaltyPoints ?? 0;
+  int get currentPoints => _balance?.totalPoints ?? user?.loyaltyPoints ?? 0;
 
   /// The user's current loyalty tier.
   MemberTier get currentTier {
+    final name = _balance?.tierName?.toLowerCase();
+    if (name != null) {
+      if (name.contains('ultra')) return MemberTier.ultra;
+      if (name.contains('family')) return MemberTier.familyMax;
+      return MemberTier.standard;
+    }
+
     if (currentPoints >= LoyaltyConstants.platinumThreshold) {
       return MemberTier.ultra;
     }
@@ -75,5 +107,36 @@ class LoyaltyDashboardViewModel extends ChangeNotifier {
 
     final progress = (currentPoints - start) / range;
     return progress.clamp(0.0, 1.0);
+  }
+
+  /// Points earned this month
+  int get earnedThisMonth => _balance?.earnedThisMonth ?? 0;
+
+  /// Points redeemed this month
+  int get redeemedThisMonth => _balance?.redeemedThisMonth ?? 0;
+
+  /// Recent transactions
+  List<LoyaltyTransaction> get recentTransactions =>
+      _balance?.transactions ?? [];
+
+  /// Fetches the real loyalty balance from API.
+  Future<void> loadBalance() async {
+    _state = LoyaltyLoadState.loading;
+    _errorMessage = null;
+    notifyListeners();
+
+    final result = await _getLoyaltyBalanceUseCase();
+    result.when(
+      success: (balance) {
+        _balance = balance;
+        _state = LoyaltyLoadState.loaded;
+      },
+      failure: (failure) {
+        developer.log('LoyaltyDashboardViewModel error: ${failure.message}');
+        _errorMessage = failure.message;
+        _state = LoyaltyLoadState.error;
+      },
+    );
+    notifyListeners();
   }
 }

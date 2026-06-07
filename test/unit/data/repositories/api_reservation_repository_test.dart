@@ -97,17 +97,9 @@ void main() {
         );
         verify(
           () => apiClient.post('/reservations', {
-            'id': reservation.id,
             'activity_id': reservation.activityId,
-            'activity_title': reservation.activityTitle,
-            'member_id': reservation.memberId,
+            'activity_slot_id': reservation.activitySlotId,
             'date': reservation.date,
-            'time': reservation.time,
-            'duration': reservation.duration,
-            'price': reservation.price,
-            'status': reservation.status,
-            'payment_status': reservation.paymentStatus,
-            'qr_code': reservation.qrCode,
           }),
         ).called(1);
       });

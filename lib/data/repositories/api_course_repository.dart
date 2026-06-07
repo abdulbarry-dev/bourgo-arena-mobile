@@ -19,7 +19,8 @@ class ApiCourseRepository implements CourseRepository {
       final response = await _apiClient.get('/courses');
       final List<dynamic> data = response is List
           ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
       final entities = data
           .map(
             (json) => CourseMapper.toEntity(
@@ -43,13 +44,29 @@ class ApiCourseRepository implements CourseRepository {
   }
 
   @override
-  Future<Result<List<dynamic>, Failure>> getCourseSessions(String courseId) {
+  Future<Result<List<Course>, Failure>> getCourseSessions(String courseId) {
     return executeApiCall(() async {
       final response = await _apiClient.get('/courses/$courseId/sessions');
       final List<dynamic> data = response is List
           ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
-      return Result.success(data);
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
+      final entities = data
+          .map(
+            (json) => CourseMapper.toEntity(
+              CourseModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(entities);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> enrollInCourse(String courseId) {
+    return executeApiCall(() async {
+      await _apiClient.post('/courses/$courseId/enroll', {});
+      return Result.success(null);
     });
   }
 }

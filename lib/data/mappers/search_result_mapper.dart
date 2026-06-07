@@ -28,9 +28,11 @@ class SearchResultMapper {
   static String _mapRoute(String type, String id) {
     switch (type.toLowerCase()) {
       case 'activity':
-        return '/booking'; // Should ideally include ID or use extra
+        return '/activities/$id/slots';
       case 'course':
-        return '/planning';
+        return '/courses/$id';
+      case 'event':
+        return '/events/$id/participants';
       default:
         return '/home';
     }

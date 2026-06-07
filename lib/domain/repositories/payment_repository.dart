@@ -7,4 +7,24 @@ abstract interface class PaymentRepository {
     int page = 1,
     int limit = 15,
   });
+
+  /// Initiates a general payment.
+  Future<Result<Map<String, dynamic>, Failure>> initiatePayment({
+    required double amount,
+    String? currency,
+    String? provider,
+    String? description,
+    String? successUrl,
+    String? failureUrl,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? phone,
+  });
+
+  /// Verifies a general payment.
+  Future<Result<Map<String, dynamic>, Failure>> verifyPayment({
+    String? paymentReference,
+    String? gatewayTransactionId,
+  });
 }

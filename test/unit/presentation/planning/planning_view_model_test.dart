@@ -5,6 +5,10 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +27,16 @@ class MockGetMemberTierUseCase extends Mock implements GetMemberTierUseCase {}
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
+class MockGetActiveSubscriptionUseCase extends Mock
+    implements GetActiveSubscriptionUseCase {}
+
+class MockGetCourseSessionsUseCase extends Mock
+    implements GetCourseSessionsUseCase {}
+
+class MockEnrollInCourseUseCase extends Mock implements EnrollInCourseUseCase {}
+
 void main() {
   late PlanningViewModel viewModel;
   late MockGetCoursesUseCase mockGetCourses;
@@ -30,6 +44,10 @@ void main() {
   late MockGetFamilyMembersUseCase mockGetFamilyMembers;
   late MockGetMemberTierUseCase mockGetMemberTier;
   late MockGetUserProfileUseCase mockGetUserProfile;
+  late MockAuthStateNotifier mockAuthStateNotifier;
+  late MockGetActiveSubscriptionUseCase mockGetActiveSubscription;
+  late MockGetCourseSessionsUseCase mockGetCourseSessions;
+  late MockEnrollInCourseUseCase mockEnrollInCourseUseCase;
 
   setUp(() {
     mockGetCourses = MockGetCoursesUseCase();
@@ -37,6 +55,12 @@ void main() {
     mockGetFamilyMembers = MockGetFamilyMembersUseCase();
     mockGetMemberTier = MockGetMemberTierUseCase();
     mockGetUserProfile = MockGetUserProfileUseCase();
+    mockAuthStateNotifier = MockAuthStateNotifier();
+    mockGetActiveSubscription = MockGetActiveSubscriptionUseCase();
+    mockGetCourseSessions = MockGetCourseSessionsUseCase();
+    mockEnrollInCourseUseCase = MockEnrollInCourseUseCase();
+
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
 
     when(
       () => mockGetCourses.call(),
@@ -52,6 +76,9 @@ void main() {
         const ServerFailure(AppErrorCode.serverError, 'error'),
       ),
     );
+    when(
+      () => mockGetActiveSubscription.call(),
+    ).thenAnswer((_) async => Result.success(null));
 
     viewModel = PlanningViewModel(
       getCoursesUseCase: mockGetCourses,
@@ -59,6 +86,10 @@ void main() {
       getFamilyMembersUseCase: mockGetFamilyMembers,
       getMemberTierUseCase: mockGetMemberTier,
       getUserProfileUseCase: mockGetUserProfile,
+      authStateNotifier: mockAuthStateNotifier,
+      getActiveSubscriptionUseCase: mockGetActiveSubscription,
+      getCourseSessionsUseCase: mockGetCourseSessions,
+      enrollInCourseUseCase: mockEnrollInCourseUseCase,
     );
   });
 

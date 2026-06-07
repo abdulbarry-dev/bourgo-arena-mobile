@@ -194,7 +194,7 @@ void main() {
       await tester.pump(const Duration(seconds: 61));
       await tester.pumpAndSettle();
 
-      final resendButton = find.byType(TextButton);
+      final resendButton = find.byType(TextButton).last;
       expect(resendButton, findsOneWidget);
 
       await tester.tap(resendButton);

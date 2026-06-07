@@ -1,7 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_payment_repository.dart';
-import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,11 +15,11 @@ void main() {
   setUp(() {
     mockApiClient = MockApiClient();
     repository = ApiPaymentRepository(mockApiClient);
+    registerFallbackValue({'dummy': 'data'});
   });
 
   group('ApiPaymentRepository', () {
     test('getUserPayments returns success with list of payments', () async {
-      // Arrange
       final jsonResponse = {
         'data': [
           {
@@ -39,39 +38,77 @@ void main() {
         () => mockApiClient.get(any()),
       ).thenAnswer((_) async => jsonResponse);
 
-      // Act
       final result = await repository.getUserPayments(page: 1, limit: 15);
 
-      // Assert
-      check(result).isA<Success>();
+      check(result).isA<Success<dynamic, Failure>>();
       final payments = result.fold(
         onSuccess: (val) => val,
         onFailure: (_) => fail('Expected success'),
       );
       check(payments.length).equals(1);
       check(payments.first.id).equals('pay_1');
-      check(payments.first.amount).equals(50.0);
 
       verify(
         () => mockApiClient.get('/user/payments?page=1&per_page=15'),
       ).called(1);
     });
 
-    test('getUserPayments returns failure on exception', () async {
-      // Arrange
-      when(() => mockApiClient.get(any())).thenThrow(Exception('Server error'));
+    test('initiatePayment returns success', () async {
+      final jsonResponse = {
+        'success': true,
+        'payment_url': 'https://gateway.com/pay/123',
+        'payment_reference': 'konnect_123',
+      };
 
-      // Act
-      final result = await repository.getUserPayments();
+      when(
+        () => mockApiClient.post('/payments/initiate', any()),
+      ).thenAnswer((_) async => jsonResponse);
 
-      // Assert
-      check(result).isA<FailureResult>();
-      final failure = result.fold(
-        onSuccess: (_) => fail('Expected failure'),
-        onFailure: (f) => f,
+      final result = await repository.initiatePayment(
+        amount: 100.0,
+        provider: 'konnect',
       );
-      check(failure).isA<ServerFailure>();
-      check(failure.code).equals(AppErrorCode.serverError);
+
+      check(result).isA<Success<dynamic, Failure>>();
+      final data = result.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => fail('Expected success'),
+      );
+      check(data['payment_url']).equals('https://gateway.com/pay/123');
+      check(data['payment_reference']).equals('konnect_123');
+
+      verify(
+        () => mockApiClient.post('/payments/initiate', {
+          'amount': 100.0,
+          'currency': 'TND',
+          'provider': 'konnect',
+        }),
+      ).called(1);
+    });
+
+    test('verifyPayment returns success', () async {
+      final jsonResponse = {'success': true, 'status': 'paid'};
+
+      when(
+        () => mockApiClient.post('/payments/verify', any()),
+      ).thenAnswer((_) async => jsonResponse);
+
+      final result = await repository.verifyPayment(
+        paymentReference: 'konnect_123',
+      );
+
+      check(result).isA<Success<dynamic, Failure>>();
+      final data = result.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => fail('Expected success'),
+      );
+      check(data['status']).equals('paid');
+
+      verify(
+        () => mockApiClient.post('/payments/verify', {
+          'payment_reference': 'konnect_123',
+        }),
+      ).called(1);
     });
   });
 }

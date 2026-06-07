@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/settings_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
@@ -16,6 +17,7 @@ void main() {
     when(() => mockViewModel.locale).thenReturn(const Locale('en'));
     when(() => mockViewModel.notificationsEnabled).thenReturn(true);
     when(() => mockViewModel.isLanguageSelected).thenReturn(false);
+    when(() => mockViewModel.isThemeSelected).thenReturn(false);
     when(() => mockViewModel.appVersion).thenReturn('1.0.0 (1)');
 
     // Stub addListener/removeListener because it's a ChangeNotifier
@@ -29,6 +31,7 @@ void main() {
     return MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
+      theme: BourgoTheme.lightTheme,
       home: SettingsScreen(viewModel: mockViewModel),
     );
   }
@@ -65,12 +68,13 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(tester));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Display Mode'));
+      final displayModeFinder = find.text('Display Mode');
+      await tester.ensureVisible(displayModeFinder.first);
       await tester.pumpAndSettle();
 
-      // "Display Mode" appears twice: one in the list tile, one in the bottom sheet title
-      expect(find.text('Display Mode'), findsNWidgets(2));
-      expect(find.text('System Default'), findsNWidgets(2));
+      await tester.tap(displayModeFinder.first);
+      await tester.pumpAndSettle();
+
       expect(find.text('Light Mode'), findsOneWidget);
       expect(find.text('Dark Mode'), findsOneWidget);
     });

@@ -94,12 +94,6 @@ class NotificationsViewModel extends ChangeNotifier {
   Future<void> markAllAsRead() async {
     if (_notifications.isEmpty || _isDisposed) return;
 
-    @override
-    void dispose() {
-      _isDisposed = true;
-      super.dispose();
-    }
-
     // Optimistic UI update
     final previousNotifications = List<entity.Notification>.from(
       _notifications,
@@ -123,5 +117,11 @@ class NotificationsViewModel extends ChangeNotifier {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }

@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
@@ -271,12 +272,40 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
     final spacing = context.spacing;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          l10n.settingsManageFamily,
-          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withValues(
+                  alpha: 0.5,
+                ),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                Symbols.family_restroom,
+                color: theme.colorScheme.primary,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Text(
+              l10n.settingsManageFamily,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontFamily: AppConstants.displayFontFamily,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 0.5,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
         ),
-        centerTitle: true,
+        backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
       ),
       body: ListenableBuilder(
         listenable: _viewModel,
@@ -322,9 +351,19 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                   ElevatedButton.icon(
                     onPressed: () => context.push('/manage-children'),
                     icon: const Icon(Symbols.groups),
-                    label: Text(l10n.profileManageChildren),
+                    label: Text(
+                      l10n.profileManageChildren.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                        fontSize: 14,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: spacing.lg),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                   ),
                 ] else ...[

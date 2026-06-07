@@ -1,13 +1,13 @@
 import 'dart:async';
-import 'package:bourgo_arena_mobile/core/utils/result.dart';
-import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
-import 'package:flutter/foundation.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:flutter/material.dart';
 
 /// Notifier for listening to authentication state changes.
 class AuthStateNotifier extends ChangeNotifier {
@@ -60,6 +60,15 @@ class AuthStateNotifier extends ChangeNotifier {
       _session = session;
     }
 
+    if (_session.state == AuthState.unauthenticated ||
+        _session.state == AuthState.guest) {
+      _registrationDraft = null;
+    }
+
+    if (_session.user?.preferences != null) {
+      _syncPreferencesToLocal(_session.user!.preferences!);
+    }
+
     if (_session.isAuthenticated) {
       unawaited(_deviceTokenRegistrar.registerIfPossible());
     }
@@ -68,6 +77,8 @@ class AuthStateNotifier extends ChangeNotifier {
 
   AuthState _parsePersistedState(String? stateStr) {
     switch (stateStr) {
+      case 'guest':
+        return AuthState.guest;
       case 'pending_verification':
         return AuthState.pendingVerification;
       case 'pending_additional_verification':
@@ -81,6 +92,67 @@ class AuthStateNotifier extends ChangeNotifier {
           (e) => e.name == stateStr,
           orElse: () => AuthState.unauthenticated,
         );
+    }
+  }
+
+  Future<void> _syncPreferencesToLocal(Map<String, dynamic> prefs) async {
+    final appPrefs = prefs['app'] as Map<String, dynamic>?;
+    if (appPrefs != null) {
+      if (appPrefs['theme'] == 'dark') {
+        await _sessionRepository.setThemeMode(ThemeMode.dark);
+      } else if (appPrefs['theme'] == 'light') {
+        await _sessionRepository.setThemeMode(ThemeMode.light);
+      } else if (appPrefs['theme'] == 'system') {
+        await _sessionRepository.setThemeMode(ThemeMode.system);
+      }
+
+      if (appPrefs['language'] is String) {
+        await _sessionRepository.setLocale(Locale(appPrefs['language']));
+      }
+    }
+
+    final notifPrefs = prefs['notifications'] as Map<String, dynamic>?;
+    if (notifPrefs != null) {
+      if (notifPrefs['push_enabled'] is bool) {
+        await _sessionRepository.setNotificationsEnabled(
+          notifPrefs['push_enabled'],
+        );
+      }
+      if (notifPrefs['promotions'] is bool) {
+        await _sessionRepository.setPromotionalNotificationsEnabled(
+          notifPrefs['promotions'],
+        );
+      }
+      if (notifPrefs['account_updates'] is bool) {
+        await _sessionRepository.setAccountNotificationsEnabled(
+          notifPrefs['account_updates'],
+        );
+      }
+      if (notifPrefs['reservations'] is bool) {
+        await _sessionRepository.setReservationsNotificationsEnabled(
+          notifPrefs['reservations'],
+        );
+      }
+      if (notifPrefs['subscriptions'] is bool) {
+        await _sessionRepository.setSubscriptionsNotificationsEnabled(
+          notifPrefs['subscriptions'],
+        );
+      }
+      if (notifPrefs['courses'] is bool) {
+        await _sessionRepository.setCoursesNotificationsEnabled(
+          notifPrefs['courses'],
+        );
+      }
+      if (notifPrefs['loyalty'] is bool) {
+        await _sessionRepository.setLoyaltyNotificationsEnabled(
+          notifPrefs['loyalty'],
+        );
+      }
+      if (notifPrefs['family'] is bool) {
+        await _sessionRepository.setFamilyNotificationsEnabled(
+          notifPrefs['family'],
+        );
+      }
     }
   }
 
@@ -160,8 +232,22 @@ class AuthStateNotifier extends ChangeNotifier {
           }
           notifyListeners();
         },
-        onFailure: (_) {
-          _session = AuthSession.unauthenticated();
+        onFailure: (failure) {
+          // If it's a network error, we shouldn't wipe the session entirely
+          // as the user might just be offline.
+          if (failure is NetworkFailure || failure is ServerFailure) {
+            // Keep the token but maybe flag as offline?
+            // For now, we'll keep the session as authenticated with the token.
+            _session = AuthSession(
+              state: AuthState.authenticated,
+              token: token,
+              // We don't have the user object if we couldn't fetch it,
+              // but we keep the token so they aren't forced to login again
+            );
+          } else {
+            // If it's an AuthFailure (401), wipe the session.
+            _session = AuthSession.unauthenticated();
+          }
           notifyListeners();
         },
       );
@@ -181,6 +267,14 @@ class AuthStateNotifier extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  /// Sets the authentication state to guest mode and persists it.
+  Future<void> setGuestMode() async {
+    _registrationDraft = null;
+    _session = AuthSession.guest();
+    await _sessionRepository.saveAuthState(AuthState.guest.name);
+    notifyListeners();
   }
 
   /// The current authentication session.

@@ -116,8 +116,12 @@ class BookingViewModel extends BaseViewModel {
       _contextualPrice ?? _selectedActivity?.basePrice ?? 0;
   bool get hasContextualPrice => _contextualPrice != null;
   MemberTier get memberTier => _memberTier;
-  int get projectedPoints =>
-      _projectPointsUseCase(amount: priceToPay, tier: _memberTier);
+  int get projectedPoints {
+    if (_paymentMethod == AppConstants.paymentMethodWalletId) {
+      return 0;
+    }
+    return _projectPointsUseCase(amount: priceToPay, tier: _memberTier);
+  }
 
   /// Moves to the next step in the flow.
   void nextStep() {
@@ -236,6 +240,7 @@ class BookingViewModel extends BaseViewModel {
     final reservation = Reservation(
       id: '', // Will be assigned by backend
       activityId: activity.id,
+      activitySlotId: slot.id,
       activityTitle: activity.category,
       memberId: member?.id,
       date: _selectedDate.toIso8601String().split('T')[0],

@@ -25,6 +25,7 @@ class LocalSessionRepository implements SessionRepository {
 
   // Theme Preference
   static const String _themeKey = 'settings_theme_mode';
+  static const String _themeSelectedKey = 'settings_theme_selected';
 
   // Locale & Onboarding
   static const String _localeKey = 'settings_locale';
@@ -214,6 +215,36 @@ class LocalSessionRepository implements SessionRepository {
     }
   }
 
+  @override
+  Future<Result<bool, Failure>> isThemeSelected() async {
+    try {
+      final isSelected = _prefs.getBool(_themeSelectedKey) ?? false;
+      return Success(isSelected);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to check theme selection: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> completeThemeSelection() async {
+    try {
+      await _prefs.setBool(_themeSelectedKey, true);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to complete theme selection: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
   // =========== Locale & Onboarding ===========
 
   @override
@@ -337,6 +368,70 @@ class LocalSessionRepository implements SessionRepository {
         CacheFailure(
           AppErrorCode.cacheError,
           'Failed to save notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> arePromotionalNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool('settings_promo_notifications') ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load promotional notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setPromotionalNotificationsEnabled(
+    bool enabled,
+  ) async {
+    try {
+      await _prefs.setBool('settings_promo_notifications', enabled);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save promotional notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> areAccountNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool('settings_account_notifications') ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load account notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setAccountNotificationsEnabled(
+    bool enabled,
+  ) async {
+    try {
+      await _prefs.setBool('settings_account_notifications', enabled);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save account notification settings: ${e.toString()}',
         ),
       );
     }

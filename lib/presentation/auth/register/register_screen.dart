@@ -11,6 +11,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -166,150 +167,164 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   key: _viewModel.formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      AuthHeader(
-                        title: l10n.authRegisterTitle,
-                        subtitle: l10n.authRegisterSubtitle,
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AuthTextField(
-                              label: l10n.authFirstNameLabel,
-                              hint: l10n.authFirstNameHint,
-                              leadingIcon: Symbols.person,
-                              controller: _viewModel.firstNameController,
-                              validator: (value) => value?.isEmpty ?? true
-                                  ? l10n.commonRequiredField
-                                  : null,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: AuthTextField(
-                              label: l10n.authLastNameLabel,
-                              hint: l10n.authLastNameHint,
-                              leadingIcon: Symbols.person,
-                              controller: _viewModel.lastNameController,
-                              validator: (value) => value?.isEmpty ?? true
-                                  ? l10n.commonRequiredField
-                                  : null,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      AuthTextField(
-                        label: l10n.authEmailLabel,
-                        hint: l10n.authEmailLabelHint,
-                        leadingIcon: Symbols.mail,
-                        keyboardType: TextInputType.emailAddress,
-                        controller: _viewModel.emailController,
-                        validator: (value) => value?.isEmpty ?? true
-                            ? l10n.commonRequiredField
-                            : null,
-                      ),
-                      const SizedBox(height: 20),
-                      AuthTextField(
-                        label: l10n.authPhoneLabel,
-                        hint: l10n.authPhoneHint,
-                        leadingIcon: Symbols.call,
-                        keyboardType: TextInputType.phone,
-                        controller: _viewModel.phoneController,
-                        validator: (value) => value?.isEmpty ?? true
-                            ? l10n.commonRequiredField
-                            : null,
-                      ),
-                      const SizedBox(height: 20),
-                      AuthTextField(
-                        label: l10n.authBirthDateLabel,
-                        hint: l10n.authBirthDateHint,
-                        leadingIcon: Symbols.calendar_today,
-                        controller: _viewModel.birthDateController,
-                        readOnly: true,
-                        onTap: _selectBirthDate,
-                        validator: (value) => value?.isEmpty ?? true
-                            ? l10n.commonRequiredField
-                            : null,
-                      ),
-                      const SizedBox(height: 20),
-                      AuthDropdown<String>(
-                        key: const Key('gender_dropdown'),
-                        label: l10n.authGenderLabel,
-                        hint: l10n.authGenderHint,
-                        leadingIcon: Symbols.person_pin,
-                        value: _viewModel.selectedGender,
-                        items: [
-                          DropdownMenuItem(
-                            value: 'male',
-                            child: Text(l10n.commonGenderMale),
-                          ),
-                          DropdownMenuItem(
-                            value: 'female',
-                            child: Text(l10n.commonGenderFemale),
-                          ),
-                        ],
-                        onChanged: _viewModel.setGender,
-                        validator: (value) =>
-                            value == null ? l10n.commonRequiredField : null,
-                      ),
-                      const SizedBox(height: 20),
-                      AuthTextField(
-                        label: l10n.authPasswordLabel,
-                        hint: l10n.authPasswordCreateHint,
-                        leadingIcon: Symbols.lock,
-                        isPassword: true,
-                        controller: _viewModel.passwordController,
-                        validator: (value) => (value?.length ?? 0) < 6
-                            ? l10n.authPasswordMinLength
-                            : null,
-                      ),
-                      const SizedBox(height: 24),
-                      FamilyAccountToggle(
-                        value: _viewModel.isParentAccount,
-                        onChanged: _viewModel.setParentAccount,
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: _viewModel.isLoading ? null : _onRegister,
-                        child: _viewModel.isLoading
-                            ? SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: theme.colorScheme.onPrimary,
-                                ),
-                              )
-                            : Text(l10n.authRegister),
-                      ),
-                      const SizedBox(height: 24),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            l10n.authHaveAccount,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => context.go('/login'),
-                            child: Text(
-                              l10n.authLogin,
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                    children:
+                        [
+                              AuthHeader(
+                                title: l10n.authRegisterTitle,
+                                subtitle: l10n.authRegisterSubtitle,
                               ),
+                              const SizedBox(height: 32),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: AuthTextField(
+                                      label: l10n.authFirstNameLabel,
+                                      hint: l10n.authFirstNameHint,
+                                      leadingIcon: Symbols.person,
+                                      controller:
+                                          _viewModel.firstNameController,
+                                      validator: (value) =>
+                                          value?.isEmpty ?? true
+                                          ? l10n.commonRequiredField
+                                          : null,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: AuthTextField(
+                                      label: l10n.authLastNameLabel,
+                                      hint: l10n.authLastNameHint,
+                                      leadingIcon: Symbols.person,
+                                      controller: _viewModel.lastNameController,
+                                      validator: (value) =>
+                                          value?.isEmpty ?? true
+                                          ? l10n.commonRequiredField
+                                          : null,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 20),
+                              AuthTextField(
+                                label: l10n.authEmailLabel,
+                                hint: l10n.authEmailLabelHint,
+                                leadingIcon: Symbols.mail,
+                                keyboardType: TextInputType.emailAddress,
+                                controller: _viewModel.emailController,
+                                validator: (value) => value?.isEmpty ?? true
+                                    ? l10n.commonRequiredField
+                                    : null,
+                              ),
+                              const SizedBox(height: 20),
+                              AuthTextField(
+                                label: l10n.authPhoneLabel,
+                                hint: l10n.authPhoneHint,
+                                leadingIcon: Symbols.call,
+                                keyboardType: TextInputType.phone,
+                                controller: _viewModel.phoneController,
+                                validator: (value) => value?.isEmpty ?? true
+                                    ? l10n.commonRequiredField
+                                    : null,
+                              ),
+                              const SizedBox(height: 20),
+                              AuthTextField(
+                                label: l10n.authBirthDateLabel,
+                                hint: l10n.authBirthDateHint,
+                                leadingIcon: Symbols.calendar_today,
+                                controller: _viewModel.birthDateController,
+                                readOnly: true,
+                                onTap: _selectBirthDate,
+                                validator: (value) => value?.isEmpty ?? true
+                                    ? l10n.commonRequiredField
+                                    : null,
+                              ),
+                              const SizedBox(height: 20),
+                              AuthDropdown<String>(
+                                key: const Key('gender_dropdown'),
+                                label: l10n.authGenderLabel,
+                                hint: l10n.authGenderHint,
+                                leadingIcon: Symbols.person_pin,
+                                value: _viewModel.selectedGender,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'male',
+                                    child: Text(l10n.commonGenderMale),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'female',
+                                    child: Text(l10n.commonGenderFemale),
+                                  ),
+                                ],
+                                onChanged: _viewModel.setGender,
+                                validator: (value) => value == null
+                                    ? l10n.commonRequiredField
+                                    : null,
+                              ),
+                              const SizedBox(height: 20),
+                              AuthTextField(
+                                label: l10n.authPasswordLabel,
+                                hint: l10n.authPasswordCreateHint,
+                                leadingIcon: Symbols.lock,
+                                isPassword: true,
+                                controller: _viewModel.passwordController,
+                                validator: (value) => (value?.length ?? 0) < 6
+                                    ? l10n.authPasswordMinLength
+                                    : null,
+                              ),
+                              const SizedBox(height: 24),
+                              FamilyAccountToggle(
+                                value: _viewModel.isParentAccount,
+                                onChanged: _viewModel.setParentAccount,
+                              ),
+                              const SizedBox(height: 32),
+                              ElevatedButton(
+                                onPressed: _viewModel.isLoading
+                                    ? null
+                                    : _onRegister,
+                                child: _viewModel.isLoading
+                                    ? SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: theme.colorScheme.onPrimary,
+                                        ),
+                                      )
+                                    : Text(l10n.authRegister),
+                              ),
+                              const SizedBox(height: 24),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    l10n.authHaveAccount,
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => context.go('/login'),
+                                    child: Text(
+                                      l10n.authLogin,
+                                      style: TextStyle(
+                                        color: theme.colorScheme.primary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 32),
+                            ]
+                            .animate(interval: 50.ms)
+                            .fade(duration: 300.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 32),
-                    ],
                   ),
                 ),
               ),

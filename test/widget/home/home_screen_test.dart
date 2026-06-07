@@ -58,7 +58,9 @@ void main() {
     when(
       () => mockCourses(),
     ).thenAnswer((_) async => Success([testCourseEntity()]));
-    when(() => mockServices()).thenAnswer((_) async => Success([testServiceEntity()]));
+    when(
+      () => mockServices(),
+    ).thenAnswer((_) async => Success([testServiceEntity()]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(milliseconds: 500));
@@ -74,7 +76,9 @@ void main() {
       (_) async =>
           Success([testCourseEntity(dayOfWeek: DateTime.now().weekday)]),
     );
-    when(() => mockServices()).thenAnswer((_) async => const Success([]));
+    when(
+      () => mockServices(),
+    ).thenAnswer((_) async => Success([testServiceEntity()]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump();

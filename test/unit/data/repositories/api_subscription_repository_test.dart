@@ -16,6 +16,18 @@ void main() {
     apiClient = MockApiClient();
     when(() => apiClient.hasToken).thenReturn(true);
     repository = ApiSubscriptionRepository(apiClient);
+    test('subscribeToPlan returns success on API success', () async {
+      when(
+        () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
+      ).thenAnswer((_) async => {});
+
+      final result = await repository.subscribeToPlan('p1');
+
+      expect(result, isA<Success<void, Failure>>());
+      verify(
+        () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
+      ).called(1);
+    });
   });
 
   group('ApiSubscriptionRepository', () {

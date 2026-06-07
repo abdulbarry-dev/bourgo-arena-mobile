@@ -2,6 +2,9 @@ import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
@@ -62,6 +65,7 @@ class EditProfileViewModel extends ChangeNotifier {
     required String email,
     required String phone,
     DateTime? birthDate,
+    String? gender,
   }) async {
     if (user == null) return false;
 
@@ -75,6 +79,7 @@ class EditProfileViewModel extends ChangeNotifier {
         email: email,
         phone: phone,
         birthDate: birthDate,
+        gender: gender,
       );
       final result = await _updateUserProfileUseCase(updatedUser);
       return await result.fold(
@@ -92,5 +97,17 @@ class EditProfileViewModel extends ChangeNotifier {
       _isSaving = false;
       notifyListeners();
     }
+  }
+
+  Future<bool> sendOtp(String identifier) async {
+    final useCase = locator<SendOtpUseCase>();
+    final result = await useCase(identifier);
+    return result.isSuccess;
+  }
+
+  Future<bool> verifyOtp(String identifier, String otp) async {
+    final useCase = locator<VerifyOtpUseCase>();
+    final result = await useCase(identifier, otp);
+    return result.fold(onSuccess: (val) => val, onFailure: (_) => false);
   }
 }

@@ -27,6 +27,7 @@ class UserMapper {
       state: model.state ?? 'active',
       isParentAccount: model.isParentAccount,
       children: model.children.map((m) => ChildMapper.toEntity(m)).toList(),
+      preferences: model.preferences,
     );
   }
 
@@ -49,6 +50,7 @@ class UserMapper {
       state: entity.state,
       isParentAccount: entity.isParentAccount,
       children: entity.children.map((e) => ChildMapper.fromEntity(e)).toList(),
+      preferences: entity.preferences,
     );
   }
 }

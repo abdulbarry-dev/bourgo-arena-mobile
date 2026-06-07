@@ -72,6 +72,7 @@ void main() {
     ).thenAnswer((_) async => Result.success(testSession));
 
     when(() => mockAuthStateNotifier.currentUser).thenReturn(testUser);
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
     when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
 

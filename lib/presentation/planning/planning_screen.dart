@@ -1,5 +1,8 @@
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
+import 'package:go_router/go_router.dart';
 import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
@@ -39,6 +42,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
           getFamilyMembersUseCase: locator<GetFamilyMembersUseCase>(),
           getMemberTierUseCase: locator<GetMemberTierUseCase>(),
           getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+          authStateNotifier: locator<AuthStateNotifier>(),
         );
   }
 
@@ -51,7 +55,37 @@ class _PlanningScreenState extends State<PlanningScreen> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(AppLocalizations.of(context)!.planningTitle),
+            elevation: 0,
+            scrolledUnderElevation: 0,
+            centerTitle: false,
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer.withValues(
+                      alpha: 0.5,
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(
+                    Symbols.calendar_month,
+                    color: theme.colorScheme.primary,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Text(
+                  AppLocalizations.of(context)!.planningTitle,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontFamily: AppConstants.displayFontFamily,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
             backgroundColor: theme.colorScheme.surface,
           ),
           body: Column(
@@ -59,18 +93,26 @@ class _PlanningScreenState extends State<PlanningScreen> {
               _DaySelector(viewModel: _viewModel),
               _PlanningControls(viewModel: _viewModel),
               Expanded(
-                child: _viewModel.isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : _viewModel.errorMessage != null
-                    ? Center(
-                        child: Text(
-                          _viewModel.errorMessage!,
-                          style: theme.textTheme.bodyLarge?.copyWith(
-                            color: theme.colorScheme.error,
+                child: RefreshIndicator(
+                  onRefresh: _viewModel.loadPlanning,
+                  child: _viewModel.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _viewModel.errorMessage != null
+                      ? SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Container(
+                            height: MediaQuery.of(context).size.height * 0.5,
+                            alignment: Alignment.center,
+                            child: Text(
+                              _viewModel.errorMessage!,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.error,
+                              ),
+                            ),
                           ),
-                        ),
-                      )
-                    : _UnifiedList(viewModel: _viewModel),
+                        )
+                      : _UnifiedList(viewModel: _viewModel),
+                ),
               ),
             ],
           ),
@@ -212,18 +254,122 @@ class _UnifiedList extends StatelessWidget {
   const _UnifiedList({required this.viewModel});
 
   @override
+  void _showQuickAssignSheet(BuildContext context, Course course) {
+    final theme = Theme.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: theme.colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: MediaQuery.of(context).padding.bottom + 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  course.name,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                if (course.timeSlot != null) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    '${course.timeSlot!.startTime} - ${course.timeSlot!.endTime}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  onPressed: () async {
+                    context.pop();
+                    if (ensureAuthenticated(context)) {
+                      final success = await viewModel.enrollInCourse(course.id);
+                      if (success && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Successfully assigned to course!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    minimumSize: const Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text(
+                    'Assign Myself',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    context.pop();
+                    context.push('/courses/${course.id}', extra: course);
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: theme.colorScheme.primary,
+                    minimumSize: const Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                  child: const Text(
+                    'View Full Details',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final entries = viewModel.unified;
 
     if (entries.isEmpty) {
-      return EmptyState(
-        title: AppLocalizations.of(context)!.planningNoCourses,
-        message: AppLocalizations.of(context)!.planningNoCoursesSubtitle,
-        icon: Symbols.calendar_today,
+      return SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height * 0.5,
+          child: EmptyState(
+            title: AppLocalizations.of(context)!.planningNoCourses,
+            message: AppLocalizations.of(context)!.planningNoCoursesSubtitle,
+            icon: Symbols.calendar_today,
+          ),
+        ),
       );
     }
 
     return ListView.builder(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(24),
       itemCount: entries.length,
       itemBuilder: (context, index) {
@@ -231,11 +377,7 @@ class _UnifiedList extends StatelessWidget {
         final child = switch (entry.type) {
           PlanningEntryType.course => CourseCard(
             course: entry.source as Course,
-            onTap: () {
-              if (ensureAuthenticated(context)) {
-                context.push('/booking', extra: entry.source as Course);
-              }
-            },
+            onTap: () => _showQuickAssignSheet(context, entry.source as Course),
           ),
           PlanningEntryType.reservation => ReservationCard(
             reservation: entry.source as Reservation,

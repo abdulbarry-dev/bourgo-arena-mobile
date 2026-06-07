@@ -28,6 +28,7 @@ Future<Result<T, Failure>> executeApiCall<T>(
         e.message,
         e.state,
         e.token,
+        e.errors,
       ),
     );
   } on NotFoundException catch (e) {

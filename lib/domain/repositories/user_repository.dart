@@ -9,4 +9,9 @@ abstract interface class UserRepository {
 
   /// Updates the user profile with the given [user] data.
   Future<Result<User, Failure>> updateUserProfile(User user);
+
+  /// Updates only the user preferences.
+  Future<Result<void, Failure>> updatePreferences(
+    Map<String, dynamic> preferences,
+  );
 }

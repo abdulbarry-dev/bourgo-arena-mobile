@@ -13,6 +13,7 @@ class AuthTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final String? errorText;
   final TextInputType keyboardType;
+  final Widget? suffixIcon;
 
   const AuthTextField({
     super.key,
@@ -26,6 +27,7 @@ class AuthTextField extends StatefulWidget {
     this.validator,
     this.errorText,
     this.keyboardType = TextInputType.text,
+    this.suffixIcon,
   });
 
   @override
@@ -90,7 +92,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
                     onPressed: () =>
                         setState(() => _obscureText = !_obscureText),
                   )
-                : null,
+                : widget.suffixIcon,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(color: theme.colorScheme.outlineVariant),

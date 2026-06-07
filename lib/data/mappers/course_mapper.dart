@@ -7,16 +7,18 @@ class CourseMapper {
   static entity.Course toEntity(CourseModel course) {
     return entity.Course(
       id: course.id,
-      title: course.title,
-      instructor: course.instructor,
-      startTime: course.startTime,
-      endTime: course.endTime,
-      dayOfWeek: course.dayOfWeek,
-      category: course.category,
-      imageUrl: course.imageUrl,
-      capacity: course.capacity,
-      enrolled: course.enrolled,
-      icon: course.icon,
+      title: course.displayTitle,
+      instructor: course.instructor ?? 'TBA',
+      startTime: course.startTime ?? '',
+      endTime: course.endTime ?? '',
+      dayOfWeek: course.dayOfWeek ?? 1,
+      category: course.category ?? 'Unknown',
+      imageUrl: (course.images?.isNotEmpty == true)
+          ? course.images!.first
+          : course.imageUrl,
+      capacity: course.capacity ?? 0,
+      enrolled: course.enrolled ?? 0,
+      icon: course.icon ?? 'fitness_center',
     );
   }
 

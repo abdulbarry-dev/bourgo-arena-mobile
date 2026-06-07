@@ -109,11 +109,15 @@ class PlanningViewModel extends BaseViewModel {
 
       coursesResult.when(
         success: (data) {
-          developer.log('PlanningViewModel: Successfully loaded ${data.length} courses');
+          developer.log(
+            'PlanningViewModel: Successfully loaded ${data.length} courses',
+          );
           _allCourses = data;
         },
         failure: (failure) {
-          developer.log('PlanningViewModel: Failed to load courses - ${failure.message}');
+          developer.log(
+            'PlanningViewModel: Failed to load courses - ${failure.message}',
+          );
           setErrorMessage(failure.message);
           _allCourses = [];
         },
@@ -121,23 +125,31 @@ class PlanningViewModel extends BaseViewModel {
 
       bookingsResult.when(
         success: (data) {
-          developer.log('PlanningViewModel: Successfully loaded ${data.length} bookings');
+          developer.log(
+            'PlanningViewModel: Successfully loaded ${data.length} bookings',
+          );
           _allReservations = data;
         },
         failure: (failure) {
-          developer.log('PlanningViewModel: Failed to load bookings - ${failure.message}');
+          developer.log(
+            'PlanningViewModel: Failed to load bookings - ${failure.message}',
+          );
           _allReservations = [];
         },
       );
 
       membersResult.when(
         success: (members) {
-          developer.log('PlanningViewModel: Successfully loaded ${members.length} family members');
+          developer.log(
+            'PlanningViewModel: Successfully loaded ${members.length} family members',
+          );
           _familyMembers = members;
           _selectedMember ??= members.isNotEmpty ? members.first : null;
         },
         failure: (failure) {
-          developer.log('PlanningViewModel: Failed to load family members - ${failure.message}');
+          developer.log(
+            'PlanningViewModel: Failed to load family members - ${failure.message}',
+          );
           _familyMembers = [];
           _selectedMember = null;
         },
@@ -151,15 +163,23 @@ class PlanningViewModel extends BaseViewModel {
           );
         },
         failure: (failure) {
-          developer.log('PlanningViewModel: Failed to load user profile - ${failure.message}');
+          developer.log(
+            'PlanningViewModel: Failed to load user profile - ${failure.message}',
+          );
           _selectedMemberTier = MemberTier.public;
         },
       );
 
       _buildUnified();
-      developer.log('PlanningViewModel: data loaded, unified length=${_unified.length}');
+      developer.log(
+        'PlanningViewModel: data loaded, unified length=${_unified.length}',
+      );
     } catch (e, stack) {
-      developer.log('PlanningViewModel: Error loading planning data: $e', error: e, stackTrace: stack);
+      developer.log(
+        'PlanningViewModel: Error loading planning data: $e',
+        error: e,
+        stackTrace: stack,
+      );
       setErrorMessage(e.toString());
     } finally {
       _isLoading = false;

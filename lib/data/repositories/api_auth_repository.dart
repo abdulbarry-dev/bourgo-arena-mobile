@@ -270,10 +270,6 @@ class ApiAuthRepository implements AuthRepository {
         );
       }
 
-      if (token != null) {
-        _apiClient.setToken(token);
-      }
-
       await _sessionRepository.saveAuthState(state.name);
 
       if (state == AuthState.pendingVerification && isEmail) {
@@ -291,6 +287,12 @@ class ApiAuthRepository implements AuthRepository {
         );
         user = UserMapper.toEntity(userModel);
       }
+
+      final shouldRefreshProfile =
+          token != null &&
+          (user == null ||
+              (finalState == AuthState.pendingOnboarding &&
+                  !_hasCompleteOnboardingProfile(user)));
 
       final shouldRefreshProfile =
           token != null &&
@@ -720,6 +722,7 @@ class ApiAuthRepository implements AuthRepository {
 
       if (token != null) {
         _apiClient.setToken(token);
+        await _sessionRepository.saveAuthToken(token);
       }
 
       await _updateSession(

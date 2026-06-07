@@ -42,7 +42,8 @@ sealed class Failure {
     String message, [
     String? state,
     String? token,
-  ]) => ValidationFailure(code, message, state, token);
+    Map<String, List<String>>? errors,
+  ]) => ValidationFailure(code, message, state, token, errors);
 }
 
 /// Represents a failure that occurred due to a network or server issue.
@@ -79,10 +80,13 @@ class CacheFailure extends Failure {
 
 /// Represents a failure due to invalid input.
 class ValidationFailure extends Failure {
+  final Map<String, List<String>>? errors;
+
   const ValidationFailure(
     super.code,
     super.message, [
     String? state,
     String? token,
+    this.errors,
   ]) : super(state: state, token: token);
 }

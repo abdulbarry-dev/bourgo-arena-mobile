@@ -13,6 +13,12 @@ import 'package:bourgo_arena_mobile/data/repositories/local_session_repository.d
 import 'package:bourgo_arena_mobile/domain/repositories/device_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/subscription_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_event_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/event_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_loyalty_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/loyalty_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_payment_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -43,9 +49,12 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/auth_use_cases.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_balance_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/device/register_device_token_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
@@ -66,7 +75,7 @@ import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 final locator = GetIt.instance;
@@ -82,8 +91,7 @@ Future<void> initLocator() async {
   );
 
   // Networking
-  final httpClient = http.Client();
-  final apiClient = ApiClient(baseUrl: AppConfig.baseUrl, client: httpClient);
+  final apiClient = ApiClient(baseUrl: AppConfig.baseUrl);
 
   // Initialize the token from storage if it exists
   final tokenResult = await locator<SessionRepository>().getAuthToken();
@@ -145,6 +153,15 @@ Future<void> initLocator() async {
   locator.registerLazySingleton<ServiceRepository>(
     () => ApiServiceRepository(locator<ApiClient>()),
   );
+  locator.registerLazySingleton<EventRepository>(
+    () => ApiEventRepository(locator<ApiClient>()),
+  );
+  locator.registerLazySingleton<LoyaltyRepository>(
+    () => ApiLoyaltyRepository(locator<ApiClient>()),
+  );
+  locator.registerLazySingleton<PaymentRepository>(
+    () => ApiPaymentRepository(locator<ApiClient>()),
+  );
 
   // Use Cases
   locator.registerLazySingleton(() => LoginUseCase(locator()));
@@ -170,6 +187,8 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => MakeReservationUseCase(locator()));
   locator.registerLazySingleton(() => CancelBookingUseCase(locator()));
   locator.registerLazySingleton(() => GetCoursesUseCase(locator()));
+  locator.registerLazySingleton(() => EnrollInCourseUseCase(locator()));
+  locator.registerLazySingleton(() => GetCourseSessionsUseCase(locator()));
   locator.registerLazySingleton(() => GetNotificationsUseCase(locator()));
   locator.registerLazySingleton(() => MarkNotificationsReadUseCase(locator()));
   locator.registerLazySingleton(() => SearchUseCase(locator()));
@@ -191,6 +210,11 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => RegisterDeviceTokenUseCase(locator()));
   locator.registerLazySingleton(() => const GetMemberTierUseCase());
   locator.registerLazySingleton(() => const ProjectPointsUseCase());
+  locator.registerLazySingleton(() => GetLoyaltyBalanceUseCase(locator()));
+  locator.registerLazySingleton(() => GetEventsUseCase(locator()));
+  locator.registerLazySingleton(() => GetEventByIdUseCase(locator()));
+  locator.registerLazySingleton(() => GetEventBracketUseCase(locator()));
+  locator.registerLazySingleton(() => RegisterForEventUseCase(locator()));
   locator.registerLazySingleton(() => GetContextualPriceUseCase(locator()));
   locator.registerLazySingleton(
     () => DeviceTokenRegistrar(
@@ -226,6 +250,8 @@ Future<void> initLocator() async {
   // ViewModels — registered as async so initialize() is awaited at startup.
   locator.registerSingletonAsync<SettingsViewModel>(() async {
     final vm = SettingsViewModel(
+      locator(),
+      locator(),
       locator(),
       locator(),
       locator(),

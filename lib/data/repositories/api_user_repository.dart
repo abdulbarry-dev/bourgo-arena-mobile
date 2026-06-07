@@ -49,4 +49,21 @@ class ApiUserRepository implements UserRepository {
       return Result.success(UserMapper.toEntity(updatedModel));
     });
   }
+
+  @override
+  Future<Result<void, Failure>> updatePreferences(
+    Map<String, dynamic> preferences,
+  ) {
+    if (!_apiClient.hasToken) {
+      return Future.value(
+        Result.failure(
+          AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+        ),
+      );
+    }
+    return executeApiCall(() async {
+      await _apiClient.put('/user/profile', {'preferences': preferences});
+      return Result.success(null);
+    });
+  }
 }
