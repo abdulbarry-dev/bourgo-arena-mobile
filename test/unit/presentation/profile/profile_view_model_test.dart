@@ -4,9 +4,12 @@ import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
 import 'package:checks/checks.dart';
@@ -22,7 +25,13 @@ class MockLogoutUseCase extends Mock implements LogoutUseCase {}
 
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
-class FakeUser extends Fake implements User {}
+class MockGetOngoingReservationsUseCase extends Mock
+    implements GetOngoingReservationsUseCase {}
+
+class MockGetFullPaymentHistoryUseCase extends Mock
+    implements GetFullPaymentHistoryUseCase {}
+
+class FakeUser extends Fake implements User {}    
 
 void main() {
   late ProfileViewModel viewModel;
@@ -30,6 +39,8 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late MockLogoutUseCase mockLogoutUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
+  late MockGetOngoingReservationsUseCase mockGetOngoingReservationsUseCase;
+  late MockGetFullPaymentHistoryUseCase mockGetFullPaymentHistoryUseCase;
 
   final testUser = User(
     id: 'user-1',
@@ -40,7 +51,7 @@ void main() {
     avatarUrl: 'https://example.com/avatar.png',
     loyaltyPoints: 100,
     subscriptionLevel: 'Gold',
-    subscriptionExpiry: '2026-12-31',
+    subscriptionExpiry: DateTime.utc(2026, 12, 31),
     children: [
       ChildProfile(
         id: 'child-1',
@@ -65,6 +76,8 @@ void main() {
     mockLogoutUseCase = MockLogoutUseCase();
     mockDeleteAccountUseCase = MockDeleteAccountUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
+    mockGetOngoingReservationsUseCase = MockGetOngoingReservationsUseCase();
+    mockGetFullPaymentHistoryUseCase = MockGetFullPaymentHistoryUseCase();
 
     // Default behavior for constructor's loadProfile call
     when(
@@ -76,11 +89,21 @@ void main() {
     when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
     when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
 
+    when(
+      () => mockGetOngoingReservationsUseCase(),
+    ).thenAnswer((_) async => Result.success([]));
+
+    when(
+      () => mockGetFullPaymentHistoryUseCase.execute(),
+    ).thenAnswer((_) async => Result.success([]));
+
     viewModel = ProfileViewModel(
       authRepository: mockAuthRepository,
       logoutUseCase: mockLogoutUseCase,
       deleteAccountUseCase: mockDeleteAccountUseCase,
       authStateNotifier: mockAuthStateNotifier,
+      getOngoingReservationsUseCase: mockGetOngoingReservationsUseCase,
+      getFullPaymentHistoryUseCase: mockGetFullPaymentHistoryUseCase,
     );
   });
 
@@ -102,6 +125,8 @@ void main() {
         logoutUseCase: mockLogoutUseCase,
         deleteAccountUseCase: mockDeleteAccountUseCase,
         authStateNotifier: mockAuthStateNotifier,
+        getOngoingReservationsUseCase: mockGetOngoingReservationsUseCase,
+        getFullPaymentHistoryUseCase: mockGetFullPaymentHistoryUseCase,
       );
 
       when(() => mockAuthRepository.getUserProfile()).thenAnswer(

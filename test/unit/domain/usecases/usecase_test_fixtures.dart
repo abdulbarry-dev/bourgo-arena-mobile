@@ -15,7 +15,7 @@ User testUser({
   String avatarUrl = 'https://example.com/avatar.png',
   int loyaltyPoints = 120,
   String subscriptionLevel = 'premium',
-  String subscriptionExpiry = '2026-12-31',
+  DateTime? subscriptionExpiry,
   DateTime? birthDate,
   bool isParentAccount = false,
   List<ChildProfile> children = const [],
@@ -66,6 +66,7 @@ Activity testActivity({
 
 Course testCourse({
   String id = 'course-1',
+  String name = 'CrossFit Beginners',
   String title = 'CrossFit Beginners',
   String instructor = 'Coach Lee',
   String startTime = '18:00',
@@ -78,6 +79,7 @@ Course testCourse({
 }) {
   return Course(
     id: id,
+    name: name,
     title: title,
     instructor: instructor,
     startTime: startTime,

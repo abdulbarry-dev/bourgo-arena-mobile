@@ -58,16 +58,16 @@ void main() {
 
     when(
       () => mockGetActivitiesUseCase.call(),
-    ).thenAnswer((_) async => const Right([]));
+    ).thenAnswer((_) async => const Success([]));
     when(
       () => mockGetCoursesUseCase.call(),
-    ).thenAnswer((_) async => const Right([]));
+    ).thenAnswer((_) async => const Success([]));
     when(
       () => mockGetEventsUseCase.call(),
-    ).thenAnswer((_) async => const Right([]));
+    ).thenAnswer((_) async => const Success([]));
     when(
       () => mockGetServicesUseCase.call(),
-    ).thenAnswer((_) async => const Right([]));
+    ).thenAnswer((_) async => const Success([]));
   });
 
   tearDown(() {

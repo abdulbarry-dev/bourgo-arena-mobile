@@ -6,14 +6,15 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_us
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -33,8 +34,8 @@ class MockGetMemberTierUseCase extends Mock implements GetMemberTierUseCase {}
 
 class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
-class MockGetActiveSubscriptionUseCase extends Mock
-    implements GetActiveSubscriptionUseCase {}
+class MockGetActiveSubscriptionsUseCase extends Mock
+    implements GetActiveSubscriptionsUseCase {}
 
 class MockGetCourseSessionsUseCase extends Mock
     implements GetCourseSessionsUseCase {}
@@ -51,7 +52,7 @@ void main() {
   late MockGetFamilyMembersUseCase mockGetFamilyMembersUseCase;
   late MockGetMemberTierUseCase mockGetMemberTierUseCase;
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
-  late MockGetActiveSubscriptionUseCase mockGetActiveSubscriptionUseCase;
+  late MockGetActiveSubscriptionsUseCase mockGetActiveSubscriptionsUseCase;
   late MockGetCourseSessionsUseCase mockGetCourseSessionsUseCase;
   late MockEnrollInCourseUseCase mockEnrollInCourseUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
@@ -71,7 +72,7 @@ void main() {
     mockGetFamilyMembersUseCase = MockGetFamilyMembersUseCase();
     mockGetMemberTierUseCase = MockGetMemberTierUseCase();
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
-    mockGetActiveSubscriptionUseCase = MockGetActiveSubscriptionUseCase();
+    mockGetActiveSubscriptionsUseCase = MockGetActiveSubscriptionsUseCase();
     mockGetCourseSessionsUseCase = MockGetCourseSessionsUseCase();
     mockEnrollInCourseUseCase = MockEnrollInCourseUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
@@ -91,8 +92,8 @@ void main() {
     locator.registerFactory<GetUserProfileUseCase>(
       () => mockGetUserProfileUseCase,
     );
-    locator.registerFactory<GetActiveSubscriptionUseCase>(
-      () => mockGetActiveSubscriptionUseCase,
+    locator.registerFactory<GetActiveSubscriptionsUseCase>(
+      () => mockGetActiveSubscriptionsUseCase,
     );
     locator.registerFactory<GetCourseSessionsUseCase>(
       () => mockGetCourseSessionsUseCase,
@@ -105,16 +106,18 @@ void main() {
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     when(
       () => mockGetCoursesUseCase.call(),
-    ).thenAnswer((_) async => const Result.success([]));
+    ).thenAnswer((_) async => const Success([]));
     when(
       () => mockGetUserBookingsUseCase.call(),
-    ).thenAnswer((_) async => const Result.success([]));
+    ).thenAnswer((_) async => const Success([]));
     when(
       () => mockGetFamilyMembersUseCase.call(),
-    ).thenAnswer((_) async => const Result.success([]));
-    when(() => mockGetActiveSubscriptionUseCase.call()).thenAnswer(
-      (_) async => const Result.failure(null),
-    ); // simulates no active sub but mock it properly
+    ).thenAnswer((_) async => const Success([]));
+    when(() => mockGetActiveSubscriptionsUseCase.execute()).thenAnswer(
+      (_) async => Result.failure(
+        const ServerFailure(AppErrorCode.serverError, 'error'),
+      ),
+    );
   });
 
   tearDown(() {
@@ -144,10 +147,6 @@ void main() {
       await tester.pump(
         const Duration(seconds: 1),
       ); // wait for animations and futures
-
-      // Since we mocked GetActiveSubscriptionUseCase to return failure or null, it shows PlanningSubscriptionState
-      // Wait, let's just assert EmptyState if we mocked it as active.
-      // Let's modify the mock to have an active plan for empty state testing.
     });
   });
 }

@@ -86,7 +86,7 @@ void main() {
         avatarUrl: 'https://example.com/jamie.png',
         loyaltyPoints: 321,
         subscriptionLevel: 'gold',
-        subscriptionExpiry: '2027-02-01',
+        subscriptionExpiry: DateTime.utc(2027, 2, 1),
         birthDate: DateTime.utc(1992, 7, 8),
         isParentAccount: true,
         children: [

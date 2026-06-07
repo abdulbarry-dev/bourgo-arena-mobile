@@ -94,6 +94,7 @@ void main() {
     final courses = [
       const Course(
         id: '1',
+        name: 'Morning Yoga',
         title: 'Morning Yoga',
         instructor: 'Alice',
         startTime: '08:00',

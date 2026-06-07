@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';

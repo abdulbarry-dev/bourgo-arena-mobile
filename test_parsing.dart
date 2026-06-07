@@ -20,6 +20,6 @@ void main() {
     print('id is not null');
     final model = SubscriptionModel.fromJson(dataToParse);
     final entity = SubscriptionMapper.toEntity(model);
-    print(entity.planName);
+    print(entity.plan?.name ?? 'Unknown Plan');
   }
 }

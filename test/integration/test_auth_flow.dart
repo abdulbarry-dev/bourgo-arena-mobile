@@ -22,7 +22,7 @@ void main() async {
     avatarUrl: '',
     loyaltyPoints: 0,
     subscriptionLevel: 'FREE',
-    subscriptionExpiry: '',
+    subscriptionExpiry: null,
     gender: 'male',
     birthDate: DateTime(1990, 1, 1),
     isParentAccount: false,

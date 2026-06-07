@@ -169,7 +169,7 @@ void main() {
     avatarUrl: 'https://example.com/avatar.png',
     loyaltyPoints: 100,
     subscriptionLevel: 'Gold',
-    subscriptionExpiry: '2026-12-31',
+    subscriptionExpiry: DateTime.utc(2026, 12, 31),
   );
 
   setUp(() {

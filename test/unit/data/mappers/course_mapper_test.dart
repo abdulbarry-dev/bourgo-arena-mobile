@@ -56,6 +56,7 @@ void main() {
     test('maps an entity back to the DTO', () {
       final course = entity.Course(
         id: 'course-2',
+        name: 'Yoga Flow',
         title: 'Yoga Flow',
         instructor: 'Coach Ana',
         startTime: '07:00',
