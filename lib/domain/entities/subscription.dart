@@ -1,13 +1,15 @@
+import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
+
 /// Entity representing an active member subscription matching SubscriptionResource.
 class Subscription {
   /// Unique identifier.
   final String id;
 
-  /// Plan name (e.g. "Premium", "Basic").
-  final String planName;
+  /// The subscribed plan details.
+  final Plan? plan;
 
-  /// Plan description.
-  final String? planDescription;
+  /// The service details for the subscription.
+  final PlanService? service;
 
   /// Status (active, expired, cancelled).
   final String status;
@@ -27,17 +29,21 @@ class Subscription {
   /// Total amount paid.
   final double? amountPaid;
 
+  /// URL to the receipt/invoice PDF.
+  final String? receiptUrl;
+
   /// Creates a new [Subscription] instance.
   const Subscription({
     required this.id,
-    required this.planName,
-    this.planDescription,
+    this.plan,
+    this.service,
     required this.status,
     this.startsAt,
     this.endsAt,
     this.daysRemaining,
     this.paymentMethod,
     this.amountPaid,
+    this.receiptUrl,
   });
 
   /// Returns true when the subscription is currently active.
@@ -49,9 +55,9 @@ class Subscription {
       other is Subscription &&
           runtimeType == other.runtimeType &&
           id == other.id &&
-          planName == other.planName &&
+          plan?.id == other.plan?.id &&
           status == other.status;
 
   @override
-  int get hashCode => id.hashCode ^ planName.hashCode ^ status.hashCode;
+  int get hashCode => id.hashCode ^ (plan?.id.hashCode ?? 0) ^ status.hashCode;
 }

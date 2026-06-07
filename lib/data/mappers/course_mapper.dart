@@ -7,6 +7,9 @@ class CourseMapper {
   static entity.Course toEntity(CourseModel course) {
     return entity.Course(
       id: course.id,
+      name: course.name ?? course.displayTitle,
+      description: course.description,
+      timeSlot: null,
       title: course.displayTitle,
       instructor: course.instructor ?? 'TBA',
       startTime: course.startTime ?? '',

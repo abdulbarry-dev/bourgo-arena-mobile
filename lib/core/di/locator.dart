@@ -1,3 +1,8 @@
+import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/transaction_history_view_model.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
+import "package:bourgo_arena_mobile/domain/usecases/settings/complete_theme_selection_use_case.dart";
+import "package:bourgo_arena_mobile/domain/usecases/settings/is_theme_selected_use_case.dart";
+import "package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart";
 import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_activity_repository.dart';
@@ -48,6 +53,8 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case
 import 'package:bourgo_arena_mobile/domain/usecases/auth/auth_use_cases.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_reservation_history_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
@@ -67,7 +74,9 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/is_language_selecte
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscription_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_subscription_history_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/cancel_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
@@ -187,6 +196,8 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => GetActivitiesUseCase(locator()));
   locator.registerLazySingleton(() => GetTimeSlotsUseCase(locator()));
   locator.registerLazySingleton(() => GetUserBookingsUseCase(locator()));
+  locator.registerLazySingleton(() => GetOngoingReservationsUseCase(locator()));
+  locator.registerLazySingleton(() => GetReservationHistoryUseCase(locator()));
   locator.registerLazySingleton(() => MakeReservationUseCase(locator()));
   locator.registerLazySingleton(() => CancelBookingUseCase(locator()));
   locator.registerLazySingleton(() => GetCoursesUseCase(locator()));
@@ -209,7 +220,10 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => RemoveChildUseCase(locator()));
   locator.registerLazySingleton(() => DisableFamilyFeatureUseCase(locator()));
   locator.registerLazySingleton(() => EnableFamilyFeatureUseCase(locator()));
-  locator.registerLazySingleton(() => GetActiveSubscriptionUseCase(locator()));
+  locator.registerLazySingleton(() => GetActiveSubscriptionsUseCase(locator()));
+  locator.registerLazySingleton(() => GetFullPaymentHistoryUseCase(locator()));
+  locator.registerLazySingleton(() => GetSubscriptionHistoryUseCase(locator()));
+  locator.registerLazySingleton(() => CancelSubscriptionUseCase(locator()));
   locator.registerLazySingleton(() => RegisterDeviceTokenUseCase(locator()));
   locator.registerLazySingleton(() => const GetMemberTierUseCase());
   locator.registerLazySingleton(() => const ProjectPointsUseCase());
@@ -236,6 +250,8 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(
     () => CompleteLanguageSelectionUseCase(locator()),
   );
+  locator.registerLazySingleton(() => IsThemeSelectedUseCase(locator()));
+  locator.registerLazySingleton(() => CompleteThemeSelectionUseCase(locator()));
   locator.registerLazySingleton(
     () => GetNotificationsEnabledUseCase(locator()),
   );
@@ -265,22 +281,30 @@ Future<void> initLocator() async {
       locator(),
       locator(),
       locator(),
+      locator(),
+      locator(),
     );
     await vm.initialize();
     return vm;
   });
 
+  locator.registerFactory<PaymentHistoryViewModel>(
+    () => PaymentHistoryViewModel(
+      locator<GetFullPaymentHistoryUseCase>(),
+    ),
+  );
+
   locator.registerFactory<FamilyManagementViewModel>(
     () => FamilyManagementViewModel(
-      getUserProfileUseCase: locator(),
-      getVerificationStatusUseCase: locator(),
-      enableFamilyFeatureUseCase: locator(),
-      verifyOtpUseCase: locator(),
-      requestFamilyAccountOtpUseCase: locator(),
-      getChildrenUseCase: locator(),
-      addChildUseCase: locator(),
-      removeChildUseCase: locator(),
-      disableFamilyFeatureUseCase: locator(),
+      getUserProfileUseCase: locator<GetUserProfileUseCase>(),
+      getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
+      enableFamilyFeatureUseCase: locator<EnableFamilyFeatureUseCase>(),
+      verifyOtpUseCase: locator<VerifyOtpUseCase>(),
+      requestFamilyAccountOtpUseCase: locator<RequestFamilyAccountOtpUseCase>(),
+      getChildrenUseCase: locator<GetChildrenUseCase>(),
+      addChildUseCase: locator<AddChildUseCase>(),
+      removeChildUseCase: locator<RemoveChildUseCase>(),
+      disableFamilyFeatureUseCase: locator<DisableFamilyFeatureUseCase>(),
     ),
   );
 

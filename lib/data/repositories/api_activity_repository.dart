@@ -19,11 +19,10 @@ class ApiActivityRepository implements ActivityRepository {
   @override
   Future<Result<List<Activity>, Failure>> getActivities() {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/activities');
-      final List<dynamic> data = response is List
-          ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
-                []);
+      final response =
+          await _apiClient.get('/activities', fullResponse: true)
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
       final entities = data
           .map(
             (json) => ActivityMapper.toEntity(
@@ -38,11 +37,12 @@ class ApiActivityRepository implements ActivityRepository {
   @override
   Future<Result<Activity, Failure>> getActivityById(String id) {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/activities/$id');
+      final response =
+          await _apiClient.get('/activities/$id', fullResponse: true)
+              as Map<String, dynamic>;
+      final data = response['data'] as Map<String, dynamic>;
       return Result.success(
-        ActivityMapper.toEntity(
-          ActivityModel.fromJson(response as Map<String, dynamic>),
-        ),
+        ActivityMapper.toEntity(ActivityModel.fromJson(data)),
       );
     });
   }
@@ -50,11 +50,13 @@ class ApiActivityRepository implements ActivityRepository {
   @override
   Future<Result<List<TimeSlot>, Failure>> getTimeSlots(String activityId) {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/activities/$activityId/slots');
-      final List<dynamic> data = response is List
-          ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
-                []);
+      final response =
+          await _apiClient.get(
+                '/activities/$activityId/slots',
+                fullResponse: true,
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
       final entities = data
           .map(
             (json) => TimeSlotMapper.toEntity(

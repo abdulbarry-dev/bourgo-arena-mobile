@@ -710,4 +710,166 @@ class LocalSessionRepository implements SessionRepository {
       );
     }
   }
+
+  // =========== Notification Preferences ===========
+
+  @override
+  Future<Result<void, Failure>> setReservationsNotificationsEnabled(
+    bool value,
+  ) async {
+    try {
+      await _prefs.setBool('notifications_reservations', value);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save reservations notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setSubscriptionsNotificationsEnabled(
+    bool value,
+  ) async {
+    try {
+      await _prefs.setBool('notifications_subscriptions', value);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save subscriptions notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setCoursesNotificationsEnabled(
+    bool value,
+  ) async {
+    try {
+      await _prefs.setBool('notifications_courses', value);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save courses notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setLoyaltyNotificationsEnabled(
+    bool value,
+  ) async {
+    try {
+      await _prefs.setBool('notifications_loyalty', value);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save loyalty notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<void, Failure>> setFamilyNotificationsEnabled(
+    bool value,
+  ) async {
+    try {
+      await _prefs.setBool('notifications_family', value);
+      return const Success(null);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to save family notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> areReservationsNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool('notifications_reservations') ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load reservations notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> areSubscriptionsNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool('notifications_subscriptions') ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load subscriptions notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> areCoursesNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool('notifications_courses') ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load courses notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> areLoyaltyNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool('notifications_loyalty') ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load loyalty notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Result<bool, Failure>> areFamilyNotificationsEnabled() async {
+    try {
+      final enabled = _prefs.getBool('notifications_family') ?? true;
+      return Success(enabled);
+    } catch (e) {
+      return FailureResult(
+        CacheFailure(
+          AppErrorCode.cacheError,
+          'Failed to load family notification settings: ${e.toString()}',
+        ),
+      );
+    }
+  }
 }

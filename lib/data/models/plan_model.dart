@@ -5,6 +5,7 @@ part 'plan_model.g.dart';
 /// DTO for a nested service within a plan.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class PlanServiceModel {
+  @JsonKey(fromJson: _idToString)
   final String id;
   final String? name;
   final String? slug;
@@ -25,11 +26,14 @@ class PlanServiceModel {
       _$PlanServiceModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$PlanServiceModelToJson(this);
+
+  static String _idToString(dynamic id) => id.toString();
 }
 
 /// DTO for a subscription plan matching PlanResource.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class PlanModel {
+  @JsonKey(fromJson: _idToString)
   final String id;
   final String name;
 
@@ -68,4 +72,6 @@ class PlanModel {
 
   /// Returns the image URL from the nested service if available.
   String? get serviceImageUrl => service?.imageUrl;
+
+  static String _idToString(dynamic id) => id.toString();
 }

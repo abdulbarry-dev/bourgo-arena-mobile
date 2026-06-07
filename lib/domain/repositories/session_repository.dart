@@ -126,11 +126,27 @@ abstract interface class SessionRepository {
   /// Clears the persisted registration/onboarding draft.
   Future<Result<void, Failure>> clearRegistrationDraft();
 
-  // =========== Login OTP Verification ===========
+  // =========== Notification OTP Verification ===========
 
   /// Checks if the user has opted out of login OTP verification reminders.
   Future<Result<bool, Failure>> shouldSkipLoginOtpForever();
 
   /// Persists the user's preference to skip login OTP verification reminders forever.
   Future<Result<void, Failure>> setSkipLoginOtpForever(bool skip);
+
+  // =========== Notification Preferences ===========
+
+  Future<Result<void, Failure>> setReservationsNotificationsEnabled(bool value);
+  Future<Result<void, Failure>> setSubscriptionsNotificationsEnabled(
+    bool value,
+  );
+  Future<Result<void, Failure>> setCoursesNotificationsEnabled(bool value);
+  Future<Result<void, Failure>> setLoyaltyNotificationsEnabled(bool value);
+  Future<Result<void, Failure>> setFamilyNotificationsEnabled(bool value);
+
+  Future<Result<bool, Failure>> areReservationsNotificationsEnabled();
+  Future<Result<bool, Failure>> areSubscriptionsNotificationsEnabled();
+  Future<Result<bool, Failure>> areCoursesNotificationsEnabled();
+  Future<Result<bool, Failure>> areLoyaltyNotificationsEnabled();
+  Future<Result<bool, Failure>> areFamilyNotificationsEnabled();
 }

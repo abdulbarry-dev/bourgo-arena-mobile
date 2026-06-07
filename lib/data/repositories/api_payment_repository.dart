@@ -20,8 +20,9 @@ class ApiPaymentRepository implements PaymentRepository {
     return executeApiCall(() async {
       final response =
           await _apiClient.get(
-                '/user/payments',
-                queryParams: {
+                'user/payments',
+                fullResponse: true,
+                queryParameters: {
                   'page': page.toString(),
                   'per_page': limit.toString(),
                 },
@@ -47,6 +48,10 @@ class ApiPaymentRepository implements PaymentRepository {
     String? description,
     String? successUrl,
     String? failureUrl,
+    String? firstName,
+    String? lastName,
+    String? email,
+    String? phone,
   }) {
     return executeApiCall(() async {
       final body = <String, dynamic>{'amount': amount};
@@ -55,6 +60,10 @@ class ApiPaymentRepository implements PaymentRepository {
       if (description != null) body['description'] = description;
       if (successUrl != null) body['success_url'] = successUrl;
       if (failureUrl != null) body['failure_url'] = failureUrl;
+      if (firstName != null) body['first_name'] = firstName;
+      if (lastName != null) body['last_name'] = lastName;
+      if (email != null) body['email'] = email;
+      if (phone != null) body['phone'] = phone;
 
       final response =
           await _apiClient.post('/payments/initiate', body)

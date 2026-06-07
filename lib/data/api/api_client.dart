@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
+import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 import 'dart:developer' as developer;
 
 /// A central client for making HTTP requests to the Laravel backend.
@@ -21,8 +22,8 @@ class ApiClient {
         Dio(
           BaseOptions(
             baseUrl: baseUrl,
-            connectTimeout: const Duration(seconds: 15),
-            receiveTimeout: const Duration(seconds: 15),
+            connectTimeout: Duration(milliseconds: AppConfig.apiTimeout),
+            receiveTimeout: Duration(milliseconds: AppConfig.apiTimeout),
             headers: {
               'Content-Type': 'application/json',
               'Accept': 'application/json',
@@ -139,13 +140,20 @@ class ApiClient {
   /// Sends a GET request to the specified [path].
   Future<dynamic> get(
     String path, {
+    Map<String, dynamic>? queryParameters,
     bool fullResponse = false,
     bool skipAuthError = false,
     bool includeAuth = true,
   }) async {
     try {
+      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      developer.log(
+        'API Request: [GET] ${_dio.options.baseUrl}$normalizedPath',
+        name: 'ApiClient',
+      );
       final response = await _dio.get(
-        path,
+        normalizedPath,
+        queryParameters: queryParameters,
         options: Options(extra: {'includeAuth': includeAuth}),
       );
       return _handleResponse(response, fullResponse: fullResponse);
@@ -163,8 +171,13 @@ class ApiClient {
     bool includeAuth = true,
   }) async {
     try {
+      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      developer.log(
+        'API Request: [POST] ${_dio.options.baseUrl}$normalizedPath',
+        name: 'ApiClient',
+      );
       final response = await _dio.post(
-        path,
+        normalizedPath,
         data: body,
         options: Options(extra: {'includeAuth': includeAuth}),
       );
@@ -183,8 +196,9 @@ class ApiClient {
     bool includeAuth = true,
   }) async {
     try {
+      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
       final response = await _dio.put(
-        path,
+        normalizedPath,
         data: body,
         options: Options(extra: {'includeAuth': includeAuth}),
       );
@@ -195,10 +209,52 @@ class ApiClient {
   }
 
   /// Sends a DELETE request to the specified [path].
-  Future<void> delete(String path, {bool skipAuthError = false}) async {
+  Future<dynamic> delete(
+    String path, {
+    bool fullResponse = false,
+    bool skipAuthError = false,
+    bool includeAuth = true,
+  }) async {
     try {
-      final response = await _dio.delete(path);
-      _handleResponse(response);
+      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      final response = await _dio.delete(
+        normalizedPath,
+        options: Options(extra: {'includeAuth': includeAuth}),
+      );
+      return _handleResponse(response, fullResponse: fullResponse);
+    } on DioException catch (e) {
+      return _handleDioException(e, skipAuthError: skipAuthError);
+    }
+  }
+
+  /// Sends a multipart/form-data POST request for file uploads.
+  Future<dynamic> uploadMultipart(
+    String path, {
+    required String fileFieldName,
+    required String filePath,
+    Map<String, dynamic>? extraFields,
+    bool fullResponse = false,
+    bool skipAuthError = false,
+    bool includeAuth = true,
+  }) async {
+    try {
+      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      final formData = FormData.fromMap({
+        fileFieldName: await MultipartFile.fromFile(filePath),
+        if (extraFields != null) ...extraFields,
+      });
+      developer.log(
+        'API Request: [POST-UPLOAD] ${_dio.options.baseUrl}$normalizedPath',
+        name: 'ApiClient',
+      );
+      final response = await _dio.post(
+        normalizedPath,
+        data: formData,
+        options: Options(
+          extra: {'includeAuth': includeAuth},
+        ),
+      );
+      return _handleResponse(response, fullResponse: fullResponse);
     } on DioException catch (e) {
       return _handleDioException(e, skipAuthError: skipAuthError);
     }
@@ -214,7 +270,7 @@ class ApiClient {
     final Map<String, dynamic> body = decoded is Map<String, dynamic>
         ? decoded
         : {};
-    final bool success = body['success'] ?? true;
+    final bool success = body['success'] is bool ? body['success'] as bool : true;
 
     if (success) {
       if (!fullResponse && body.containsKey('data') && body['data'] != null) {
@@ -306,7 +362,20 @@ class ApiClient {
           });
         }
         throw ValidationException(message, state, token, validationErrors);
+      case 429:
+        throw ServerException(
+          'Trop de requêtes. Veuillez réessayer plus tard.',
+          state,
+          token,
+        );
       default:
+        if (response.statusCode != null && response.statusCode! >= 500) {
+          throw ServerException(
+            'Erreur serveur (${response.statusCode}). Veuillez réessayer.',
+            state,
+            token,
+          );
+        }
         throw ServerException(message, state, token);
     }
   }

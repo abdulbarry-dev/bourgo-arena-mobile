@@ -1,39 +1,38 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:bourgo_arena_mobile/data/models/plan_model.dart';
 
 part 'subscription_model.g.dart';
 
 /// DTO for an active subscription matching SubscriptionResource.
-@JsonSerializable(fieldRename: FieldRename.snake)
+@JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
 class SubscriptionModel {
   @JsonKey(fromJson: _idToString)
   final String id;
-  final String? planName;
-  final String? planDescription;
+
+  final PlanModel? plan;
+  final PlanServiceModel? service;
+
   final String? status;
   final String? startsAt;
   final String? endsAt;
   final int? daysRemaining;
   final String? paymentMethod;
   final double? amountPaid;
-
-  /// Legacy fields retained for backward compatibility.
-  final String? name;
-  final double? price;
-  final int? durationMonths;
+  final bool? isActive;
+  final String? receiptUrl;
 
   const SubscriptionModel({
     required this.id,
-    this.planName,
-    this.planDescription,
+    this.plan,
+    this.service,
     this.status,
     this.startsAt,
     this.endsAt,
     this.daysRemaining,
     this.paymentMethod,
     this.amountPaid,
-    this.name,
-    this.price,
-    this.durationMonths,
+    this.isActive,
+    this.receiptUrl,
   });
 
   factory SubscriptionModel.fromJson(Map<String, dynamic> json) =>
