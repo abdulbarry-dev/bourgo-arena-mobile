@@ -87,6 +87,12 @@ abstract interface class AuthRepository {
   /// Fetches the profile of the currently authenticated user.
   Future<Result<AuthSession, Failure>> getUserProfile();
 
+  /// Uploads a profile avatar image file.
+  Future<Result<AuthSession, Failure>> uploadAvatar(String filePath);
+
+  /// Deletes the current profile avatar.
+  Future<Result<AuthSession, Failure>> deleteAvatar();
+
   /// Stream of authentication state changes.
   Stream<AuthSession> get onAuthStateChanged;
 }

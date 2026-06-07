@@ -2,6 +2,8 @@ import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -16,8 +18,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer/shimmer.dart';
 
-/// The user profile screen.
+/// The user profile screen enhanced with premium design standards.
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -38,11 +42,13 @@ class _ProfileScreenState extends State<ProfileScreen>
       logoutUseCase: locator<LogoutUseCase>(),
       deleteAccountUseCase: locator<DeleteAccountUseCase>(),
       authStateNotifier: locator<AuthStateNotifier>(),
+      getOngoingReservationsUseCase: locator<GetOngoingReservationsUseCase>(),
+      getFullPaymentHistoryUseCase: locator<GetFullPaymentHistoryUseCase>(),
     );
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1000),
     );
     _animationController.forward();
   }
@@ -57,14 +63,17 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
+    final spacing = context.spacing;
 
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
         if (_viewModel.isLoading) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
           );
         }
 
@@ -76,43 +85,63 @@ class _ProfileScreenState extends State<ProfileScreen>
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
             appBar: AppBar(
-              title: Text(l10n.navProfile),
-              backgroundColor: appColors.bgSurface,
+              title: Text(
+                l10n.navProfile.toUpperCase(),
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+              backgroundColor: Colors.transparent,
               elevation: 0,
+              centerTitle: true,
             ),
             body: const GuestAuthState(icon: Symbols.person),
           );
         }
 
         if (user == null) {
-          return Scaffold(body: Center(child: Text(l10n.commonLoadingError)));
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Symbols.error,
+                    size: 48,
+                    color: theme.colorScheme.error.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(l10n.commonLoadingError),
+                ],
+              ),
+            ),
+          );
         }
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           body: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
             slivers: [
               _buildAppBar(context, user),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: spacing.horizontalPadding(context),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(height: 24),
-                      _StatsRow(user: user, animation: _animationController),
-                      const SizedBox(height: 32),
-                      Text(
-                        l10n.profileSettings.toUpperCase(),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withValues(
-                            alpha: 0.35,
-                          ),
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
+                      SizedBox(height: spacing.lg),
+                      _StatsDashboard(
+                        user: user,
+                        ongoingReservationsCount: _viewModel.ongoingReservationsCount,
+                        successfulPaymentsCount: _viewModel.successfulPaymentsCount,
+                        animation: _animationController,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: spacing.xl),
+                      _buildSectionHeader(context, l10n.profileSettings),
+                      SizedBox(height: spacing.md),
                       _ProfileMenu(
                         animation: _animationController,
                         onTapAbonnement: () => context.push('/subscription'),
@@ -120,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                             context.push('/notifications'),
                         onTapSettings: () => context.push('/settings'),
                       ),
-                      const SizedBox(height: 48),
+                      SizedBox(height: spacing.xxl),
                       _LogoutButton(
                         onLogout: () async {
                           await _viewModel.logout();
@@ -129,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           }
                         },
                       ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: spacing.xxxl),
                     ],
                   ),
                 ),
@@ -141,33 +170,69 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    final theme = Theme.of(context);
+    final spacing = context.spacing;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: spacing.xs),
+      child: Text(
+        title.toUpperCase(),
+        style: theme.textTheme.labelSmall?.copyWith(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          fontWeight: FontWeight.w900,
+          letterSpacing: 2,
+          fontFamily: GoogleFonts.lexend().fontFamily,
+        ),
+      ),
+    );
+  }
+
   Widget _buildAppBar(BuildContext context, User user) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
     final l10n = AppLocalizations.of(context)!;
+    final spacing = context.spacing;
 
     return SliverAppBar(
-      expandedHeight: 280,
+      expandedHeight: 320,
       pinned: true,
-      backgroundColor: appColors.bgSurface,
+      stretch: true,
+      backgroundColor: theme.scaffoldBackgroundColor,
       elevation: 0,
       flexibleSpace: FlexibleSpaceBar(
+        stretchModes: const [
+          StretchMode.zoomBackground,
+          StretchMode.blurBackground,
+        ],
         background: Stack(
           alignment: Alignment.center,
           children: [
-            // Ambient Background Glow
+            // Kinetic Background Gradient
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    theme.colorScheme.primary.withValues(alpha: 0.1),
+                    theme.scaffoldBackgroundColor,
+                  ],
+                ),
+              ),
+            ),
+            // Asymmetric Decorative Ring
             Positioned(
-              top: 20,
+              top: -40,
+              right: -40,
               child: Container(
-                width: 240,
-                height: 240,
+                width: 200,
+                height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      theme.colorScheme.primary.withValues(alpha: 0.15),
-                      theme.colorScheme.primary.withValues(alpha: 0.0),
-                    ],
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.05),
+                    width: 40,
                   ),
                 ),
               ),
@@ -175,54 +240,99 @@ class _ProfileScreenState extends State<ProfileScreen>
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 60),
                 Hero(
                   tag: 'profile_avatar',
                   child: Container(
-                    width: 100,
-                    height: 100,
+                    padding: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
                       border: Border.all(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                        width: 2,
+                        color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                        width: 1,
                       ),
-                      image: user.avatarUrl != null
-                          ? DecorationImage(
-                              image: NetworkImage(user.avatarUrl!),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
-                      boxShadow: [
-                        BoxShadow(
-                          color: theme.colorScheme.primary.withValues(
-                            alpha: 0.2,
-                          ),
-                          blurRadius: 20,
-                          spreadRadius: 2,
-                        ),
-                      ],
                     ),
-                    child: user.avatarUrl == null
-                        ? Icon(
-                            Symbols.person,
-                            size: 48,
-                            color: theme.colorScheme.primary,
-                          )
-                        : null,
+                    child: ClipOval(
+                      child: SizedBox(
+                        width: 110,
+                        height: 110,
+                        child: user.avatarUrl != null
+                            ? Image.network(
+                                user.avatarUrl!,
+                                fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Shimmer.fromColors(
+                                    baseColor:
+                                        theme.colorScheme.surfaceContainerHighest,
+                                    highlightColor: theme.colorScheme
+                                        .surfaceContainerHighest
+                                        .withValues(alpha: 0.4),
+                                    child: Container(
+                                      color: theme.colorScheme
+                                          .surfaceContainerHighest,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      color: appColors.bgElevated,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: theme.colorScheme.primary
+                                              .withValues(alpha: 0.15),
+                                          blurRadius: 30,
+                                          spreadRadius: 5,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Icon(
+                                      Symbols.person_filled,
+                                      size: 48,
+                                      color: theme.colorScheme.primary
+                                          .withValues(alpha: 0.5),
+                                    ),
+                                  );
+                                },
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                  color: appColors.bgElevated,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: theme.colorScheme.primary
+                                          .withValues(alpha: 0.15),
+                                      blurRadius: 30,
+                                      spreadRadius: 5,
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  Symbols.person_filled,
+                                  size: 48,
+                                  color: theme.colorScheme.primary
+                                      .withValues(alpha: 0.5),
+                                ),
+                              ),
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: spacing.lg),
                 Text(
-                  '${user.firstName} ${user.lastName}'.toUpperCase(),
+                  user.name.toUpperCase(),
+                  textAlign: TextAlign.center,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontFamily: AppConstants.displayFontFamily,
                     fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
+                    letterSpacing: -1.0,
+                    fontSize: 28,
+                    height: 1.1,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
                 TierBadge(
                   tierName: user.subscriptionLevel ?? l10n.profileStandardTier,
                 ),
@@ -235,114 +345,212 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 }
 
-class _StatsRow extends StatelessWidget {
+class _StatsDashboard extends StatelessWidget {
   final User user;
+  final int ongoingReservationsCount;
+  final int successfulPaymentsCount;
   final Animation<double> animation;
 
-  const _StatsRow({required this.user, required this.animation});
+  const _StatsDashboard({
+    required this.user,
+    required this.ongoingReservationsCount,
+    required this.successfulPaymentsCount,
+    required this.animation,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
-    final l10n = AppLocalizations.of(context)!;
 
     return SlideTransition(
-      position: Tween<Offset>(begin: const Offset(0, 0.2), end: Offset.zero)
+      position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
           .animate(
             CurvedAnimation(
               parent: animation,
-              curve: const Interval(0.0, 0.5, curve: Curves.easeOutCubic),
+              curve: const Interval(0.2, 0.7, curve: Curves.easeOutCubic),
             ),
           ),
       child: FadeTransition(
         opacity: CurvedAnimation(
           parent: animation,
-          curve: const Interval(0.0, 0.5, curve: Curves.easeIn),
+          curve: const Interval(0.2, 0.7, curve: Curves.easeIn),
         ),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
           decoration: BoxDecoration(
             color: appColors.bgElevated,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: appColors.bgBorder, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: theme.shadowColor.withValues(alpha: 0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: appColors.bgBorder.withValues(alpha: 0.5),
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildStatItem(
-                context,
-                l10n.profilePoints,
-                NumberFormat(
-                  '#,###',
-                ).format(user.loyaltyPoints).replaceAll(',', ' '),
-                Symbols.stars,
-                theme.colorScheme.primary,
-                () => context.push('/loyalty'),
-              ),
-              Container(width: 1, height: 40, color: appColors.bgBorder),
-              _buildStatItem(
-                context,
-                "RÉSERVATIONS",
-                "12", // Placeholder for actual stats
-                Symbols.event_available,
-                theme.colorScheme.onSurface,
-                () => context.push('/bookings'),
-              ),
-            ],
+          clipBehavior: Clip.antiAlias,
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                Expanded(
+                  child: _StatTile(
+                    value: NumberFormat(
+                      '#,###',
+                    ).format(user.loyaltyPoints).replaceAll(',', ' '),
+                    icon: Symbols.stars,
+                    color: theme.colorScheme.primary,
+                    onTap: () => context.push('/loyalty'),
+                  ),
+                ),
+                _buildDivider(appColors),
+                Expanded(
+                  child: _ReservationStatTile(
+                    count: ongoingReservationsCount,
+                    onTap: () => context.push('/bookings'),
+                  ),
+                ),
+                _buildDivider(appColors),
+                Expanded(
+                  child: _HistoryStatTile(
+                    count: successfulPaymentsCount,
+                    onTap: () => context.push('/transactions'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildStatItem(
-    BuildContext context,
-    String label,
-    String value,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
+  Widget _buildDivider(AppColors appColors) {
+    return VerticalDivider(
+      width: 1,
+      thickness: 1,
+      color: appColors.bgBorder.withValues(alpha: 0.5),
+      indent: 20,
+      endIndent: 20,
+    );
+  }
+}
+
+class _StatTile extends StatelessWidget {
+  final String value;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _StatTile({
+    required this.value,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final spacing = context.spacing;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          vertical: spacing.lg,
+          horizontal: spacing.md,
+        ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, color: color, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  value,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: color,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
+            Icon(icon, color: color.withValues(alpha: 0.8), size: 24),
+            SizedBox(height: spacing.sm),
             Text(
-              label.toUpperCase(),
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(
-                  alpha: 0.65,
-                ),
-                letterSpacing: 1,
-                fontWeight: FontWeight.bold,
+              value,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: color,
+                fontFamily: GoogleFonts.lexend().fontFamily,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ReservationStatTile extends StatelessWidget {
+  final int count;
+  final VoidCallback onTap;
+
+  const _ReservationStatTile({
+    required this.count,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = context.spacing;
+    final color = theme.colorScheme.primary;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: spacing.lg,
+          horizontal: spacing.md,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Symbols.event_available, color: color, size: 24),
+            SizedBox(height: spacing.sm),
+            Text(
+              '$count',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: color,
+                fontFamily: GoogleFonts.lexend().fontFamily,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HistoryStatTile extends StatelessWidget {
+  final int count;
+  final VoidCallback onTap;
+
+  const _HistoryStatTile({
+    required this.count,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = context.spacing;
+    final color = theme.colorScheme.primary;
+
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: spacing.lg,
+          horizontal: spacing.md,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Symbols.history, color: color, size: 24),
+            SizedBox(height: spacing.sm),
+            Text(
+              '$count',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: color,
+                fontFamily: GoogleFonts.lexend().fontFamily,
               ),
             ),
           ],
@@ -372,29 +580,29 @@ class _ProfileMenu extends StatelessWidget {
     return Column(
       children: [
         _buildAnimatedItem(
-          0.1,
+          0.3,
           ProfileListItem(
             icon: Symbols.card_membership,
             title: l10n.profileMySubscription,
-            subtitle: "Gérer votre forfait et accès",
+            subtitle: "Gérer votre forfait et accès premium",
             onTap: onTapAbonnement,
           ),
         ),
         _buildAnimatedItem(
-          0.2,
+          0.4,
           ProfileListItem(
             icon: Symbols.notifications,
             title: l10n.profileNotifications,
-            subtitle: "Gérer vos alertes et rappels",
+            subtitle: "Gérer vos alertes et rappels de cours",
             onTap: onTapNotifications,
           ),
         ),
         _buildAnimatedItem(
-          0.3,
+          0.5,
           ProfileListItem(
             icon: Symbols.settings,
             title: l10n.profileSettings,
-            subtitle: "Informations personnelles, mot de passe",
+            subtitle: "Informations personnelles et sécurité",
             onTap: onTapSettings,
           ),
         ),
@@ -404,7 +612,7 @@ class _ProfileMenu extends StatelessWidget {
 
   Widget _buildAnimatedItem(double delay, Widget child) {
     return SlideTransition(
-      position: Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero)
+      position: Tween<Offset>(begin: const Offset(0.1, 0), end: Offset.zero)
           .animate(
             CurvedAnimation(
               parent: animation,
@@ -447,39 +655,40 @@ class _LogoutButton extends StatelessWidget {
       builder: (dialogContext) {
         final theme = Theme.of(context);
         final appColors = theme.extension<AppColors>()!;
+        final spacing = context.spacing;
 
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(dialogContext).viewInsets.bottom,
           ),
           child: Container(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(spacing.lg),
             decoration: BoxDecoration(
               color: appColors.bgElevated,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(32),
               ),
               border: Border.all(
-                color: theme.colorScheme.error.withValues(alpha: 0.3),
+                color: theme.colorScheme.error.withValues(alpha: 0.1),
               ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 48,
+                  width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(bottom: 24),
+                  margin: const EdgeInsets.only(bottom: 32),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 72,
+                  height: 72,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.error.withValues(alpha: 0.1),
+                    color: theme.colorScheme.error.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -488,12 +697,14 @@ class _LogoutButton extends StatelessWidget {
                     size: 32,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Text(
                   l10n.profileLogoutTitle.toUpperCase(),
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
-                    color: theme.colorScheme.error,
+                    color: theme.colorScheme.onSurface,
+                    fontFamily: AppConstants.displayFontFamily,
+                    letterSpacing: -0.5,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -502,7 +713,9 @@ class _LogoutButton extends StatelessWidget {
                   l10n.profileLogoutMessage,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.7,
+                    ),
                     height: 1.5,
                   ),
                 ),
@@ -513,17 +726,22 @@ class _LogoutButton extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(dialogContext),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(color: appColors.bgBorder),
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          side: BorderSide(
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.1,
+                            ),
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                         child: Text(
                           l10n.commonCancel.toUpperCase(),
                           style: TextStyle(
                             color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1,
                           ),
                         ),
                       ),
@@ -534,32 +752,28 @@ class _LogoutButton extends StatelessWidget {
                         onPressed: () {
                           Navigator.pop(dialogContext);
                           onLogout();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(l10n.profileLogoutSuccess),
-                              duration: const Duration(seconds: 2),
-                              behavior: SnackBarBehavior.floating,
-                              margin: const EdgeInsets.all(16),
-                            ),
-                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.colorScheme.error,
                           foregroundColor: theme.colorScheme.onError,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                         child: Text(
                           l10n.profileLogoutConfirm.toUpperCase(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1,
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
               ],
             ),
           ),
