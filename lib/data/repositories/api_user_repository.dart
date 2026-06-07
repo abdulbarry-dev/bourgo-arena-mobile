@@ -25,8 +25,10 @@ class ApiUserRepository implements UserRepository {
     }
     return executeApiCall(() async {
       final response =
-          await _apiClient.get('/user/profile') as Map<String, dynamic>;
-      final userModel = UserProfileModel.fromJson(response);
+          await _apiClient.get('/user/profile', fullResponse: true)
+              as Map<String, dynamic>;
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      final userModel = UserProfileModel.fromJson(data);
       return Result.success(UserMapper.toEntity(userModel));
     });
   }

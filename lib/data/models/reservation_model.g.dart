@@ -29,7 +29,7 @@ Map<String, dynamic> _$ReservationActivityModelToJson(
 ReservationSlotModel _$ReservationSlotModelFromJson(
   Map<String, dynamic> json,
 ) => ReservationSlotModel(
-  id: json['id'] as String?,
+  id: (json['id'] as num?)?.toInt(),
   time: json['time'] as String?,
   startTime: json['start_time'] as String?,
   endTime: json['end_time'] as String?,

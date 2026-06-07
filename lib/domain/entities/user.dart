@@ -17,7 +17,7 @@ abstract class User with _$User {
     String? avatarUrl,
     required int loyaltyPoints,
     String? subscriptionLevel,
-    String? subscriptionExpiry,
+    DateTime? subscriptionExpiry,
     DateTime? birthDate,
     String? gender,
     @Default('active') String status,

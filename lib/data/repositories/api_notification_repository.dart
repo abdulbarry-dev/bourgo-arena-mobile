@@ -3,7 +3,6 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/notification_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/notification_model.dart';
-import 'package:bourgo_arena_mobile/data/models/pagination_meta_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/core/paginated_result.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart';
@@ -43,7 +42,9 @@ class ApiNotificationRepository implements NotificationRepository {
 
       final List<dynamic> data = response['data'] as List<dynamic>;
       final metaJson = response['meta'] as Map<String, dynamic>;
-      final meta = PaginationMetaModel.fromJson(metaJson);
+      final currentPage = (metaJson['current_page'] as num?)?.toInt() ?? 1;
+      final lastPage = (metaJson['last_page'] as num?)?.toInt() ?? 1;
+      final total = (metaJson['total'] as num?)?.toInt() ?? 0;
 
       final entities = data
           .map(
@@ -56,10 +57,10 @@ class ApiNotificationRepository implements NotificationRepository {
       return Result.success(
         PaginatedResult(
           data: entities,
-          currentPage: meta.currentPage,
-          lastPage: meta.lastPage,
-          total: meta.total,
-          hasMore: meta.currentPage < meta.lastPage,
+          currentPage: currentPage,
+          lastPage: lastPage,
+          total: total,
+          hasMore: currentPage < lastPage,
         ),
       );
     });

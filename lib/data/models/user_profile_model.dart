@@ -16,7 +16,7 @@ abstract class UserProfileModel with _$UserProfileModel {
     @JsonKey(name: 'avatar_url') String? avatarUrl,
     @JsonKey(name: 'loyalty_points') @Default(0) int loyaltyPoints,
     @JsonKey(name: 'subscription_level') String? subscriptionLevel,
-    @JsonKey(name: 'subscription_expiry') String? subscriptionExpiry,
+    @JsonKey(name: 'subscription_expiry') DateTime? subscriptionExpiry,
     @JsonKey(name: 'birth_date') DateTime? birthDate,
     String? gender,
     String? status,

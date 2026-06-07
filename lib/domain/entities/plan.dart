@@ -4,6 +4,7 @@ import 'package:equatable/equatable.dart';
 class PlanService extends Equatable {
   final String id;
   final String? name;
+  final String? slug;
   final String? description;
   final String? imageUrl;
   final String? status;
@@ -11,13 +12,14 @@ class PlanService extends Equatable {
   const PlanService({
     required this.id,
     this.name,
+    this.slug,
     this.description,
     this.imageUrl,
     this.status,
   });
 
   @override
-  List<Object?> get props => [id, name, description, imageUrl, status];
+  List<Object?> get props => [id, name, slug, description, imageUrl, status];
 }
 
 /// Entity representing a subscription plan matching PlanResource.

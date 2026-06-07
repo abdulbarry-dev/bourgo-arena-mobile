@@ -19,11 +19,10 @@ class ApiFamilyRepository implements FamilyRepository {
       return Future.value(const Success([]));
     }
     return executeApiCall(() async {
-      final response = await _apiClient.get('/family/children');
-      final List<dynamic> data = response is List
-          ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
-                []);
+      final response =
+          await _apiClient.get('/family/children', fullResponse: true)
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
       final entities = data
           .map(
             (json) => ChildMapper.toEntity(

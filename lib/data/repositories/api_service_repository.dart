@@ -19,7 +19,7 @@ class ApiServiceRepository implements ServiceRepository {
       final response =
           await _apiClient.get(
                 '/services',
-                queryParams: {
+                queryParameters: {
                   'page': page.toString(),
                   'per_page': limit.toString(),
                 },

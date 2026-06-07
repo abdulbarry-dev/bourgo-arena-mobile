@@ -1,7 +1,18 @@
+import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
+
 /// Entity representing a group course or training session.
 class Course {
   /// Unique identifier.
   final String id;
+
+  /// Course name.
+  final String name;
+
+  /// Description.
+  final String? description;
+
+  /// Course time slot.
+  final TimeSlot? timeSlot;
 
   /// Name of the course (e.g. CrossFit Beginners).
   final String title;
@@ -36,6 +47,9 @@ class Course {
   /// Creates a new [Course] instance.
   const Course({
     required this.id,
+    required this.name,
+    this.description,
+    this.timeSlot,
     required this.title,
     required this.instructor,
     required this.startTime,
@@ -60,6 +74,9 @@ class Course {
       other is Course &&
           runtimeType == other.runtimeType &&
           id == other.id &&
+          name == other.name &&
+          description == other.description &&
+          timeSlot == other.timeSlot &&
           title == other.title &&
           instructor == other.instructor &&
           startTime == other.startTime &&
@@ -74,6 +91,9 @@ class Course {
   @override
   int get hashCode =>
       id.hashCode ^
+      name.hashCode ^
+      description.hashCode ^
+      timeSlot.hashCode ^
       title.hashCode ^
       instructor.hashCode ^
       startTime.hashCode ^

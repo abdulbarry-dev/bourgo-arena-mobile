@@ -14,47 +14,42 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
   ApiSubscriptionRepository(this._apiClient);
 
   @override
-  Future<Result<Subscription?, Failure>> getActiveSubscription() {
+  Future<Result<List<Subscription>, Failure>> getActiveSubscriptions() {
     if (!_apiClient.hasToken) {
-      return Future.value(const Success(null));
+      return Future.value(const Success([]));
     }
     return executeApiCall(() async {
-      final response = await _apiClient.get('/member/subscription');
-      if (response == null) {
-        return const Success(null);
-      }
+      final response = await _apiClient.get('/member/subscription', fullResponse: true);
 
-      final responseMap = response as Map<String, dynamic>;
+      final data =
+          (response as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
+      final subscriptions = data.map((json) {
+        return SubscriptionMapper.toEntity(
+          SubscriptionModel.fromJson(json as Map<String, dynamic>),
+        );
+      }).toList();
 
-      // Handle the case where the API returns { "success": true, "message": "...", "data": null }
-      // ApiClient returns the raw body when data is null.
-      if (responseMap.containsKey('data') && responseMap['data'] == null) {
-        return const Success(null);
-      }
+      return Result.success(subscriptions);
+    });
+  }
 
-      // If we got the whole body but there is a data object, extract it
-      // (This is a safeguard in case ApiClient didn't extract it for some reason)
-      var dataToParse = responseMap;
-      if (responseMap.containsKey('data')) {
-        final dataField = responseMap['data'];
-        if (dataField == null ||
-            (dataField is List && dataField.isEmpty) ||
-            (dataField is Map && dataField.isEmpty)) {
-          return const Success(null);
-        }
-        if (dataField is Map<String, dynamic>) {
-          dataToParse = dataField;
-        }
-      }
+  @override
+  Future<Result<List<Subscription>, Failure>> getSubscriptionHistory() {
+    if (!_apiClient.hasToken) {
+      return Future.value(const Success([]));
+    }
+    return executeApiCall(() async {
+      final response = await _apiClient.get('/member/subscriptions/history', fullResponse: true);
 
-      // Handle edge case where id is null, empty string, or zero (also indicates no subscription)
-      final id = dataToParse['id'];
-      if (id == null || id.toString().trim().isEmpty || id.toString() == '0') {
-        return const Success(null);
-      }
+      final data =
+          (response as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
+      final subscriptions = data.map((json) {
+        return SubscriptionMapper.toEntity(
+          SubscriptionModel.fromJson(json as Map<String, dynamic>),
+        );
+      }).toList();
 
-      final model = SubscriptionModel.fromJson(dataToParse);
-      return Success(SubscriptionMapper.toEntity(model));
+      return Result.success(subscriptions);
     });
   }
 
@@ -62,6 +57,14 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
   Future<Result<void, Failure>> subscribeToPlan(String planId) {
     return executeApiCall(() async {
       await _apiClient.post('/subscriptions', {'plan_id': planId});
+      return Result.success(null);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> cancelSubscription(String subscriptionId) {
+    return executeApiCall(() async {
+      await _apiClient.delete('/subscriptions/$subscriptionId');
       return Result.success(null);
     });
   }

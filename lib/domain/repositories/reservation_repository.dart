@@ -7,6 +7,18 @@ abstract interface class ReservationRepository {
   /// Retrieves a list of all reservations for the current user.
   Future<Result<List<Reservation>, Failure>> getReservations();
 
+  /// Retrieves ongoing/future confirmed reservations.
+  Future<Result<List<Reservation>, Failure>> getOngoingReservations({
+    int page = 1,
+    int perPage = 20,
+  });
+
+  /// Retrieves past/completed/cancelled reservation history.
+  Future<Result<List<Reservation>, Failure>> getReservationHistory({
+    int page = 1,
+    int perPage = 20,
+  });
+
   /// Creates a new reservation via POST /reservations.
   /// [activityId], [activitySlotId], and [date] are required by the API.
   Future<Result<Reservation, Failure>> makeReservation(Reservation reservation);

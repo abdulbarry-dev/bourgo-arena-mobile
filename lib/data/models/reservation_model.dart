@@ -28,7 +28,7 @@ class ReservationActivityModel {
 /// DTO for a nested slot within a reservation.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class ReservationSlotModel {
-  final String? id;
+  final int? id;
   final String? time;
   final String? startTime;
   final String? endTime;

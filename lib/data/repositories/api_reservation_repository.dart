@@ -19,11 +19,72 @@ class ApiReservationRepository implements ReservationRepository {
       return Future.value(const Success([]));
     }
     return executeApiCall(() async {
-      final response = await _apiClient.get('/reservations');
-      final List<dynamic> data = response is List
-          ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
-                []);
+      final response =
+          await _apiClient.get('/reservations', fullResponse: true)
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final entities = data
+          .map(
+            (json) => ReservationMapper.toEntity(
+              ReservationModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(entities);
+    });
+  }
+
+  @override
+  Future<Result<List<Reservation>, Failure>> getOngoingReservations({
+    int page = 1,
+    int perPage = 20,
+  }) {
+    if (!_apiClient.hasToken) {
+      return Future.value(const Success([]));
+    }
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/reservations/ongoing',
+                fullResponse: true,
+                queryParameters: {
+                  'page': page.toString(),
+                  'per_page': perPage.toString(),
+                },
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final entities = data
+          .map(
+            (json) => ReservationMapper.toEntity(
+              ReservationModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(entities);
+    });
+  }
+
+  @override
+  Future<Result<List<Reservation>, Failure>> getReservationHistory({
+    int page = 1,
+    int perPage = 20,
+  }) {
+    if (!_apiClient.hasToken) {
+      return Future.value(const Success([]));
+    }
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/reservations/history',
+                fullResponse: true,
+                queryParameters: {
+                  'page': page.toString(),
+                  'per_page': perPage.toString(),
+                },
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
       final entities = data
           .map(
             (json) => ReservationMapper.toEntity(
