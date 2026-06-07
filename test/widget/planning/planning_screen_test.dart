@@ -30,7 +30,6 @@ void main() {
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.errorMessage).thenReturn(null);
     when(() => mockViewModel.courses).thenReturn([]);
-    when(() => mockViewModel.reservations).thenReturn([]);
     when(() => mockViewModel.unified).thenReturn([]);
     when(() => mockViewModel.familyMembers).thenReturn([]);
     when(() => mockViewModel.selectedMember).thenReturn(null);

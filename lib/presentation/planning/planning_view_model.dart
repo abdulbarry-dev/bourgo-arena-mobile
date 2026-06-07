@@ -4,10 +4,8 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
 import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
-import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
@@ -37,12 +35,11 @@ class PlanningEntry {
   });
 }
 
-enum PlanningEntryType { course, reservation }
+enum PlanningEntryType { course }
 
 /// ViewModel for the Planning (Course Schedule) screen.
 class PlanningViewModel extends BaseViewModel {
   final GetCoursesUseCase _getCoursesUseCase;
-  final GetUserBookingsUseCase _getUserBookingsUseCase;
   final GetFamilyMembersUseCase _getFamilyMembersUseCase;
   final GetMemberTierUseCase _getMemberTierUseCase;
   final GetUserProfileUseCase _getUserProfileUseCase;
@@ -52,7 +49,6 @@ class PlanningViewModel extends BaseViewModel {
   final AuthStateNotifier _authStateNotifier;
 
   List<Course> _allCourses = [];
-  List<Reservation> _allReservations = [];
   List<PlanningEntry> _unified = [];
 
   List<FamilyMember> _familyMembers = [];
@@ -64,10 +60,7 @@ class PlanningViewModel extends BaseViewModel {
   /// List of courses filtered by the selected day.
   List<Course> get courses => _coursesForDay();
 
-  /// List of reservations filtered by selected day.
-  List<Reservation> get reservations => _reservationsForDay();
-
-  /// Unified feed of courses + reservations.
+  /// Unified feed of courses.
   List<PlanningEntry> get unified => _unified;
 
   List<FamilyMember> get familyMembers => _familyMembers;
@@ -89,7 +82,6 @@ class PlanningViewModel extends BaseViewModel {
   /// Creates a new [PlanningViewModel] instance.
   PlanningViewModel({
     required GetCoursesUseCase getCoursesUseCase,
-    required GetUserBookingsUseCase getUserBookingsUseCase,
     required GetFamilyMembersUseCase getFamilyMembersUseCase,
     required GetMemberTierUseCase getMemberTierUseCase,
     required GetUserProfileUseCase getUserProfileUseCase,
@@ -98,7 +90,6 @@ class PlanningViewModel extends BaseViewModel {
     required EnrollInCourseUseCase enrollInCourseUseCase,
     required AuthStateNotifier authStateNotifier,
   }) : _getCoursesUseCase = getCoursesUseCase,
-       _getUserBookingsUseCase = getUserBookingsUseCase,
        _getFamilyMembersUseCase = getFamilyMembersUseCase,
        _getMemberTierUseCase = getMemberTierUseCase,
        _getUserProfileUseCase = getUserProfileUseCase,
@@ -109,7 +100,7 @@ class PlanningViewModel extends BaseViewModel {
     loadPlanning();
   }
 
-  /// Loads courses + reservations + family members for unified planning.
+  /// Loads courses + family members for unified planning.
   Future<void> loadPlanning() async {
     developer.log('PlanningViewModel: loadPlanning() started');
     _isLoading = true;
@@ -131,13 +122,6 @@ class PlanningViewModel extends BaseViewModel {
       }
 
       if (isAuthenticated) {
-        final reservationsResult = await _getUserBookingsUseCase();
-        if (reservationsResult is Success<List<Reservation>, Failure>) {
-          _allReservations = reservationsResult.data;
-        } else {
-          developer.log('PlanningViewModel: reservations load failed');
-        }
-
         final familyResult = await _getFamilyMembersUseCase();
         if (familyResult is Success<List<FamilyMember>, Failure>) {
           _familyMembers = familyResult.data;
@@ -188,21 +172,6 @@ class PlanningViewModel extends BaseViewModel {
       );
     }
 
-    for (final res in _reservationsForDay()) {
-      entries.add(
-        PlanningEntry(
-          id: res.id,
-          type: PlanningEntryType.reservation,
-          title: res.activityTitle,
-          timeLabel: res.time,
-          dayOfWeek: 1, // Need actual day of week from date
-          source: res,
-          highlightForTier: false,
-        ),
-      );
-    }
-
-    // Sort entries by time (simplified)
     entries.sort((a, b) => a.timeLabel.compareTo(b.timeLabel));
     _unified = entries;
   }
@@ -218,11 +187,6 @@ class PlanningViewModel extends BaseViewModel {
 
   List<Course> _coursesForDay() {
     return _allCourses.where((c) => c.dayOfWeek == _selectedDay).toList();
-  }
-
-  List<Reservation> _reservationsForDay() {
-    // Simplified filtering for now
-    return _allReservations;
   }
 
   void selectDay(int day) {

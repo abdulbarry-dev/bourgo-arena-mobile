@@ -4,8 +4,6 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
-import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
@@ -18,7 +16,6 @@ import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.da
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
-import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -44,7 +41,6 @@ class _PlanningScreenState extends State<PlanningScreen> {
         widget.viewModel ??
         PlanningViewModel(
           getCoursesUseCase: locator<GetCoursesUseCase>(),
-          getUserBookingsUseCase: locator<GetUserBookingsUseCase>(),
           getFamilyMembersUseCase: locator<GetFamilyMembersUseCase>(),
           getMemberTierUseCase: locator<GetMemberTierUseCase>(),
           getUserProfileUseCase: locator<GetUserProfileUseCase>(),
@@ -447,15 +443,10 @@ class _UnifiedList extends StatelessWidget {
       itemCount: entries.length,
       itemBuilder: (context, index) {
         final entry = entries[index];
-        final child = switch (entry.type) {
-          PlanningEntryType.course => CourseCard(
-            course: entry.source as Course,
-            onTap: () => _showQuickAssignSheet(context, entry.source as Course),
-          ),
-          PlanningEntryType.reservation => ReservationCard(
-            reservation: entry.source as Reservation,
-          ),
-        };
+        final child = CourseCard(
+          course: entry.source as Course,
+          onTap: () => _showQuickAssignSheet(context, entry.source as Course),
+        );
         return Padding(padding: const EdgeInsets.only(bottom: 16), child: child)
             .animate(delay: (index * 50).ms)
             .fade(duration: 400.ms)

@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/mappers/verification_mapper.dart';
+import 'package:bourgo_arena_mobile/data/models/member_tier_model.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
 import 'package:bourgo_arena_mobile/data/models/verification_status_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
@@ -894,6 +895,38 @@ class ApiAuthRepository implements AuthRepository {
       final finalSession = await _checkLoginVerification(session);
       await _updateSession(finalSession);
       return Success(finalSession);
+    });
+  }
+
+  @override
+  Future<Result<AuthSession, Failure>> getMemberTier() async {
+    if (!_apiClient.hasToken) {
+      return FailureResult(
+        AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+      );
+    }
+    return executeApiCall(() async {
+      final tierResponse = await _apiClient.get('/member/tier')
+          as Map<String, dynamic>;
+
+      final tierModel = MemberTierModel.fromJson(tierResponse);
+      final currentUser = _currentSession?.user;
+      if (currentUser == null) {
+        throw ServerException(
+          'No profile loaded. Fetch profile before tier.',
+        );
+      }
+
+      final updatedUser = currentUser.copyWith(
+        subscriptionLevel: tierModel.label,
+      );
+
+      final state = _currentSession!.state;
+      final token = _currentSession!.token;
+
+      final session = AuthSession(user: updatedUser, state: state, token: token);
+      await _updateSession(session);
+      return Success(session);
     });
   }
 

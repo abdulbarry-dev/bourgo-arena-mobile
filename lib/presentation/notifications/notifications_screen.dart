@@ -93,8 +93,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
       _viewModel.loadMore();
     }
   }
@@ -174,8 +175,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         child: _FilterChip(
                           label: _filterLabel(key),
                           isSelected: isSelected,
-                          onTap:
-                              () => setState(() => _selectedFilter = key),
+                          onTap: () => setState(() {
+                              _selectedFilter = key;
+                              _scrollController.jumpTo(0);
+                            }),
                         ),
                       );
                     }).toList(),
@@ -236,7 +239,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         horizontal: spacing.md,
         vertical: spacing.lg,
       ),
-      itemCount: filteredList.length + (_viewModel.hasMore ? 1 : 1),
+      itemCount: filteredList.length + 1,
       separatorBuilder: (context, index) => SizedBox(height: spacing.sm),
       itemBuilder: (context, index) {
         if (index < filteredList.length) {
@@ -244,7 +247,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             notification: filteredList[index],
           );
         }
-        if (_viewModel.hasMore) {
+        if (_viewModel.isLoadingMore) {
           return const Center(
             child: Padding(
               padding: EdgeInsets.all(16),

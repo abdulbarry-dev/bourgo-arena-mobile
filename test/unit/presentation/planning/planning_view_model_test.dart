@@ -1,6 +1,5 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
@@ -16,9 +15,6 @@ import 'package:mocktail/mocktail.dart';
 import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 
 class MockGetCoursesUseCase extends Mock implements GetCoursesUseCase {}
-
-class MockGetUserBookingsUseCase extends Mock
-    implements GetUserBookingsUseCase {}
 
 class MockGetFamilyMembersUseCase extends Mock
     implements GetFamilyMembersUseCase {}
@@ -40,7 +36,6 @@ class MockEnrollInCourseUseCase extends Mock implements EnrollInCourseUseCase {}
 void main() {
   late PlanningViewModel viewModel;
   late MockGetCoursesUseCase mockGetCourses;
-  late MockGetUserBookingsUseCase mockGetBookings;
   late MockGetFamilyMembersUseCase mockGetFamilyMembers;
   late MockGetMemberTierUseCase mockGetMemberTier;
   late MockGetUserProfileUseCase mockGetUserProfile;
@@ -51,7 +46,6 @@ void main() {
 
   setUp(() {
     mockGetCourses = MockGetCoursesUseCase();
-    mockGetBookings = MockGetUserBookingsUseCase();
     mockGetFamilyMembers = MockGetFamilyMembersUseCase();
     mockGetMemberTier = MockGetMemberTierUseCase();
     mockGetUserProfile = MockGetUserProfileUseCase();
@@ -64,9 +58,6 @@ void main() {
 
     when(
       () => mockGetCourses.call(),
-    ).thenAnswer((_) async => Result.success([]));
-    when(
-      () => mockGetBookings.call(),
     ).thenAnswer((_) async => Result.success([]));
     when(
       () => mockGetFamilyMembers.call(),
@@ -82,7 +73,6 @@ void main() {
 
     viewModel = PlanningViewModel(
       getCoursesUseCase: mockGetCourses,
-      getUserBookingsUseCase: mockGetBookings,
       getFamilyMembersUseCase: mockGetFamilyMembers,
       getMemberTierUseCase: mockGetMemberTier,
       getUserProfileUseCase: mockGetUserProfile,

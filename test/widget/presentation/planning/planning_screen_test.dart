@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
@@ -23,9 +22,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGetCoursesUseCase extends Mock implements GetCoursesUseCase {}
-
-class MockGetUserBookingsUseCase extends Mock
-    implements GetUserBookingsUseCase {}
 
 class MockGetFamilyMembersUseCase extends Mock
     implements GetFamilyMembersUseCase {}
@@ -48,7 +44,6 @@ class MockGoRouter extends Mock implements GoRouter {}
 
 void main() {
   late MockGetCoursesUseCase mockGetCoursesUseCase;
-  late MockGetUserBookingsUseCase mockGetUserBookingsUseCase;
   late MockGetFamilyMembersUseCase mockGetFamilyMembersUseCase;
   late MockGetMemberTierUseCase mockGetMemberTierUseCase;
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
@@ -68,7 +63,6 @@ void main() {
 
   setUp(() {
     mockGetCoursesUseCase = MockGetCoursesUseCase();
-    mockGetUserBookingsUseCase = MockGetUserBookingsUseCase();
     mockGetFamilyMembersUseCase = MockGetFamilyMembersUseCase();
     mockGetMemberTierUseCase = MockGetMemberTierUseCase();
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
@@ -80,9 +74,6 @@ void main() {
 
     locator.allowReassignment = true;
     locator.registerFactory<GetCoursesUseCase>(() => mockGetCoursesUseCase);
-    locator.registerFactory<GetUserBookingsUseCase>(
-      () => mockGetUserBookingsUseCase,
-    );
     locator.registerFactory<GetFamilyMembersUseCase>(
       () => mockGetFamilyMembersUseCase,
     );
@@ -106,9 +97,6 @@ void main() {
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     when(
       () => mockGetCoursesUseCase.call(),
-    ).thenAnswer((_) async => const Success([]));
-    when(
-      () => mockGetUserBookingsUseCase.call(),
     ).thenAnswer((_) async => const Success([]));
     when(
       () => mockGetFamilyMembersUseCase.call(),
