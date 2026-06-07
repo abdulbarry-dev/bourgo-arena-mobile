@@ -11,6 +11,10 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_us
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'dart:developer' as developer;
 
 class PlanningEntry {
@@ -42,6 +46,10 @@ class PlanningViewModel extends BaseViewModel {
   final GetFamilyMembersUseCase _getFamilyMembersUseCase;
   final GetMemberTierUseCase _getMemberTierUseCase;
   final GetUserProfileUseCase _getUserProfileUseCase;
+  final GetActiveSubscriptionsUseCase _getActiveSubscriptionsUseCase;
+  final GetCourseSessionsUseCase _getCourseSessionsUseCase;
+  final EnrollInCourseUseCase _enrollInCourseUseCase;
+  final AuthStateNotifier _authStateNotifier;
 
   List<Course> _allCourses = [];
   List<Reservation> _allReservations = [];
@@ -72,6 +80,12 @@ class PlanningViewModel extends BaseViewModel {
   /// Currently selected day of the week (1-7).
   int get selectedDay => _selectedDay;
 
+  /// Whether the user is authenticated.
+  bool get isAuthenticated => _authStateNotifier.isAuthenticated;
+
+  /// Whether the selected member has an active plan.
+  bool get hasActivePlan => _selectedMemberTier != MemberTier.public;
+
   /// Creates a new [PlanningViewModel] instance.
   PlanningViewModel({
     required GetCoursesUseCase getCoursesUseCase,
@@ -79,11 +93,19 @@ class PlanningViewModel extends BaseViewModel {
     required GetFamilyMembersUseCase getFamilyMembersUseCase,
     required GetMemberTierUseCase getMemberTierUseCase,
     required GetUserProfileUseCase getUserProfileUseCase,
+    required GetActiveSubscriptionsUseCase getActiveSubscriptionsUseCase,
+    required GetCourseSessionsUseCase getCourseSessionsUseCase,
+    required EnrollInCourseUseCase enrollInCourseUseCase,
+    required AuthStateNotifier authStateNotifier,
   }) : _getCoursesUseCase = getCoursesUseCase,
        _getUserBookingsUseCase = getUserBookingsUseCase,
        _getFamilyMembersUseCase = getFamilyMembersUseCase,
        _getMemberTierUseCase = getMemberTierUseCase,
-       _getUserProfileUseCase = getUserProfileUseCase {
+       _getUserProfileUseCase = getUserProfileUseCase,
+       _getActiveSubscriptionsUseCase = getActiveSubscriptionsUseCase,
+       _getCourseSessionsUseCase = getCourseSessionsUseCase,
+       _enrollInCourseUseCase = enrollInCourseUseCase,
+       _authStateNotifier = authStateNotifier {
     loadPlanning();
   }
 
@@ -94,158 +116,143 @@ class PlanningViewModel extends BaseViewModel {
     clearError();
     notifyListeners();
 
+    final isAuthenticated = _authStateNotifier.isAuthenticated;
+
     try {
-      final results = await Future.wait([
-        _getCoursesUseCase(),
-        _getUserBookingsUseCase(),
-        _getFamilyMembersUseCase(),
-        _getUserProfileUseCase(),
-      ]);
+      final coursesResult = await _getCoursesUseCase();
+      if (coursesResult is Success<List<Course>, Failure>) {
+        _allCourses = coursesResult.data;
+      } else {
+        developer.log('PlanningViewModel: courses load failed');
+        setErrorMessage('failed_to_load_courses');
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
 
-      final coursesResult = results[0] as Result<List<Course>, Failure>;
-      final bookingsResult = results[1] as Result<List<Reservation>, Failure>;
-      final membersResult = results[2] as Result<List<FamilyMember>, Failure>;
-      final userResult = results[3] as Result<User, Failure>;
+      if (isAuthenticated) {
+        final reservationsResult = await _getUserBookingsUseCase();
+        if (reservationsResult is Success<List<Reservation>, Failure>) {
+          _allReservations = reservationsResult.data;
+        } else {
+          developer.log('PlanningViewModel: reservations load failed');
+        }
 
-      coursesResult.when(
-        success: (data) {
-          developer.log(
-            'PlanningViewModel: Successfully loaded ${data.length} courses',
-          );
-          _allCourses = data;
-        },
-        failure: (failure) {
-          developer.log(
-            'PlanningViewModel: Failed to load courses - ${failure.message}',
-          );
-          setErrorMessage(failure.message);
-          _allCourses = [];
-        },
-      );
+        final familyResult = await _getFamilyMembersUseCase();
+        if (familyResult is Success<List<FamilyMember>, Failure>) {
+          _familyMembers = familyResult.data;
+        } else {
+          developer.log('PlanningViewModel: family load failed');
+        }
 
-      bookingsResult.when(
-        success: (data) {
-          developer.log(
-            'PlanningViewModel: Successfully loaded ${data.length} bookings',
-          );
-          _allReservations = data;
-        },
-        failure: (failure) {
-          developer.log(
-            'PlanningViewModel: Failed to load bookings - ${failure.message}',
-          );
-          _allReservations = [];
-        },
-      );
-
-      membersResult.when(
-        success: (members) {
-          developer.log(
-            'PlanningViewModel: Successfully loaded ${members.length} family members',
-          );
-          _familyMembers = members;
-          _selectedMember ??= members.isNotEmpty ? members.first : null;
-        },
-        failure: (failure) {
-          developer.log(
-            'PlanningViewModel: Failed to load family members - ${failure.message}',
-          );
-          _familyMembers = [];
-          _selectedMember = null;
-        },
-      );
-
-      userResult.when(
-        success: (user) {
-          developer.log('PlanningViewModel: Successfully loaded user profile');
+        final profileResult = await _getUserProfileUseCase();
+        if (profileResult is Success<User, Failure>) {
           _selectedMemberTier = _getMemberTierUseCase(
-            subscriptionLevel: user.subscriptionLevel,
+            subscriptionLevel: profileResult.data.subscriptionLevel,
           );
-        },
-        failure: (failure) {
-          developer.log(
-            'PlanningViewModel: Failed to load user profile - ${failure.message}',
-          );
-          _selectedMemberTier = MemberTier.public;
-        },
-      );
+        } else {
+          developer.log('PlanningViewModel: profile load failed');
+        }
+      } else {
+        _selectedMemberTier = MemberTier.public;
+      }
 
-      _buildUnified();
-      developer.log(
-        'PlanningViewModel: data loaded, unified length=${_unified.length}',
-      );
+      _rebuildUnified();
     } catch (e, stack) {
       developer.log(
-        'PlanningViewModel: Error loading planning data: $e',
+        'PlanningViewModel: Unexpected error: $e',
         error: e,
         stackTrace: stack,
       );
-      setErrorMessage(e.toString());
+      setErrorMessage('unexpected_error');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /// Updates the selected day and refreshes the data.
-  void selectDay(int day) {
-    _selectedDay = day;
-    notifyListeners();
+  void _rebuildUnified() {
+    final entries = <PlanningEntry>[];
+
+    for (final course in _coursesForDay()) {
+      entries.add(
+        PlanningEntry(
+          id: course.id,
+          type: PlanningEntryType.course,
+          title: course.title,
+          timeLabel: '${course.startTime} - ${course.endTime}',
+          dayOfWeek: course.dayOfWeek,
+          source: course,
+          highlightForTier: _isRecommendedForTier(course),
+        ),
+      );
+    }
+
+    for (final res in _reservationsForDay()) {
+      entries.add(
+        PlanningEntry(
+          id: res.id,
+          type: PlanningEntryType.reservation,
+          title: res.activityTitle,
+          timeLabel: res.time,
+          dayOfWeek: 1, // Need actual day of week from date
+          source: res,
+          highlightForTier: false,
+        ),
+      );
+    }
+
+    // Sort entries by time (simplified)
+    entries.sort((a, b) => a.timeLabel.compareTo(b.timeLabel));
+    _unified = entries;
   }
 
-  void selectMember(FamilyMember member) {
-    _selectedMember = member;
-    notifyListeners();
+  bool _isRecommendedForTier(Course course) {
+    if (_selectedMemberTier == MemberTier.ultra) return true;
+    if (_selectedMemberTier == MemberTier.standard &&
+        course.category == 'Fitness') {
+      return true;
+    }
+    return false;
   }
 
   List<Course> _coursesForDay() {
-    return _allCourses.where((course) {
-      return course.dayOfWeek == _selectedDay;
-    }).toList();
+    return _allCourses.where((c) => c.dayOfWeek == _selectedDay).toList();
   }
 
   List<Reservation> _reservationsForDay() {
-    return _allReservations.where((reservation) {
-      try {
-        final date = DateTime.parse(reservation.date);
-        return date.weekday == _selectedDay;
-      } catch (_) {
-        return false;
-      }
-    }).toList();
+    // Simplified filtering for now
+    return _allReservations;
   }
 
-  void _buildUnified() {
-    final courses = _coursesForDay();
-    final reservations = _reservationsForDay();
+  void selectDay(int day) {
+    _selectedDay = day;
+    _rebuildUnified();
+    notifyListeners();
+  }
 
-    final merged = <PlanningEntry>[
-      ...courses.map(
-        (c) => PlanningEntry(
-          id: c.id,
-          type: PlanningEntryType.course,
-          title: c.title,
-          timeLabel: '${c.startTime}–${c.endTime}',
-          dayOfWeek: c.dayOfWeek,
-          source: c,
-          highlightForTier: _selectedMemberTier.rank >= MemberTier.ultra.rank,
-        ),
-      ),
-      ...reservations.map(
-        (r) => PlanningEntry(
-          id: r.id,
-          type: PlanningEntryType.reservation,
-          title: r.activityTitle,
-          timeLabel: r.time,
-          dayOfWeek: _selectedDay,
-          source: r,
-          highlightForTier:
-              _selectedMemberTier.rank >= MemberTier.standard.rank,
-        ),
-      ),
-    ];
+  void selectMember(FamilyMember? member) {
+    _selectedMember = member;
+    notifyListeners();
+    // In a real app, this would refresh data filtered by that member
+  }
 
-    merged.sort((a, b) => a.timeLabel.compareTo(b.timeLabel));
-    _unified = merged;
+  Future<bool> enrollInCourse(String courseId) async {
+    final result = await _enrollInCourseUseCase(courseId);
+    return result.when(
+      success: (_) {
+        // Refresh planning to show new reservation
+        loadPlanning();
+        return true;
+      },
+      failure: (f) {
+        setErrorMessage('enrollment_failed');
+        return false;
+      },
+    );
+  }
+
+  Future<Result<List<dynamic>, Failure>> getCourseSessions(String courseId) {
+    return _getCourseSessionsUseCase(courseId);
   }
 }

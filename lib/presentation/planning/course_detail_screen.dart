@@ -110,7 +110,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
               else
                 Container(
                   height: 250,
-                  color: appColors.bgElevated,
+                  color: theme.colorScheme.surfaceContainer,
                   child: const Icon(Icons.fitness_center, size: 64),
                 ),
               Padding(

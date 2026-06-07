@@ -5,6 +5,8 @@ import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'dart:developer' as developer;
 
@@ -14,8 +16,12 @@ class ProfileViewModel extends BaseViewModel {
   final LogoutUseCase _logoutUseCase;
   final DeleteAccountUseCase _deleteAccountUseCase;
   final AuthStateNotifier _authStateNotifier;
+  final GetOngoingReservationsUseCase _getOngoingReservationsUseCase;
+  final GetFullPaymentHistoryUseCase _getFullPaymentHistoryUseCase;
 
   bool _isLoading = false;
+  int _ongoingReservationsCount = 0;
+  int _successfulPaymentsCount = 0;
 
   /// The user's profile data, sourced from the global AuthStateNotifier.
   User? get user => _authStateNotifier.currentUser;
@@ -23,20 +29,53 @@ class ProfileViewModel extends BaseViewModel {
   /// Whether data is currently being loaded.
   bool get isLoading => _isLoading;
 
+  /// The count of ongoing reservations for the current user.
+  int get ongoingReservationsCount => _ongoingReservationsCount;
+
+  /// The count of successfully completed payments.
+  int get successfulPaymentsCount => _successfulPaymentsCount;
+
   /// Creates a new [ProfileViewModel] instance.
   ProfileViewModel({
     required AuthRepository authRepository,
     required LogoutUseCase logoutUseCase,
     required DeleteAccountUseCase deleteAccountUseCase,
     required AuthStateNotifier authStateNotifier,
+    required GetOngoingReservationsUseCase getOngoingReservationsUseCase,
+    required GetFullPaymentHistoryUseCase getFullPaymentHistoryUseCase,
   }) : _authRepository = authRepository,
        _logoutUseCase = logoutUseCase,
        _deleteAccountUseCase = deleteAccountUseCase,
-       _authStateNotifier = authStateNotifier {
+       _authStateNotifier = authStateNotifier,
+       _getOngoingReservationsUseCase = getOngoingReservationsUseCase,
+       _getFullPaymentHistoryUseCase = getFullPaymentHistoryUseCase {
     _authStateNotifier.addListener(notifyListeners);
     if (user == null) {
       loadProfile();
     }
+    _loadCounts();
+  }
+
+  Future<void> _loadCounts() async {
+    final reservationResult = await _getOngoingReservationsUseCase();
+    reservationResult.fold(
+      onSuccess: (reservations) {
+        _ongoingReservationsCount = reservations.length;
+      },
+      onFailure: (_) {},
+    );
+
+    final paymentResult = await _getFullPaymentHistoryUseCase.execute();
+    paymentResult.fold(
+      onSuccess: (payments) {
+        _successfulPaymentsCount = payments
+            .where((p) => p.status.toLowerCase() == 'success' || p.status.toLowerCase() == 'paid')
+            .length;
+      },
+      onFailure: (_) {},
+    );
+
+    notifyListeners();
   }
 
   @override

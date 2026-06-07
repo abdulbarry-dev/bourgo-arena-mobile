@@ -84,8 +84,12 @@ class LoginViewModel extends ChangeNotifier {
                 extra: _buildOnboardingData(session),
               );
             }
+          } else if (session.state == AuthState.authenticated &&
+              context.mounted) {
+            // Force navigation to home to prevent being stuck on login screen
+            context.go('/home');
           }
-          // Note: For other states, GoRouter redirect in router.dart will handle navigation
+          // Note: For other states (verification, etc.), GoRouter redirect will handle it
         },
       );
     }

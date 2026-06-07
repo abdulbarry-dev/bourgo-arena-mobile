@@ -17,6 +17,7 @@ class NotificationsViewModel extends ChangeNotifier {
   bool _isLoadingMore = false;
   int _currentPage = 1;
   bool _hasMore = true;
+  String? _errorMessage;
 
   /// List of user notifications.
   List<entity.Notification> get notifications => _notifications;
@@ -29,6 +30,9 @@ class NotificationsViewModel extends ChangeNotifier {
 
   /// Whether there are more notifications to load.
   bool get hasMore => _hasMore;
+
+  /// Error message if loading failed, null otherwise.
+  String? get errorMessage => _errorMessage;
 
   /// Creates a new [NotificationsViewModel] instance.
   NotificationsViewModel({
@@ -46,6 +50,7 @@ class NotificationsViewModel extends ChangeNotifier {
     _isLoading = true;
     _currentPage = 1;
     _notifications = [];
+    _errorMessage = null;
     if (!_isDisposed) notifyListeners();
 
     final result = await _getNotificationsUseCase(page: _currentPage);
@@ -58,6 +63,7 @@ class NotificationsViewModel extends ChangeNotifier {
         },
         failure: (failure) {
           _isLoading = false;
+          _errorMessage = failure.message;
           developer.log('Error loading notifications: ${failure.message}');
         },
       );

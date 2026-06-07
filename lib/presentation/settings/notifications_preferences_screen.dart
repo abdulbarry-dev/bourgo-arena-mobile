@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
@@ -15,19 +14,24 @@ class NotificationsPreferencesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
-        backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
+        centerTitle: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+          color: theme.colorScheme.onSurface,
+        ),
         title: Text(
-          l10n.settingsPushNotifications,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontFamily: AppConstants.displayFontFamily,
-            fontWeight: FontWeight.w800,
+          l10n.settingsPushNotifications.toUpperCase(),
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
           ),
         ),
       ),

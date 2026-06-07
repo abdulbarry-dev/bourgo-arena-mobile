@@ -1,3 +1,4 @@
+import "package:flutter/material.dart";
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart' as entity;
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
@@ -133,7 +134,7 @@ class HomeViewModel extends BaseViewModel {
           for (var service in data as List<Service>) {
             newOfferings.add(
               UnifiedOffering(
-                id: service.id,
+                id: service.id.toString(),
                 title: service.name,
                 description: service.description,
                 imageUrl: service.imageUrl,

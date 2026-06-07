@@ -1,14 +1,29 @@
-import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/entities/loyalty_balance.dart';
 import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
-import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:bourgo_arena_mobile/domain/entities/loyalty_balance.dart';
 
-/// Loyalty Dashboard screen showing points, progress, and transactions.
+({String label, IconData icon}) _mapSourceType(String sourceType) {
+  switch (sourceType) {
+    case 'daily_checkin':
+      return (label: 'Check-in quotidien', icon: Symbols.calendar_check);
+    case 'referral':
+      return (label: 'Parrainage', icon: Symbols.person_add);
+    case 'subscription_renewal':
+      return (label: "Renouvellement d'abonnement", icon: Symbols.card_membership);
+    case 'reservation_completed':
+      return (label: 'Réservation complétée', icon: Symbols.event_available);
+    case 'welcome_bonus':
+      return (label: 'Bonus de bienvenue', icon: Symbols.celebration);
+    default:
+      final label = sourceType.replaceAll('_', ' ');
+      return (label: label[0].toUpperCase() + label.substring(1), icon: Symbols.receipt_long);
+  }
+}
+
 class LoyaltyDashboardScreen extends StatelessWidget {
   final LoyaltyDashboardViewModel viewModel;
 
@@ -17,52 +32,37 @@ class LoyaltyDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-    final l10n = AppLocalizations.of(context)!;
+    final spacing = context.spacing;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(
-                  alpha: 0.5,
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                Symbols.stars,
-                color: theme.colorScheme.primary,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Text(
-              l10n.loyaltyDashboardTitle,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontFamily: AppConstants.displayFontFamily,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ],
+        title: Text(
+          'MES POINTS',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
         ),
-        backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+          color: theme.colorScheme.onSurface,
+        ),
       ),
       body: AnimatedBuilder(
         animation: viewModel,
         builder: (context, _) {
-          if (viewModel.isLoading &&
-              viewModel.currentPoints == 0 &&
-              viewModel.recentTransactions.isEmpty) {
+          if (viewModel.isLoading && viewModel.currentPoints == 0 && viewModel.recentTransactions.isEmpty) {
             return const Center(child: CircularProgressIndicator());
+          }
+
+          if (viewModel.errorMessage != null && viewModel.currentPoints == 0 && viewModel.recentTransactions.isEmpty) {
+            return _buildErrorState(context, theme, spacing);
           }
 
           final points = viewModel.currentPoints;
@@ -71,87 +71,47 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           final pointsToNext = viewModel.pointsToNextTier;
           final progress = viewModel.progressToNextTier;
 
-          final String tierName = switch (currentTier) {
-            MemberTier.standard => l10n.profileStandardTier,
-            MemberTier.ultra => l10n.loyaltyGoldMember,
-            _ => currentTier.label,
-          };
-
-          final String nextTierLabel = switch (nextTier) {
-            MemberTier.ultra => 'Platinum',
-            MemberTier.standard => 'Gold',
-            _ => nextTier?.label ?? '',
-          };
-
-          final userName = (viewModel.user?.name.trim().isNotEmpty == true)
-              ? viewModel.user!.name
-              : 'Guest Member';
-
           return RefreshIndicator(
             onRefresh: () => viewModel.loadBalance(),
+            color: theme.colorScheme.primary,
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
                 SliverPadding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(spacing.lg),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      _buildPointsCard(
-                        context,
-                        theme,
-                        appColors,
-                        l10n,
-                        points,
-                        tierName,
-                        userName,
-                      ),
-                      const SizedBox(height: 24),
+                      _buildPointsCard(context, theme, spacing, points, currentTier),
+                      SizedBox(height: spacing.lg),
                       if (nextTier != null)
-                        _buildProgressBar(
-                          context,
-                          theme,
-                          appColors,
-                          l10n,
-                          progress,
-                          pointsToNext,
-                          nextTierLabel,
-                        )
+                        _buildProgressSection(context, theme, spacing, progress, pointsToNext, nextTier)
                       else
-                        _buildMaxTierMessage(context, theme),
-                      const SizedBox(height: 32),
-                      _buildSectionTitle(
-                        context,
-                        theme,
-                        l10n.loyaltyRecentTransactions,
-                      ),
-                      const SizedBox(height: 16),
+                        _buildMaxTierMessage(context, theme, spacing),
+                      SizedBox(height: spacing.xl),
+                      _buildSectionTitle(theme, 'HISTORIQUE DES POINTS'),
+                      SizedBox(height: spacing.md),
                     ]),
                   ),
                 ),
                 if (viewModel.recentTransactions.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: _buildEmptyState(context, theme, appColors, l10n),
+                    child: _buildEmptyState(context, theme, spacing),
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: spacing.md),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final tx = viewModel.recentTransactions[index];
-                        return _buildTransactionItem(
-                          context,
-                          theme,
-                          appColors,
-                          tx,
-                        );
-                      }, childCount: viewModel.recentTransactions.length),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final tx = viewModel.recentTransactions[index];
+                          return _buildTransactionItem(context, theme, spacing, tx);
+                        },
+                        childCount: viewModel.recentTransactions.length,
+                      ),
                     ),
                   ),
-                const SliverToBoxAdapter(child: SizedBox(height: 40)),
+                SliverToBoxAdapter(child: SizedBox(height: spacing.xxl)),
               ],
             ),
           );
@@ -160,39 +120,88 @@ class LoyaltyDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPointsCard(
-    BuildContext context,
-    ThemeData theme,
-    AppColors appColors,
-    AppLocalizations l10n,
-    int points,
-    String tierName,
-    String userName,
-  ) {
-    final formattedPoints = NumberFormat(
-      '#,###',
-    ).format(points).replaceAll(',', ' ');
+  Widget _buildPointsCard(BuildContext context, ThemeData theme, AppSpacing spacing, int points, MemberTier tier) {
+    final formattedPoints = NumberFormat('#,###').format(points).replaceAll(',', ' ');
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF2A2D34), // Sleek dark slate
-            Color(0xFF141518), // Deeper slate
+            theme.colorScheme.primary.withValues(alpha: 0.15),
+            theme.colorScheme.primary.withValues(alpha: 0.05),
           ],
         ),
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xxs),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  tier.label.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(spacing.sm),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Symbols.stars, color: theme.colorScheme.primary, size: 24),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.xl),
+          Text(
+            'SOLDE DE POINTS',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.5,
+            ),
+          ),
+          SizedBox(height: spacing.xs),
+          Text(
+            formattedPoints,
+            style: theme.textTheme.displaySmall?.copyWith(
+              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: 1.0,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProgressSection(BuildContext context, ThemeData theme, AppSpacing spacing, double progress, int pointsToNext, MemberTier nextTier) {
+    final appColors = theme.extension<AppColors>()!;
+    final formattedPoints = NumberFormat('#,###').format(pointsToNext);
+
+    return Container(
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: appColors.bgElevated,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: appColors.bgBorder),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,178 +210,53 @@ class LoyaltyDashboardScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'BOURGO LOYALTY',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 2.0,
-                  fontSize: 10,
+                'Prochain palier : ${nextTier.label}',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              Icon(
-                Symbols.contactless,
-                color: Colors.white.withValues(alpha: 0.5),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Text(
-            l10n.loyaltyTotalPoints.toUpperCase(),
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
-              letterSpacing: 1.0,
-              fontSize: 12,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            formattedPoints,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 40,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 2.0,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'MEMBER',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.5),
-                      fontSize: 8,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    userName.toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Text(
-                  tierName.toUpperCase(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
-                    fontSize: 10,
-                  ),
+              Text(
+                '$formattedPoints pts',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: theme.colorScheme.primary,
                 ),
               ),
             ],
+          ),
+          SizedBox(height: spacing.sm),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
+              valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
+              minHeight: 8,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProgressBar(
-    BuildContext context,
-    ThemeData theme,
-    AppColors appColors,
-    AppLocalizations l10n,
-    double progress,
-    int pointsToNext,
-    String nextTierLabel,
-  ) {
-    final numberFormat = NumberFormat('#,###');
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Stack(
-          children: [
-            Container(
-              height: 12,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(6),
-              ),
-            ),
-            FractionallySizedBox(
-              widthFactor: progress,
-              child: Container(
-                height: 12,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      theme.colorScheme.primary.withValues(alpha: 0.7),
-                      theme.colorScheme.primary,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(6),
-                  boxShadow: [
-                    BoxShadow(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Text(
-          l10n
-              .loyaltyPointsToPlatinum(numberFormat.format(pointsToNext))
-              .replaceAll('Platinum', nextTierLabel),
-          textAlign: TextAlign.center,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMaxTierMessage(BuildContext context, ThemeData theme) {
+  Widget _buildMaxTierMessage(BuildContext context, ThemeData theme, AppSpacing spacing) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(spacing.md),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+        color: theme.colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.15)),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Symbols.workspace_premium, color: theme.colorScheme.primary),
-          const SizedBox(width: 12),
+          Icon(Symbols.workspace_premium, color: theme.colorScheme.primary, size: 20),
+          SizedBox(width: spacing.sm),
           Text(
-            'Highest tier reached!',
-            style: theme.textTheme.titleSmall?.copyWith(
+            'Niveau maximum atteint',
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w700,
               color: theme.colorScheme.primary,
-              fontWeight: FontWeight.bold,
             ),
           ),
         ],
@@ -380,11 +264,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionTitle(
-    BuildContext context,
-    ThemeData theme,
-    String title,
-  ) {
+  Widget _buildSectionTitle(ThemeData theme, String title) {
     return Text(
       title.toUpperCase(),
       style: theme.textTheme.labelSmall?.copyWith(
@@ -395,106 +275,52 @@ class LoyaltyDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(
-    BuildContext context,
-    ThemeData theme,
-    AppColors appColors,
-    AppLocalizations l10n,
-  ) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.05),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Symbols.receipt_long,
-              size: 64,
-              color: theme.colorScheme.primary.withValues(alpha: 0.5),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            l10n.loyaltyNoTransactions,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Text(
-              l10n.loyaltyNoTransactionsSubtitle,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(
-                  alpha: 0.8,
-                ),
-                height: 1.5,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTransactionItem(
-    BuildContext context,
-    ThemeData theme,
-    AppColors appColors,
-    LoyaltyTransaction tx,
-  ) {
-    final bool isPositive = tx.points >= 0;
-    final color = isPositive ? Colors.green.shade600 : Colors.red.shade600;
-    final icon = isPositive ? Symbols.add_circle : Symbols.remove_circle;
+  Widget _buildTransactionItem(BuildContext context, ThemeData theme, AppSpacing spacing, LoyaltyTransaction tx) {
+    final appColors = theme.extension<AppColors>()!;
+    final sourceType = tx.description ?? '';
+    final mapped = _mapSourceType(sourceType);
+    final isPositive = tx.points >= 0;
     final sign = isPositive ? '+' : '';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: spacing.sm),
+      padding: EdgeInsets.all(spacing.md),
       decoration: BoxDecoration(
-        color: appColors.bgElevated,
+        color: appColors.bgSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: appColors.bgBorder, width: 1),
+        border: Border.all(color: appColors.bgBorder),
       ),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: isPositive
+                  ? Colors.green.withValues(alpha: 0.1)
+                  : Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color),
+            child: Icon(mapped.icon, color: isPositive ? Colors.green.shade600 : Colors.red.shade600, size: 22),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: spacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  tx.description ??
-                      (isPositive ? 'Points Earned' : 'Points Redeemed'),
+                  mapped.label,
                   style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
                 if (tx.createdAt != null) ...[
-                  const SizedBox(height: 4),
+                  SizedBox(height: spacing.xxs),
                   Text(
                     _formatDate(tx.createdAt!),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant.withValues(
-                        alpha: 0.7,
-                      ),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -505,7 +331,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
             '$sign${tx.points}',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w900,
-              color: color,
+              color: isPositive ? Colors.green.shade600 : Colors.red.shade600,
             ),
           ),
         ],
@@ -513,11 +339,101 @@ class LoyaltyDashboardScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildEmptyState(BuildContext context, ThemeData theme, AppSpacing spacing) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(spacing.lg),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withValues(alpha: 0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Symbols.receipt_long,
+                size: 56,
+                color: theme.colorScheme.primary.withValues(alpha: 0.5),
+              ),
+            ),
+            SizedBox(height: spacing.lg),
+            Text(
+              'Aucune transaction',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: spacing.sm),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+              child: Text(
+                'Vos transactions de points apparaîtront ici.',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildErrorState(BuildContext context, ThemeData theme, AppSpacing spacing) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(spacing.lg),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.error.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Symbols.wifi_off, size: 48, color: theme.colorScheme.error),
+            ),
+            SizedBox(height: spacing.lg),
+            Text(
+              'Chargement échoué',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            SizedBox(height: spacing.sm),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+              child: Text(
+                viewModel.errorMessage ?? 'Impossible de charger vos points.',
+                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            SizedBox(height: spacing.xl),
+            FilledButton.icon(
+              onPressed: () => viewModel.loadBalance(),
+              icon: const Icon(Symbols.refresh, size: 20),
+              label: const Text('Réessayer'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _formatDate(String isoString) {
     try {
-      final date = DateTime.parse(isoString);
-      return DateFormat('MMM d, yyyy').format(date);
-    } catch (e) {
+      return DateFormat('MMM d, yyyy').format(DateTime.parse(isoString));
+    } catch (_) {
       return isoString;
     }
   }

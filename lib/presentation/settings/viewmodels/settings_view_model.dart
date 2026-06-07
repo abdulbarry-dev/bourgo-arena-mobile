@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/complete_language_selection_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/get_locale_use_case.dart';
@@ -142,64 +143,58 @@ class SettingsViewModel extends BaseViewModel {
       _sessionRepository.areFamilyNotificationsEnabled(),
     ]);
 
-    final themeResult = results[0] as Result<ThemeMode, dynamic>;
-    final localeResult = results[1] as Result<Locale, dynamic>;
-    final notifResult = results[2] as Result<bool, dynamic>;
-    final langResult = results[3] as Result<bool, dynamic>;
-    final themeSelResult = results[4] as Result<bool, dynamic>;
+    final themeResult = results[0] as Result<ThemeMode, Failure>;
+    final localeResult = results[1] as Result<Locale, Failure>;
+    final notifResult = results[2] as Result<bool, Failure>;
+    final langResult = results[3] as Result<bool, Failure>;
+    final themeSelResult = results[4] as Result<bool, Failure>;
     final packageInfo = results[5] as PackageInfo;
-    final promoResult = results[6] as Result<bool, dynamic>;
-    final accountResult = results[7] as Result<bool, dynamic>;
-    final reservationsResult = results[8] as Result<bool, dynamic>;
-    final subscriptionsResult = results[9] as Result<bool, dynamic>;
-    final coursesResult = results[10] as Result<bool, dynamic>;
-    final loyaltyResult = results[11] as Result<bool, dynamic>;
-    final familyResult = results[12] as Result<bool, dynamic>;
+    final promoResult = results[6] as Result<bool, Failure>;
+    final accountResult = results[7] as Result<bool, Failure>;
+    final reservationsResult = results[8] as Result<bool, Failure>;
+    final subscriptionsResult = results[9] as Result<bool, Failure>;
+    final coursesResult = results[10] as Result<bool, Failure>;
+    final loyaltyResult = results[11] as Result<bool, Failure>;
+    final familyResult = results[12] as Result<bool, Failure>;
 
-    if (themeResult.isSuccess) {
-      _themeMode = (themeResult as Success<ThemeMode, dynamic>).data;
-    }
-    if (localeResult.isSuccess) {
-      _locale = (localeResult as Success<Locale, dynamic>).data;
-    }
-    if (notifResult.isSuccess) {
-      _notificationsEnabled = (notifResult as Success<bool, dynamic>).data;
-    }
-    if (langResult.isSuccess) {
-      _languageSelected = (langResult as Success<bool, dynamic>).data;
-    }
-    if (themeSelResult.isSuccess) {
-      _themeSelected = (themeSelResult as Success<bool, dynamic>).data;
-    }
-    if (promoResult.isSuccess) {
-      _promoNotificationsEnabled = (promoResult as Success<bool, dynamic>).data;
-    }
-    if (accountResult.isSuccess) {
-      _accountNotificationsEnabled =
-          (accountResult as Success<bool, dynamic>).data;
-    }
-    if (reservationsResult.isSuccess) {
-      _reservationsNotificationsEnabled =
-          (reservationsResult as Success<bool, dynamic>).data;
-    }
-    if (subscriptionsResult.isSuccess) {
-      _subscriptionsNotificationsEnabled =
-          (subscriptionsResult as Success<bool, dynamic>).data;
-    }
-    if (coursesResult.isSuccess) {
-      _coursesNotificationsEnabled =
-          (coursesResult as Success<bool, dynamic>).data;
-    }
-    if (loyaltyResult.isSuccess) {
-      _loyaltyNotificationsEnabled =
-          (loyaltyResult as Success<bool, dynamic>).data;
-    }
-    if (familyResult.isSuccess) {
-      _familyNotificationsEnabled =
-          (familyResult as Success<bool, dynamic>).data;
-    }
-
-    _appVersion = '${packageInfo.version} (${packageInfo.buildNumber})';
+    _themeMode = themeResult.isSuccess
+        ? (themeResult as Success<ThemeMode, Failure>).data
+        : ThemeMode.system;
+    _locale = localeResult.isSuccess
+        ? (localeResult as Success<Locale, Failure>).data
+        : const Locale('en');
+    _notificationsEnabled = notifResult.isSuccess
+        ? (notifResult as Success<bool, Failure>).data
+        : true;
+    _languageSelected = langResult.isSuccess
+        ? (langResult as Success<bool, Failure>).data
+        : false;
+    _themeSelected = themeSelResult.isSuccess
+        ? (themeSelResult as Success<bool, Failure>).data
+        : false;
+    _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+    _promoNotificationsEnabled = promoResult.isSuccess
+        ? (promoResult as Success<bool, Failure>).data
+        : true;
+    _accountNotificationsEnabled = accountResult.isSuccess
+        ? (accountResult as Success<bool, Failure>).data
+        : true;
+    _reservationsNotificationsEnabled = reservationsResult.isSuccess
+        ? (reservationsResult as Success<bool, Failure>).data
+        : true;
+    _subscriptionsNotificationsEnabled = subscriptionsResult.isSuccess
+        ? (subscriptionsResult as Success<bool, Failure>).data
+        : true;
+    _coursesNotificationsEnabled = coursesResult.isSuccess
+        ? (coursesResult as Success<bool, Failure>).data
+        : true;
+    _loyaltyNotificationsEnabled = loyaltyResult.isSuccess
+        ? (loyaltyResult as Success<bool, Failure>).data
+        : true;
+    _familyNotificationsEnabled = familyResult.isSuccess
+        ? (familyResult as Success<bool, Failure>).data
+        : true;
+    _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
 
     notifyListeners();
   }
