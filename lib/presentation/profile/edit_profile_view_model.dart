@@ -16,6 +16,7 @@ class EditProfileViewModel extends ChangeNotifier {
 
   bool _isLoading = true;
   bool _isSaving = false;
+  bool _isUploadingAvatar = false;
 
   EditProfileViewModel({
     required UpdateUserProfileUseCase updateUserProfileUseCase,
@@ -33,6 +34,7 @@ class EditProfileViewModel extends ChangeNotifier {
 
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
+  bool get isUploadingAvatar => _isUploadingAvatar;
 
   @override
   void dispose() {
@@ -95,6 +97,38 @@ class EditProfileViewModel extends ChangeNotifier {
       return false;
     } finally {
       _isSaving = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> uploadAvatar(String filePath) async {
+    _isUploadingAvatar = true;
+    notifyListeners();
+
+    try {
+      final result = await _authRepository.uploadAvatar(filePath);
+      return result.isSuccess;
+    } catch (e, stackTrace) {
+      developer.log('Error uploading avatar', error: e, stackTrace: stackTrace);
+      return false;
+    } finally {
+      _isUploadingAvatar = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> deleteAvatar() async {
+    _isUploadingAvatar = true;
+    notifyListeners();
+
+    try {
+      final result = await _authRepository.deleteAvatar();
+      return result.isSuccess;
+    } catch (e, stackTrace) {
+      developer.log('Error deleting avatar', error: e, stackTrace: stackTrace);
+      return false;
+    } finally {
+      _isUploadingAvatar = false;
       notifyListeners();
     }
   }

@@ -294,12 +294,6 @@ class ApiAuthRepository implements AuthRepository {
               (finalState == AuthState.pendingOnboarding &&
                   !_hasCompleteOnboardingProfile(user)));
 
-      final shouldRefreshProfile =
-          token != null &&
-          (user == null ||
-              (finalState == AuthState.pendingOnboarding &&
-                  !_hasCompleteOnboardingProfile(user)));
-
       if (shouldRefreshProfile) {
         // If a token was provided but user data is missing, attempt to fetch
         // the profile. This also normalizes partial onboarding sessions where
@@ -833,6 +827,74 @@ class ApiAuthRepository implements AuthRepository {
     }
 
     return result;
+  }
+
+  @override
+  Future<Result<AuthSession, Failure>> uploadAvatar(String filePath) async {
+    if (!_apiClient.hasToken) {
+      return FailureResult(
+        AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+      );
+    }
+    return executeApiCall(() async {
+      final userResponse = await _apiClient.uploadMultipart(
+            '/user/profile/avatar',
+            fileFieldName: 'avatar',
+            filePath: filePath,
+          )
+          as Map<String, dynamic>;
+
+      final userModel = UserProfileModel.fromJson(userResponse);
+      final user = UserMapper.toEntity(userModel);
+
+      final stateStr = userResponse['state'] as String? ?? 'active';
+      final state = _mapBackendState(stateStr);
+
+      await _sessionRepository.saveAuthState(state.name);
+
+      final tokenResult = await _sessionRepository.getAuthToken();
+      final token = tokenResult.fold(
+        onSuccess: (t) => t,
+        onFailure: (_) => null,
+      );
+
+      final session = AuthSession(user: user, state: state, token: token);
+      final finalSession = await _checkLoginVerification(session);
+      await _updateSession(finalSession);
+      return Success(finalSession);
+    });
+  }
+
+  @override
+  Future<Result<AuthSession, Failure>> deleteAvatar() async {
+    if (!_apiClient.hasToken) {
+      return FailureResult(
+        AuthFailure(AppErrorCode.invalidCredentials, 'Guest user'),
+      );
+    }
+    return executeApiCall(() async {
+      final userResponse = await _apiClient.delete('/user/profile/avatar')
+          as Map<String, dynamic>;
+
+      final userModel = UserProfileModel.fromJson(userResponse);
+      final user = UserMapper.toEntity(userModel);
+
+      final stateStr = userResponse['state'] as String? ?? 'active';
+      final state = _mapBackendState(stateStr);
+
+      await _sessionRepository.saveAuthState(state.name);
+
+      final tokenResult = await _sessionRepository.getAuthToken();
+      final token = tokenResult.fold(
+        onSuccess: (t) => t,
+        onFailure: (_) => null,
+      );
+
+      final session = AuthSession(user: user, state: state, token: token);
+      final finalSession = await _checkLoginVerification(session);
+      await _updateSession(finalSession);
+      return Success(finalSession);
+    });
   }
 
   @override
