@@ -91,7 +91,10 @@ Future<void> initLocator() async {
   );
 
   // Networking
-  final apiClient = ApiClient(baseUrl: AppConfig.baseUrl);
+  final apiClient = ApiClient(
+    baseUrl: AppConfig.baseUrl,
+    sharedPreferences: sharedPrefs,
+  );
 
   // Initialize the token from storage if it exists
   final tokenResult = await locator<SessionRepository>().getAuthToken();

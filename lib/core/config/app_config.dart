@@ -1,22 +1,33 @@
-/// Application configuration constants and flags.
-///
-/// These values can be overridden using `--dart-define` during the build process.
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart';
+
+/// Centralized configuration for environment variables and platform-specific checks.
 class AppConfig {
-  /// The base URL for the production API.
-  static const String baseUrl = String.fromEnvironment(
-    'BASE_URL',
-    defaultValue: 'http://localhost:8000/api/v1',
-  );
+  static bool? _isTest;
 
-  /// The timeout duration for API requests in milliseconds.
-  static const int apiTimeout = int.fromEnvironment(
-    'API_TIMEOUT',
-    defaultValue: 30000,
-  );
+  /// Returns true if the application is running in a test environment.
+  /// Safely handles Flutter Web by avoiding dart:io calls where unsupported.
+  static bool get isTest {
+    if (_isTest != null) {
+      return _isTest!;
+    }
 
-  /// The application name.
-  static const String appName = 'Bourgo Arena';
+    if (kIsWeb) {
+      _isTest = false;
+    } else {
+      try {
+        _isTest = io.Platform.environment.containsKey('FLUTTER_TEST');
+      } catch (_) {
+        // Fallback if Platform.environment throws unexpectedly
+        _isTest = false;
+      }
+    }
 
-  /// The application version.
-  static const String version = '1.0.0';
+    return _isTest!;
+  }
+
+  /// Override the test mode manually (useful for tests).
+  static void setTestMode(bool value) {
+    _isTest = value;
+  }
 }

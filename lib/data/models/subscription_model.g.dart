@@ -6,28 +6,34 @@ part of 'subscription_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-BenefitModel _$BenefitModelFromJson(Map<String, dynamic> json) =>
-    BenefitModel(label: json['label'] as String, icon: json['icon'] as String?);
-
-Map<String, dynamic> _$BenefitModelToJson(BenefitModel instance) =>
-    <String, dynamic>{'label': instance.label, 'icon': instance.icon};
-
 SubscriptionModel _$SubscriptionModelFromJson(Map<String, dynamic> json) =>
     SubscriptionModel(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      price: (json['price'] as num).toDouble(),
-      benefits: (json['benefits'] as List<dynamic>)
-          .map((e) => BenefitModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      durationMonths: (json['duration_months'] as num).toInt(),
+      id: SubscriptionModel._idToString(json['id']),
+      planName: json['plan_name'] as String?,
+      planDescription: json['plan_description'] as String?,
+      status: json['status'] as String?,
+      startsAt: json['starts_at'] as String?,
+      endsAt: json['ends_at'] as String?,
+      daysRemaining: (json['days_remaining'] as num?)?.toInt(),
+      paymentMethod: json['payment_method'] as String?,
+      amountPaid: (json['amount_paid'] as num?)?.toDouble(),
+      name: json['name'] as String?,
+      price: (json['price'] as num?)?.toDouble(),
+      durationMonths: (json['duration_months'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SubscriptionModelToJson(SubscriptionModel instance) =>
     <String, dynamic>{
       'id': instance.id,
+      'plan_name': instance.planName,
+      'plan_description': instance.planDescription,
+      'status': instance.status,
+      'starts_at': instance.startsAt,
+      'ends_at': instance.endsAt,
+      'days_remaining': instance.daysRemaining,
+      'payment_method': instance.paymentMethod,
+      'amount_paid': instance.amountPaid,
       'name': instance.name,
       'price': instance.price,
-      'benefits': instance.benefits,
       'duration_months': instance.durationMonths,
     };

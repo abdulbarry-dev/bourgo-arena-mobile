@@ -10,6 +10,7 @@ import 'package:bourgo_arena_mobile/presentation/home/widgets/unified_offering_c
 import 'package:bourgo_arena_mobile/presentation/home/models/unified_offering.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -145,61 +146,84 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(24),
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Image.asset(
-                            'assets/images/background.jpg',
-                            fit: BoxFit.cover,
-                            alignment: Alignment.centerRight,
-                          ),
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.black.withValues(alpha: 0.18),
-                                  Colors.black.withValues(alpha: 0.52),
-                                ],
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                      child:
+                          Stack(
+                                fit: StackFit.expand,
                                 children: [
-                                  Text(
-                                    greeting,
-                                    style: theme.textTheme.labelMedium
-                                        ?.copyWith(
-                                          color: theme.colorScheme.primary,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 1.5,
-                                        ),
+                                  Image.asset(
+                                    'assets/images/background.jpg',
+                                    fit: BoxFit.cover,
+                                    alignment: Alignment.centerRight,
                                   ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Discover Your\nNext Challenge',
-                                    style: theme.textTheme.displaySmall
-                                        ?.copyWith(
-                                          color: Colors.white,
-                                          fontFamily:
-                                              AppConstants.displayFontFamily,
-                                          fontWeight: FontWeight.bold,
-                                          height: 1.1,
-                                        ),
+                                  DecoratedBox(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.black.withValues(alpha: 0.18),
+                                          Colors.black.withValues(alpha: 0.52),
+                                        ],
+                                      ),
+                                    ),
                                   ),
+                                  Padding(
+                                        padding: const EdgeInsets.all(24),
+                                        child: Align(
+                                          alignment: Alignment.bottomLeft,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                greeting,
+                                                style: theme
+                                                    .textTheme
+                                                    .labelMedium
+                                                    ?.copyWith(
+                                                      color: theme
+                                                          .colorScheme
+                                                          .primary,
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      letterSpacing: 1.5,
+                                                    ),
+                                              ),
+                                              const SizedBox(height: 8),
+                                              Text(
+                                                'Discover Your\nNext Challenge',
+                                                style: theme
+                                                    .textTheme
+                                                    .displaySmall
+                                                    ?.copyWith(
+                                                      color: Colors.white,
+                                                      fontFamily: AppConstants
+                                                          .displayFontFamily,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      height: 1.1,
+                                                    ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                      .animate()
+                                      .fade(duration: 500.ms)
+                                      .slideY(
+                                        begin: 0.1,
+                                        end: 0,
+                                        curve: Curves.easeOutQuad,
+                                      ),
                                 ],
+                              )
+                              .animate()
+                              .fade(delay: 300.ms)
+                              .scale(
+                                begin: const Offset(0.95, 0.95),
+                                curve: Curves.easeOutBack,
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 ),
@@ -210,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     text: l10n.homeTicker,
                     backgroundColor: theme.colorScheme.primary,
                     textColor: theme.colorScheme.onPrimary,
-                  ),
+                  ).animate().fade(delay: 200.ms).slideX(begin: 0.1, end: 0),
                 ),
 
                 const SliverToBoxAdapter(child: SizedBox(height: 32)),
@@ -371,9 +395,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             final offering =
                                 _viewModel.filteredOfferings[index];
                             return UnifiedOfferingCard(
-                              offering: offering,
-                              onTap: () => _onOfferingTapped(offering),
-                            );
+                                  offering: offering,
+                                  onTap: () => _onOfferingTapped(offering),
+                                )
+                                .animate(delay: (index * 50).ms)
+                                .fade(duration: 400.ms)
+                                .slideY(
+                                  begin: 0.1,
+                                  end: 0,
+                                  curve: Curves.easeOutQuad,
+                                );
                           }, childCount: _viewModel.filteredOfferings.length),
                         ),
                 ),

@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/manage_children_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -190,9 +191,12 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
       children: List.generate(children.length, (index) {
         final child = children[index];
         return Padding(
-          padding: EdgeInsets.only(bottom: spacing.lg),
-          child: _buildChildCard(context, child),
-        );
+              padding: EdgeInsets.only(bottom: spacing.lg),
+              child: _buildChildCard(context, child),
+            )
+            .animate(delay: (index * 50).ms)
+            .fade(duration: 300.ms)
+            .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
       }),
     );
   }

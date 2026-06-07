@@ -12,7 +12,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_cas
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/common/widgets/bourgo_image_card.dart';
+import 'package:bourgo_arena_mobile/presentation/home/widgets/unified_offering_card.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -86,7 +86,7 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
     activitiesCompleter.complete(Success([testActivityEntity()]));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
     expect(find.byType(CircularProgressIndicator), findsNothing);
   });
 
@@ -108,9 +108,9 @@ void main() {
     );
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 2));
 
-    expect(find.byType(EmptyState), findsNWidgets(2));
+    expect(find.byType(EmptyState), findsOneWidget);
   });
 }
 

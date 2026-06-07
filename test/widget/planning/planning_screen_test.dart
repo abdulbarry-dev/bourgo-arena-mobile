@@ -25,6 +25,8 @@ void main() {
     when(() => mockAuthStateNotifier.state).thenReturn(AuthState.authenticated);
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     mockViewModel = MockPlanningViewModel();
+    when(() => mockViewModel.isAuthenticated).thenReturn(true);
+    when(() => mockViewModel.hasActivePlan).thenReturn(true);
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.errorMessage).thenReturn(null);
     when(() => mockViewModel.courses).thenReturn([]);
@@ -61,7 +63,7 @@ void main() {
     when(() => mockViewModel.selectDay(any())).thenReturn(null);
 
     await tester.pumpWidget(createWidget());
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
 
     final context = tester.element(find.byType(PlanningScreen));
     final l10n = AppLocalizations.of(context)!;
@@ -117,7 +119,7 @@ void main() {
     when(() => mockViewModel.unified).thenReturn(unified);
 
     await tester.pumpWidget(createWidget());
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2));
 
     check(find.text('Morning Yoga').evaluate()).isNotEmpty();
     check(find.text('Alice').evaluate()).isNotEmpty();

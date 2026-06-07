@@ -54,15 +54,51 @@ void main() {
     when(
       () => sessionRepository.shouldSkipLoginOtpForever(),
     ).thenAnswer((_) async => const Success(false));
+    when(
+      () => sessionRepository.getThemeMode(),
+    ).thenAnswer((_) async => const Success(ThemeMode.system));
+    when(
+      () => sessionRepository.getLocale(),
+    ).thenAnswer((_) async => const Success(Locale('en')));
+    when(
+      () => sessionRepository.areNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.arePromotionalNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areAccountNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areReservationsNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areSubscriptionsNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areCoursesNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areLoyaltyNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
+    when(
+      () => sessionRepository.areFamilyNotificationsEnabled(),
+    ).thenAnswer((_) async => const Success(true));
 
-    // Default verification status
-    when(() => apiClient.get('/user/verification-status')).thenAnswer(
+    when(
+      () => apiClient.get(any(), includeAuth: any(named: 'includeAuth')),
+    ).thenAnswer(
       (_) async => {
         'email_verified': true,
         'phone_verified': true,
         'is_fully_verified': true,
       },
     );
+
+    // Default mock for profile update
+    when(
+      () => apiClient.put('/user/profile', any()),
+    ).thenAnswer((_) async => {});
   });
 
   test(
@@ -123,6 +159,11 @@ void main() {
       // Now complete registration (simulate PIN setup)
       final user = userEntity;
       final completeResult = await repository.completeRegistration(user);
+      if (completeResult is FailureResult) {
+        print(
+          'completeRegistration Failed: ${(completeResult as FailureResult).failure.message}',
+        );
+      }
       expect(completeResult, isA<Success<void, dynamic>>());
 
       await expectation;

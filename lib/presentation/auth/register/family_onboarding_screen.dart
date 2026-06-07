@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.da
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -187,47 +188,61 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                     ),
                     sliver: SliverToBoxAdapter(
                       child: Column(
-                        children: [
-                          FamilyMemberForm(
-                            firstNameController: _viewModel.firstNameController,
-                            lastNameController: _viewModel.lastNameController,
-                            birthDateController: _viewModel.birthDateController,
-                            selectedGender: _viewModel.selectedGender,
-                            onGenderChanged: _viewModel.setGender,
-                            onSelectBirthDate: _selectBirthDate,
-                            onAdd: _viewModel.addMember,
-                            firstNameError: _viewModel.hasFirstNameError
-                                ? l10n.commonRequiredField
-                                : null,
-                            lastNameError: _viewModel.hasLastNameError
-                                ? l10n.commonRequiredField
-                                : null,
-                            genderError: _viewModel.hasGenderError
-                                ? l10n.commonRequiredField
-                                : null,
-                            birthDateError: _viewModel.hasBirthDateError
-                                ? l10n.commonRequiredField
-                                : null,
-                          ),
-                          const SizedBox(height: 48),
-                          FilledButton(
-                            onPressed: _onContinue,
-                            style: FilledButton.styleFrom(
-                              minimumSize: const Size(double.infinity, 56),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            ),
-                            child: Text(
-                              l10n.commonStart,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                          ),
-                        ],
+                        children:
+                            [
+                                  FamilyMemberForm(
+                                    firstNameController:
+                                        _viewModel.firstNameController,
+                                    lastNameController:
+                                        _viewModel.lastNameController,
+                                    birthDateController:
+                                        _viewModel.birthDateController,
+                                    selectedGender: _viewModel.selectedGender,
+                                    onGenderChanged: _viewModel.setGender,
+                                    onSelectBirthDate: _selectBirthDate,
+                                    onAdd: _viewModel.addMember,
+                                    firstNameError: _viewModel.hasFirstNameError
+                                        ? l10n.commonRequiredField
+                                        : null,
+                                    lastNameError: _viewModel.hasLastNameError
+                                        ? l10n.commonRequiredField
+                                        : null,
+                                    genderError: _viewModel.hasGenderError
+                                        ? l10n.commonRequiredField
+                                        : null,
+                                    birthDateError: _viewModel.hasBirthDateError
+                                        ? l10n.commonRequiredField
+                                        : null,
+                                  ),
+                                  const SizedBox(height: 48),
+                                  FilledButton(
+                                    onPressed: _onContinue,
+                                    style: FilledButton.styleFrom(
+                                      minimumSize: const Size(
+                                        double.infinity,
+                                        56,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      l10n.commonStart,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 0.5,
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                                .animate(interval: 50.ms)
+                                .fade(duration: 300.ms)
+                                .slideY(
+                                  begin: 0.1,
+                                  end: 0,
+                                  curve: Curves.easeOutQuad,
+                                ),
                       ),
                     ),
                   ),

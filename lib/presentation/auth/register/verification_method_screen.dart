@@ -10,6 +10,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -133,42 +134,56 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
                         padding: const EdgeInsets.all(24.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            AuthHeader(
-                              title: l10n.authVerificationMethodTitle,
-                              subtitle: l10n.authVerificationMethodSubtitle,
-                            ),
-                            const SizedBox(height: 48),
-                            if (email != null)
-                              _MethodCard(
-                                title: l10n.authEmailMethod,
-                                value: email,
-                                icon: Symbols.mail,
-                                onTap: _isLoading
-                                    ? () {}
-                                    : () => _proceedToOtp(context, email),
-                              ),
-                            if (email != null && phone != null)
-                              const SizedBox(height: 20),
-                            if (phone != null)
-                              _MethodCard(
-                                title: l10n.authPhoneMethod,
-                                value: phone,
-                                icon: Symbols.call,
-                                onTap: _isLoading
-                                    ? () {}
-                                    : () => _proceedToOtp(context, phone),
-                              ),
-                            const SizedBox(height: 48),
-                            Text(
-                              l10n.authMethodAccessInstruction,
-                              textAlign: TextAlign.center,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                          ],
+                          children:
+                              [
+                                    AuthHeader(
+                                      title: l10n.authVerificationMethodTitle,
+                                      subtitle:
+                                          l10n.authVerificationMethodSubtitle,
+                                    ),
+                                    const SizedBox(height: 48),
+                                    if (email != null)
+                                      _MethodCard(
+                                        title: l10n.authEmailMethod,
+                                        value: email,
+                                        icon: Symbols.mail,
+                                        onTap: _isLoading
+                                            ? () {}
+                                            : () =>
+                                                  _proceedToOtp(context, email),
+                                      ),
+                                    if (email != null && phone != null)
+                                      const SizedBox(height: 20),
+                                    if (phone != null)
+                                      _MethodCard(
+                                        title: l10n.authPhoneMethod,
+                                        value: phone,
+                                        icon: Symbols.call,
+                                        onTap: _isLoading
+                                            ? () {}
+                                            : () =>
+                                                  _proceedToOtp(context, phone),
+                                      ),
+                                    const SizedBox(height: 48),
+                                    Text(
+                                      l10n.authMethodAccessInstruction,
+                                      textAlign: TextAlign.center,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme
+                                                .colorScheme
+                                                .onSurfaceVariant,
+                                          ),
+                                    ),
+                                    const SizedBox(height: 24),
+                                  ]
+                                  .animate(interval: 50.ms)
+                                  .fade(duration: 300.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
                         ),
                       ),
                     ),

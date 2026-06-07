@@ -6,13 +6,37 @@ part of 'plan_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+PlanServiceModel _$PlanServiceModelFromJson(Map<String, dynamic> json) =>
+    PlanServiceModel(
+      id: json['id'] as String,
+      name: json['name'] as String?,
+      slug: json['slug'] as String?,
+      description: json['description'] as String?,
+      imageUrl: json['image_url'] as String?,
+      status: json['status'] as String?,
+    );
+
+Map<String, dynamic> _$PlanServiceModelToJson(PlanServiceModel instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'slug': instance.slug,
+      'description': instance.description,
+      'image_url': instance.imageUrl,
+      'status': instance.status,
+    };
+
 PlanModel _$PlanModelFromJson(Map<String, dynamic> json) => PlanModel(
   id: json['id'] as String,
   name: json['name'] as String,
-  description: json['description'] as String,
+  description: json['description'] as String?,
   price: (json['price'] as num).toDouble(),
-  billingCycle: json['billing_cycle'] as String,
-  service: json['service'] as Map<String, dynamic>?,
+  durationDays: (json['duration_days'] as num?)?.toInt(),
+  billingCycle: json['billing_cycle'] as String?,
+  hasAllCourses: json['has_all_courses'] as bool?,
+  service: json['service'] == null
+      ? null
+      : PlanServiceModel.fromJson(json['service'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$PlanModelToJson(PlanModel instance) => <String, dynamic>{
@@ -20,6 +44,8 @@ Map<String, dynamic> _$PlanModelToJson(PlanModel instance) => <String, dynamic>{
   'name': instance.name,
   'description': instance.description,
   'price': instance.price,
+  'duration_days': instance.durationDays,
   'billing_cycle': instance.billingCycle,
+  'has_all_courses': instance.hasAllCourses,
   'service': instance.service,
 };

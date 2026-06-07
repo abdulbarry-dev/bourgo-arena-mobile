@@ -51,6 +51,19 @@ dependencies:
   device_info_plus: ^13.1.0
   equatable: ^2.0.8
   cached_network_image: ^3.4.1
+  firebase_messaging: ^16.3.0
+  firebase_core: ^4.10.0
+  dio_cache_interceptor_hive_store: ^4.0.0
+  dio_cache_interceptor_file_store: ^1.2.3
+  flutter_animate: ^4.5.2
+  dio_smart_retry: ^7.0.1
+  shimmer: ^3.0.0
+  dio: ^5.9.2
+  freezed_annotation: ^3.1.0
+  webview_flutter: ^4.13.1
+  path_provider: ^2.1.5
+  dio_cache_interceptor: ^3.5.1
+  url_launcher: ^6.3.2
 
 
 dev_dependencies:

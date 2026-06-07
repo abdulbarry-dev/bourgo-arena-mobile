@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
@@ -24,6 +25,14 @@ class PremiumNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (AppConfig.isTestEnvironment) {
+      return Container(
+        width: width ?? double.infinity,
+        height: height ?? double.infinity,
+        color: Colors.grey,
+      );
+    }
+
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>();
 
