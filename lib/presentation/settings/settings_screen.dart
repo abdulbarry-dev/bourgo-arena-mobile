@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/presentation/settings/privacy_policy_screen.
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// A professional settings screen for application configuration.
 class SettingsScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
+    final spacing = context.spacing;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -27,44 +28,31 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(
-                  alpha: 0.5,
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                Symbols.settings,
-                color: theme.colorScheme.primary,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Text(
-              l10n.settingsTitle,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontFamily: AppConstants.displayFontFamily,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => context.pop(),
+          color: theme.colorScheme.onSurface,
         ),
-        backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
+        title: Text(
+          l10n.settingsTitle.toUpperCase(),
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontFamily: AppConstants.displayFontFamily,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
       ),
       body: AnimatedBuilder(
         animation: viewModel,
         builder: (context, _) {
           return ListView(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+            physics: const BouncingScrollPhysics(),
+            padding: spacing.screenPadding(context),
             children: [
               _SettingsSection(
-                title: l10n.settingsSectionAccount.toUpperCase(),
+                title: l10n.settingsSectionAccount,
                 children: [
                   _SettingsTile(
                     icon: Symbols.person,
@@ -84,9 +72,9 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: spacing.xl),
               _SettingsSection(
-                title: l10n.settingsSectionPreferences.toUpperCase(),
+                title: l10n.settingsSectionPreferences,
                 children: [
                   _SettingsTile(
                     icon: Symbols.language,
@@ -108,9 +96,9 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: spacing.xl),
               _SettingsSection(
-                title: l10n.settingsSectionLegal.toUpperCase(),
+                title: l10n.settingsSectionLegal,
                 children: [
                   _SettingsTile(
                     icon: Symbols.description,
@@ -127,9 +115,9 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: spacing.xl),
               _SettingsSection(
-                title: l10n.settingsSectionAbout.toUpperCase(),
+                title: l10n.settingsSectionAbout,
                 children: [
                   _SettingsTile(
                     icon: Symbols.info,
@@ -140,29 +128,32 @@ class SettingsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 48),
-              OutlinedButton.icon(
-                onPressed: () => _showDeleteAccountModal(context, l10n),
-                icon: const Icon(Symbols.delete, size: 20),
-                label: Text(l10n.settingsDeleteAccount.toUpperCase()),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: theme.colorScheme.error,
-                  side: BorderSide(
-                    color: theme.colorScheme.error.withValues(alpha: 0.5),
-                    width: 1.5,
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  textStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
+              SizedBox(height: spacing.xxl),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing.sm),
+                child: OutlinedButton.icon(
+                  onPressed: () => _showDeleteAccountModal(context, l10n),
+                  icon: const Icon(Symbols.delete, size: 20),
+                  label: Text(l10n.settingsDeleteAccount.toUpperCase()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: theme.colorScheme.error,
+                    side: BorderSide(
+                      color: theme.colorScheme.error.withValues(alpha: 0.3),
+                      width: 1.5,
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: spacing.xxxl),
             ],
           );
         },
@@ -179,10 +170,10 @@ class SettingsScreen extends StatelessWidget {
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           child: Column(
             children: [
               Container(
@@ -190,7 +181,9 @@ class SettingsScreen extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurface.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -294,25 +287,29 @@ class SettingsScreen extends StatelessWidget {
   }) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
+    final spacing = context.spacing;
 
     return Container(
-      padding: const EdgeInsets.all(
-        24,
-      ).copyWith(bottom: MediaQuery.of(context).padding.bottom + 24),
+      padding: EdgeInsets.all(
+        spacing.lg,
+      ).copyWith(bottom: MediaQuery.of(context).padding.bottom + spacing.lg),
       decoration: BoxDecoration(
         color: appColors.bgElevated,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-        border: Border.all(color: appColors.bgBorder, width: 1),
+        border: Border.all(
+          color: appColors.bgBorder.withValues(alpha: 0.5),
+          width: 1,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 48,
+            width: 40,
             height: 4,
-            margin: const EdgeInsets.only(bottom: 24),
+            margin: const EdgeInsets.only(bottom: 32),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -322,7 +319,7 @@ class SettingsScreen extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: appColors.brandPrimaryGhost,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: theme.colorScheme.primary, size: 20),
@@ -330,9 +327,10 @@ class SettingsScreen extends StatelessWidget {
               const SizedBox(width: 16),
               Text(
                 title.toUpperCase(),
-                style: theme.textTheme.titleMedium?.copyWith(
+                style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w900,
-                  letterSpacing: 1.0,
+                  letterSpacing: 1.5,
+                  fontFamily: GoogleFonts.lexend().fontFamily,
                 ),
               ),
             ],
@@ -340,10 +338,13 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 24),
           Container(
             decoration: BoxDecoration(
-              color: appColors.bgSurface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: appColors.bgBorder),
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: appColors.bgBorder.withValues(alpha: 0.5),
+              ),
             ),
+            clipBehavior: Clip.antiAlias,
             child: Column(children: children),
           ),
         ],
@@ -361,39 +362,40 @@ class SettingsScreen extends StatelessWidget {
       builder: (dialogContext) {
         final theme = Theme.of(context);
         final appColors = theme.extension<AppColors>()!;
+        final spacing = context.spacing;
 
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(dialogContext).viewInsets.bottom,
           ),
           child: Container(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(spacing.lg),
             decoration: BoxDecoration(
               color: appColors.bgElevated,
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(32),
               ),
               border: Border.all(
-                color: theme.colorScheme.error.withValues(alpha: 0.3),
+                color: theme.colorScheme.error.withValues(alpha: 0.1),
               ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 48,
+                  width: 40,
                   height: 4,
-                  margin: const EdgeInsets.only(bottom: 24),
+                  margin: const EdgeInsets.only(bottom: 32),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
                 Container(
-                  width: 64,
-                  height: 64,
+                  width: 72,
+                  height: 72,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.error.withValues(alpha: 0.1),
+                    color: theme.colorScheme.error.withValues(alpha: 0.08),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -402,20 +404,24 @@ class SettingsScreen extends StatelessWidget {
                     size: 32,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 Text(
                   l10n.settingsConfirmDeleteTitle.toUpperCase(),
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
-                    color: theme.colorScheme.error,
+                    color: theme.colorScheme.onSurface,
+                    fontFamily: AppConstants.displayFontFamily,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 12),
                 Text(
                   l10n.settingsConfirmDeleteMessage,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.7,
+                    ),
                     height: 1.5,
                   ),
                 ),
@@ -434,17 +440,22 @@ class SettingsScreen extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () => Navigator.pop(dialogContext),
                         style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: BorderSide(color: appColors.bgBorder),
+                          padding: const EdgeInsets.symmetric(vertical: 18),
+                          side: BorderSide(
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.1,
+                            ),
+                          ),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                         child: Text(
                           l10n.settingsCancel.toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1,
                           ),
                         ),
                       ),
@@ -473,15 +484,19 @@ class SettingsScreen extends StatelessWidget {
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.colorScheme.error,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          foregroundColor: theme.colorScheme.onError,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 18),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(16),
                           ),
                         ),
                         child: Text(
                           l10n.settingsDelete.toUpperCase(),
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1,
+                          ),
                         ),
                       ),
                     ),
@@ -518,19 +533,33 @@ class _SelectionTile<T> extends StatelessWidget {
     return InkWell(
       onTap: () => onChanged(value),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               title,
               style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? theme.colorScheme.primary : Colors.white,
+                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w600,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface,
+                fontFamily: GoogleFonts.lexend().fontFamily,
               ),
             ),
             if (isSelected)
-              Icon(Symbols.check, color: theme.colorScheme.primary, size: 20),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Symbols.check,
+                  color: theme.colorScheme.onPrimary,
+                  size: 14,
+                ),
+              ),
           ],
         ),
       ),
@@ -546,29 +575,35 @@ class _SettingsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appColors = Theme.of(context).extension<AppColors>()!;
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+    final spacing = context.spacing;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 12),
+          padding: EdgeInsets.only(left: spacing.xs, bottom: spacing.sm),
           child: Text(
-            title,
-            style: TextStyle(
-              fontSize: 12,
+            title.toUpperCase(),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
               fontWeight: FontWeight.w900,
-              color: Colors.white.withValues(alpha: 0.4),
-              letterSpacing: 1.5,
+              letterSpacing: 2.0,
+              fontFamily: GoogleFonts.lexend().fontFamily,
             ),
           ),
         ),
         Container(
           decoration: BoxDecoration(
-            color: appColors.bgElevated,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: appColors.bgBorder, width: 1),
+            color: appColors.bgElevated.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: appColors.bgBorder.withValues(alpha: 0.5),
+              width: 1,
+            ),
           ),
+          clipBehavior: Clip.antiAlias,
           child: Column(children: children),
         ),
       ],
@@ -597,19 +632,21 @@ class _SettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
+    final spacing = context.spacing;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.vertical(
-        top: isLast ? Radius.zero : const Radius.circular(20),
-        bottom: isLast ? const Radius.circular(20) : Radius.zero,
-      ),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(spacing.md),
         decoration: BoxDecoration(
           border: isLast
               ? null
-              : Border(bottom: BorderSide(color: appColors.bgBorder, width: 1)),
+              : Border(
+                  bottom: BorderSide(
+                    color: appColors.bgBorder.withValues(alpha: 0.5),
+                    width: 1,
+                  ),
+                ),
         ),
         child: Row(
           children: [
@@ -617,11 +654,8 @@ class _SettingsTile extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: appColors.brandPrimaryGhost,
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
-                border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                ),
               ),
               child: Icon(icon, size: 20, color: theme.colorScheme.primary),
             ),
@@ -629,98 +663,32 @@ class _SettingsTile extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurface,
+                  fontFamily: GoogleFonts.lexend().fontFamily,
                 ),
               ),
             ),
             if (trailingText != null)
               Text(
                 trailingText!,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
                   color: theme.colorScheme.primary,
+                  fontFamily: AppConstants.displayFontFamily,
                 ),
               ),
             if (showArrow) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Icon(
-                Symbols.chevron_right,
+                Icons.chevron_right_rounded,
                 size: 20,
-                color: Colors.white.withValues(alpha: 0.3),
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
               ),
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SettingsSwitchTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final bool isLast;
-
-  const _SettingsSwitchTile({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.onChanged,
-    this.isLast = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(bottom: BorderSide(color: appColors.bgBorder, width: 1)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: appColors.brandPrimaryGhost,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: theme.colorScheme.primary.withValues(alpha: 0.2),
-              ),
-            ),
-            child: Icon(icon, size: 20, color: theme.colorScheme.primary),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: theme.colorScheme.primary,
-            activeThumbColor: theme.colorScheme.surface,
-            inactiveTrackColor: appColors.bgSurface,
-            inactiveThumbColor: Colors.white.withValues(alpha: 0.6),
-          ),
-        ],
       ),
     );
   }

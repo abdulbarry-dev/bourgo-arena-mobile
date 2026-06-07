@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
@@ -274,38 +273,22 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withValues(
-                  alpha: 0.5,
-                ),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                Symbols.family_restroom,
-                color: theme.colorScheme.primary,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Text(
-              l10n.settingsManageFamily,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontFamily: AppConstants.displayFontFamily,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 0.5,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-          ],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+          color: theme.colorScheme.onSurface,
         ),
-        backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
+        title: Text(
+          l10n.settingsManageFamily.toUpperCase(),
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
+        ),
       ),
       body: ListenableBuilder(
         listenable: _viewModel,

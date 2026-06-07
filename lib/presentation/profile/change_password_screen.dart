@@ -80,19 +80,21 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+          color: theme.colorScheme.onSurface,
+        ),
         title: Text(
           l10n.passwordChangeTitle.toUpperCase(),
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
           ),
-        ),
-        backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
-        elevation: 0,
-        centerTitle: true,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: appColors.bgBorder, height: 1.0),
         ),
       ),
       body: ListenableBuilder(

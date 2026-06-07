@@ -1,120 +1,121 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
-import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// A card displaying a user's reservation details.
 class ReservationCard extends StatelessWidget {
-  /// The reservation to display.
   final Reservation reservation;
 
-  /// Creates a new [ReservationCard] instance.
   const ReservationCard({super.key, required this.reservation});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+    final spacing = context.spacing;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: spacing.md),
+      padding: EdgeInsets.all(spacing.md),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.5),
-        ),
+        color: appColors.bgSurface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: appColors.bgBorder),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                _StatusBadge(status: reservation.status),
+          Row(
+            children: [
+              _StatusBadge(status: reservation.status),
+              const Spacer(),
+              Text(
+                '#${reservation.id.length > 8 ? reservation.id.substring(0, 8) : reservation.id}',
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.md),
+          Text(
+            reservation.activityTitle.toUpperCase(),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.3,
+            ),
+          ),
+          SizedBox(height: spacing.sm),
+          Row(
+            children: [
+              Icon(
+                Symbols.calendar_today,
+                size: 14,
+                color: theme.colorScheme.primary,
+              ),
+              SizedBox(width: spacing.xs),
+              Text(
+                reservation.date,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              SizedBox(width: spacing.md),
+              Icon(
+                Symbols.schedule,
+                size: 14,
+                color: theme.colorScheme.primary,
+              ),
+              SizedBox(width: spacing.xs),
+              Text(
+                reservation.time,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.sm),
+          Row(
+            children: [
+              Icon(Symbols.receipt, size: 14, color: theme.colorScheme.primary),
+              SizedBox(width: spacing.xs),
+              Text(
+                '${reservation.price.toStringAsFixed(3)} TND',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              if (reservation.paymentStatus.isNotEmpty) ...[
                 const Spacer(),
-                Text(
-                  reservation.id,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(
-                      alpha: 0.5,
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.sm,
+                    vertical: spacing.xxs,
+                  ),
+                  decoration: BoxDecoration(
+                    color: reservation.paymentStatus == 'paid'
+                        ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                        : Colors.orange.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    reservation.paymentStatus.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: reservation.paymentStatus == 'paid'
+                          ? theme.colorScheme.primary
+                          : Colors.orange,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
               ],
-            ),
-          ),
-          Divider(
-            height: 1,
-            color: theme.colorScheme.outline.withValues(alpha: 0.1),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        reservation.activityTitle,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 16,
-                        runSpacing: 8,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Symbols.calendar_month,
-                                size: 16,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                reservation.date,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Symbols.schedule,
-                                size: 16,
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                reservation.time,
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  '${reservation.price} ${reservation.paymentStatus == "paid" ? AppLocalizations.of(context)!.bookingCurrency : AppLocalizations.of(context)!.bookingToPay}',
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         ],
       ),
@@ -130,50 +131,40 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    Color color;
-    String label;
-    IconData icon;
-
-    switch (status.toLowerCase()) {
-      case 'confirmed':
-        color = theme.colorScheme.primary;
-        label = AppLocalizations.of(context)!.activitiesStatusConfirmed;
-        icon = Symbols.check_circle;
-        break;
-      case 'pending':
-        color = Colors.orange;
-        label = AppLocalizations.of(context)!.activitiesStatusPending;
-        icon = Symbols.schedule;
-        break;
-      case 'cancelled':
-        color = theme.colorScheme.error;
-        label = AppLocalizations.of(context)!.activitiesStatusCancelled;
-        icon = Symbols.cancel;
-        break;
-      default:
-        color = theme.colorScheme.onSurfaceVariant;
-        label = status.toUpperCase();
-        icon = Symbols.info;
-    }
+    final (Color color, String label, IconData icon) = switch (status
+        .toLowerCase()) {
+      'confirmed' => (
+        theme.colorScheme.primary,
+        'CONFIRMÉ',
+        Symbols.check_circle,
+      ),
+      'pending' => (Colors.orange, 'EN ATTENTE', Symbols.schedule),
+      'cancelled' => (theme.colorScheme.error, 'ANNULÉ', Symbols.cancel),
+      _ => (
+        theme.colorScheme.onSurfaceVariant,
+        status.toUpperCase(),
+        Symbols.info,
+      ),
+    };
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withAlpha(30),
-        borderRadius: BorderRadius.circular(full),
-        border: Border.all(color: color.withAlpha(100)),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
               color: color,
               fontSize: 10,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w900,
               letterSpacing: 1,
             ),
           ),
@@ -182,5 +173,3 @@ class _StatusBadge extends StatelessWidget {
     );
   }
 }
-
-const double full = 9999;

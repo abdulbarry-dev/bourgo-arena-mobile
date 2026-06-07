@@ -463,7 +463,7 @@ class _SubscriptionManagementScreenState
                               ) {
                                 final plan = filteredPlans[index];
                                 final isCurrent =
-                                    widget.currentSubscription?.planName ==
+                                    widget.currentSubscription?.plan?.name ==
                                     plan.name;
 
                                 return Padding(

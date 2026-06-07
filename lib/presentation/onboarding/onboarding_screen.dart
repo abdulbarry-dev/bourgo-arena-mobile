@@ -1,4 +1,6 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
@@ -105,18 +107,13 @@ class OnboardingScreen extends StatelessWidget {
                               ),
                               SizedBox(height: spacing.md),
                               TextButton(
-                                onPressed: () => context.go('/home'),
-                                child: Text(
-                                  AppLocalizations.of(context)!.guestBrowse,
-                                  style: TextStyle(
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: spacing.md),
-                              TextButton(
-                                onPressed: () => context.go('/home'),
+                                onPressed: () async {
+                                  await locator<AuthStateNotifier>()
+                                      .setGuestMode();
+                                  if (context.mounted) {
+                                    context.go('/home');
+                                  }
+                                },
                                 child: Text(
                                   AppLocalizations.of(context)!.guestBrowse,
                                   style: TextStyle(

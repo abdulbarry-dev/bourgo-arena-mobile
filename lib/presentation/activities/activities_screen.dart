@@ -1,15 +1,15 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
-import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activities_view_model.dart';
-import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
-import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -33,6 +33,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
     _viewModel = ActivitiesViewModel(
       getActivitiesUseCase: locator<GetActivitiesUseCase>(),
       getUserBookingsUseCase: locator<GetUserBookingsUseCase>(),
+      authStateNotifier: locator<AuthStateNotifier>(),
     );
     _tabController = TabController(length: 2, vsync: this);
     _viewModel.loadData();
@@ -98,10 +99,8 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                 letterSpacing: 1.2,
               ),
               tabs: [
-                Tab(text: AppLocalizations.of(context)!.activitiesExplorer),
-                Tab(
-                  text: AppLocalizations.of(context)!.activitiesMyReservations,
-                ),
+                Tab(text: "SPORTS"),
+                Tab(text: "ACTIVITÉS"),
               ],
             ),
           ),
@@ -112,35 +111,29 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
                   ),
                 )
               : _viewModel.errorMessage != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _viewModel.errorMessage == 'loading_failed'
-                            ? AppLocalizations.of(context)!.commonLoadingFailed
-                            : _viewModel.errorMessage ?? '',
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _viewModel.loadData,
-                        child: Text(
-                          AppLocalizations.of(context)!.activitiesRetry,
-                        ),
-                      ),
-                    ],
-                  ),
+              ? PremiumErrorState(
+                  title: "ERREUR DE CHARGEMENT",
+                  message:
+                      "Une erreur est survenue lors de la récupération des données. Veuillez vérifier votre connexion et réessayer.",
+                  actionLabel: AppLocalizations.of(context)!.activitiesRetry,
+                  onRetry: _viewModel.loadData,
                 )
               : TabBarView(
                   controller: _tabController,
                   children: [
                     RefreshIndicator(
                       onRefresh: _viewModel.loadData,
-                      child: _ActivitiesTab(viewModel: _viewModel),
+                      child: _ActivitiesList(
+                        activities: _viewModel.sports,
+                        emptyTitle: "AUCUN SPORT DISPONIBLE",
+                      ),
                     ),
                     RefreshIndicator(
                       onRefresh: _viewModel.loadData,
-                      child: _ReservationsTab(viewModel: _viewModel),
+                      child: _ActivitiesList(
+                        activities: _viewModel.otherActivities,
+                        emptyTitle: "AUCUNE ACTIVITÉ DISPONIBLE",
+                      ),
                     ),
                   ],
                 ),
@@ -150,20 +143,21 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   }
 }
 
-class _ActivitiesTab extends StatelessWidget {
-  final ActivitiesViewModel viewModel;
+class _ActivitiesList extends StatelessWidget {
+  final List<Activity> activities;
+  final String emptyTitle;
 
-  const _ActivitiesTab({required this.viewModel});
+  const _ActivitiesList({required this.activities, required this.emptyTitle});
 
   @override
   Widget build(BuildContext context) {
-    if (viewModel.activities.isEmpty) {
+    if (activities.isEmpty) {
       return SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.6,
           child: EmptyState(
-            title: AppLocalizations.of(context)!.activitiesNoSportsFound,
+            title: emptyTitle,
             message: AppLocalizations.of(
               context,
             )!.activitiesNoSportsFoundSubtitle,
@@ -176,9 +170,9 @@ class _ActivitiesTab extends StatelessWidget {
     return ListView.builder(
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      itemCount: viewModel.activities.length,
+      itemCount: activities.length,
       itemBuilder: (context, index) {
-        final activity = viewModel.activities[index];
+        final activity = activities[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: ActivityCard(
@@ -210,65 +204,5 @@ class _ActivitiesTab extends StatelessWidget {
       default:
         return Icons.sports;
     }
-  }
-}
-
-class _ReservationsTab extends StatelessWidget {
-  final ActivitiesViewModel viewModel;
-
-  const _ReservationsTab({required this.viewModel});
-
-  @override
-  Widget build(BuildContext context) {
-    final isAuthenticated = locator<AuthStateNotifier>().isAuthenticated;
-
-    if (!isAuthenticated) {
-      return SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: EmptyState(
-            title: AppLocalizations.of(context)!.authLoginTitle,
-            message: AppLocalizations.of(context)!.authLoginSubtitle,
-            icon: Symbols.login,
-            actionLabel: AppLocalizations.of(context)!.authLogin,
-            onAction: () {
-              ensureAuthenticated(context);
-            },
-          ),
-        ),
-      );
-    }
-
-    if (viewModel.reservations.isEmpty) {
-      return SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.6,
-          child: EmptyState(
-            title: AppLocalizations.of(context)!.activitiesNoReservations,
-            message: AppLocalizations.of(
-              context,
-            )!.activitiesNoReservationsSubtitle,
-            icon: Symbols.calendar_add_on,
-            actionLabel: AppLocalizations.of(
-              context,
-            )!.activitiesNoReservationsCTA,
-            onAction: () {
-              context.push('/booking');
-            },
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      itemCount: viewModel.reservations.length,
-      itemBuilder: (context, index) {
-        return ReservationCard(reservation: viewModel.reservations[index]);
-      },
-    );
   }
 }

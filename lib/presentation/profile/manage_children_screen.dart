@@ -98,12 +98,24 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
     final spacing = context.spacing;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          l10n.profileManageChildren,
-          style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
+          color: theme.colorScheme.onSurface,
         ),
-        centerTitle: true,
+        title: Text(
+          l10n.profileManageChildren.toUpperCase(),
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+          ),
+        ),
       ),
       body: ListenableBuilder(
         listenable: _viewModel,

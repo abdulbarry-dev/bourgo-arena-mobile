@@ -16,9 +16,9 @@ class TermsOfServiceScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16.0),
           child: Text(
             l10n.settingsTerms.toUpperCase(),
-            style: theme.textTheme.titleMedium?.copyWith(
+            style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w900,
-              letterSpacing: 1.0,
+              letterSpacing: 1.5,
             ),
           ),
         ),

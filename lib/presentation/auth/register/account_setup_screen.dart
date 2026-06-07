@@ -157,7 +157,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
       avatarUrl: '',
       loyaltyPoints: 0,
       subscriptionLevel: 'FREE',
-      subscriptionExpiry: 'N/A',
+      subscriptionExpiry: null,
       gender: _selectedGender,
       birthDate: _selectedBirthDate,
       isParentAccount: _data['isParentAccount'] == true,
