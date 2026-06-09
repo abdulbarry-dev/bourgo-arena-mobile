@@ -43,7 +43,11 @@ void main() {
       final reservation = testReservation();
       final rwp = ReservationWithPayment(
         reservation: reservation,
-        payment: {'payment_url': 'https://gateway.com/pay', 'id': 256, 'payment_reference': 'ref_abc'},
+        payment: {
+          'payment_url': 'https://gateway.com/pay',
+          'id': 256,
+          'payment_reference': 'ref_abc',
+        },
       );
       when(
         () => repository.makeReservation(reservation),
@@ -66,7 +70,8 @@ void main() {
       );
 
       when(() => repository.makeReservation(reservation)).thenAnswer(
-        (_) async => const FailureResult<ReservationWithPayment, Failure>(failure),
+        (_) async =>
+            const FailureResult<ReservationWithPayment, Failure>(failure),
       );
 
       final result = await useCase(reservation);

@@ -1,3 +1,7 @@
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/domain/entities/event.dart';
+import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:equatable/equatable.dart';
 
 class Service extends Equatable {
@@ -9,6 +13,10 @@ class Service extends Equatable {
   final int coursesCount;
   final int eventsCount;
   final int activitiesCount;
+  final List<Plan> plans;
+  final List<Course> courses;
+  final List<Event> events;
+  final List<Activity> activities;
 
   const Service({
     required this.id,
@@ -19,6 +27,10 @@ class Service extends Equatable {
     this.coursesCount = 0,
     this.eventsCount = 0,
     this.activitiesCount = 0,
+    this.plans = const [],
+    this.courses = const [],
+    this.events = const [],
+    this.activities = const [],
   });
 
   @override
@@ -31,5 +43,9 @@ class Service extends Equatable {
     coursesCount,
     eventsCount,
     activitiesCount,
+    plans,
+    courses,
+    events,
+    activities,
   ];
 }

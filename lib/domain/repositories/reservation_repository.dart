@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation_with_payment.dart';
+import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 
 /// Interface for booking reservation operations.
 abstract interface class ReservationRepository {
@@ -22,7 +23,9 @@ abstract interface class ReservationRepository {
 
   /// Creates a new reservation via POST /reservations.
   /// Returns the created reservation along with optional deposit payment info.
-  Future<Result<ReservationWithPayment, Failure>> makeReservation(Reservation reservation);
+  Future<Result<ReservationWithPayment, Failure>> makeReservation(
+    Reservation reservation,
+  );
 
   /// Cancels an existing reservation by its [id].
   Future<Result<void, Failure>> cancelReservation(String id);
@@ -41,4 +44,7 @@ abstract interface class ReservationRepository {
     String reservationId,
     String paymentId,
   );
+
+  /// Retrieves available time slots across activities for a given [date].
+  Future<Result<List<TimeSlot>, Failure>> getReservationSlots(String date);
 }

@@ -4,10 +4,7 @@ class ReservationWithPayment {
   final Reservation reservation;
   final Map<String, dynamic>? payment;
 
-  const ReservationWithPayment({
-    required this.reservation,
-    this.payment,
-  });
+  const ReservationWithPayment({required this.reservation, this.payment});
 
   String? get paymentUrl => payment?['payment_url'] as String?;
   String? get paymentReference => payment?['payment_reference'] as String?;

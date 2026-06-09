@@ -21,7 +21,15 @@ class PlanService extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, name, slug, description, imageUrl, images, status];
+  List<Object?> get props => [
+    id,
+    name,
+    slug,
+    description,
+    imageUrl,
+    images,
+    status,
+  ];
 }
 
 /// Entity representing a subscription plan matching PlanResource.

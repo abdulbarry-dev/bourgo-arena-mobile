@@ -12,7 +12,9 @@ class MakeReservationUseCase {
 
   /// Executes the operation to create a reservation.
   /// Returns the reservation along with optional deposit payment info.
-  Future<Result<ReservationWithPayment, Failure>> call(Reservation reservation) async {
+  Future<Result<ReservationWithPayment, Failure>> call(
+    Reservation reservation,
+  ) async {
     return _repository.makeReservation(reservation);
   }
 }

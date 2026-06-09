@@ -7,8 +7,10 @@ class GetEventsUseCase {
   final EventRepository _repository;
   const GetEventsUseCase(this._repository);
 
-  Future<Result<List<Event>, Failure>> call({String? sportType, int page = 1}) =>
-      _repository.getEvents(sportType: sportType, page: page);
+  Future<Result<List<Event>, Failure>> call({
+    String? sportType,
+    int page = 1,
+  }) => _repository.getEvents(sportType: sportType, page: page);
 }
 
 class GetEventByIdUseCase {
