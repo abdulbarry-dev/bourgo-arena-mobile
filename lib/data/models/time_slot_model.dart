@@ -32,6 +32,12 @@ class TimeSlotModel {
   /// True when all spots are taken.
   final bool? isFullyBooked;
 
+  /// Day of week (0=Sunday..6=Saturday).
+  final int? dayOfWeek;
+
+  /// Duration in minutes.
+  final int? durationMinutes;
+
   /// Creates a new [TimeSlotModel] instance.
   const TimeSlotModel({
     this.id,
@@ -43,6 +49,8 @@ class TimeSlotModel {
     this.bookedCount,
     this.isAvailable,
     this.isFullyBooked,
+    this.dayOfWeek,
+    this.durationMinutes,
   });
 
   /// Creates a [TimeSlotModel] from JSON.

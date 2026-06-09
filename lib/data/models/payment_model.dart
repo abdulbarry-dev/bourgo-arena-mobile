@@ -8,11 +8,13 @@ class PaymentModel {
   final String type;
   final String description;
   final double amount;
-  final String currency;
+  final String? currency;
   final String status;
-  final String gateway;
+  final String? gateway;
   final String paymentReference;
   final String? receiptUrl;
+  final int? reservationId;
+  final int? subscriptionId;
   final DateTime createdAt;
 
   const PaymentModel({
@@ -20,15 +22,21 @@ class PaymentModel {
     required this.type,
     required this.description,
     required this.amount,
-    required this.currency,
+    this.currency,
     required this.status,
-    required this.gateway,
+    this.gateway,
     required this.paymentReference,
     this.receiptUrl,
+    this.reservationId,
+    this.subscriptionId,
     required this.createdAt,
   });
 
-  factory PaymentModel.fromJson(Map<String, dynamic> json) =>
-      _$PaymentModelFromJson(json);
+  factory PaymentModel.fromJson(Map<String, dynamic> json) {
+    if (json['id'] != null && json['id'] is int) {
+      json['id'] = json['id'].toString();
+    }
+    return _$PaymentModelFromJson(json);
+  }
   Map<String, dynamic> toJson() => _$PaymentModelToJson(this);
 }

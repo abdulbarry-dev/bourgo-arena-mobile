@@ -13,6 +13,9 @@ PlanServiceModel _$PlanServiceModelFromJson(Map<String, dynamic> json) =>
       slug: json['slug'] as String?,
       description: json['description'] as String?,
       imageUrl: json['image_url'] as String?,
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList(),
       status: json['status'] as String?,
     );
 
@@ -23,6 +26,7 @@ Map<String, dynamic> _$PlanServiceModelToJson(PlanServiceModel instance) =>
       'slug': instance.slug,
       'description': instance.description,
       'image_url': instance.imageUrl,
+      'images': instance.images,
       'status': instance.status,
     };
 

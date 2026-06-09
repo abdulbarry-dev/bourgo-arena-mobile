@@ -18,6 +18,7 @@ class SubscriptionMapper {
               slug: model.service!.slug,
               description: model.service!.description,
               imageUrl: model.service!.imageUrl,
+              images: model.service!.images,
               status: model.service!.status,
             )
           : null,
@@ -42,6 +43,7 @@ class SubscriptionMapper {
               slug: entity.service!.slug,
               description: entity.service!.description,
               imageUrl: entity.service!.imageUrl,
+              images: entity.service!.images,
               status: entity.service!.status,
             )
           : null,

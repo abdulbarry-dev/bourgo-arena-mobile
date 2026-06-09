@@ -11,11 +11,13 @@ PaymentModel _$PaymentModelFromJson(Map<String, dynamic> json) => PaymentModel(
   type: json['type'] as String,
   description: json['description'] as String,
   amount: (json['amount'] as num).toDouble(),
-  currency: json['currency'] as String,
+  currency: json['currency'] as String?,
   status: json['status'] as String,
-  gateway: json['gateway'] as String,
+  gateway: json['gateway'] as String?,
   paymentReference: json['payment_reference'] as String,
   receiptUrl: json['receipt_url'] as String?,
+  reservationId: (json['reservation_id'] as num?)?.toInt(),
+  subscriptionId: (json['subscription_id'] as num?)?.toInt(),
   createdAt: DateTime.parse(json['created_at'] as String),
 );
 
@@ -30,5 +32,7 @@ Map<String, dynamic> _$PaymentModelToJson(PaymentModel instance) =>
       'gateway': instance.gateway,
       'payment_reference': instance.paymentReference,
       'receipt_url': instance.receiptUrl,
+      'reservation_id': instance.reservationId,
+      'subscription_id': instance.subscriptionId,
       'created_at': instance.createdAt.toIso8601String(),
     };

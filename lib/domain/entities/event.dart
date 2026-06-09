@@ -1,15 +1,25 @@
+/// Entity representing a participant user.
+class ParticipantUser {
+  final int? id;
+  final String? name;
+  final String? initials;
+
+  const ParticipantUser({this.id, this.name, this.initials});
+}
+
 /// Entity representing a tournament participant.
 class Participant {
-  final String? id;
+  final int? id;
   final String? name;
   final String? avatarUrl;
+  final String? initials;
 
-  const Participant({this.id, this.name, this.avatarUrl});
+  const Participant({this.id, this.name, this.avatarUrl, this.initials});
 }
 
 /// Entity representing a bracket match.
 class Match {
-  final String id;
+  final int id;
   final int? round;
   final int? matchNumber;
   final String? scheduledAt;
@@ -17,8 +27,8 @@ class Match {
   final String? status;
   final Participant? participant1;
   final Participant? participant2;
-  final String? winnerId;
-  final String? nextMatchId;
+  final int? winnerId;
+  final int? nextMatchId;
 
   const Match({
     required this.id,
@@ -36,58 +46,76 @@ class Match {
 
 /// Pure domain entity representing a tournament or championship event.
 class Event {
-  /// Unique identifier.
   final String id;
-
-  /// Event name.
   final String? name;
-
-  /// Description.
   final String? description;
-
-  /// Format (single_elimination, round_robin, etc.).
+  final String? sportType;
   final String? format;
-
-  /// Maximum number of participants.
   final int? maxParticipants;
-
-  /// Current number of registered participants.
   final int? participantsCount;
-
-  /// Registration deadline (ISO datetime).
   final String? registrationDeadline;
-
-  /// Start date (ISO datetime).
   final String? startDate;
-
-  /// End date (ISO datetime).
   final String? endDate;
-
-  /// Status (published, ongoing, completed).
+  final List<String> images;
+  final String? imageUrl;
   final String? status;
-
-  /// Whether participants need to check in.
   final bool requiresCheckIn;
-
-  /// ISO datetime of creation.
   final String? createdAt;
 
-  /// Creates a new [Event] instance.
   const Event({
     required this.id,
     this.name,
     this.description,
+    this.sportType,
     this.format,
     this.maxParticipants,
     this.participantsCount,
     this.registrationDeadline,
     this.startDate,
     this.endDate,
+    this.images = const [],
+    this.imageUrl,
     this.status,
     this.requiresCheckIn = false,
     this.createdAt,
   });
 
-  /// True if registration is still open.
-  bool get isRegistrationOpen => status == 'published';
+  bool get isRegistrationOpen => status == 'open';
+}
+
+/// Entity representing a registered event participant (from GET /user/events).
+class EventParticipant {
+  final int id;
+  final String eventId;
+  final ParticipantUser? user;
+  final int? seedNumber;
+  final String? status;
+  final bool hasCheckedIn;
+  final String? registeredAt;
+  final Event? event;
+
+  const EventParticipant({
+    required this.id,
+    required this.eventId,
+    this.user,
+    this.seedNumber,
+    this.status,
+    this.hasCheckedIn = false,
+    this.registeredAt,
+    this.event,
+  });
+
+  bool get isApproved => status == 'approved';
+  bool get isPending => status == 'pending';
+  bool get isWaitlisted => status == 'waitlisted';
+}
+
+/// Result of registering for an event.
+class RegistrationResult {
+  final String status;
+
+  const RegistrationResult({required this.status});
+
+  bool get isRegistered => status == 'pending' || status == 'approved';
+  bool get isWaitlisted => status == 'waitlisted';
 }

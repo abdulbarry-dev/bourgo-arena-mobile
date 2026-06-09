@@ -24,6 +24,12 @@ class TimeSlot {
   /// True when all spots are taken.
   final bool isFullyBooked;
 
+  /// Day of week (0=Sunday..6=Saturday).
+  final int? dayOfWeek;
+
+  /// Duration in minutes.
+  final int? durationMinutes;
+
   /// Creates a new [TimeSlot] instance.
   const TimeSlot({
     this.id,
@@ -34,6 +40,8 @@ class TimeSlot {
     this.capacity,
     this.bookedCount,
     this.isFullyBooked = false,
+    this.dayOfWeek,
+    this.durationMinutes,
   });
 
   @override
