@@ -1,20 +1,24 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
-import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/domain/entities/event.dart';
+import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/presentation/home/widgets/ticker_strip.dart';
-import 'package:bourgo_arena_mobile/presentation/home/widgets/unified_offering_card.dart';
-import 'package:bourgo_arena_mobile/presentation/home/models/unified_offering.dart';
-import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
+import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:shimmer/shimmer.dart';
 
-/// The home screen of Bourgo Arena.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -24,7 +28,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late final HomeViewModel _viewModel;
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -40,53 +43,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _searchController.dispose();
     _viewModel.dispose();
     super.dispose();
   }
 
-  void _onOfferingTapped(UnifiedOffering offering) {
-    switch (offering.type) {
-      case OfferingType.service:
-        context.push('/services/${offering.id}', extra: offering.sourceEntity);
-        break;
-      case OfferingType.course:
-        context.push('/courses/${offering.id}', extra: offering.sourceEntity);
-        break;
-      case OfferingType.event:
-        context.push('/events/${offering.id}', extra: offering.sourceEntity);
-        break;
-      case OfferingType.activity:
-        context.push(
-          '/activities/${offering.id}',
-          extra: offering.sourceEntity,
-        );
-        break;
-    }
+  void _goToBrowseTab(int subTab) {
+    ActivitiesScreen.initialSubTab = subTab;
+    MainLayout.tabController.value = 1;
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
     final l10n = AppLocalizations.of(context)!;
 
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        if (_viewModel.isLoading && _viewModel.filteredOfferings.isEmpty) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        final timeOfDay = DateTime.now().hour;
-        final greeting = timeOfDay < 12
-            ? 'GOOD MORNING'
-            : timeOfDay < 18
-            ? 'GOOD AFTERNOON'
-            : 'GOOD EVENING';
-
         return Scaffold(
           backgroundColor: theme.colorScheme.surface,
           appBar: AppBar(
@@ -115,9 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             actions: [
               IconButton(
-                onPressed: () {
-                  context.push('/search');
-                },
+                onPressed: () => context.push('/search'),
                 icon: const Icon(Symbols.search),
                 tooltip: 'Global Search',
               ),
@@ -136,282 +107,83 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                // Hero Section
-                SliverToBoxAdapter(
-                  child: Container(
-                    height: 220,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 12,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(24),
-                      child:
-                          Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  Image.asset(
-                                    'assets/images/background.jpg',
-                                    fit: BoxFit.cover,
-                                    alignment: Alignment.centerRight,
-                                  ),
-                                  DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                        colors: [
-                                          Colors.black.withValues(alpha: 0.18),
-                                          Colors.black.withValues(alpha: 0.52),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                        padding: const EdgeInsets.all(24),
-                                        child: Align(
-                                          alignment: Alignment.bottomLeft,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                greeting,
-                                                style: theme
-                                                    .textTheme
-                                                    .labelMedium
-                                                    ?.copyWith(
-                                                      color: theme
-                                                          .colorScheme
-                                                          .primary,
-                                                      fontWeight:
-                                                          FontWeight.w900,
-                                                      letterSpacing: 1.5,
-                                                    ),
-                                              ),
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                'Discover Your\nNext Challenge',
-                                                style: theme
-                                                    .textTheme
-                                                    .displaySmall
-                                                    ?.copyWith(
-                                                      color: Colors.white,
-                                                      fontFamily: AppConstants
-                                                          .displayFontFamily,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      height: 1.1,
-                                                    ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )
-                                      .animate()
-                                      .fade(duration: 500.ms)
-                                      .slideY(
-                                        begin: 0.1,
-                                        end: 0,
-                                        curve: Curves.easeOutQuad,
-                                      ),
-                                ],
-                              )
-                              .animate()
-                              .fade(delay: 300.ms)
-                              .scale(
-                                begin: const Offset(0.95, 0.95),
-                                curve: Curves.easeOutBack,
-                              ),
+                _HeroSection(theme: theme),
+                const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+                _DashboardSection(
+                  title: 'TOURNAMENTS & EVENTS',
+                  icon: Symbols.emoji_events,
+                  accentColor: Colors.purple.shade400,
+                  isLoading: _viewModel.eventsLoading,
+                  error: _viewModel.eventsError,
+                  isEmpty: _viewModel.events.isEmpty,
+                  itemCount: _viewModel.events.length,
+                  cardWidth: 200,
+                  onSeeAll: () => _goToBrowseTab(2),
+                  onRetry: () => _viewModel.loadHomeData(),
+                  itemBuilder: (context, index) => _EventCard(
+                    event: _viewModel.events[index],
+                    onTap: () => context.push(
+                      '/events/${_viewModel.events[index].id}',
+                      extra: _viewModel.events[index],
                     ),
                   ),
                 ),
 
-                // Ticker Strip
-                SliverToBoxAdapter(
-                  child: TickerStrip(
-                    text: l10n.homeTicker,
-                    backgroundColor: theme.colorScheme.primary,
-                    textColor: theme.colorScheme.onPrimary,
-                  ).animate().fade(delay: 200.ms).slideX(begin: 0.1, end: 0),
-                ),
-
-                const SliverToBoxAdapter(child: SizedBox(height: 32)),
-
-                // Search Bar
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surface,
-                        borderRadius: BorderRadius.circular(32),
-                        boxShadow: [
-                          BoxShadow(
-                            color: theme.shadowColor.withValues(alpha: 0.08),
-                            blurRadius: 24,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: TextField(
-                        controller: _searchController,
-                        onChanged: _viewModel.setSearchQuery,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'Search courses, events...',
-                          hintStyle: TextStyle(
-                            color: theme.colorScheme.onSurfaceVariant,
-                            fontWeight: FontWeight.normal,
-                          ),
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.only(left: 20, right: 12),
-                            child: Icon(
-                              Symbols.search,
-                              color: theme.colorScheme.primary,
-                              size: 24,
-                            ),
-                          ),
-                          prefixIconConstraints: const BoxConstraints(
-                            minWidth: 56,
-                            minHeight: 56,
-                          ),
-                          suffixIcon: ValueListenableBuilder<TextEditingValue>(
-                            valueListenable: _searchController,
-                            builder: (context, value, _) {
-                              if (value.text.isEmpty) {
-                                return const SizedBox.shrink();
-                              }
-                              return IconButton(
-                                icon: Icon(
-                                  Symbols.close,
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                  size: 20,
-                                ),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  _viewModel.setSearchQuery('');
-                                },
-                              );
-                            },
-                          ),
-                          filled: true,
-                          fillColor: Colors.transparent,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 18,
-                            horizontal: 20,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(32),
-                            borderSide: BorderSide.none,
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(32),
-                            borderSide: BorderSide.none,
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(32),
-                            borderSide: BorderSide(
-                              color: theme.colorScheme.primary.withValues(
-                                alpha: 0.3,
-                              ),
-                              width: 1.5,
-                            ),
-                          ),
-                        ),
-                      ),
+                _DashboardSection(
+                  title: 'COURSES',
+                  icon: Symbols.school,
+                  accentColor: Colors.orange.shade400,
+                  isLoading: _viewModel.coursesLoading,
+                  error: _viewModel.coursesError,
+                  isEmpty: _viewModel.courses.isEmpty,
+                  itemCount: _viewModel.courses.length,
+                  cardWidth: 200,
+                  onSeeAll: () => _goToBrowseTab(0),
+                  onRetry: () => _viewModel.loadHomeData(),
+                  itemBuilder: (context, index) => _CourseCard(
+                    course: _viewModel.courses[index],
+                    onTap: () => context.push(
+                      '/courses/${_viewModel.courses[index].id}',
+                      extra: _viewModel.courses[index],
                     ),
                   ),
                 ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 16)),
-
-                // Filter Chips
-                SliverPersistentHeader(
-                  pinned: true,
-                  delegate: _SliverFilterDelegate(
-                    child: Container(
-                      color: appColors.bgSurface.withValues(alpha: 0.95),
-                      child: ListView(
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 16,
-                        ),
-                        children: [
-                          _buildFilterChip('ALL', null, theme, appColors),
-                          _buildFilterChip(
-                            'SERVICES',
-                            OfferingType.service,
-                            theme,
-                            appColors,
-                          ),
-                          _buildFilterChip(
-                            'COURSES',
-                            OfferingType.course,
-                            theme,
-                            appColors,
-                          ),
-                          _buildFilterChip(
-                            'EVENTS',
-                            OfferingType.event,
-                            theme,
-                            appColors,
-                          ),
-                          _buildFilterChip(
-                            'ACTIVITIES',
-                            OfferingType.activity,
-                            theme,
-                            appColors,
-                          ),
-                        ],
-                      ),
-                    ),
+                _DashboardSection(
+                  title: 'ACTIVITIES',
+                  icon: Symbols.sports_soccer,
+                  accentColor: Colors.teal.shade400,
+                  isLoading: _viewModel.activitiesLoading,
+                  error: _viewModel.activitiesError,
+                  isEmpty: _viewModel.activities.isEmpty,
+                  itemCount: _viewModel.activities.length,
+                  cardWidth: 200,
+                  onSeeAll: () => _goToBrowseTab(1),
+                  onRetry: () => _viewModel.loadHomeData(),
+                  itemBuilder: (context, index) => _ActivityCard(
+                    activity: _viewModel.activities[index],
+                    onTap: () {
+                      if (ensureAuthenticated(context)) {
+                        context.push(
+                          '/booking',
+                          extra: _viewModel.activities[index],
+                        );
+                      }
+                    },
                   ),
                 ),
 
-                // Unified Feed
-                SliverPadding(
-                  padding: const EdgeInsets.all(24),
-                  sliver: _viewModel.filteredOfferings.isEmpty
-                      ? SliverToBoxAdapter(
-                          child: EmptyState(
-                            title: 'No results found',
-                            message:
-                                'Try adjusting your search or filter criteria.',
-                            icon: Symbols.search_off,
-                          ),
-                        )
-                      : SliverList(
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            final offering =
-                                _viewModel.filteredOfferings[index];
-                            return UnifiedOfferingCard(
-                                  offering: offering,
-                                  onTap: () => _onOfferingTapped(offering),
-                                )
-                                .animate(delay: (index * 50).ms)
-                                .fade(duration: 400.ms)
-                                .slideY(
-                                  begin: 0.1,
-                                  end: 0,
-                                  curve: Curves.easeOutQuad,
-                                );
-                          }, childCount: _viewModel.filteredOfferings.length),
-                        ),
+                _ServicesSection(
+                  services: _viewModel.services,
+                  isLoading: _viewModel.servicesLoading,
+                  error: _viewModel.servicesError,
+                  onRetry: () => _viewModel.loadHomeData(),
                 ),
 
                 const SliverToBoxAdapter(
                   child: SizedBox(height: 100),
-                ), // Bottom nav spacing
+                ),
               ],
             ),
           ),
@@ -419,61 +191,223 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+}
 
-  Widget _buildFilterChip(
-    String label,
-    OfferingType? type,
-    ThemeData theme,
-    AppColors appColors,
-  ) {
-    final isSelected = _viewModel.selectedFilterType == type;
-    final isDark = theme.brightness == Brightness.dark;
+class _HeroSection extends SliverToBoxAdapter {
+  _HeroSection({required ThemeData theme})
+    : super(
+        child: Container(
+          height: 200,
+          margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Image.asset(
+                  'assets/images/background.jpg',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.centerRight,
+                ),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.18),
+                        Colors.black.withValues(alpha: 0.52),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _greeting(),
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Discover Your\nNext Challenge',
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            color: Colors.white,
+                            fontFamily: AppConstants.displayFontFamily,
+                            fontWeight: FontWeight.bold,
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ).animate().fade(duration: 500.ms).slideY(
+                  begin: 0.1,
+                  end: 0,
+                  curve: Curves.easeOutQuad,
+                ),
+              ],
+            ),
+          ).animate().fade(delay: 300.ms),
+        ),
+      );
+
+  static String _greeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'GOOD MORNING';
+    if (hour < 18) return 'GOOD AFTERNOON';
+    return 'GOOD EVENING';
+  }
+}
+
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final VoidCallback? onSeeAll;
+  final Color accentColor;
+
+  const _SectionHeader({
+    required this.title,
+    required this.icon,
+    this.onSeeAll,
+    required this.accentColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
     return Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: GestureDetector(
-        onTap: () {
-          _viewModel.setFilterType(type);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : appColors.bgElevated,
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : appColors.bgBorder,
-              width: 1.5,
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: accentColor),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+              color: theme.colorScheme.onSurface,
             ),
-            boxShadow: isSelected && isDark
-                ? [
-                    BoxShadow(
-                      color: appColors.brandPrimaryGlow,
-                      blurRadius: 12,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : [],
           ),
-          child: Center(
-            child: AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 300),
-              style: TextStyle(
-                fontFamily: theme.textTheme.labelLarge?.fontFamily,
-                fontSize: 14,
-                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                letterSpacing: 0.5,
-                color: isSelected
-                    ? theme.colorScheme.onPrimary
-                    : theme.colorScheme.onSurfaceVariant,
+          const Spacer(),
+          if (onSeeAll != null)
+            GestureDetector(
+              onTap: onSeeAll,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'SEE ALL',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: accentColor,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Symbols.chevron_right, size: 16, color: accentColor),
+                ],
               ),
-              child: Text(label),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DashboardSection extends SliverToBoxAdapter {
+  _DashboardSection({
+    required String title,
+    required IconData icon,
+    required Color accentColor,
+    required bool isLoading,
+    required String? error,
+    required bool isEmpty,
+    required int itemCount,
+    required double cardWidth,
+    required VoidCallback? onSeeAll,
+    required VoidCallback onRetry,
+    required Widget Function(BuildContext context, int index) itemBuilder,
+  }) : super(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SectionHeader(
+                title: title,
+                icon: icon,
+                onSeeAll: onSeeAll,
+                accentColor: accentColor,
+              ),
+              if (isLoading)
+                _SkeletonRow(cardWidth: cardWidth)
+              else if (error != null)
+                _ErrorRow(
+                  message: error,
+                  accentColor: accentColor,
+                  onRetry: onRetry,
+                )
+              else if (isEmpty)
+                _EmptyRow(message: 'No $title available', accentColor: accentColor)
+              else
+                SizedBox(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(left: 24, right: 8),
+                    itemCount: itemCount,
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: SizedBox(
+                        width: cardWidth,
+                        child: itemBuilder(context, index),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+}
+
+class _SkeletonRow extends StatelessWidget {
+  final double cardWidth;
+
+  const _SkeletonRow({required this.cardWidth});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final baseColor = theme.colorScheme.onSurface.withValues(alpha: 0.05);
+    final highlightColor = theme.colorScheme.onSurface.withValues(alpha: 0.1);
+
+    return SizedBox(
+      height: 200,
+      child: Shimmer.fromColors(
+        baseColor: baseColor,
+        highlightColor: highlightColor,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.only(left: 24, right: 8),
+          itemCount: 3,
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Container(
+              width: cardWidth,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
             ),
           ),
         ),
@@ -482,20 +416,576 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _SliverFilterDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-  _SliverFilterDelegate({required this.child});
+class _ErrorRow extends StatelessWidget {
+  final String message;
+  final Color accentColor;
+  final VoidCallback onRetry;
+
+  const _ErrorRow({
+    required this.message,
+    required this.accentColor,
+    required this.onRetry,
+  });
 
   @override
-  double get minExtent => 72.0;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        height: 200,
+        decoration: BoxDecoration(
+          color: theme.colorScheme.error.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.error.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Symbols.error,
+                size: 28,
+                color: theme.colorScheme.error.withValues(alpha: 0.5),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Something went wrong',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Symbols.refresh, size: 16),
+                label: const Text('RETRY'),
+                style: TextButton.styleFrom(
+                  foregroundColor: accentColor,
+                  textStyle: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyRow extends StatelessWidget {
+  final String message;
+  final Color accentColor;
+
+  const _EmptyRow({required this.message, required this.accentColor});
+
   @override
-  double get maxExtent => 72.0;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Container(
+        height: 200,
+        decoration: BoxDecoration(
+          color: accentColor.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: accentColor.withValues(alpha: 0.08)),
+        ),
+        child: Center(
+          child: Text(
+            message,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EventCard extends StatelessWidget {
+  final Event event;
+  final VoidCallback onTap;
+
+  const _EventCard({required this.event, required this.onTap});
+
   @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) => child;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+
+    String? formattedDate;
+    if (event.startDate != null) {
+      try {
+        formattedDate = DateFormat('MMM d').format(DateTime.parse(event.startDate!));
+      } catch (_) {
+        formattedDate = event.startDate;
+      }
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appColors.bgBorder),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 3,
+              child: _buildImage(theme, appColors),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      event.name?.toUpperCase() ?? 'EVENT',
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontFamily: AppConstants.displayFontFamily,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    if (formattedDate != null)
+                      Row(
+                        children: [
+                          Icon(
+                            Symbols.calendar_month,
+                            size: 12,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            formattedDate,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImage(ThemeData theme, AppColors appColors) {
+    final hasImage = event.images.isNotEmpty;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: hasImage ? null : Colors.purple.withValues(alpha: 0.1),
+      ),
+      child: hasImage
+          ? PremiumNetworkImage(
+              imageUrl: event.images.first,
+              fit: BoxFit.cover,
+            )
+          : Center(
+              child: Icon(
+                Symbols.emoji_events,
+                size: 32,
+                color: Colors.purple.shade300.withValues(alpha: 0.5),
+              ),
+            ),
+    );
+  }
+}
+
+class _CourseCard extends StatelessWidget {
+  final Course course;
+  final VoidCallback onTap;
+
+  const _CourseCard({required this.course, required this.onTap});
+
   @override
-  bool shouldRebuild(covariant _SliverFilterDelegate oldDelegate) => true;
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+    final hasImage = course.images.isNotEmpty;
+    final isActive = course.status == 'active';
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appColors.bgBorder),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: hasImage ? null : Colors.orange.withValues(alpha: 0.1),
+                ),
+                child: hasImage
+                    ? PremiumNetworkImage(
+                        imageUrl: course.images.first,
+                        fit: BoxFit.cover,
+                      )
+                    : Center(
+                        child: Icon(
+                          Symbols.school,
+                          size: 32,
+                          color: Colors.orange.shade300.withValues(alpha: 0.5),
+                        ),
+                      ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      course.name.toUpperCase(),
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontFamily: AppConstants.displayFontFamily,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    if (course.status != null)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          course.status!.toUpperCase(),
+                          style: TextStyle(
+                            color: isActive
+                                ? theme.colorScheme.onPrimary
+                                : theme.colorScheme.onSurface,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActivityCard extends StatelessWidget {
+  final Activity activity;
+  final VoidCallback onTap;
+
+  const _ActivityCard({required this.activity, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+    final hasImage = activity.imageUrl.isNotEmpty;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appColors.bgBorder),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: hasImage ? null : Colors.teal.withValues(alpha: 0.1),
+                ),
+                child: hasImage
+                    ? PremiumNetworkImage(
+                        imageUrl: activity.imageUrl,
+                        fit: BoxFit.cover,
+                      )
+                    : Center(
+                        child: Icon(
+                          Symbols.sports_soccer,
+                          size: 32,
+                          color: Colors.teal.shade300.withValues(alpha: 0.5),
+                        ),
+                      ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      activity.title.toUpperCase(),
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        fontFamily: AppConstants.displayFontFamily,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 13,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Text(
+                          '${activity.basePrice.toStringAsFixed(0)} TND',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 11,
+                          ),
+                        ),
+                        const Spacer(),
+                        Icon(
+                          Symbols.chevron_right,
+                          size: 14,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ServicesSection extends SliverToBoxAdapter {
+  _ServicesSection({
+    required List<Service> services,
+    required bool isLoading,
+    required String? error,
+    required VoidCallback onRetry,
+  }) : super(
+          child: _buildServices(
+            services: services,
+            isLoading: isLoading,
+            error: error,
+            onRetry: onRetry,
+          ),
+        );
+
+  static Widget _buildServices({
+    required List<Service> services,
+    required bool isLoading,
+    required String? error,
+    required VoidCallback onRetry,
+  }) {
+    final accentColor = Colors.blue.shade400;
+
+    if (isLoading) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(
+            title: 'SERVICES',
+            icon: Symbols.build,
+            accentColor: accentColor,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: _SkeletonRow(cardWidth: 200),
+          ),
+        ],
+      );
+    }
+
+    if (error != null) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(
+            title: 'SERVICES',
+            icon: Symbols.build,
+            accentColor: accentColor,
+          ),
+          _ErrorRow(message: error, accentColor: accentColor, onRetry: onRetry),
+        ],
+      );
+    }
+
+    if (services.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionHeader(
+            title: 'SERVICES',
+            icon: Symbols.build,
+            accentColor: accentColor,
+          ),
+          _EmptyRow(message: 'No services available', accentColor: accentColor),
+        ],
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _SectionHeader(
+          title: 'SERVICES',
+          icon: Symbols.build,
+          accentColor: accentColor,
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: GridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 1.6,
+            children: services.map((service) {
+              return _ServiceCard(
+                service: service,
+                onTap: () {},
+              );
+            }).toList(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ServiceCard extends StatelessWidget {
+  final Service service;
+  final VoidCallback onTap;
+
+  const _ServiceCard({required this.service, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appColors.bgBorder),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                service.name.toUpperCase(),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontFamily: AppConstants.displayFontFamily,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 12,
+                  letterSpacing: 0.5,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  if (service.coursesCount > 0)
+                    _ServiceStat(
+                      label: '${service.coursesCount} courses',
+                      theme: theme,
+                    ),
+                  if (service.coursesCount > 0 && service.eventsCount > 0)
+                    const SizedBox(width: 8),
+                  if (service.eventsCount > 0)
+                    _ServiceStat(
+                      label: '${service.eventsCount} events',
+                      theme: theme,
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ServiceStat extends StatelessWidget {
+  final String label;
+  final ThemeData theme;
+
+  const _ServiceStat({required this.label, required this.theme});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 9,
+          fontWeight: FontWeight.w600,
+          color: theme.colorScheme.primary,
+        ),
+      ),
+    );
+  }
 }

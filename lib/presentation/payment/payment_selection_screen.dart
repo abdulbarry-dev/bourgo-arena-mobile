@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
@@ -7,9 +8,12 @@ import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_selection_view_model.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_webview_screen.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:url_launcher/url_launcher.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 
 class PaymentSelectionScreen extends StatefulWidget {
   final Plan plan;
@@ -28,6 +32,8 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
     super.initState();
     _viewModel = PaymentSelectionViewModel(
       paymentRepository: locator<PaymentRepository>(),
+      subscribeToPlanUseCase: locator<SubscribeToPlanUseCase>(),
+      payWithLoyaltyUseCase: locator<PayWithLoyaltyUseCase>(),
     );
     _viewModel.addListener(_onViewModelChanged);
   }
@@ -44,11 +50,16 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
   }
 
   Future<void> _startPayment(String provider) async {
-    await _viewModel.initiatePayment(
+    await _viewModel.subscribeAndPay(
+      planId: widget.plan.id,
       amount: widget.plan.price,
       provider: provider,
       description: 'Subscription to ${widget.plan.name}',
     );
+
+    if (_viewModel.state == PaymentSelectionState.loyaltySuccess) {
+      return;
+    }
 
     final url = _viewModel.paymentUrl;
     if (url == null || !mounted) return;
@@ -56,7 +67,6 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
     if (kIsWeb) {
       final uri = Uri.tryParse(url);
       if (uri != null && await canLaunchUrl(uri)) {
-        // On web, launch in the same tab so the redirect loads our app with /payment/success
         await launchUrl(uri, webOnlyWindowName: '_self');
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -96,32 +106,16 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
     final appColors = theme.extension<AppColors>()!;
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        title: Text(
-          'PAYMENT METHOD',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
-          ),
-        ),
-        backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Symbols.arrow_back),
-          onPressed: () {
-            if (_viewModel.state == PaymentSelectionState.verified) {
-              context.go('/home');
-            } else {
-              context.pop();
-            }
-          },
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1.0),
-          child: Container(color: appColors.bgBorder, height: 1.0),
-        ),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: SubScreenAppBar(
+        title: 'PAYMENT METHOD',
+        onBack: () {
+          if (_viewModel.state == PaymentSelectionState.verified) {
+            context.go('/home');
+          } else {
+            context.pop();
+          }
+        },
       ),
       body: _buildBody(theme, appColors),
     );
@@ -129,11 +123,16 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
 
   Widget _buildBody(ThemeData theme, AppColors appColors) {
     switch (_viewModel.state) {
+      case PaymentSelectionState.subscribing:
+        return _buildLoading(theme, 'Creating subscription...');
       case PaymentSelectionState.initiating:
         return _buildLoading(theme, 'Preparing payment...');
+      case PaymentSelectionState.loyaltyPaying:
+        return _buildLoading(theme, 'Processing loyalty payment...');
       case PaymentSelectionState.awaitingVerification:
         return _buildLoading(theme, 'Verifying payment...');
       case PaymentSelectionState.verified:
+      case PaymentSelectionState.loyaltySuccess:
         return _buildSuccess(theme);
       case PaymentSelectionState.failed:
         return _buildFailed(theme);
@@ -279,6 +278,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                 color: theme.colorScheme.primary,
               ),
             ),
+          ).animate().fade(duration: 400.ms).slideY(
+            begin: 0.1,
+            end: 0,
+            curve: Curves.easeOutQuad,
           ),
           const SizedBox(height: 24),
           Text(
@@ -289,6 +292,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               letterSpacing: 2.0,
             ),
             textAlign: TextAlign.center,
+          ).animate(delay: 50.ms).fade(duration: 400.ms).slideY(
+            begin: 0.1,
+            end: 0,
+            curve: Curves.easeOutQuad,
           ),
           const SizedBox(height: 8),
           Text(
@@ -299,6 +306,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               color: theme.colorScheme.onSurface,
             ),
             textAlign: TextAlign.center,
+          ).animate(delay: 100.ms).fade(duration: 400.ms).slideY(
+            begin: 0.1,
+            end: 0,
+            curve: Curves.easeOutQuad,
           ),
           Text(
             'For ${widget.plan.name}',
@@ -306,6 +317,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               color: theme.colorScheme.onSurfaceVariant,
             ),
             textAlign: TextAlign.center,
+          ).animate(delay: 150.ms).fade(duration: 400.ms).slideY(
+            begin: 0.1,
+            end: 0,
+            curve: Curves.easeOutQuad,
           ),
           const SizedBox(height: 48),
 
@@ -316,6 +331,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
             ),
+          ).animate(delay: 200.ms).fade(duration: 400.ms).slideY(
+            begin: 0.1,
+            end: 0,
+            curve: Curves.easeOutQuad,
           ),
           const SizedBox(height: 16),
 
@@ -324,10 +343,14 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
             title: 'Pay with Konnect',
             subtitle: 'Bank Cards, E-Dinar, Wallets',
             icon: Symbols.credit_card,
-            brandColor: const Color(0xFF005AE2), // Konnect Blue
+            brandColor: const Color(0xFF005AE2),
             theme: theme,
             appColors: appColors,
             onTap: () => _startPayment('konnect'),
+          ).animate(delay: 250.ms).fade(duration: 400.ms).slideY(
+            begin: 0.1,
+            end: 0,
+            curve: Curves.easeOutQuad,
           ),
           const SizedBox(height: 32),
 
@@ -347,7 +370,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               ),
               Expanded(child: Divider(color: appColors.bgBorder)),
             ],
-          ),
+          ).animate(delay: 300.ms).fade(duration: 400.ms),
           const SizedBox(height: 32),
 
           // Loyalty Balance Button
@@ -355,14 +378,17 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
             title: 'Pay with Loyalty Balance',
             subtitle: 'Use your accumulated points',
             icon: Symbols.stars,
-            brandColor: theme.colorScheme.primary, // App Primary (Neon)
+            brandColor: theme.colorScheme.primary,
             theme: theme,
             appColors: appColors,
             isPrimary: true,
             onTap: () {
-              // Usually handled internally via another endpoint, but for now we simulate
               _startPayment('loyalty');
             },
+          ).animate(delay: 350.ms).fade(duration: 400.ms).slideY(
+            begin: 0.1,
+            end: 0,
+            curve: Curves.easeOutQuad,
           ),
         ],
       ),

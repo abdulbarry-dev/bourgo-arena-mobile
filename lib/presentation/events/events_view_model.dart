@@ -4,10 +4,8 @@ import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:flutter/material.dart';
 
-/// State for the events list.
 enum EventsLoadState { idle, loading, loaded, error }
 
-/// ViewModel for the Events / Tournaments screen.
 class EventsViewModel extends ChangeNotifier {
   final GetEventsUseCase _getEventsUseCase;
   final RegisterForEventUseCase _registerForEventUseCase;
@@ -16,8 +14,8 @@ class EventsViewModel extends ChangeNotifier {
   EventsLoadState _state = EventsLoadState.idle;
   String? _errorMessage;
   String? _registeringEventId;
+  String? _lastRegistrationStatus;
 
-  /// Creates a new [EventsViewModel].
   EventsViewModel({
     required GetEventsUseCase getEventsUseCase,
     required RegisterForEventUseCase registerForEventUseCase,
@@ -26,19 +24,11 @@ class EventsViewModel extends ChangeNotifier {
     loadEvents();
   }
 
-  /// Current list of events.
   List<Event> get events => _events;
-
-  /// True while the list is being fetched.
   bool get isLoading => _state == EventsLoadState.loading;
-
-  /// Error message if fetch failed.
   String? get errorMessage => _errorMessage;
-
-  /// ID of the event currently being registered for.
   String? get registeringEventId => _registeringEventId;
 
-  /// Fetches events from the API.
   Future<void> loadEvents() async {
     _state = EventsLoadState.loading;
     _errorMessage = null;
@@ -59,17 +49,20 @@ class EventsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Registers the current user for [eventId].
   Future<bool> registerForEvent(String eventId) async {
     _registeringEventId = eventId;
+    _lastRegistrationStatus = null;
     notifyListeners();
 
     final result = await _registerForEventUseCase(eventId);
     _registeringEventId = null;
-    notifyListeners();
 
     return result.when(
-      success: (_) => true,
+      success: (reg) {
+        _lastRegistrationStatus = reg.status;
+        notifyListeners();
+        return true;
+      },
       failure: (failure) {
         developer.log('EventsViewModel register: ${failure.message}');
         _errorMessage = failure.message;
@@ -78,4 +71,6 @@ class EventsViewModel extends ChangeNotifier {
       },
     );
   }
+
+  String? get lastRegistrationStatus => _lastRegistrationStatus;
 }

@@ -4,7 +4,9 @@ import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subs
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_view_model.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -39,24 +41,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: AppBar(
-            backgroundColor: theme.scaffoldBackgroundColor,
-            elevation: 0,
-            scrolledUnderElevation: 0,
-            centerTitle: false,
-            title: Text(
-              'MON ABONNEMENT',
-              style: theme.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.5,
-              ),
-            ),
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-              onPressed: () => Navigator.pop(context),
-              color: theme.colorScheme.onSurface,
-            ),
-          ),
+          appBar: SubScreenAppBar(title: 'MON ABONNEMENT'),
           body: _viewModel.isLoading && subscription == null
               ? const Center(child: CircularProgressIndicator())
               : RefreshIndicator(
@@ -72,18 +57,35 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           _SubscriptionCard(
                             subscription: subscription,
                             appColors: theme.extension<AppColors>()!,
+                          ).animate().fade(duration: 400.ms).slideY(
+                            begin: 0.1,
+                            end: 0,
+                            curve: Curves.easeOutQuad,
                           ),
                           SizedBox(height: spacing.xl),
                           _PlanDetailsSection(
                             subscription: subscription,
                             appColors: theme.extension<AppColors>()!,
+                          ).animate(delay: 100.ms).fade(duration: 400.ms).slideY(
+                            begin: 0.1,
+                            end: 0,
+                            curve: Curves.easeOutQuad,
                           ),
                           SizedBox(height: spacing.xl),
-                          _ServiceSection(subscription: subscription),
+                          _ServiceSection(subscription: subscription)
+                              .animate(delay: 200.ms).fade(duration: 400.ms).slideY(
+                            begin: 0.1,
+                            end: 0,
+                            curve: Curves.easeOutQuad,
+                          ),
                           SizedBox(height: spacing.xl),
                           _PaymentSection(
                             subscription: subscription,
                             appColors: theme.extension<AppColors>()!,
+                          ).animate(delay: 300.ms).fade(duration: 400.ms).slideY(
+                            begin: 0.1,
+                            end: 0,
+                            curve: Curves.easeOutQuad,
                           ),
                         ] else if (_viewModel.errorMessage != null) ...[
                           _ErrorState(
@@ -94,28 +96,32 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           _EmptyState(),
                         ],
                         SizedBox(height: spacing.lg),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: ElevatedButton.icon(
-                            onPressed: () => context.push('/plans'),
-                            icon: const Icon(Symbols.explore, size: 20),
-                            label: const Text(
-                              'VOIR LES OFFRES',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.2,
+                          SizedBox(
+                            width: double.infinity,
+                            height: 56,
+                            child: ElevatedButton.icon(
+                              onPressed: () => context.push('/plans'),
+                              icon: const Icon(Symbols.explore, size: 20),
+                              label: const Text(
+                                'VOIR LES OFFRES',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1.2,
+                                ),
                               ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.colorScheme.primary,
-                              foregroundColor: theme.colorScheme.onPrimary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: theme.colorScheme.primary,
+                                foregroundColor: theme.colorScheme.onPrimary,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
                               ),
+                            ).animate(delay: 400.ms).fade(duration: 400.ms).slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
                             ),
                           ),
-                        ),
                         SizedBox(height: spacing.xl),
                       ],
                     ),

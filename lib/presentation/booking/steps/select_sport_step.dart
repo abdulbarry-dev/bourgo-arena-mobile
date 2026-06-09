@@ -22,29 +22,12 @@ class SelectSportStep extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(bottom: 16),
           child: ActivityCard(
-            title: activity.title,
-            imageUrl: activity.imageUrl,
+            activity: activity,
             isFullWidth: true,
-            icon: _getIcon(activity.icon),
             onTap: () => viewModel.selectActivity(activity),
           ),
         );
       },
     );
-  }
-
-  IconData _getIcon(String name) {
-    switch (name) {
-      case 'sports_soccer':
-        return Icons.sports_soccer;
-      case 'sports_tennis':
-        return Icons.sports_tennis;
-      case 'sports_basketball':
-        return Icons.sports_basketball;
-      case 'fitness_center':
-        return Icons.fitness_center;
-      default:
-        return Icons.sports;
-    }
   }
 }

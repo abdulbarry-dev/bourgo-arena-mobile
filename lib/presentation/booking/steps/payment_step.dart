@@ -38,7 +38,13 @@ class PaymentStep extends StatelessWidget {
         _BottomPayButton(
           onPressed: () async {
             final success = await viewModel.makeReservation();
-            if (success && context.mounted) {
+            if (!success || !context.mounted) return;
+
+            if (viewModel.requiresDeposit) {
+              context.push(
+                '/payment/${viewModel.createdReservationId}',
+              );
+            } else {
               context.push(
                 '/booking-success',
                 extra: viewModel.selectedActivity,

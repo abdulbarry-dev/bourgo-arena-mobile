@@ -1,6 +1,5 @@
-import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
-import 'package:material_symbols_icons/symbols.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
@@ -14,6 +13,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/booking/steps/activity_detail_step.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/payment_step.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/select_member_step.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/steps/select_sport_step.dart';
@@ -76,9 +76,10 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
             elevation: 0,
             scrolledUnderElevation: 0,
             centerTitle: false,
-            backgroundColor: theme.colorScheme.surface,
+            backgroundColor: theme.scaffoldBackgroundColor,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+              color: theme.colorScheme.onSurface,
               onPressed: () {
                 if (_viewModel.currentStep > 0 &&
                     widget.initialActivity == null) {
@@ -88,33 +89,14 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
                 }
               },
             ),
-            title: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primaryContainer.withValues(
-                      alpha: 0.5,
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(
-                    Symbols.book_online,
-                    color: theme.colorScheme.primary,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  AppLocalizations.of(context)!.bookingTitle,
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontFamily: AppConstants.displayFontFamily,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-              ],
+            title: Text(
+              AppLocalizations.of(context)!.bookingTitle.toUpperCase(),
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontFamily: AppConstants.displayFontFamily,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ),
           body: Column(
@@ -147,8 +129,13 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
         case 1:
           return SelectSportStep(viewModel: _viewModel);
         case 2:
-          return SelectTimeStep(viewModel: _viewModel);
+          return ActivityDetailStep(
+            viewModel: _viewModel,
+            onConfirm: () => _viewModel.confirmActivitySelection(),
+          );
         case 3:
+          return SelectTimeStep(viewModel: _viewModel);
+        case 4:
           return PaymentStep(viewModel: _viewModel);
         default:
           return const SizedBox.shrink();
@@ -159,8 +146,13 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
       case 0:
         return SelectSportStep(viewModel: _viewModel);
       case 1:
-        return SelectTimeStep(viewModel: _viewModel);
+        return ActivityDetailStep(
+          viewModel: _viewModel,
+          onConfirm: () => _viewModel.confirmActivitySelection(),
+        );
       case 2:
+        return SelectTimeStep(viewModel: _viewModel);
+      case 3:
         return PaymentStep(viewModel: _viewModel);
       default:
         return const SizedBox.shrink();

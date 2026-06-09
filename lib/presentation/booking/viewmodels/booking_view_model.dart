@@ -48,6 +48,10 @@ class BookingViewModel extends BaseViewModel {
   bool _isPricingLoading = false;
   bool _isLoading = false;
 
+  String? _depositUrl;
+  int? _depositPaymentId;
+  String? _createdReservationId;
+
   /// Creates a new [BookingViewModel] instance.
   BookingViewModel({
     required GetActivitiesUseCase getActivitiesUseCase,
@@ -79,7 +83,7 @@ class BookingViewModel extends BaseViewModel {
   /// Current step in the booking flow (0-2).
   int get currentStep => _currentStep;
 
-  int get totalSteps => _isFamilyAccount ? 4 : 3;
+  int get totalSteps => _isFamilyAccount ? 5 : 4;
   int get paymentStepIndex => totalSteps - 1;
 
   /// The activity selected for booking.
@@ -116,6 +120,11 @@ class BookingViewModel extends BaseViewModel {
       _contextualPrice ?? _selectedActivity?.basePrice ?? 0;
   bool get hasContextualPrice => _contextualPrice != null;
   MemberTier get memberTier => _memberTier;
+
+  String? get depositUrl => _depositUrl;
+  int? get depositPaymentId => _depositPaymentId;
+  String? get createdReservationId => _createdReservationId;
+  bool get requiresDeposit => _depositUrl != null;
   int get projectedPoints {
     if (_paymentMethod == AppConstants.paymentMethodWalletId) {
       return 0;
@@ -139,10 +148,16 @@ class BookingViewModel extends BaseViewModel {
     }
   }
 
-  /// Selects an [activity] and proceeds to the next step.
+  /// Selects an [activity] and moves to the detail step.
   void selectActivity(Activity activity) {
     _selectedActivity = activity;
     _currentStep = _isFamilyAccount ? 2 : 1;
+    notifyListeners();
+  }
+
+  /// Confirms activity selection from detail view, loads slots and moves forward.
+  void confirmActivitySelection() {
+    _currentStep = _isFamilyAccount ? 3 : 2;
     _loadSlots();
     _loadContextualPrice();
     notifyListeners();
@@ -219,6 +234,8 @@ class BookingViewModel extends BaseViewModel {
   }
 
   /// Creates a new reservation based on the current selection.
+  /// Returns [true] if the reservation was created (with or without deposit),
+  /// and populates [depositUrl] if the backend returned a 10% deposit payment.
   Future<bool> makeReservation() async {
     final activity = _selectedActivity;
     final slot = _selectedSlot;
@@ -235,10 +252,13 @@ class BookingViewModel extends BaseViewModel {
 
     _isLoading = true;
     clearError();
+    _depositUrl = null;
+    _depositPaymentId = null;
+    _createdReservationId = null;
     notifyListeners();
 
     final reservation = Reservation(
-      id: '', // Will be assigned by backend
+      id: '',
       activityId: activity.id,
       activitySlotId: slot.id,
       activityTitle: activity.category,
@@ -247,11 +267,11 @@ class BookingViewModel extends BaseViewModel {
       time: slot.time,
       duration: activity.id == 'padel-1'
           ? '90 min'
-          : '60 min', // Mock logic for demo
+          : '60 min',
       price: priceToPay,
       status: 'confirmed',
-      paymentStatus: 'paid',
-      qrCode: 'mock-qr-code',
+      paymentStatus: 'pending',
+      qrCode: '',
     );
 
     final result = await _makeReservationUseCase(reservation);
@@ -260,6 +280,11 @@ class BookingViewModel extends BaseViewModel {
     result.when(
       success: (data) {
         success = true;
+        _createdReservationId = data.reservation.id;
+        if (data.requiresDeposit) {
+          _depositUrl = data.paymentUrl;
+          _depositPaymentId = data.depositPaymentId;
+        }
         _resetForm();
       },
       failure: (failure) {
@@ -368,8 +393,6 @@ class BookingViewModel extends BaseViewModel {
 
       if (_selectedActivity != null) {
         _currentStep = _isFamilyAccount ? 2 : 1;
-        _loadSlots();
-        _loadContextualPrice();
       } else {
         _currentStep = _isFamilyAccount ? 0 : 0;
         _loadActivities();

@@ -22,7 +22,6 @@ class PaymentGatewayScreen extends StatefulWidget {
 
 class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
     with WidgetsBindingObserver {
-  String _selectedGateway = 'konnect';
   PaymentViewModel? _viewModel;
   bool _didReturnFromBrowser = false;
 
@@ -30,6 +29,8 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _initViewModel();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _startPayment());
   }
 
   @override
@@ -54,7 +55,6 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
     _viewModel = PaymentViewModel(
       reservationRepository: locator<ReservationRepository>(),
       reservationId: widget.reservationId,
-      gateway: _selectedGateway,
     );
     setState(() {});
   }
@@ -89,129 +89,23 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
         title: const Text('Payment'),
         backgroundColor: theme.colorScheme.surface,
       ),
-      body: _viewModel == null
-          ? _GatewaySelector(
-              selected: _selectedGateway,
-              onChanged: (g) => setState(() => _selectedGateway = g),
-              onPay: _startPayment,
-            )
-          : ListenableBuilder(
-              listenable: _viewModel!,
-              builder: (context, _) {
-                return _PaymentStatus(
-                  viewModel: _viewModel!,
-                  onRetry: () => setState(() {
-                    _viewModel?.dispose();
-                    _viewModel = null;
-                  }),
-                  onDone: () => context.go('/home'),
-                );
-              },
-            ),
-    );
-  }
-}
-
-class _GatewaySelector extends StatelessWidget {
-  final String selected;
-  final ValueChanged<String> onChanged;
-  final VoidCallback onPay;
-
-  const _GatewaySelector({
-    required this.selected,
-    required this.onChanged,
-    required this.onPay,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Choose a payment method',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 32),
-          _GatewayOption(
-            label: 'Konnect',
-            logo: Icons.payment,
-            value: 'konnect',
-            selected: selected,
-            onTap: () => onChanged('konnect'),
-          ),
-          const Spacer(),
-          ElevatedButton(
-            onPressed: onPay,
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 56),
-            ),
-            child: const Text('Proceed to Payment'),
-          ),
-        ],
+      body: ListenableBuilder(
+        listenable: _viewModel!,
+        builder: (context, _) {
+          return _PaymentStatus(
+            viewModel: _viewModel!,
+            onRetry: () {
+              _viewModel?.dispose();
+              _initViewModel();
+              _startPayment();
+            },
+            onDone: () => context.go('/home'),
+          );
+        },
       ),
     );
   }
 }
-
-class _GatewayOption extends StatelessWidget {
-  final String label;
-  final IconData logo;
-  final String value;
-  final String selected;
-  final VoidCallback onTap;
-
-  const _GatewayOption({
-    required this.label,
-    required this.logo,
-    required this.value,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isSelected = value == selected;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outlineVariant,
-            width: isSelected ? 2 : 1,
-          ),
-          color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.05)
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(logo, size: 32, color: theme.colorScheme.primary),
-            const SizedBox(width: 16),
-            Text(label, style: theme.textTheme.titleMedium),
-            const Spacer(),
-            if (isSelected)
-              Icon(Icons.check_circle, color: theme.colorScheme.primary),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _PaymentStatus extends StatelessWidget {
   final PaymentViewModel viewModel;
   final VoidCallback onRetry;

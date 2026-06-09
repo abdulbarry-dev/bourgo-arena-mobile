@@ -30,24 +30,29 @@ class ActivitiesViewModel extends BaseViewModel {
   /// List of all activities.
   List<Activity> get activities => _activities;
 
-  /// List of activities categorized as sports.
+  /// List of activities categorized as sports (training, technique, conditioning).
   List<Activity> get sports => _activities.where((a) => _isSport(a)).toList();
 
-  /// List of activities not categorized as sports.
-  List<Activity> get otherActivities =>
+  /// List of activities categorized as well-being (recovery, mobility, mindfulness).
+  List<Activity> get wellbeing =>
       _activities.where((a) => !_isSport(a)).toList();
 
+  static const _sportFeatures = {
+    'coaching', 'technique', 'conditioning', 'high-intensity',
+    'pad-work', 'court-hire', 'equipment', 'cardio',
+  };
+
   bool _isSport(Activity a) {
-    final searchArea = '${a.category} ${a.title} ${a.description}'
-        .toLowerCase();
-    return searchArea.contains('sport') ||
-        searchArea.contains('football') ||
-        searchArea.contains('padel') ||
-        searchArea.contains('tennis') ||
-        searchArea.contains('boxing') ||
-        searchArea.contains('fitness') ||
-        searchArea.contains('gym') ||
-        searchArea.contains('training');
+    if (a.features.isEmpty) {
+      final lower = '${a.title} ${a.description}'.toLowerCase();
+      return lower.contains('sport') ||
+          lower.contains('football') ||
+          lower.contains('padel') ||
+          lower.contains('tennis') ||
+          lower.contains('boxing') ||
+          lower.contains('training');
+    }
+    return a.features.any((f) => _sportFeatures.contains(f.toLowerCase()));
   }
 
   /// List of user's reservations.

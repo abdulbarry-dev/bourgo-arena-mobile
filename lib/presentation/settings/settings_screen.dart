@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/privacy_policy_screen.dart';
@@ -355,158 +356,38 @@ class SettingsScreen extends StatelessWidget {
   void _showDeleteAccountModal(BuildContext context, AppLocalizations l10n) {
     final passwordController = TextEditingController();
 
-    showModalBottomSheet(
+    ConfirmActionModal.show(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (dialogContext) {
-        final theme = Theme.of(context);
-        final appColors = theme.extension<AppColors>()!;
-        final spacing = context.spacing;
-
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(dialogContext).viewInsets.bottom,
-          ),
-          child: Container(
-            padding: EdgeInsets.all(spacing.lg),
-            decoration: BoxDecoration(
-              color: appColors.bgElevated,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(32),
-              ),
-              border: Border.all(
-                color: theme.colorScheme.error.withValues(alpha: 0.1),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 32),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.error.withValues(alpha: 0.08),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Symbols.warning,
-                    color: theme.colorScheme.error,
-                    size: 32,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  l10n.settingsConfirmDeleteTitle.toUpperCase(),
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: theme.colorScheme.onSurface,
-                    fontFamily: AppConstants.displayFontFamily,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.settingsConfirmDeleteMessage,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(
-                      alpha: 0.7,
-                    ),
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                AuthTextField(
-                  label: l10n.passwordCurrentLabel,
-                  hint: l10n.passwordCurrentHint,
-                  controller: passwordController,
-                  isPassword: true,
-                  leadingIcon: Symbols.lock,
-                ),
-                const SizedBox(height: 32),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          side: BorderSide(
-                            color: theme.colorScheme.onSurface.withValues(
-                              alpha: 0.1,
-                            ),
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          l10n.settingsCancel.toUpperCase(),
-                          style: TextStyle(
-                            color: theme.colorScheme.onSurface,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final pwd = passwordController.text.trim();
-                          if (pwd.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(l10n.settingsEnterPasswordFirst),
-                              ),
-                            );
-                            return;
-                          }
-
-                          final success = await viewModel.deleteAccount(
-                            password: pwd,
-                          );
-                          if (success && context.mounted) {
-                            Navigator.pop(dialogContext);
-                            context.go('/login');
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.error,
-                          foregroundColor: theme.colorScheme.onError,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 18),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: Text(
-                          l10n.settingsDelete.toUpperCase(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        );
+      icon: Symbols.warning,
+      title: l10n.settingsConfirmDeleteTitle,
+      message: l10n.settingsConfirmDeleteMessage,
+      cancelLabel: l10n.settingsCancel,
+      confirmLabel: l10n.settingsDelete,
+      isDestructive: true,
+      content: Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: AuthTextField(
+          label: l10n.passwordCurrentLabel,
+          hint: l10n.passwordCurrentHint,
+          controller: passwordController,
+          isPassword: true,
+          leadingIcon: Symbols.lock,
+        ),
+      ),
+      onConfirm: (dialogContext) async {
+        final pwd = passwordController.text.trim();
+        if (pwd.isEmpty) {
+          ScaffoldMessenger.of(dialogContext).showSnackBar(
+            SnackBar(content: Text(l10n.settingsEnterPasswordFirst)),
+          );
+          return false;
+        }
+        final success = await viewModel.deleteAccount(password: pwd);
+        if (success && dialogContext.mounted) {
+          context.go('/login');
+          return true;
+        }
+        return false;
       },
     );
   }
