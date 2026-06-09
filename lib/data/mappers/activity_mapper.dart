@@ -15,7 +15,9 @@ class ActivityMapper {
       imageUrl: (model.images?.isNotEmpty == true)
           ? model.images!.first
           : (model.imageUrl ?? ''),
-      images: model.images ?? (model.imageUrl != null ? [model.imageUrl!] : const []),
+      images:
+          model.images ??
+          (model.imageUrl != null ? [model.imageUrl!] : const []),
       icon: model.icon ?? 'sports',
       description: model.description ?? '',
       features: model.features ?? const [],

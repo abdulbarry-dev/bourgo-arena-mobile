@@ -26,7 +26,13 @@ class ParticipantModel {
   final String? initials;
   final ParticipantUserModel? user;
 
-  const ParticipantModel({this.id, this.name, this.avatarUrl, this.initials, this.user});
+  const ParticipantModel({
+    this.id,
+    this.name,
+    this.avatarUrl,
+    this.initials,
+    this.user,
+  });
 
   factory ParticipantModel.fromJson(Map<String, dynamic> json) =>
       _$ParticipantModelFromJson(json);

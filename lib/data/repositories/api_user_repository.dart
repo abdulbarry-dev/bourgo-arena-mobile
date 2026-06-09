@@ -25,7 +25,7 @@ class ApiUserRepository implements UserRepository {
     }
     return executeApiCall(() async {
       final response =
-          await _apiClient.get('/user/profile', fullResponse: true)
+          await _apiClient.get('/member/profile', fullResponse: true)
               as Map<String, dynamic>;
       final data = response['data'] as Map<String, dynamic>? ?? response;
       final userModel = UserProfileModel.fromJson(data);
@@ -45,7 +45,7 @@ class ApiUserRepository implements UserRepository {
     return executeApiCall(() async {
       final model = UserMapper.fromEntity(user);
       final response =
-          await _apiClient.put('/user/profile', model.toJson())
+          await _apiClient.put('/member/profile', model.toJson())
               as Map<String, dynamic>;
       final updatedModel = UserProfileModel.fromJson(response);
       return Result.success(UserMapper.toEntity(updatedModel));
@@ -64,7 +64,7 @@ class ApiUserRepository implements UserRepository {
       );
     }
     return executeApiCall(() async {
-      await _apiClient.put('/user/profile', {'preferences': preferences});
+      await _apiClient.put('/member/profile', {'preferences': preferences});
       return Result.success(null);
     });
   }

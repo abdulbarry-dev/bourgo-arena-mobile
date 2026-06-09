@@ -20,7 +20,7 @@ class ApiPaymentRepository implements PaymentRepository {
     return executeApiCall(() async {
       final response =
           await _apiClient.get(
-                'user/payments',
+                '/member/payments',
                 fullResponse: true,
                 queryParameters: {
                   'page': page.toString(),

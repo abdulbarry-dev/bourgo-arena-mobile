@@ -8,7 +8,9 @@ class CourseMapper {
       id: model.id,
       name: model.name ?? model.displayTitle,
       description: model.description,
-      images: model.images ?? (model.imageUrl != null ? [model.imageUrl!] : const []),
+      images:
+          model.images ??
+          (model.imageUrl != null ? [model.imageUrl!] : const []),
       imageUrl: model.imageUrl,
       status: model.status,
     );

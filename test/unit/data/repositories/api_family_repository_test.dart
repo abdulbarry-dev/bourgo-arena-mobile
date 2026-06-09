@@ -1,8 +1,10 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_family_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/family_member_profile.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -30,8 +32,15 @@ void main() {
 
     test('getChildren returns list of ChildProfile on 200', () async {
       when(
-        () => apiClient.get('/family/children'),
-      ).thenAnswer((_) async => [tChildJson]);
+        () => apiClient.get(
+          '/family/children',
+          fullResponse: any(named: 'fullResponse'),
+        ),
+      ).thenAnswer(
+        (_) async => {
+          'data': [tChildJson],
+        },
+      );
 
       final result = await repository.getChildren();
 
@@ -56,6 +65,137 @@ void main() {
       expect(result, isA<Success<ChildProfile, Failure>>());
       final data = (result as Success<ChildProfile, Failure>).data;
       expect(data.firstName, 'John');
+    });
+
+    group('getFamilyMembers', () {
+      final tMemberJson = {
+        'id': '10',
+        'name': 'Sara Ben Ali',
+        'relation': 'spouse',
+        'birth_date': '1997-08-22',
+        'initials': 'SB',
+        'avatar_url': null,
+        'created_at': '2026-02-10T08:00:00.000000Z',
+      };
+
+      test('returns list of FamilyMemberProfile on 200', () async {
+        when(
+          () => apiClient.get(
+            '/family/members',
+            fullResponse: any(named: 'fullResponse'),
+          ),
+        ).thenAnswer(
+          (_) async => {
+            'data': [tMemberJson],
+          },
+        );
+
+        final result = await repository.getFamilyMembers();
+
+        expect(result, isA<Success<List<FamilyMemberProfile>, Failure>>());
+        final data =
+            (result as Success<List<FamilyMemberProfile>, Failure>).data;
+        expect(data, hasLength(1));
+        expect(data.first.name, 'Sara Ben Ali');
+        expect(data.first.relation, 'spouse');
+      });
+
+      test('returns empty list when not authenticated', () async {
+        when(() => apiClient.hasToken).thenReturn(false);
+
+        final result = await repository.getFamilyMembers();
+
+        expect(result, isA<Success<List<FamilyMemberProfile>, Failure>>());
+        expect(
+          (result as Success<List<FamilyMemberProfile>, Failure>).data,
+          isEmpty,
+        );
+      });
+    });
+
+    group('addFamilyMember', () {
+      final tMemberJson = {
+        'data': {
+          'id': '20',
+          'name': 'Sara Ben Ali',
+          'relation': 'spouse',
+          'birth_date': '1997-08-22',
+          'initials': 'SB',
+          'avatar_url': null,
+          'created_at': '2026-02-10T08:00:00.000000Z',
+        },
+      };
+
+      test('returns FamilyMemberProfile on 201', () async {
+        when(
+          () => apiClient.post('/family/members', any()),
+        ).thenAnswer((_) async => tMemberJson);
+
+        final result = await repository.addFamilyMember(
+          name: 'Sara Ben Ali',
+          relation: 'spouse',
+          birthDate: DateTime(1997, 8, 22),
+        );
+
+        expect(result, isA<Success<FamilyMemberProfile, Failure>>());
+        final data = (result as Success<FamilyMemberProfile, Failure>).data;
+        expect(data.name, 'Sara Ben Ali');
+        expect(data.relation, 'spouse');
+      });
+    });
+
+    group('updateFamilyMember', () {
+      final tMemberJson = {
+        'data': {
+          'id': '20',
+          'name': 'Sara Ben Ali Updated',
+          'relation': 'spouse',
+          'birth_date': '1997-08-22',
+          'initials': 'SB',
+          'avatar_url': null,
+          'created_at': '2026-02-10T08:00:00.000000Z',
+        },
+      };
+
+      test('returns updated FamilyMemberProfile on 200', () async {
+        when(
+          () => apiClient.put('/family/members/20', any()),
+        ).thenAnswer((_) async => tMemberJson);
+
+        final result = await repository.updateFamilyMember(
+          id: '20',
+          name: 'Sara Ben Ali Updated',
+          relation: 'spouse',
+          birthDate: DateTime(1997, 8, 22),
+        );
+
+        expect(result, isA<Success<FamilyMemberProfile, Failure>>());
+        final data = (result as Success<FamilyMemberProfile, Failure>).data;
+        expect(data.name, 'Sara Ben Ali Updated');
+      });
+    });
+
+    group('removeFamilyMember', () {
+      test('returns Success on 200', () async {
+        when(
+          () => apiClient.delete('/family/members/20'),
+        ).thenAnswer((_) async => {});
+
+        final result = await repository.removeFamilyMember('20');
+
+        expect(result, isA<Success<void, Failure>>());
+        verify(() => apiClient.delete('/family/members/20')).called(1);
+      });
+
+      test('returns Failure on error', () async {
+        when(
+          () => apiClient.delete('/family/members/20'),
+        ).thenThrow(const AuthException('API Error: 401 unauthorized'));
+
+        final result = await repository.removeFamilyMember('20');
+
+        expect(result, isA<FailureResult<void, Failure>>());
+      });
     });
   });
 }

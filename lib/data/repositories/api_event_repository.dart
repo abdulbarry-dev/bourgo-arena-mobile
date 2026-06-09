@@ -27,11 +27,14 @@ class ApiEventRepository implements EventRepository {
       );
       final List<dynamic> data = response is List
           ? response
-          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ?? []);
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
       final entities = data
-          .map((json) => EventMapper.toEntity(
-                EventModel.fromJson(json as Map<String, dynamic>),
-              ))
+          .map(
+            (json) => EventMapper.toEntity(
+              EventModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
           .toList();
       return Result.success(entities);
     });
@@ -48,10 +51,13 @@ class ApiEventRepository implements EventRepository {
   }
 
   @override
-  Future<Result<Map<String, dynamic>, Failure>> getEventBracket(String eventId) {
+  Future<Result<Map<String, dynamic>, Failure>> getEventBracket(
+    String eventId,
+  ) {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/events/$eventId/bracket')
-          as Map<String, dynamic>;
+      final response =
+          await _apiClient.get('/events/$eventId/bracket')
+              as Map<String, dynamic>;
       final data = response['data'] as Map<String, dynamic>? ?? response;
       return Result.success(data);
     });
@@ -60,8 +66,9 @@ class ApiEventRepository implements EventRepository {
   @override
   Future<Result<RegistrationResult, Failure>> registerForEvent(String eventId) {
     return executeApiCall(() async {
-      final response = await _apiClient.post('/events/$eventId/register', {})
-          as Map<String, dynamic>;
+      final response =
+          await _apiClient.post('/events/$eventId/register', {})
+              as Map<String, dynamic>;
       final status = response['status'] as String? ?? 'pending';
       return Result.success(RegistrationResult(status: status));
     });
@@ -70,13 +77,15 @@ class ApiEventRepository implements EventRepository {
   @override
   Future<Result<List<EventParticipant>, Failure>> getMyEvents() {
     return executeApiCall(() async {
-      final response = await _apiClient.get('/user/events')
-          as Map<String, dynamic>;
+      final response =
+          await _apiClient.get('/user/events') as Map<String, dynamic>;
       final data = response['data'] as List<dynamic>? ?? [];
       final entities = data
-          .map((json) => EventMapper.toParticipantEntity(
-                EventParticipantModel.fromJson(json as Map<String, dynamic>),
-              ))
+          .map(
+            (json) => EventMapper.toParticipantEntity(
+              EventParticipantModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
           .toList();
       return Result.success(entities);
     });

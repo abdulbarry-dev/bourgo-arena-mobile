@@ -2,10 +2,13 @@ import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/reservation_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/time_slot_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation_model.dart';
+import 'package:bourgo_arena_mobile/data/models/time_slot_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation_with_payment.dart';
+import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
 
 /// Laravel API implementation of [ReservationRepository].
@@ -128,10 +131,8 @@ class ApiReservationRepository implements ReservationRepository {
       };
       final response =
           await _apiClient.post('/reservations', body) as Map<String, dynamic>;
-      final data =
-          response['data'] as Map<String, dynamic>? ?? response;
-      final payment =
-          response['payment'] as Map<String, dynamic>?;
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      final payment = response['payment'] as Map<String, dynamic>?;
       return Result.success(
         ReservationWithPayment(
           reservation: ReservationMapper.toEntity(
@@ -159,13 +160,13 @@ class ApiReservationRepository implements ReservationRepository {
     return executeApiCall(() async {
       final body = <String, dynamic>{};
       if (amount != null) body['amount'] = amount;
-      final response = await _apiClient
-          .post('/reservations/$reservationId/payment/initiate', body);
+      final response = await _apiClient.post(
+        '/reservations/$reservationId/payment/initiate',
+        body,
+      );
       final responseMap = response as Map<String, dynamic>;
-      final data =
-          responseMap['data'] as Map<String, dynamic>? ?? responseMap;
-      final payment =
-          data['payment'] as Map<String, dynamic>? ?? data;
+      final data = responseMap['data'] as Map<String, dynamic>? ?? responseMap;
+      final payment = data['payment'] as Map<String, dynamic>? ?? data;
       return Result.success(payment);
     });
   }
@@ -182,6 +183,26 @@ class ApiReservationRepository implements ReservationRepository {
       final status =
           (response as Map<String, dynamic>)['status'] as String? ?? 'unknown';
       return Result.success(status);
+    });
+  }
+
+  @override
+  Future<Result<List<TimeSlot>, Failure>> getReservationSlots(String date) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/reservations/slots',
+                queryParameters: {'date': date},
+              )
+              as List<dynamic>;
+      final slots = response
+          .map(
+            (json) => TimeSlotMapper.toEntity(
+              TimeSlotModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(slots);
     });
   }
 }

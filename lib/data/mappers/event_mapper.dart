@@ -19,10 +19,12 @@ class EventMapper {
       scheduledAt: model.scheduledAt,
       score: model.score,
       status: model.status,
-      participant1:
-          model.participant1 != null ? _toParticipant(model.participant1!) : null,
-      participant2:
-          model.participant2 != null ? _toParticipant(model.participant2!) : null,
+      participant1: model.participant1 != null
+          ? _toParticipant(model.participant1!)
+          : null,
+      participant2: model.participant2 != null
+          ? _toParticipant(model.participant2!)
+          : null,
       winnerId: model.winnerId,
       nextMatchId: model.nextMatchId,
     );
@@ -41,7 +43,9 @@ class EventMapper {
       startDate: model.startDate,
       endDate: model.endDate,
       images: model.images ?? const [],
-      imageUrl: model.imageUrl ?? (model.images?.isNotEmpty == true ? model.images!.first : null),
+      imageUrl:
+          model.imageUrl ??
+          (model.images?.isNotEmpty == true ? model.images!.first : null),
       status: model.status,
       requiresCheckIn: model.requiresCheckIn ?? false,
       createdAt: model.createdAt,

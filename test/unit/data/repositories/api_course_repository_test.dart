@@ -63,7 +63,10 @@ void main() {
         },
       ];
       when(
-        () => mockApiClient.get('/courses', fullResponse: any(named: 'fullResponse')),
+        () => mockApiClient.get(
+          '/courses',
+          fullResponse: any(named: 'fullResponse'),
+        ),
       ).thenAnswer((_) async => {'data': jsonResponse});
 
       // Act
@@ -78,7 +81,12 @@ void main() {
       check(courses.length).equals(1);
       check(courses.first.name).equals('Yoga');
 
-      verify(() => mockApiClient.get('/courses', fullResponse: any(named: 'fullResponse'))).called(1);
+      verify(
+        () => mockApiClient.get(
+          '/courses',
+          fullResponse: any(named: 'fullResponse'),
+        ),
+      ).called(1);
     });
 
     test('getCourseDetails returns course details', () async {
@@ -136,6 +144,30 @@ void main() {
       check(sessions.length).equals(1);
 
       verify(() => mockApiClient.get('/courses/c1/sessions')).called(1);
+    });
+
+    test('getSessionBooking returns booking status on 200', () async {
+      final tBooking = {
+        'data': {
+          'id': '300',
+          'session_id': '101',
+          'status': 'booked',
+          'booked_at': '2026-06-10T08:00:00.000000Z',
+        },
+      };
+      when(
+        () => mockApiClient.get('/courses/c1/sessions/s1/booking'),
+      ).thenAnswer((_) async => tBooking);
+
+      final result = await repository.getSessionBooking('c1', 's1');
+
+      check(result).isA<Success>();
+      final booking = result.fold(
+        onSuccess: (val) => val,
+        onFailure: (_) => fail('Expected success'),
+      );
+      check(booking.id).equals('300');
+      check(booking.status).equals('booked');
     });
 
     test('getCourses returns failure on exception', () async {

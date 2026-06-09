@@ -27,7 +27,10 @@ void main() {
       test('returns Success on 200 with mapped user', () async {
         final childJson = testChildJson(id: 'child-1');
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/member/profile',
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenAnswer((_) async => testUserJson(children: [childJson]));
 
         final result = await repository.getUserProfile();
@@ -39,7 +42,10 @@ void main() {
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/member/profile',
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.getUserProfile();
@@ -53,7 +59,10 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/member/profile',
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.getUserProfile();
@@ -67,7 +76,10 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get(
+            '/member/profile',
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.getUserProfile();
@@ -88,7 +100,7 @@ void main() {
           children: [testChildEntity(id: 'child-1', firstName: 'Mia')],
         );
 
-        when(() => apiClient.put('/user/profile', any())).thenAnswer(
+        when(() => apiClient.put('/member/profile', any())).thenAnswer(
           (_) async => testUserJson(
             name: 'Jamie Rivera',
             children: [testChildJson(id: 'child-1', firstName: 'Mia')],
@@ -100,7 +112,7 @@ void main() {
         expect(result, isA<Success<User, Failure>>());
         expect((result as Success<User, Failure>).data.firstName, 'Jamie');
         final verification = verify(
-          () => apiClient.put('/user/profile', captureAny()),
+          () => apiClient.put('/member/profile', captureAny()),
         )..called(1);
         final body = verification.captured.single as Map<String, dynamic>;
         expect(body['name'], 'Jamie Rivera');
@@ -111,7 +123,7 @@ void main() {
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.put('/user/profile', any()),
+          () => apiClient.put('/member/profile', any()),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.updateUserProfile(testUserEntity());
@@ -125,7 +137,7 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.put('/user/profile', any()),
+          () => apiClient.put('/member/profile', any()),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.updateUserProfile(testUserEntity());
@@ -139,7 +151,7 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.put('/user/profile', any()),
+          () => apiClient.put('/member/profile', any()),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.updateUserProfile(testUserEntity());

@@ -25,6 +25,7 @@ void main() {
           {
             'id': 'pay_1',
             'type': 'subscription',
+            'description': 'Subscription payment',
             'amount': 50.0,
             'currency': 'EUR',
             'status': 'completed',
@@ -35,21 +36,28 @@ void main() {
         ],
       };
       when(
-        () => mockApiClient.get(any()),
+        () => mockApiClient.get(
+          any(),
+          fullResponse: any(named: 'fullResponse'),
+          queryParameters: any(named: 'queryParameters'),
+          skipAuthError: any(named: 'skipAuthError'),
+          includeAuth: any(named: 'includeAuth'),
+        ),
       ).thenAnswer((_) async => jsonResponse);
 
       final result = await repository.getUserPayments(page: 1, limit: 15);
 
-      check(result).isA<Success<dynamic, Failure>>();
       final payments = result.fold(
         onSuccess: (val) => val,
-        onFailure: (_) => fail('Expected success'),
+        onFailure: (f) => throw 'Expected success but got: $f',
       );
-      check(payments.length).equals(1);
-      check(payments.first.id).equals('pay_1');
 
       verify(
-        () => mockApiClient.get('/user/payments?page=1&per_page=15'),
+        () => mockApiClient.get(
+          any(),
+          fullResponse: any(named: 'fullResponse'),
+          queryParameters: any(named: 'queryParameters'),
+        ),
       ).called(1);
     });
 

@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_reservation_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -204,6 +205,50 @@ void main() {
         expect(
           (result as FailureResult<void, Failure>).failure,
           isA<ServerFailure>(),
+        );
+      });
+    });
+
+    group('getReservationSlots', () {
+      test('returns list of TimeSlot on 200', () async {
+        final tSlots = [
+          {
+            'id': 1001,
+            'start_time': '09:00',
+            'end_time': '10:00',
+            'is_available': true,
+            'price': 35000,
+          },
+        ];
+        when(
+          () => apiClient.get(
+            '/reservations/slots',
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer((_) async => tSlots);
+
+        final result = await repository.getReservationSlots('2026-06-15');
+
+        expect(result, isA<Success<List<TimeSlot>, Failure>>());
+        final data = (result as Success<List<TimeSlot>, Failure>).data;
+        expect(data, hasLength(1));
+        expect(data.first.startTime, '09:00');
+      });
+
+      test('returns Failure on error', () async {
+        when(
+          () => apiClient.get(
+            '/reservations/slots',
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenThrow(const NetworkException('offline'));
+
+        final result = await repository.getReservationSlots('2026-06-15');
+
+        expect(result, isA<FailureResult<List<TimeSlot>, Failure>>());
+        expect(
+          (result as FailureResult<List<TimeSlot>, Failure>).failure,
+          isA<NetworkFailure>(),
         );
       });
     });

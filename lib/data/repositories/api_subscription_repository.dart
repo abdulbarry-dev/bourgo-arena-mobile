@@ -19,7 +19,10 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
       return Future.value(const Success([]));
     }
     return executeApiCall(() async {
-      final response = await _apiClient.get('/member/subscription', fullResponse: true);
+      final response = await _apiClient.get(
+        '/member/subscription',
+        fullResponse: true,
+      );
 
       final data =
           (response as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
@@ -39,7 +42,10 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
       return Future.value(const Success([]));
     }
     return executeApiCall(() async {
-      final response = await _apiClient.get('/member/subscriptions/history', fullResponse: true);
+      final response = await _apiClient.get(
+        '/member/subscriptions/history',
+        fullResponse: true,
+      );
 
       final data =
           (response as Map<String, dynamic>)['data'] as List<dynamic>? ?? [];
@@ -69,7 +75,7 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
   @override
   Future<Result<void, Failure>> cancelSubscription(String subscriptionId) {
     return executeApiCall(() async {
-      await _apiClient.delete('/subscriptions/$subscriptionId');
+      await _apiClient.post('/subscriptions/$subscriptionId/cancel', {});
       return Result.success(null);
     });
   }

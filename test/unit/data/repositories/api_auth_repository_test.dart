@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_identity_storage.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
@@ -7,6 +8,7 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/device_registration_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -17,16 +19,30 @@ class MockApiClient extends Mock implements ApiClient {}
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
+class MockDeviceIdentityStorage extends Mock implements DeviceIdentityStorage {}
+
+class MockDeviceRegistrationRepository extends Mock
+    implements DeviceRegistrationRepository {}
+
 void main() {
   late MockApiClient apiClient;
   late MockSessionRepository sessionRepository;
+  late MockDeviceIdentityStorage deviceIdentityStorage;
+  late MockDeviceRegistrationRepository deviceRegistrationRepo;
   late ApiAuthRepository repository;
 
   setUp(() {
     apiClient = MockApiClient();
     when(() => apiClient.hasToken).thenReturn(true);
     sessionRepository = MockSessionRepository();
-    repository = ApiAuthRepository(apiClient, sessionRepository);
+    deviceIdentityStorage = MockDeviceIdentityStorage();
+    deviceRegistrationRepo = MockDeviceRegistrationRepository();
+    repository = ApiAuthRepository(
+      apiClient,
+      sessionRepository,
+      deviceIdentityStorage,
+      deviceRegistrationRepo,
+    );
 
     // Default mocks for SessionRepository
     when(
@@ -94,7 +110,7 @@ void main() {
     ).thenAnswer((_) async => const Success(true));
 
     // Default mock for verification status endpoint
-    when(() => apiClient.get('/user/verification-status')).thenAnswer(
+    when(() => apiClient.get('/member/verification-status')).thenAnswer(
       (_) async => {
         'email_verified': true,
         'phone_verified': true,
@@ -104,11 +120,11 @@ void main() {
 
     // Default mocks for profile requests triggered during auth flows
     when(
-      () => apiClient.put('/user/profile', any()),
+      () => apiClient.put('/member/profile', any()),
     ).thenAnswer((_) async => {});
     when(
       () => apiClient.get(
-        '/user/profile',
+        '/member/profile',
         skipAuthError: any(named: 'skipAuthError'),
         fullResponse: any(named: 'fullResponse'),
         includeAuth: any(named: 'includeAuth'),
@@ -138,7 +154,7 @@ void main() {
 
         when(
           () => apiClient.get(
-            '/user/profile',
+            '/member/profile',
             fullResponse: false,
             skipAuthError: true,
           ),
@@ -179,11 +195,11 @@ void main() {
           }),
         ).called(1);
         verify(() => apiClient.setToken(null)).called(1);
-        verify(() => apiClient.setToken(token)).called(2);
+        verify(() => apiClient.setToken(token)).called(1);
         verify(() => sessionRepository.saveAuthToken(token)).called(1);
         verify(
           () => apiClient.get(
-            '/user/profile',
+            '/member/profile',
             fullResponse: false,
             skipAuthError: true,
           ),
@@ -204,7 +220,7 @@ void main() {
 
         when(
           () => apiClient.get(
-            '/user/profile',
+            '/member/profile',
             fullResponse: false,
             skipAuthError: true,
           ),
@@ -222,7 +238,7 @@ void main() {
             'password': 'secret123',
           }),
         ).called(1);
-        verify(() => apiClient.setToken(token)).called(2);
+        verify(() => apiClient.setToken(token)).called(1);
       });
 
       test(
@@ -258,7 +274,7 @@ void main() {
 
           when(
             () => apiClient.get(
-              '/user/profile',
+              '/member/profile',
               fullResponse: false,
               skipAuthError: true,
             ),
@@ -296,7 +312,7 @@ void main() {
           expect(session.user?.gender, 'male');
           verify(
             () => apiClient.get(
-              '/user/profile',
+              '/member/profile',
               fullResponse: false,
               skipAuthError: true,
             ),
@@ -328,7 +344,7 @@ void main() {
               'password': 'secret123',
             }),
           ).called(1);
-          verifyNever(() => apiClient.get('/user/profile'));
+          verifyNever(() => apiClient.get('/member/profile'));
           verify(() => apiClient.setToken(null)).called(1);
           verifyNever(() => sessionRepository.saveAuthToken(any()));
         },
@@ -383,7 +399,7 @@ void main() {
           // Profile fetch fails (user hasn't completed onboarding yet)
           when(
             () => apiClient.get(
-              '/user/profile',
+              '/member/profile',
               fullResponse: false,
               skipAuthError: true,
             ),
@@ -421,7 +437,7 @@ void main() {
           ).called(1);
           verify(
             () => apiClient.get(
-              '/user/profile',
+              '/member/profile',
               fullResponse: false,
               skipAuthError: true,
             ),
@@ -871,7 +887,7 @@ void main() {
     group('updatePassword', () {
       test('returns Success on 200', () async {
         when(
-          () => apiClient.put('/user/password', any()),
+          () => apiClient.put('/member/password', any()),
         ).thenAnswer((_) async => null);
 
         final result = await repository.updatePassword(
@@ -881,7 +897,7 @@ void main() {
 
         expect(result, isA<Success<void, Failure>>());
         verify(
-          () => apiClient.put('/user/password', {
+          () => apiClient.put('/member/password', {
             'current_password': 'old-pass',
             'new_password': 'new-pass',
             'new_password_confirmation': 'new-pass',
@@ -891,7 +907,7 @@ void main() {
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.put('/user/password', any()),
+          () => apiClient.put('/member/password', any()),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.updatePassword(
@@ -908,7 +924,7 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.put('/user/password', any()),
+          () => apiClient.put('/member/password', any()),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.updatePassword(
@@ -925,7 +941,7 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.put('/user/password', any()),
+          () => apiClient.put('/member/password', any()),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.updatePassword(
@@ -949,7 +965,7 @@ void main() {
           final userJson = testUserJson(email: identifier);
 
           when(
-            () => apiClient.get('/user/profile', skipAuthError: true),
+            () => apiClient.get('/member/profile', skipAuthError: true),
           ).thenAnswer((_) async => userJson);
           when(
             () => apiClient.post('/auth/delete-account', any()),
@@ -970,7 +986,7 @@ void main() {
 
           expect(result, isA<Success<void, Failure>>());
           verify(
-            () => apiClient.get('/user/profile', skipAuthError: true),
+            () => apiClient.get('/member/profile', skipAuthError: true),
           ).called(1);
           verify(
             () => apiClient.post('/auth/delete-account', {
@@ -1011,7 +1027,7 @@ void main() {
         final expectedUser = testUserEntity();
 
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get('/member/profile'),
         ).thenAnswer((_) async => userJson);
 
         final eventExpectation = expectLater(
@@ -1032,13 +1048,13 @@ void main() {
           (result as Success<AuthSession, Failure>).data.user?.id,
           expectedUser.id,
         );
-        verify(() => apiClient.get('/user/profile')).called(1);
+        verify(() => apiClient.get('/member/profile')).called(1);
         await eventExpectation;
       });
 
       test('returns Failure(AuthFailure) on 401 and clears session', () async {
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get('/member/profile'),
         ).thenThrow(const AuthException('401'));
         when(
           () => sessionRepository.clearSession(),
@@ -1074,7 +1090,8 @@ void main() {
         );
 
         when(
-          () => apiClient.get('/user/verification-status', skipAuthError: true),
+          () =>
+              apiClient.get('/member/verification-status', skipAuthError: true),
         ).thenAnswer((_) async => verificationStatusJson);
 
         final result = await repository.getVerificationStatus();
@@ -1085,13 +1102,15 @@ void main() {
         expect(status.phoneVerified, isFalse);
         expect(status.email, 'alex@example.com');
         verify(
-          () => apiClient.get('/user/verification-status', skipAuthError: true),
+          () =>
+              apiClient.get('/member/verification-status', skipAuthError: true),
         ).called(1);
       });
 
       test('returns failure on server error', () async {
         when(
-          () => apiClient.get('/user/verification-status', skipAuthError: true),
+          () =>
+              apiClient.get('/member/verification-status', skipAuthError: true),
         ).thenThrow(const ServerException('Server error'));
 
         final result = await repository.getVerificationStatus();
@@ -1105,7 +1124,8 @@ void main() {
 
       test('returns failure on network error', () async {
         when(
-          () => apiClient.get('/user/verification-status', skipAuthError: true),
+          () =>
+              apiClient.get('/member/verification-status', skipAuthError: true),
         ).thenThrow(const NetworkException('Connection error'));
 
         final result = await repository.getVerificationStatus();
@@ -1125,7 +1145,8 @@ void main() {
         );
 
         when(
-          () => apiClient.get('/user/verification-status', skipAuthError: true),
+          () =>
+              apiClient.get('/member/verification-status', skipAuthError: true),
         ).thenAnswer((_) async => verificationStatusJson);
 
         final result = await repository.getVerificationStatus();
@@ -1146,7 +1167,7 @@ void main() {
         };
 
         when(
-          () => apiClient.post('/user/verify-email', {
+          () => apiClient.post('/member/verify-email', {
             'email': 'alex@example.com',
             'otp': '123456',
           }),
@@ -1172,7 +1193,7 @@ void main() {
         expect(result, isA<Success<bool, Failure>>());
         expect((result as Success<bool, Failure>).data, isTrue);
         verify(
-          () => apiClient.post('/user/verify-email', {
+          () => apiClient.post('/member/verify-email', {
             'email': 'alex@example.com',
             'otp': '123456',
           }),
@@ -1183,7 +1204,7 @@ void main() {
 
       test('returns failure on invalid OTP', () async {
         when(
-          () => apiClient.post('/user/verify-email', any()),
+          () => apiClient.post('/member/verify-email', any()),
         ).thenThrow(const ServerException('Invalid OTP'));
 
         final result = await repository.verifyEmail(
@@ -1200,7 +1221,7 @@ void main() {
 
       test('handles network error', () async {
         when(
-          () => apiClient.post('/user/verify-email', any()),
+          () => apiClient.post('/member/verify-email', any()),
         ).thenThrow(const NetworkException('Connection timeout'));
 
         final result = await repository.verifyEmail(
@@ -1224,7 +1245,7 @@ void main() {
         };
 
         when(
-          () => apiClient.post('/user/verify-email', any()),
+          () => apiClient.post('/member/verify-email', any()),
         ).thenAnswer((_) async => responseData);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -1251,7 +1272,7 @@ void main() {
       test('saves auth token on successful verification', () async {
         const token = 'new-token-456';
 
-        when(() => apiClient.post('/user/verify-email', any())).thenAnswer(
+        when(() => apiClient.post('/member/verify-email', any())).thenAnswer(
           (_) async => {
             'valid': true,
             'token': token,
@@ -1274,7 +1295,7 @@ void main() {
         final responseData = {'valid': true, 'token': token, 'state': 'active'};
 
         when(
-          () => apiClient.post('/user/verify-phone', {
+          () => apiClient.post('/member/verify-phone', {
             'phone': '+15550000000',
             'otp': '123456',
           }),
@@ -1283,7 +1304,7 @@ void main() {
           () => sessionRepository.saveAuthToken(token),
         ).thenAnswer((_) async => const Success<void, Failure>(null));
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get('/member/profile'),
         ).thenAnswer((_) async => testUserJson());
 
         final eventExpectation = expectLater(
@@ -1300,7 +1321,7 @@ void main() {
         expect(result, isA<Success<bool, Failure>>());
         expect((result as Success<bool, Failure>).data, isTrue);
         verify(
-          () => apiClient.post('/user/verify-phone', {
+          () => apiClient.post('/member/verify-phone', {
             'phone': '+15550000000',
             'otp': '123456',
           }),
@@ -1310,7 +1331,7 @@ void main() {
 
       test('returns failure on invalid OTP', () async {
         when(
-          () => apiClient.post('/user/verify-phone', any()),
+          () => apiClient.post('/member/verify-phone', any()),
         ).thenThrow(const ServerException('Invalid OTP'));
 
         final result = await repository.verifyPhone('+15550000000', '999999');
@@ -1324,7 +1345,7 @@ void main() {
 
       test('handles network error', () async {
         when(
-          () => apiClient.post('/user/verify-phone', any()),
+          () => apiClient.post('/member/verify-phone', any()),
         ).thenThrow(const NetworkException('Connection timeout'));
 
         final result = await repository.verifyPhone('+15550000000', '123456');
@@ -1345,7 +1366,7 @@ void main() {
         };
 
         when(
-          () => apiClient.post('/user/verify-phone', any()),
+          () => apiClient.post('/member/verify-phone', any()),
         ).thenAnswer((_) async => responseData);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -1369,14 +1390,14 @@ void main() {
       test('saves auth token on successful verification', () async {
         const token = 'phone-token-789';
 
-        when(() => apiClient.post('/user/verify-phone', any())).thenAnswer(
+        when(() => apiClient.post('/member/verify-phone', any())).thenAnswer(
           (_) async => {'valid': true, 'token': token, 'state': 'active'},
         );
         when(
           () => sessionRepository.saveAuthToken(token),
         ).thenAnswer((_) async => const Success<void, Failure>(null));
         when(
-          () => apiClient.get('/user/profile'),
+          () => apiClient.get('/member/profile'),
         ).thenAnswer((_) async => testUserJson());
 
         await repository.verifyPhone('+15550000000', '123456');
@@ -1389,7 +1410,7 @@ void main() {
 
         for (final phone in phoneNumbers) {
           when(
-            () => apiClient.post('/user/verify-phone', {
+            () => apiClient.post('/member/verify-phone', {
               'phone': phone,
               'otp': '123456',
             }),
@@ -1404,7 +1425,7 @@ void main() {
             () => sessionRepository.saveAuthToken('token'),
           ).thenAnswer((_) async => const Success<void, Failure>(null));
           when(
-            () => apiClient.get('/user/profile'),
+            () => apiClient.get('/member/profile'),
           ).thenAnswer((_) async => testUserJson());
 
           final result = await repository.verifyPhone(phone, '123456');

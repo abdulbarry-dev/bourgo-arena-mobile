@@ -23,7 +23,10 @@ void main() {
       'getActiveSubscriptions returns empty list when API returns empty data',
       () async {
         when(
-          () => apiClient.get('/member/subscription', fullResponse: any(named: "fullResponse")),
+          () => apiClient.get(
+            '/member/subscription',
+            fullResponse: any(named: "fullResponse"),
+          ),
         ).thenAnswer((_) async => {'data': []});
 
         final result = await repository.getActiveSubscriptions();
@@ -41,7 +44,11 @@ void main() {
             {
               'id': 1,
               'plan': {'id': 2, 'name': 'Gold', 'price': 100.0},
-              'service': {'id': 1, 'name': 'Fitness & Gym', 'slug': 'fitness-gym'},
+              'service': {
+                'id': 1,
+                'name': 'Fitness & Gym',
+                'slug': 'fitness-gym',
+              },
               'status': 'active',
               'starts_at': '2026-06-01',
               'ends_at': '2026-12-31',
@@ -54,7 +61,10 @@ void main() {
           ],
         };
         when(
-          () => apiClient.get('/member/subscription', fullResponse: any(named: "fullResponse")),
+          () => apiClient.get(
+            '/member/subscription',
+            fullResponse: any(named: "fullResponse"),
+          ),
         ).thenAnswer((_) async => tSubJson);
 
         final result = await repository.getActiveSubscriptions();
@@ -70,8 +80,19 @@ void main() {
       final tSubResp = {
         'data': {
           'id': 43,
-          'plan': {'id': '3', 'name': 'Premium', 'price': 149.999, 'has_all_courses': true},
-          'service': {'id': '1', 'name': 'Fitness', 'slug': 'fitness', 'image_url': 'https://img.com/f.jpg', 'status': 'active'},
+          'plan': {
+            'id': '3',
+            'name': 'Premium',
+            'price': 149.999,
+            'has_all_courses': true,
+          },
+          'service': {
+            'id': '1',
+            'name': 'Fitness',
+            'slug': 'fitness',
+            'image_url': 'https://img.com/f.jpg',
+            'status': 'active',
+          },
           'status': 'pending',
           'starts_at': '2026-06-15',
           'ends_at': null,
@@ -100,13 +121,13 @@ void main() {
 
     test('cancelSubscription returns success on API success', () async {
       when(
-        () => apiClient.delete('/subscriptions/sub1'),
+        () => apiClient.post('/subscriptions/sub1/cancel', {}),
       ).thenAnswer((_) async => {});
 
       final result = await repository.cancelSubscription('sub1');
 
       expect(result, isA<Success<void, Failure>>());
-      verify(() => apiClient.delete('/subscriptions/sub1')).called(1);
+      verify(() => apiClient.post('/subscriptions/sub1/cancel', {})).called(1);
     });
   });
 }

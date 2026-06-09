@@ -3,8 +3,10 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
+import 'package:bourgo_arena_mobile/data/models/family_member_profile_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/family_member_profile.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/family_repository.dart';
 
 /// Laravel API implementation of [FamilyRepository].
@@ -70,7 +72,7 @@ class ApiFamilyRepository implements FamilyRepository {
   }) {
     return executeApiCall(() async {
       final response =
-          await _apiClient.put('/family/members/$id', {
+          await _apiClient.put('/family/children/$id', {
                 'first_name': firstName,
                 'last_name': lastName,
                 'birth_date': birthDate.toIso8601String().split('T').first,
@@ -89,6 +91,76 @@ class ApiFamilyRepository implements FamilyRepository {
   Future<Result<void, Failure>> removeChild(String id) {
     return executeApiCall(() async {
       await _apiClient.delete('/family/children/$id');
+      return Result.success(null);
+    });
+  }
+
+  @override
+  Future<Result<List<FamilyMemberProfile>, Failure>> getFamilyMembers() {
+    if (!_apiClient.hasToken) {
+      return Future.value(const Success([]));
+    }
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get('/family/members', fullResponse: true)
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final entities = data
+          .map(
+            (json) => FamilyMemberProfileModel.fromJson(
+              json as Map<String, dynamic>,
+            ).toEntity(),
+          )
+          .toList();
+      return Result.success(entities);
+    });
+  }
+
+  @override
+  Future<Result<FamilyMemberProfile, Failure>> addFamilyMember({
+    required String name,
+    required String relation,
+    required DateTime birthDate,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post('/family/members', {
+                'name': name,
+                'relation': relation,
+                'birth_date': birthDate.toIso8601String().split('T').first,
+              })
+              as Map<String, dynamic>;
+
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return Result.success(FamilyMemberProfileModel.fromJson(data).toEntity());
+    });
+  }
+
+  @override
+  Future<Result<FamilyMemberProfile, Failure>> updateFamilyMember({
+    required String id,
+    required String name,
+    required String relation,
+    required DateTime birthDate,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.put('/family/members/$id', {
+                'name': name,
+                'relation': relation,
+                'birth_date': birthDate.toIso8601String().split('T').first,
+              })
+              as Map<String, dynamic>;
+
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return Result.success(FamilyMemberProfileModel.fromJson(data).toEntity());
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> removeFamilyMember(String id) {
+    return executeApiCall(() async {
+      await _apiClient.delete('/family/members/$id');
       return Result.success(null);
     });
   }

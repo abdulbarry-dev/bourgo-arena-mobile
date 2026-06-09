@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 import 'dart:async';
+import 'package:bourgo_arena_mobile/core/utils/device_identity_storage.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
@@ -17,17 +18,25 @@ import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/device_registration_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 
 /// Laravel API implementation of [AuthRepository].
 class ApiAuthRepository implements AuthRepository {
   final ApiClient _apiClient;
   final SessionRepository _sessionRepository;
+  final DeviceIdentityStorage _deviceIdentityStorage;
+  final DeviceRegistrationRepository _deviceRegistrationRepo;
   AuthSession? _currentSession;
   final StreamController<AuthSession> _authStateController =
       StreamController<AuthSession>.broadcast();
 
-  ApiAuthRepository(this._apiClient, this._sessionRepository) {
+  ApiAuthRepository(
+    this._apiClient,
+    this._sessionRepository,
+    this._deviceIdentityStorage,
+    this._deviceRegistrationRepo,
+  ) {
     _apiClient.onAuthError = (String? state) {
       _handleAuthError(state, null);
     };
@@ -156,7 +165,7 @@ class ApiAuthRepository implements AuthRepository {
 
     try {
       final userResponse =
-          await _apiClient.get('/user/profile', skipAuthError: true)
+          await _apiClient.get('/member/profile', skipAuthError: true)
               as Map<String, dynamic>;
       final userModel = UserProfileModel.fromJson(userResponse);
       final profileUser = UserMapper.toEntity(userModel);
@@ -216,7 +225,7 @@ class ApiAuthRepository implements AuthRepository {
 
   Future<User?> _fetchUserProfileEntity() async {
     final userResponse =
-        await _apiClient.get('/user/profile', skipAuthError: true)
+        await _apiClient.get('/member/profile', skipAuthError: true)
             as Map<String, dynamic>;
     final userModel = UserProfileModel.fromJson(userResponse);
     return UserMapper.toEntity(userModel);
@@ -232,10 +241,12 @@ class ApiAuthRepository implements AuthRepository {
       _apiClient.setToken(null);
 
       final isEmail = identifier.contains('@');
+      final deviceId = _deviceIdentityStorage.getDeviceId();
       final response =
           await _apiClient.post('/auth/login', {
                 isEmail ? 'email' : 'phone': identifier,
                 'password': password,
+                if (deviceId != null) 'device_id': deviceId,
               })
               as Map<String, dynamic>;
 
@@ -324,6 +335,9 @@ class ApiAuthRepository implements AuthRepository {
 
       final finalSession = await _checkLoginVerification(session);
       await _updateSession(finalSession);
+
+      _linkDeviceAfterAuth(deviceId);
+
       return Success(finalSession);
     });
 
@@ -342,7 +356,7 @@ class ApiAuthRepository implements AuthRepository {
           // Try to fetch user profile to populate the session
           try {
             final userResponse =
-                await _apiClient.get('/user/profile', skipAuthError: true)
+                await _apiClient.get('/member/profile', skipAuthError: true)
                     as Map<String, dynamic>;
             final userModel = UserProfileModel.fromJson(userResponse);
             final user = UserMapper.toEntity(userModel);
@@ -470,7 +484,18 @@ class ApiAuthRepository implements AuthRepository {
         await _apiClient.post('/auth/logout', {});
         return const Success(null);
       } finally {
+        final deviceId = _deviceIdentityStorage.getDeviceId();
+        if (deviceId != null) {
+          try {
+            await _deviceRegistrationRepo.logout(deviceId);
+          } catch (_) {}
+        }
         _apiClient.setToken(null);
+        // Restore device token as fallback Bearer after sanctum token cleared
+        final deviceToken = _deviceIdentityStorage.getRegistrationToken();
+        if (deviceToken != null) {
+          _apiClient.setDeviceToken(deviceToken);
+        }
         // Clear the persisted session (including the token)
         await _sessionRepository.clearSession();
         _currentSession = null;
@@ -496,6 +521,7 @@ class ApiAuthRepository implements AuthRepository {
 
       final fullName = '$firstName $lastName'.trim();
       final dateOfBirth = birthDate.toIso8601String().split('T')[0];
+      final deviceId = _deviceIdentityStorage.getDeviceId();
 
       final rawResponse = await _apiClient.post('/auth/register', {
         'name': fullName,
@@ -506,6 +532,7 @@ class ApiAuthRepository implements AuthRepository {
         'date_of_birth': dateOfBirth,
         'gender': gender,
         'is_parent_account': isFamilyAccount,
+        if (deviceId != null) 'device_id': deviceId,
       });
       final response = rawResponse is Map<String, dynamic>
           ? rawResponse
@@ -554,8 +581,15 @@ class ApiAuthRepository implements AuthRepository {
         ),
       );
 
+      _linkDeviceAfterAuth(deviceId);
+
       return const Success(null);
     });
+  }
+
+  void _linkDeviceAfterAuth(String? deviceId) {
+    if (deviceId == null) return;
+    _deviceRegistrationRepo.link(deviceId);
   }
 
   @override
@@ -770,7 +804,7 @@ class ApiAuthRepository implements AuthRepository {
     required String newPassword,
   }) {
     return executeApiCall(() async {
-      await _apiClient.put('/user/password', {
+      await _apiClient.put('/member/password', {
         'current_password': currentPassword,
         'new_password': newPassword,
         'new_password_confirmation': newPassword,
@@ -788,7 +822,7 @@ class ApiAuthRepository implements AuthRepository {
     }
     final result = await executeApiCall(() async {
       final userResponse =
-          await _apiClient.get('/user/profile') as Map<String, dynamic>;
+          await _apiClient.get('/member/profile') as Map<String, dynamic>;
 
       final userModel = UserProfileModel.fromJson(userResponse);
       final user = UserMapper.toEntity(userModel);
@@ -838,12 +872,13 @@ class ApiAuthRepository implements AuthRepository {
       );
     }
     return executeApiCall(() async {
-      final userResponse = await _apiClient.uploadMultipart(
-            '/user/profile/avatar',
-            fileFieldName: 'avatar',
-            filePath: filePath,
-          )
-          as Map<String, dynamic>;
+      final userResponse =
+          await _apiClient.uploadMultipart(
+                '/member/profile/avatar',
+                fileFieldName: 'avatar',
+                filePath: filePath,
+              )
+              as Map<String, dynamic>;
 
       final userModel = UserProfileModel.fromJson(userResponse);
       final user = UserMapper.toEntity(userModel);
@@ -874,8 +909,9 @@ class ApiAuthRepository implements AuthRepository {
       );
     }
     return executeApiCall(() async {
-      final userResponse = await _apiClient.delete('/user/profile/avatar')
-          as Map<String, dynamic>;
+      final userResponse =
+          await _apiClient.delete('/member/profile/avatar')
+              as Map<String, dynamic>;
 
       final userModel = UserProfileModel.fromJson(userResponse);
       final user = UserMapper.toEntity(userModel);
@@ -906,15 +942,13 @@ class ApiAuthRepository implements AuthRepository {
       );
     }
     return executeApiCall(() async {
-      final tierResponse = await _apiClient.get('/member/tier')
-          as Map<String, dynamic>;
+      final tierResponse =
+          await _apiClient.get('/member/tier') as Map<String, dynamic>;
 
       final tierModel = MemberTierModel.fromJson(tierResponse);
       final currentUser = _currentSession?.user;
       if (currentUser == null) {
-        throw ServerException(
-          'No profile loaded. Fetch profile before tier.',
-        );
+        throw ServerException('No profile loaded. Fetch profile before tier.');
       }
 
       final updatedUser = currentUser.copyWith(
@@ -924,7 +958,11 @@ class ApiAuthRepository implements AuthRepository {
       final state = _currentSession!.state;
       final token = _currentSession!.token;
 
-      final session = AuthSession(user: updatedUser, state: state, token: token);
+      final session = AuthSession(
+        user: updatedUser,
+        state: state,
+        token: token,
+      );
       await _updateSession(session);
       return Success(session);
     });
@@ -947,7 +985,10 @@ class ApiAuthRepository implements AuthRepository {
     }
     return executeApiCall(() async {
       final response =
-          await _apiClient.get('/user/verification-status', skipAuthError: true)
+          await _apiClient.get(
+                '/member/verification-status',
+                skipAuthError: true,
+              )
               as Map<String, dynamic>;
       final model = VerificationStatusModel.fromJson(response);
       final status = VerificationMapper.toEntity(model);
@@ -959,7 +1000,7 @@ class ApiAuthRepository implements AuthRepository {
   Future<Result<bool, Failure>> verifyEmail(String email, String otp) {
     return executeApiCall(() async {
       final response =
-          await _apiClient.post('/user/verify-email', {
+          await _apiClient.post('/member/verify-email', {
                 'email': email,
                 'otp': otp,
               })
@@ -1022,7 +1063,7 @@ class ApiAuthRepository implements AuthRepository {
   Future<Result<bool, Failure>> verifyPhone(String phone, String otp) {
     return executeApiCall(() async {
       final response =
-          await _apiClient.post('/user/verify-phone', {
+          await _apiClient.post('/member/verify-phone', {
                 'phone': phone,
                 'otp': otp,
               })
