@@ -55,6 +55,12 @@ import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/presentation/events/events_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/events/event_detail_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/payment_gateway_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/subscription_management_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/plan_detail_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/payment/payment_selection_screen.dart';
+import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
+import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
+import 'package:bourgo_arena_mobile/presentation/common/transitions/app_page_transitions.dart';
 
 import 'package:bourgo_arena_mobile/presentation/booking/reservations_screen.dart';
 import 'package:flutter/material.dart';
@@ -403,7 +409,42 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/subscription',
-      builder: (context, state) => const SubscriptionScreen(),
+      pageBuilder: (context, state) => AppPageTransitions.pushPage(
+        state,
+        const SubscriptionScreen(),
+      ),
+    ),
+    GoRoute(
+      path: '/plans',
+      pageBuilder: (context, state) => AppPageTransitions.pushPage(
+        state,
+        SubscriptionManagementScreen(
+          currentSubscription: state.extra as Subscription?,
+        ),
+      ),
+    ),
+    GoRoute(
+      path: '/plans/:id',
+      pageBuilder: (context, state) {
+        final planId = state.pathParameters['id']!;
+        final plan = state.extra as Plan?;
+        return AppPageTransitions.pushPage(
+          state,
+          PlanDetailScreen(planId: planId, plan: plan),
+        );
+      },
+    ),
+    GoRoute(
+      path: '/payment-selection',
+      pageBuilder: (context, state) {
+        final extra = state.extra! as Map<String, dynamic>;
+        return AppPageTransitions.pushPage(
+          state,
+          PaymentSelectionScreen(
+            plan: extra['plan'] as Plan,
+          ),
+        );
+      },
     ),
     GoRoute(
       path: '/notifications',

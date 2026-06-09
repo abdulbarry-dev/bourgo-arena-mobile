@@ -24,6 +24,8 @@ import 'package:bourgo_arena_mobile/data/repositories/api_loyalty_repository.dar
 import 'package:bourgo_arena_mobile/domain/repositories/loyalty_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_payment_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_plan_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/plan_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/activity_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -61,6 +63,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_balance_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/device/register_device_token_use_case.dart';
@@ -75,8 +78,10 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_notifications_enabled_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/settings/set_theme_mode_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_plans_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_subscription_history_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/cancel_subscription_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
@@ -174,6 +179,9 @@ Future<void> initLocator() async {
   locator.registerLazySingleton<PaymentRepository>(
     () => ApiPaymentRepository(locator<ApiClient>()),
   );
+  locator.registerLazySingleton<PlanRepository>(
+    () => ApiPlanRepository(locator<ApiClient>()),
+  );
 
   // Use Cases
   locator.registerLazySingleton(() => LoginUseCase(locator()));
@@ -201,7 +209,7 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => MakeReservationUseCase(locator()));
   locator.registerLazySingleton(() => CancelBookingUseCase(locator()));
   locator.registerLazySingleton(() => GetCoursesUseCase(locator()));
-  locator.registerLazySingleton(() => EnrollInCourseUseCase(locator()));
+  locator.registerLazySingleton(() => BookCourseSessionUseCase(locator()));
   locator.registerLazySingleton(() => GetCourseSessionsUseCase(locator()));
   locator.registerLazySingleton(() => GetNotificationsUseCase(locator()));
   locator.registerLazySingleton(() => MarkNotificationsReadUseCase(locator()));
@@ -221,6 +229,7 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => DisableFamilyFeatureUseCase(locator()));
   locator.registerLazySingleton(() => EnableFamilyFeatureUseCase(locator()));
   locator.registerLazySingleton(() => GetActiveSubscriptionsUseCase(locator()));
+  locator.registerLazySingleton(() => GetPlansUseCase(locator()));
   locator.registerLazySingleton(() => GetFullPaymentHistoryUseCase(locator()));
   locator.registerLazySingleton(() => GetSubscriptionHistoryUseCase(locator()));
   locator.registerLazySingleton(() => CancelSubscriptionUseCase(locator()));
@@ -228,10 +237,15 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => const GetMemberTierUseCase());
   locator.registerLazySingleton(() => const ProjectPointsUseCase());
   locator.registerLazySingleton(() => GetLoyaltyBalanceUseCase(locator()));
+  locator.registerLazySingleton(() => SubscribeToPlanUseCase(locator()));
+  locator.registerLazySingleton(() => PayWithLoyaltyUseCase(locator()));
   locator.registerLazySingleton(() => GetEventsUseCase(locator()));
   locator.registerLazySingleton(() => GetEventByIdUseCase(locator()));
   locator.registerLazySingleton(() => GetEventBracketUseCase(locator()));
   locator.registerLazySingleton(() => RegisterForEventUseCase(locator()));
+  locator.registerLazySingleton(() => GetMyEventsUseCase(locator()));
+  locator.registerLazySingleton(() => WithdrawFromEventUseCase(locator()));
+  locator.registerLazySingleton(() => CheckInToEventUseCase(locator()));
   locator.registerLazySingleton(() => GetContextualPriceUseCase(locator()));
   locator.registerLazySingleton(
     () => DeviceTokenRegistrar(
