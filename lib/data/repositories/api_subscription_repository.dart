@@ -54,10 +54,15 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
   }
 
   @override
-  Future<Result<void, Failure>> subscribeToPlan(String planId) {
+  Future<Result<Subscription, Failure>> subscribeToPlan(String planId) {
     return executeApiCall(() async {
-      await _apiClient.post('/subscriptions', {'plan_id': planId});
-      return Result.success(null);
+      final response =
+          await _apiClient.post('/subscriptions', {'plan_id': planId})
+              as Map<String, dynamic>;
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return Result.success(
+        SubscriptionMapper.toEntity(SubscriptionModel.fromJson(data)),
+      );
     });
   }
 

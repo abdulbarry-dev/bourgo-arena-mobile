@@ -46,6 +46,9 @@ class ApiPaymentRepository implements PaymentRepository {
     String? currency = 'TND',
     String? provider,
     String? description,
+    String? type,
+    int? reservationId,
+    int? subscriptionId,
     String? successUrl,
     String? failureUrl,
     String? firstName,
@@ -58,6 +61,9 @@ class ApiPaymentRepository implements PaymentRepository {
       if (currency != null) body['currency'] = currency;
       if (provider != null) body['provider'] = provider;
       if (description != null) body['description'] = description;
+      if (type != null) body['type'] = type;
+      if (reservationId != null) body['reservation_id'] = reservationId;
+      if (subscriptionId != null) body['subscription_id'] = subscriptionId;
       if (successUrl != null) body['success_url'] = successUrl;
       if (failureUrl != null) body['failure_url'] = failureUrl;
       if (firstName != null) body['first_name'] = firstName;

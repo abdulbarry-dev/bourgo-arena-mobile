@@ -7,4 +7,12 @@ abstract interface class LoyaltyRepository {
   /// Fetches the member's current loyalty balance, tier, and recent
   /// transactions from GET /loyalty/balance.
   Future<Result<LoyaltyBalance, Failure>> getLoyaltyBalance();
+
+  /// Pays for a reservation or subscription using loyalty points.
+  /// [type] is 'reservation' or 'subscription'.
+  /// [id] is the reservation or subscription ID.
+  Future<Result<Map<String, dynamic>, Failure>> payWithPoints(
+    String type,
+    int id,
+  );
 }
