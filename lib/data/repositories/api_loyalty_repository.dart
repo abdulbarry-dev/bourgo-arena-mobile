@@ -27,4 +27,20 @@ class ApiLoyaltyRepository implements LoyaltyRepository {
       return Success(LoyaltyBalanceMapper.toEntity(model));
     });
   }
+
+  @override
+  Future<Result<Map<String, dynamic>, Failure>> payWithPoints(
+    String type,
+    int id,
+  ) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post('/loyalty/pay', {
+            'type': type,
+            'id': id,
+          }) as Map<String, dynamic>;
+      final data = response['data'] as Map<String, dynamic>? ?? response;
+      return Success(data);
+    });
+  }
 }

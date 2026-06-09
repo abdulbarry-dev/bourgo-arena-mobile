@@ -3,11 +3,11 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/course_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/course_model.dart';
+import 'package:bourgo_arena_mobile/data/models/course_session_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/course_repository.dart';
 
-/// Laravel API implementation of [CourseRepository].
 class ApiCourseRepository implements CourseRepository {
   final ApiClient _apiClient;
 
@@ -21,11 +21,9 @@ class ApiCourseRepository implements CourseRepository {
               as Map<String, dynamic>;
       final data = response['data'] as List<dynamic>? ?? [];
       final entities = data
-          .map(
-            (json) => CourseMapper.toEntity(
-              CourseModel.fromJson(json as Map<String, dynamic>),
-            ),
-          )
+          .map((json) => CourseMapper.toEntity(
+                CourseModel.fromJson(json as Map<String, dynamic>),
+              ))
           .toList();
       return Result.success(entities);
     });
@@ -37,13 +35,16 @@ class ApiCourseRepository implements CourseRepository {
       final response =
           await _apiClient.get('/courses/$courseId') as Map<String, dynamic>;
       final data = response['data'] as Map<String, dynamic>? ?? response;
-      final entity = CourseMapper.toEntity(CourseModel.fromJson(data));
-      return Result.success(entity);
+      return Result.success(
+        CourseMapper.toEntity(CourseModel.fromJson(data)),
+      );
     });
   }
 
   @override
-  Future<Result<List<Course>, Failure>> getCourseSessions(String courseId) {
+  Future<Result<List<CourseSession>, Failure>> getCourseSessions(
+    String courseId,
+  ) {
     return executeApiCall(() async {
       final response = await _apiClient.get('/courses/$courseId/sessions');
       final List<dynamic> data = response is List
@@ -51,20 +52,22 @@ class ApiCourseRepository implements CourseRepository {
           : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
                 []);
       final entities = data
-          .map(
-            (json) => CourseMapper.toEntity(
-              CourseModel.fromJson(json as Map<String, dynamic>),
-            ),
-          )
+          .map((json) => CourseMapper.toSessionEntity(
+                CourseSessionModel.fromJson(json as Map<String, dynamic>),
+              ))
           .toList();
       return Result.success(entities);
     });
   }
 
   @override
-  Future<Result<void, Failure>> enrollInCourse(String courseId) {
+  Future<Result<void, Failure>> bookSession(
+    String courseId,
+    String sessionId,
+    String date,
+  ) {
     return executeApiCall(() async {
-      await _apiClient.post('/courses/$courseId/enroll', {});
+      await _apiClient.post('/courses/$courseId/sessions/$sessionId/book', {'date': date});
       return Result.success(null);
     });
   }

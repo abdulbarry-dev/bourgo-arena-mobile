@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/data/mappers/reservation_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/reservation_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation_with_payment.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
 
 /// Laravel API implementation of [ReservationRepository].
@@ -116,7 +117,7 @@ class ApiReservationRepository implements ReservationRepository {
   }
 
   @override
-  Future<Result<Reservation, Failure>> makeReservation(
+  Future<Result<ReservationWithPayment, Failure>> makeReservation(
     Reservation reservation,
   ) {
     return executeApiCall(() async {
@@ -125,12 +126,19 @@ class ApiReservationRepository implements ReservationRepository {
         'activity_slot_id': reservation.activitySlotId,
         'date': reservation.date,
       };
-      final response = await _apiClient.post('/reservations', body);
-      final data = response is Map<String, dynamic>
-          ? response
-          : (response as Map<String, dynamic>);
+      final response =
+          await _apiClient.post('/reservations', body) as Map<String, dynamic>;
+      final data =
+          response['data'] as Map<String, dynamic>? ?? response;
+      final payment =
+          response['payment'] as Map<String, dynamic>?;
       return Result.success(
-        ReservationMapper.toEntity(ReservationModel.fromJson(data)),
+        ReservationWithPayment(
+          reservation: ReservationMapper.toEntity(
+            ReservationModel.fromJson(data),
+          ),
+          payment: payment,
+        ),
       );
     });
   }
@@ -145,20 +153,20 @@ class ApiReservationRepository implements ReservationRepository {
 
   @override
   Future<Result<Map<String, dynamic>, Failure>> initiatePayment(
-    String reservationId,
-    String gateway,
-  ) {
+    String reservationId, {
+    double? amount,
+  }) {
     return executeApiCall(() async {
+      final body = <String, dynamic>{};
+      if (amount != null) body['amount'] = amount;
       final response = await _apiClient
-          .post('/reservations/$reservationId/payment/initiate', {
-            'gateway': gateway,
-            'success_url': 'bourgo://payment/success',
-            'failure_url': 'bourgo://payment/failure',
-          });
+          .post('/reservations/$reservationId/payment/initiate', body);
       final responseMap = response as Map<String, dynamic>;
       final data =
-          responseMap['payment'] as Map<String, dynamic>? ?? responseMap;
-      return Result.success(data);
+          responseMap['data'] as Map<String, dynamic>? ?? responseMap;
+      final payment =
+          data['payment'] as Map<String, dynamic>? ?? data;
+      return Result.success(payment);
     });
   }
 
