@@ -34,11 +34,18 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
               )
               as Map<String, dynamic>;
 
-      final data = response['data'] as Map<String, dynamic>;
+      Map<String, dynamic> data = response;
+      if (response.containsKey('data') && response['data'] is Map<String, dynamic>) {
+        data = response['data'] as Map<String, dynamic>;
+      }
+
       return Success(
         DeviceRegistrationData(
           token: data['token'] as String,
-          expiresAt: DateTime.parse(data['expires_at'] as String),
+          expiresAt: DateTime.parse(
+            data['expires_at'] as String? ??
+                DateTime.now().add(const Duration(days: 30)).toIso8601String(),
+          ),
         ),
       );
     });
@@ -51,11 +58,18 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
           await _apiClient.post('/device/refresh', {}, fullResponse: true)
               as Map<String, dynamic>;
 
-      final data = response['data'] as Map<String, dynamic>;
+      Map<String, dynamic> data = response;
+      if (response.containsKey('data') && response['data'] is Map<String, dynamic>) {
+        data = response['data'] as Map<String, dynamic>;
+      }
+
       return Success(
         DeviceRefreshData(
           token: data['token'] as String,
-          expiresAt: DateTime.parse(data['expires_at'] as String),
+          expiresAt: DateTime.parse(
+            data['expires_at'] as String? ??
+                DateTime.now().add(const Duration(days: 30)).toIso8601String(),
+          ),
         ),
       );
     });
@@ -64,7 +78,11 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
   @override
   Future<Result<void, Failure>> link(String deviceId) {
     return executeApiCall(() async {
-      await _apiClient.post('/device/link', {'device_id': deviceId});
+      await _apiClient.post(
+        '/device/link',
+        {'device_id': deviceId},
+        useSanctumOnly: true,
+      );
       return const Success(null);
     });
   }

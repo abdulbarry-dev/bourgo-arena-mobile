@@ -336,7 +336,8 @@ class ApiAuthRepository implements AuthRepository {
       final finalSession = await _checkLoginVerification(session);
       await _updateSession(finalSession);
 
-      _linkDeviceAfterAuth(deviceId);
+      // Await device linking to ensure subsequent requests are authenticated
+      await _linkDeviceAfterAuth(deviceId);
 
       return Success(finalSession);
     });
@@ -581,15 +582,20 @@ class ApiAuthRepository implements AuthRepository {
         ),
       );
 
-      _linkDeviceAfterAuth(deviceId);
+      await _linkDeviceAfterAuth(deviceId);
 
       return const Success(null);
     });
   }
 
-  void _linkDeviceAfterAuth(String? deviceId) {
+  Future<void> _linkDeviceAfterAuth(String? deviceId) async {
     if (deviceId == null) return;
-    _deviceRegistrationRepo.link(deviceId);
+    try {
+      await _deviceRegistrationRepo.link(deviceId);
+      developer.log('Device successfully linked to member.', name: 'ApiAuthRepository');
+    } catch (e) {
+      developer.log('Failed to link device after auth: $e', name: 'ApiAuthRepository');
+    }
   }
 
   @override
