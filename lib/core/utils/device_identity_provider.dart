@@ -29,7 +29,14 @@ class DeviceIdentityProvider {
   Future<Map<String, dynamic>> getDeviceFingerprint() async {
     try {
       final deviceInfo = DeviceInfoPlugin();
-      if (kIsWeb) return {};
+      if (kIsWeb) {
+        final webInfo = await deviceInfo.webBrowserInfo;
+        return {
+          'manufacturer': webInfo.vendor ?? 'Unknown',
+          'model': webInfo.browserName.toString(),
+          'os_version': webInfo.appVersion ?? 'Web',
+        };
+      }
 
       if (Platform.isAndroid) {
         final androidInfo = await deviceInfo.androidInfo;
