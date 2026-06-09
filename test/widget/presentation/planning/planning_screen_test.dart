@@ -36,7 +36,7 @@ class MockGetActiveSubscriptionsUseCase extends Mock
 class MockGetCourseSessionsUseCase extends Mock
     implements GetCourseSessionsUseCase {}
 
-class MockEnrollInCourseUseCase extends Mock implements EnrollInCourseUseCase {}
+class MockBookCourseSessionUseCase extends Mock implements BookCourseSessionUseCase {}
 
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
@@ -49,7 +49,7 @@ void main() {
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
   late MockGetActiveSubscriptionsUseCase mockGetActiveSubscriptionsUseCase;
   late MockGetCourseSessionsUseCase mockGetCourseSessionsUseCase;
-  late MockEnrollInCourseUseCase mockEnrollInCourseUseCase;
+  late MockBookCourseSessionUseCase mockBookCourseSessionUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
   late MockGoRouter mockGoRouter;
 
@@ -68,7 +68,7 @@ void main() {
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
     mockGetActiveSubscriptionsUseCase = MockGetActiveSubscriptionsUseCase();
     mockGetCourseSessionsUseCase = MockGetCourseSessionsUseCase();
-    mockEnrollInCourseUseCase = MockEnrollInCourseUseCase();
+    mockBookCourseSessionUseCase = MockBookCourseSessionUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
     mockGoRouter = MockGoRouter();
 
@@ -89,8 +89,8 @@ void main() {
     locator.registerFactory<GetCourseSessionsUseCase>(
       () => mockGetCourseSessionsUseCase,
     );
-    locator.registerFactory<EnrollInCourseUseCase>(
-      () => mockEnrollInCourseUseCase,
+    locator.registerFactory<BookCourseSessionUseCase>(
+      () => mockBookCourseSessionUseCase,
     );
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
 

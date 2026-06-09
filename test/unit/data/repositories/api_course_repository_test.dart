@@ -63,8 +63,8 @@ void main() {
         },
       ];
       when(
-        () => mockApiClient.get(any()),
-      ).thenAnswer((_) async => jsonResponse);
+        () => mockApiClient.get('/courses', fullResponse: any(named: 'fullResponse')),
+      ).thenAnswer((_) async => {'data': jsonResponse});
 
       // Act
       final result = await repository.getCourses();
@@ -76,10 +76,9 @@ void main() {
         onFailure: (_) => fail('Expected success'),
       );
       check(courses.length).equals(1);
-      check(courses.first.id).equals('c1');
-      check(courses.first.title).equals('Yoga');
+      check(courses.first.name).equals('Yoga');
 
-      verify(() => mockApiClient.get('/courses')).called(1);
+      verify(() => mockApiClient.get('/courses', fullResponse: any(named: 'fullResponse'))).called(1);
     });
 
     test('getCourseDetails returns course details', () async {

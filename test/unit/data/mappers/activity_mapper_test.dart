@@ -70,10 +70,12 @@ void main() {
       final entity = Activity(
         id: 'activity-9',
         title: 'Tennis',
+        name: 'Tennis',
         category: 'Outdoor',
         basePrice: 45.5,
         currency: 'EUR',
         imageUrl: 'https://example.com/tennis.png',
+        images: ['https://example.com/tennis.png'],
         icon: 'sports_tennis',
         description: 'Court booking',
         features: const ['Rackets included'],

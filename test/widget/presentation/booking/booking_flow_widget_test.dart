@@ -26,10 +26,12 @@ void main() {
   const testActivity = Activity(
     id: 'test-1',
     title: 'Test Sport',
+    name: 'Test Sport',
     category: 'Outdoor',
     basePrice: 25.0,
     currency: '€',
     imageUrl: 'https://example.com/test.png',
+    images: ['https://example.com/test.png'],
     icon: 'sports_soccer',
     description: 'Test Description',
     features: ['Feature 1'],

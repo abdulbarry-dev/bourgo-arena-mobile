@@ -33,7 +33,6 @@ void main() {
     when(() => mockViewModel.unified).thenReturn([]);
     when(() => mockViewModel.familyMembers).thenReturn([]);
     when(() => mockViewModel.selectedMember).thenReturn(null);
-    when(() => mockViewModel.selectedDay).thenReturn(1);
     when(() => mockViewModel.addListener(any())).thenReturn(null);
     when(() => mockViewModel.removeListener(any())).thenReturn(null);
   });
@@ -46,31 +45,11 @@ void main() {
     );
   }
 
-  testWidgets('renders day selector and empty state', (tester) async {
+  testWidgets('renders empty state when no courses', (tester) async {
     await tester.pumpWidget(createWidget());
     await tester.pumpAndSettle();
 
-    final context = tester.element(find.byType(PlanningScreen));
-    final l10n = AppLocalizations.of(context)!;
-
-    // Day names should be present (e.g., Mon)
-    check(find.text(l10n.commonMon).evaluate()).isNotEmpty();
-    check(find.text(l10n.planningNoCourses).evaluate()).length.equals(1);
-  });
-
-  testWidgets('tapping day calls selectDay', (tester) async {
-    when(() => mockViewModel.selectDay(any())).thenReturn(null);
-
-    await tester.pumpWidget(createWidget());
-    await tester.pump(const Duration(seconds: 2));
-
-    final context = tester.element(find.byType(PlanningScreen));
-    final l10n = AppLocalizations.of(context)!;
-    final mon = find.text(l10n.commonMon).first;
-    await tester.tap(mon);
-    await tester.pump();
-
-    verify(() => mockViewModel.selectDay(1)).called(1);
+    check(find.text('No courses scheduled').evaluate()).length.equals(1);
   });
 
   testWidgets('shows loading indicator when isLoading is true', (tester) async {
@@ -94,26 +73,16 @@ void main() {
       const Course(
         id: '1',
         name: 'Morning Yoga',
-        title: 'Morning Yoga',
-        instructor: 'Alice',
-        startTime: '08:00',
-        endTime: '09:00',
-        dayOfWeek: 1,
-        category: 'Wellness',
-        capacity: 20,
-        enrolled: 5,
-        icon: 'yoga',
+        description: 'Start your day right',
+        images: [],
+        status: 'active',
       ),
     ];
     final unified = [
       PlanningEntry(
         id: '1',
-        type: PlanningEntryType.course,
         title: 'Morning Yoga',
-        timeLabel: '08:00-09:00',
-        dayOfWeek: 1,
         source: courses.first,
-        highlightForTier: false,
       ),
     ];
     when(() => mockViewModel.unified).thenReturn(unified);
@@ -121,7 +90,6 @@ void main() {
     await tester.pumpWidget(createWidget());
     await tester.pump(const Duration(seconds: 2));
 
-    check(find.text('Morning Yoga').evaluate()).isNotEmpty();
-    check(find.text('Alice').evaluate()).isNotEmpty();
+    check(find.text('MORNING YOGA').evaluate()).isNotEmpty();
   });
 }

@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation_with_payment.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_time_slots_use_case.dart';
@@ -76,10 +77,12 @@ void main() {
     const Activity(
       id: '1',
       title: 'Soccer',
+      name: 'Soccer',
       category: 'Outdoor',
       basePrice: 50.0,
       currency: 'EUR',
       imageUrl: 'image1',
+      images: ['image1'],
       description: 'Soccer desc',
       icon: 'sports_soccer',
       features: ['Pitch', 'Lighting'],
@@ -126,7 +129,9 @@ void main() {
     ).thenAnswer((_) async => Result.success(tReservations));
     when(
       () => mockMakeReservationUseCase(any()),
-    ).thenAnswer((_) async => Result.success(tReservations.first));
+    ).thenAnswer((_) async => Result.success(
+      ReservationWithPayment(reservation: tReservations.first),
+    ));
     when(
       () => mockCancelBookingUseCase(any()),
     ).thenAnswer((_) async => Result.success(null));

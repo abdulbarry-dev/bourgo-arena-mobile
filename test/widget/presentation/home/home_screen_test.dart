@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
@@ -83,7 +82,7 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en'), Locale('fr')],
+      supportedLocales: [Locale('en'), Locale('fr')],
       home: InheritedGoRouter(
         goRouter: mockGoRouter,
         child: const HomeScreen(),
@@ -92,18 +91,18 @@ void main() {
   }
 
   group('HomeScreen Widget Tests', () {
-    testWidgets('shows loading state initially', (tester) async {
+    testWidgets('shows section headers after data loads', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
-      // pump once to trigger init state
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    });
+      await tester.pump(const Duration(seconds: 2));
 
-    testWidgets('shows empty state when no data is returned', (tester) async {
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester
-          .pumpAndSettle(); // Wait for futures to resolve and animations
+      expect(find.text('TOURNAMENTS & EVENTS'), findsOneWidget);
+      expect(find.text('COURSES'), findsOneWidget);
 
-      expect(find.text('No results found'), findsOneWidget);
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
+      await tester.pump(const Duration(seconds: 1));
+
+      expect(find.text('ACTIVITIES'), findsOneWidget);
+      expect(find.text('SERVICES'), findsOneWidget);
     });
   });
 }

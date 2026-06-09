@@ -16,10 +16,12 @@ void main() {
       const activity1 = Activity(
         id: '1',
         title: 'Tennis',
+        name: 'Tennis',
         category: 'Indoor',
         basePrice: 20.0,
         currency: 'EUR',
         imageUrl: 'url',
+        images: ['url'],
         icon: 'tennis_icon',
         description: 'Tennis description',
         features: ['Court', 'Rackets'],
@@ -30,10 +32,12 @@ void main() {
       const activity2 = Activity(
         id: '1',
         title: 'Tennis',
+        name: 'Tennis',
         category: 'Indoor',
         basePrice: 20.0,
         currency: 'EUR',
         imageUrl: 'url',
+        images: ['url'],
         icon: 'tennis_icon',
         description: 'Tennis description',
         features: ['Court', 'Rackets'],
@@ -44,10 +48,12 @@ void main() {
       const activityDifferent = Activity(
         id: '2',
         title: 'Football',
+        name: 'Football',
         category: 'Outdoor',
         basePrice: 15.0,
         currency: 'EUR',
         imageUrl: 'url',
+        images: ['url'],
         icon: 'football_icon',
         description: 'Football description',
         features: ['Field'],
@@ -66,10 +72,12 @@ void main() {
         final activityWithSameFeatures = Activity(
           id: '1',
           title: 'Tennis',
+          name: 'Tennis',
           category: 'Indoor',
           basePrice: 20.0,
           currency: 'EUR',
           imageUrl: 'url',
+          images: ['url'],
           icon: 'tennis_icon',
           description: 'Tennis description',
           features: List.from(['Court', 'Rackets']),
@@ -121,56 +129,60 @@ void main() {
       const course1 = Course(
         id: 'course1',
         name: 'Yoga',
-        title: 'Yoga',
-        instructor: 'Sarah',
+        description: 'Morning yoga class',
+        images: ['https://img.com/yoga.jpg'],
+        imageUrl: 'https://img.com/yoga.jpg',
+        status: 'active',
+      );
+
+      const course2 = Course(
+        id: 'course2',
+        name: 'Pilates',
+        images: [],
+        status: 'inactive',
+      );
+
+      test('equality should work correctly', () {
+        check(course1).equals(course1);
+        check(course1).not((p) => p.equals(course2));
+      });
+    });
+
+    group('CourseSession', () {
+      final session1 = CourseSession(
+        id: 's1',
+        title: 'Morning Yoga',
         startTime: '08:00',
         endTime: '09:00',
         dayOfWeek: 1,
-        category: 'Wellness',
         capacity: 20,
         enrolled: 15,
-        icon: 'yoga_icon',
+        imageUrl: 'https://img.com/yoga.jpg',
       );
 
-      const courseFull = Course(
-        id: 'course2',
-        name: 'Pilates',
+      final sessionFull = CourseSession(
+        id: 's2',
         title: 'Pilates',
-        instructor: 'Emma',
         startTime: '10:00',
         endTime: '11:00',
         dayOfWeek: 2,
-        category: 'Wellness',
         capacity: 10,
         enrolled: 10,
-        icon: 'pilates_icon',
       );
 
       test('isFull should return correct value', () {
-        check(course1.isFull).isFalse();
-        check(courseFull.isFull).isTrue();
+        check(session1.isFull).isFalse();
+        check(sessionFull.isFull).isTrue();
       });
 
       test('remainingSpots should return correct value', () {
-        check(course1.remainingSpots).equals(5);
-        check(courseFull.remainingSpots).equals(0);
+        check(session1.remainingSpots).equals(5);
+        check(sessionFull.remainingSpots).equals(0);
       });
 
       test('equality should work correctly', () {
-        const course2 = Course(
-          id: 'course1',
-          name: 'Yoga',
-          title: 'Yoga',
-          instructor: 'Sarah',
-          startTime: '08:00',
-          endTime: '09:00',
-          dayOfWeek: 1,
-          category: 'Wellness',
-          capacity: 20,
-          enrolled: 15,
-          icon: 'yoga_icon',
-        );
-        check(course1).equals(course2);
+        check(session1).equals(session1);
+        check(session1).not((p) => p.equals(sessionFull));
       });
     });
 
