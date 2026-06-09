@@ -70,10 +70,10 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     result.when(
       success: (subscription) {
         setState(() => _isSubscribing = false);
-        context.push('/payment-selection', extra: {
-          'plan': _plan,
-          'subscription': subscription,
-        });
+        context.push(
+          '/payment-selection',
+          extra: {'plan': _plan, 'subscription': subscription},
+        );
       },
       failure: (failure) {
         setState(() => _isSubscribing = false);
@@ -106,10 +106,10 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage != null
-              ? _buildError(theme)
-              : _plan == null
-                  ? _buildNotFound(theme)
-                  : _buildContent(theme, appColors),
+          ? _buildError(theme)
+          : _plan == null
+          ? _buildNotFound(theme)
+          : _buildContent(theme, appColors),
     );
   }
 
@@ -127,99 +127,118 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (_plan!.service != null)
-                        _buildServiceBadge(theme, appColors).animate(
-                          delay: 50.ms,
-                        ).fade(duration: 400.ms).slideY(
-                          begin: 0.1,
-                          end: 0,
-                          curve: Curves.easeOutQuad,
-                        ),
+                        _buildServiceBadge(theme, appColors)
+                            .animate(delay: 50.ms)
+                            .fade(duration: 400.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
+                            ),
                       const SizedBox(height: 16),
                       Text(
-                        _plan!.name.toUpperCase(),
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontFamily: AppConstants.displayFontFamily,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.2,
-                          color: theme.colorScheme.onSurface,
-                        ),
-                      ).animate(delay: 100.ms).fade(duration: 400.ms).slideY(
-                        begin: 0.1,
-                        end: 0,
-                        curve: Curves.easeOutQuad,
-                      ),
+                            _plan!.name.toUpperCase(),
+                            style: theme.textTheme.headlineSmall?.copyWith(
+                              fontFamily: AppConstants.displayFontFamily,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                          )
+                          .animate(delay: 100.ms)
+                          .fade(duration: 400.ms)
+                          .slideY(
+                            begin: 0.1,
+                            end: 0,
+                            curve: Curves.easeOutQuad,
+                          ),
                       const SizedBox(height: 12),
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            '${_plan!.price.toStringAsFixed(0)} TND',
-                            style: theme.textTheme.displaySmall?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          if (_plan!.durationDays != null) ...[
-                            const SizedBox(width: 8),
-                            Text(
-                              '/ ${_plan!.durationDays} DAYS',
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                                letterSpacing: 1.0,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${_plan!.price.toStringAsFixed(0)} TND',
+                                style: theme.textTheme.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  color: theme.colorScheme.primary,
+                                ),
                               ),
-                            ),
-                          ],
-                        ],
-                      ).animate(delay: 150.ms).fade(duration: 400.ms).slideY(
-                        begin: 0.1,
-                        end: 0,
-                        curve: Curves.easeOutQuad,
-                      ),
+                              if (_plan!.durationDays != null) ...[
+                                const SizedBox(width: 8),
+                                Text(
+                                  '/ ${_plan!.durationDays} DAYS',
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    letterSpacing: 1.0,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          )
+                          .animate(delay: 150.ms)
+                          .fade(duration: 400.ms)
+                          .slideY(
+                            begin: 0.1,
+                            end: 0,
+                            curve: Curves.easeOutQuad,
+                          ),
                       const SizedBox(height: 32),
                       Text(
-                        'INCLUDES',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.5,
-                        ),
-                      ).animate(delay: 200.ms).fade(duration: 400.ms).slideY(
-                        begin: 0.1,
-                        end: 0,
-                        curve: Curves.easeOutQuad,
-                      ),
+                            'INCLUDES',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.5,
+                            ),
+                          )
+                          .animate(delay: 200.ms)
+                          .fade(duration: 400.ms)
+                          .slideY(
+                            begin: 0.1,
+                            end: 0,
+                            curve: Curves.easeOutQuad,
+                          ),
                       const SizedBox(height: 16),
                       if (_plan!.service != null)
                         _buildFeatureRow(
-                          theme,
-                          Symbols.category,
-                          'Service: ${_plan!.service!.name}',
-                        ).animate(delay: 250.ms).fade(duration: 400.ms).slideY(
-                          begin: 0.1,
-                          end: 0,
-                          curve: Curves.easeOutQuad,
-                        ),
+                              theme,
+                              Symbols.category,
+                              'Service: ${_plan!.service!.name}',
+                            )
+                            .animate(delay: 250.ms)
+                            .fade(duration: 400.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
+                            ),
                       if (_plan!.hasAllCourses)
                         _buildFeatureRow(
-                          theme,
-                          Symbols.all_inclusive,
-                          'Access to ALL courses',
-                        ).animate(delay: 300.ms).fade(duration: 400.ms).slideY(
-                          begin: 0.1,
-                          end: 0,
-                          curve: Curves.easeOutQuad,
-                        ),
+                              theme,
+                              Symbols.all_inclusive,
+                              'Access to ALL courses',
+                            )
+                            .animate(delay: 300.ms)
+                            .fade(duration: 400.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
+                            ),
                       if (_plan!.service?.description != null &&
                           _plan!.service!.description!.isNotEmpty)
                         _buildFeatureRow(
-                          theme,
-                          Symbols.info,
-                          _plan!.service!.description!,
-                        ).animate(delay: 350.ms).fade(duration: 400.ms).slideY(
-                          begin: 0.1,
-                          end: 0,
-                          curve: Curves.easeOutQuad,
-                        ),
+                              theme,
+                              Symbols.info,
+                              _plan!.service!.description!,
+                            )
+                            .animate(delay: 350.ms)
+                            .fade(duration: 400.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
+                            ),
                       const SizedBox(height: 40),
                     ],
                   ),
@@ -230,13 +249,10 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         ),
         Container(
           padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-          child: _buildCTA(theme).animate(delay: 400.ms).fade(
-            duration: 400.ms,
-          ).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+          child: _buildCTA(theme)
+              .animate(delay: 400.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
         ),
       ],
     );
@@ -346,11 +362,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Symbols.bolt,
-            size: 14,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(Symbols.bolt, size: 14, color: theme.colorScheme.primary),
           const SizedBox(width: 6),
           Text(
             _plan!.service!.name?.toUpperCase() ?? 'SERVICE',
@@ -372,11 +384,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(icon, size: 20, color: theme.colorScheme.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -399,10 +407,10 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: theme.colorScheme.onPrimary,
         minimumSize: const Size(double.infinity, 56),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        disabledBackgroundColor: theme.colorScheme.primary.withValues(
+          alpha: 0.4,
         ),
-        disabledBackgroundColor: theme.colorScheme.primary.withValues(alpha: 0.4),
       ),
       child: _isSubscribing
           ? const SizedBox(
@@ -430,11 +438,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Symbols.error,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
+            Icon(Symbols.error, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text(
               _errorMessage ?? 'Something went wrong',

@@ -1,5 +1,5 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/browse/browse_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_screen.dart';
@@ -22,7 +22,7 @@ class _MainLayoutState extends State<MainLayout> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const ActivitiesScreen(),
+    const BrowseScreen(),
     const PlanningScreen(),
     const ProfileScreen(),
   ];

@@ -14,14 +14,20 @@ import 'package:shimmer/shimmer.dart';
     case 'referral':
       return (label: 'Parrainage', icon: Symbols.person_add);
     case 'subscription_renewal':
-      return (label: "Renouvellement d'abonnement", icon: Symbols.card_membership);
+      return (
+        label: "Renouvellement d'abonnement",
+        icon: Symbols.card_membership,
+      );
     case 'reservation_completed':
       return (label: 'Réservation complétée', icon: Symbols.event_available);
     case 'welcome_bonus':
       return (label: 'Bonus de bienvenue', icon: Symbols.celebration);
     default:
       final label = sourceType.replaceAll('_', ' ');
-      return (label: label[0].toUpperCase() + label.substring(1), icon: Symbols.receipt_long);
+      return (
+        label: label[0].toUpperCase() + label.substring(1),
+        icon: Symbols.receipt_long,
+      );
   }
 }
 
@@ -102,7 +108,9 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             return _buildShimmerSkeleton(context, theme, spacing);
           }
 
-          if (_viewModel.errorMessage != null && _viewModel.currentPoints == 0 && _viewModel.recentTransactions.isEmpty) {
+          if (_viewModel.errorMessage != null &&
+              _viewModel.currentPoints == 0 &&
+              _viewModel.recentTransactions.isEmpty) {
             return _buildErrorState(context, theme, spacing);
           }
 
@@ -129,10 +137,23 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                   padding: EdgeInsets.all(spacing.lg),
                   sliver: SliverList(
                     delegate: SliverChildListDelegate([
-                      _buildPointsCard(context, theme, spacing, points, currentTier),
+                      _buildPointsCard(
+                        context,
+                        theme,
+                        spacing,
+                        points,
+                        currentTier,
+                      ),
                       SizedBox(height: spacing.lg),
                       if (nextTier != null)
-                        _buildProgressSection(context, theme, spacing, progress, pointsToNext, nextTier)
+                        _buildProgressSection(
+                          context,
+                          theme,
+                          spacing,
+                          progress,
+                          pointsToNext,
+                          nextTier,
+                        )
                       else
                         _buildMaxTierMessage(context, theme, spacing),
                       SizedBox(height: spacing.xl),
@@ -150,13 +171,15 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                   SliverPadding(
                     padding: EdgeInsets.symmetric(horizontal: spacing.md),
                     sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final tx = _viewModel.recentTransactions[index];
-                          return _buildTransactionItem(context, theme, spacing, tx);
-                        },
-                        childCount: _viewModel.recentTransactions.length,
-                      ),
+                      delegate: SliverChildBuilderDelegate((context, index) {
+                        final tx = _viewModel.recentTransactions[index];
+                        return _buildTransactionItem(
+                          context,
+                          theme,
+                          spacing,
+                          tx,
+                        );
+                      }, childCount: _viewModel.recentTransactions.length),
                     ),
                   ),
                 SliverToBoxAdapter(child: SizedBox(height: spacing.xxl)),
@@ -168,8 +191,16 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  Widget _buildPointsCard(BuildContext context, ThemeData theme, AppSpacing spacing, int points, MemberTier tier) {
-    final formattedPoints = NumberFormat('#,###').format(points).replaceAll(',', ' ');
+  Widget _buildPointsCard(
+    BuildContext context,
+    ThemeData theme,
+    AppSpacing spacing,
+    int points,
+    MemberTier tier,
+  ) {
+    final formattedPoints = NumberFormat(
+      '#,###',
+    ).format(points).replaceAll(',', ' ');
 
     return Container(
       width: double.infinity,
@@ -184,7 +215,9 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
           ],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.1)),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.1),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -193,7 +226,10 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xxs),
+                padding: EdgeInsets.symmetric(
+                  horizontal: spacing.sm,
+                  vertical: spacing.xxs,
+                ),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -213,7 +249,11 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                   color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Symbols.stars, color: theme.colorScheme.primary, size: 24),
+                child: Icon(
+                  Symbols.stars,
+                  color: theme.colorScheme.primary,
+                  size: 24,
+                ),
               ),
             ],
           ),
@@ -240,7 +280,14 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  Widget _buildProgressSection(BuildContext context, ThemeData theme, AppSpacing spacing, double progress, int pointsToNext, MemberTier nextTier) {
+  Widget _buildProgressSection(
+    BuildContext context,
+    ThemeData theme,
+    AppSpacing spacing,
+    double progress,
+    int pointsToNext,
+    MemberTier nextTier,
+  ) {
     final appColors = theme.extension<AppColors>()!;
     final formattedPoints = NumberFormat('#,###').format(pointsToNext);
 
@@ -288,17 +335,27 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  Widget _buildMaxTierMessage(BuildContext context, ThemeData theme, AppSpacing spacing) {
+  Widget _buildMaxTierMessage(
+    BuildContext context,
+    ThemeData theme,
+    AppSpacing spacing,
+  ) {
     return Container(
       padding: EdgeInsets.all(spacing.md),
       decoration: BoxDecoration(
         color: theme.colorScheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.15)),
+        border: Border.all(
+          color: theme.colorScheme.primary.withValues(alpha: 0.15),
+        ),
       ),
       child: Row(
         children: [
-          Icon(Symbols.workspace_premium, color: theme.colorScheme.primary, size: 20),
+          Icon(
+            Symbols.workspace_premium,
+            color: theme.colorScheme.primary,
+            size: 20,
+          ),
           SizedBox(width: spacing.sm),
           Text(
             'Niveau maximum atteint',
@@ -323,7 +380,12 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  Widget _buildTransactionItem(BuildContext context, ThemeData theme, AppSpacing spacing, LoyaltyTransaction tx) {
+  Widget _buildTransactionItem(
+    BuildContext context,
+    ThemeData theme,
+    AppSpacing spacing,
+    LoyaltyTransaction tx,
+  ) {
     final appColors = theme.extension<AppColors>()!;
     final sourceType = tx.description ?? '';
     final mapped = _mapSourceType(sourceType);
@@ -349,7 +411,11 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                   : Colors.red.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(mapped.icon, color: isPositive ? Colors.green.shade600 : Colors.red.shade600, size: 22),
+            child: Icon(
+              mapped.icon,
+              color: isPositive ? Colors.green.shade600 : Colors.red.shade600,
+              size: 22,
+            ),
           ),
           SizedBox(width: spacing.md),
           Expanded(
@@ -368,7 +434,9 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                   Text(
                     _formatDate(tx.createdAt!),
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                   ),
                 ],
@@ -387,7 +455,11 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, ThemeData theme, AppSpacing spacing) {
+  Widget _buildEmptyState(
+    BuildContext context,
+    ThemeData theme,
+    AppSpacing spacing,
+  ) {
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: spacing.xxl),
@@ -431,10 +503,16 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  Widget _buildShimmerSkeleton(BuildContext context, ThemeData theme, AppSpacing spacing) {
+  Widget _buildShimmerSkeleton(
+    BuildContext context,
+    ThemeData theme,
+    AppSpacing spacing,
+  ) {
     return Shimmer.fromColors(
       baseColor: theme.colorScheme.surfaceContainerHighest,
-      highlightColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+      highlightColor: theme.colorScheme.surfaceContainerHighest.withValues(
+        alpha: 0.4,
+      ),
       child: SingleChildScrollView(
         padding: EdgeInsets.all(spacing.lg),
         child: Column(
@@ -446,7 +524,10 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             SizedBox(height: spacing.xl),
             _buildShimmerSectionTitle(theme, spacing),
             SizedBox(height: spacing.md),
-            ...List.generate(5, (_) => _buildShimmerTransactionItem(theme, spacing)),
+            ...List.generate(
+              5,
+              (_) => _buildShimmerTransactionItem(theme, spacing),
+            ),
           ],
         ),
       ),
@@ -621,7 +702,11 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     );
   }
 
-  Widget _buildErrorState(BuildContext context, ThemeData theme, AppSpacing spacing) {
+  Widget _buildErrorState(
+    BuildContext context,
+    ThemeData theme,
+    AppSpacing spacing,
+  ) {
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: spacing.xxl),
@@ -634,7 +719,11 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                 color: theme.colorScheme.error.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Symbols.wifi_off, size: 48, color: theme.colorScheme.error),
+              child: Icon(
+                Symbols.wifi_off,
+                size: 48,
+                color: theme.colorScheme.error,
+              ),
             ),
             SizedBox(height: spacing.lg),
             Text(
@@ -649,7 +738,9 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
               padding: EdgeInsets.symmetric(horizontal: spacing.xl),
               child: Text(
                 _viewModel.errorMessage ?? 'Impossible de charger vos points.',
-                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -659,7 +750,9 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
               icon: const Icon(Symbols.refresh, size: 20),
               label: const Text('Réessayer'),
               style: FilledButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
             ),
           ],

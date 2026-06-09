@@ -56,14 +56,13 @@ class _SubscriptionManagementScreenState
   List<Plan> _filteredPlans() {
     return _viewModel.plans.where((plan) {
       final matchesService =
-          _selectedServiceId == 'All' ||
-          plan.service?.id == _selectedServiceId;
+          _selectedServiceId == 'All' || plan.service?.id == _selectedServiceId;
       final matchesSearch =
           _searchQuery.isEmpty ||
           plan.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           (plan.service?.name?.toLowerCase().contains(
-                    _searchQuery.toLowerCase(),
-                  ) ??
+                _searchQuery.toLowerCase(),
+              ) ??
               false);
       return matchesService && matchesSearch;
     }).toList();
@@ -81,20 +80,18 @@ class _SubscriptionManagementScreenState
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(
-            title: 'EXPLORE PLANS',
-          ),
+          appBar: SubScreenAppBar(title: 'EXPLORE PLANS'),
           body: _viewModel.isLoading
               ? _buildSkeletonLoading(theme)
               : _viewModel.errorMessage != null
-                  ? _buildErrorState(theme)
-                  : Column(
-                      children: [
-                        _buildSearchBar(theme),
-                        _buildFilterPills(theme),
-                        Expanded(child: _buildPlanList(theme, filteredPlans)),
-                      ],
-                    ),
+              ? _buildErrorState(theme)
+              : Column(
+                  children: [
+                    _buildSearchBar(theme),
+                    _buildFilterPills(theme),
+                    Expanded(child: _buildPlanList(theme, filteredPlans)),
+                  ],
+                ),
         );
       },
     );
@@ -226,24 +223,22 @@ class _SubscriptionManagementScreenState
         itemCount: filteredPlans.length,
         itemBuilder: (context, index) {
           final plan = filteredPlans[index];
-          final isCurrent =
-              widget.currentSubscription?.plan?.name == plan.name;
+          final isCurrent = widget.currentSubscription?.plan?.name == plan.name;
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: _PlanCard(
-              plan: plan,
-              isCurrent: isCurrent,
-              theme: theme,
-              appColors: appColors,
-              onTap: () => context.push('/plans/${plan.id}', extra: plan),
-            ).animate(
-              delay: (index * 50).ms,
-            ).fade(duration: 400.ms).slideY(
-              begin: 0.1,
-              end: 0,
-              curve: Curves.easeOutQuad,
-            ),
+            child:
+                _PlanCard(
+                      plan: plan,
+                      isCurrent: isCurrent,
+                      theme: theme,
+                      appColors: appColors,
+                      onTap: () =>
+                          context.push('/plans/${plan.id}', extra: plan),
+                    )
+                    .animate(delay: (index * 50).ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           );
         },
       ),
@@ -350,18 +345,15 @@ class _PlanCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildImageSection(),
-            _buildContentSection(),
-          ],
+          children: [_buildImageSection(), _buildContentSection()],
         ),
       ),
     );
   }
 
   Widget _buildImageSection() {
-    final hasImage = plan.service?.imageUrl != null &&
-        plan.service!.imageUrl!.isNotEmpty;
+    final hasImage =
+        plan.service?.imageUrl != null && plan.service!.imageUrl!.isNotEmpty;
 
     return SizedBox(
       height: 160,
@@ -397,11 +389,7 @@ class _PlanCard extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            left: 16,
-            bottom: 16,
-            child: _buildBadge(),
-          ),
+          Positioned(left: 16, bottom: 16, child: _buildBadge()),
         ],
       ),
     );
@@ -439,11 +427,7 @@ class _PlanCard extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Symbols.bolt,
-              size: 12,
-              color: theme.colorScheme.primary,
-            ),
+            Icon(Symbols.bolt, size: 12, color: theme.colorScheme.primary),
             const SizedBox(width: 4),
             Text(
               plan.service!.name!.toUpperCase(),

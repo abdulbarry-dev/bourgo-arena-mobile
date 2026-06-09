@@ -43,22 +43,19 @@ class SelectTimeStep extends StatelessWidget {
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                Icon(Symbols.event_busy,
-                    size: 48,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurfaceVariant
-                        .withValues(alpha: 0.4)),
+                Icon(
+                  Symbols.event_busy,
+                  size: 48,
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                ),
                 const SizedBox(height: 12),
                 Text(
                   l10n.bookingNoSlots,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge
-                      ?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -99,9 +96,7 @@ class SelectTimeStep extends StatelessWidget {
         ),
         _BottomActionBar(
           label: l10n.bookingConfirm,
-          onPressed: viewModel.selectedSlot != null
-              ? viewModel.nextStep
-              : null,
+          onPressed: viewModel.selectedSlot != null ? viewModel.nextStep : null,
           price: viewModel.priceToPay,
         ),
       ],
@@ -127,20 +122,20 @@ class _DatePicker extends StatelessWidget {
       height: 100,
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
-        border: Border(
-          bottom: BorderSide(
-            color: appColors.bgBorder,
-            width: 1,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: appColors.bgBorder, width: 1)),
       ),
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         itemCount: 7,
         itemBuilder: (context, index) {
-          final date = DateTime(now.year, now.month, now.day).add(Duration(days: index));
-          final isSelected = viewModel.selectedDate.day == date.day &&
+          final date = DateTime(
+            now.year,
+            now.month,
+            now.day,
+          ).add(Duration(days: index));
+          final isSelected =
+              viewModel.selectedDate.day == date.day &&
               viewModel.selectedDate.month == date.month &&
               viewModel.selectedDate.year == date.year;
           final dayOfWeek = date.weekday % 7;
@@ -191,10 +186,10 @@ class _DatePicker extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.6,
                       color: isSelected
-                          ? theme.colorScheme.onPrimary
-                              .withValues(alpha: 0.8)
-                          : theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.6),
+                          ? theme.colorScheme.onPrimary.withValues(alpha: 0.8)
+                          : theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.6,
+                            ),
                     ),
                   ),
                 ],
@@ -240,12 +235,14 @@ class _DaySection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        ...slots.map((slot) => _SlotTile(
-              key: ValueKey(slot.id ?? slot.time),
-              slot: slot,
-              isSelected: selectedSlotId == slot.id,
-              onTap: () => onSelectSlot(slot),
-            )),
+        ...slots.map(
+          (slot) => _SlotTile(
+            key: ValueKey(slot.id ?? slot.time),
+            slot: slot,
+            isSelected: selectedSlotId == slot.id,
+            onTap: () => onSelectSlot(slot),
+          ),
+        ),
         const SizedBox(height: 4),
       ],
     );
@@ -289,16 +286,17 @@ class _SlotTile extends StatelessWidget {
             color: isSelected
                 ? theme.colorScheme.primary.withValues(alpha: 0.12)
                 : isFullyBooked
-                    ? theme.colorScheme.surfaceContainerHighest
-                        .withValues(alpha: 0.4)
-                    : theme.colorScheme.surface,
+                ? theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.4,
+                  )
+                : theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
                   : isFullyBooked
-                      ? appColors.bgBorder.withValues(alpha: 0.5)
-                      : appColors.bgBorder,
+                  ? appColors.bgBorder.withValues(alpha: 0.5)
+                  : appColors.bgBorder,
               width: isSelected ? 1.5 : 1,
             ),
           ),
@@ -311,24 +309,26 @@ class _SlotTile extends StatelessWidget {
                   color: isSelected
                       ? theme.colorScheme.primary
                       : isFullyBooked
-                          ? theme.colorScheme.surfaceContainerHighest
-                          : theme.colorScheme.primaryContainer
-                              .withValues(alpha: 0.3),
+                      ? theme.colorScheme.surfaceContainerHighest
+                      : theme.colorScheme.primaryContainer.withValues(
+                          alpha: 0.3,
+                        ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
                   isSelected
                       ? Symbols.check_circle
                       : isFullyBooked
-                          ? Symbols.event_busy
-                          : Symbols.schedule,
+                      ? Symbols.event_busy
+                      : Symbols.schedule,
                   size: 20,
                   color: isSelected
                       ? theme.colorScheme.onPrimary
                       : isFullyBooked
-                          ? theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.4)
-                          : theme.colorScheme.primary,
+                      ? theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.4,
+                        )
+                      : theme.colorScheme.primary,
                 ),
               ),
               const SizedBox(width: 14),
@@ -341,8 +341,9 @@ class _SlotTile extends StatelessWidget {
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: isFullyBooked
-                            ? theme.colorScheme.onSurfaceVariant
-                                .withValues(alpha: 0.5)
+                            ? theme.colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.5,
+                              )
                             : theme.colorScheme.onSurface,
                       ),
                     ),
@@ -352,10 +353,12 @@ class _SlotTile extends StatelessWidget {
                         '${slot.durationMinutes} min',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: isFullyBooked
-                              ? theme.colorScheme.onSurfaceVariant
-                                  .withValues(alpha: 0.35)
-                              : theme.colorScheme.onSurfaceVariant
-                                  .withValues(alpha: 0.6),
+                              ? theme.colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.35,
+                                )
+                              : theme.colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.6,
+                                ),
                         ),
                       ),
                     ],
@@ -364,13 +367,16 @@ class _SlotTile extends StatelessWidget {
               ),
               if (slot.capacity != null && slot.bookedCount != null)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? theme.colorScheme.primary.withValues(alpha: 0.15)
-                        : theme.colorScheme.surfaceContainerHighest
-                            .withValues(alpha: 0.5),
+                        : theme.colorScheme.surfaceContainerHighest.withValues(
+                            alpha: 0.5,
+                          ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -378,19 +384,23 @@ class _SlotTile extends StatelessWidget {
                     style: theme.textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: isFullyBooked
-                          ? theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.4)
+                          ? theme.colorScheme.onSurfaceVariant.withValues(
+                              alpha: 0.4,
+                            )
                           : theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 )
               else if (isFullyBooked)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest
-                        .withValues(alpha: 0.5),
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.5,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

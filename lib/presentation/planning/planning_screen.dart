@@ -191,10 +191,17 @@ class _PlanningScreenState extends State<PlanningScreen> {
     if (_isBooking) return;
     _isBooking = true;
 
-    final targetWeekday = entry.dayOfWeek == 0 ? DateTime.sunday : entry.dayOfWeek;
-    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final targetWeekday = entry.dayOfWeek == 0
+        ? DateTime.sunday
+        : entry.dayOfWeek;
+    final today = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
     final nextDate = _findNextMatchingDate(today, targetWeekday);
-    final dateStr = '${nextDate.year}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${nextDate.year}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}';
 
     final confirmed = await _showBookingModal(context, entry, nextDate);
     if (!confirmed || !mounted) {
@@ -202,7 +209,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
       return;
     }
 
-    final error = await _viewModel.bookSession(entry.courseId, entry.id, dateStr);
+    final error = await _viewModel.bookSession(
+      entry.courseId,
+      entry.id,
+      dateStr,
+    );
     _isBooking = false;
     if (!mounted) return;
 
@@ -210,66 +221,99 @@ class _PlanningScreenState extends State<PlanningScreen> {
       setState(() {});
       CelebrationOverlay.show(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Réservé ${entry.title} le $dateStr à ${entry.startTime}')),
+        SnackBar(
+          content: Text(
+            'Réservé ${entry.title} le $dateStr à ${entry.startTime}',
+          ),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(error), backgroundColor: Theme.of(context).colorScheme.error),
+        SnackBar(
+          content: Text(error),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
       );
     }
   }
 
-  Future<bool> _showBookingModal(BuildContext context, PlanningEntry entry, DateTime nextDate) async {
+  Future<bool> _showBookingModal(
+    BuildContext context,
+    PlanningEntry entry,
+    DateTime nextDate,
+  ) async {
     final theme = Theme.of(context);
     final capitalDay = _formatDayName(entry.dayOfWeek);
     const months = [
-      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+      'Janvier',
+      'Février',
+      'Mars',
+      'Avril',
+      'Mai',
+      'Juin',
+      'Juillet',
+      'Août',
+      'Septembre',
+      'Octobre',
+      'Novembre',
+      'Décembre',
     ];
-    final formattedDate = '$capitalDay ${nextDate.day} ${months[nextDate.month - 1]} ${nextDate.year}';
+    final formattedDate =
+        '$capitalDay ${nextDate.day} ${months[nextDate.month - 1]} ${nextDate.year}';
 
     return await ConfirmActionModal.show(
-      context: context,
-      icon: Symbols.event,
-      title: 'RÉSERVER',
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            entry.title.toUpperCase(),
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: theme.colorScheme.primary,
-              fontFamily: AppConstants.displayFontFamily,
-              letterSpacing: 1,
-            ),
-            textAlign: TextAlign.center,
+          context: context,
+          icon: Symbols.event,
+          title: 'RÉSERVER',
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                entry.title.toUpperCase(),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: theme.colorScheme.primary,
+                  fontFamily: AppConstants.displayFontFamily,
+                  letterSpacing: 1,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                formattedDate,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                entry.formattedTime,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.7,
+                  ),
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            formattedDate,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            entry.formattedTime,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   String _formatDayName(int dayOfWeek) {
-    const raw = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const raw = [
+      'Dimanche',
+      'Lundi',
+      'Mardi',
+      'Mercredi',
+      'Jeudi',
+      'Vendredi',
+      'Samedi',
+    ];
     return raw[dayOfWeek];
   }
 
@@ -344,7 +388,11 @@ class _SessionSchedule extends StatelessWidget {
   final PlanningViewModel viewModel;
   final void Function(PlanningEntry) onReserve;
 
-  const _SessionSchedule({super.key, required this.viewModel, required this.onReserve});
+  const _SessionSchedule({
+    super.key,
+    required this.viewModel,
+    required this.onReserve,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -371,17 +419,19 @@ class _SessionSchedule extends StatelessWidget {
               final entry = sessions[i];
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child:                 SessionScheduleCard(
-                  entry: entry,
-                  isBooked: entry.isBooked,
-                  onTap: () => context.push(
-                    '/courses/${entry.courseId}',
-                    extra: entry.source,
-                  ),
-                  onReserve: () => onReserve(entry),
-                ).animate(
-                  delay: (dayIndex * 80 + i * 50).ms,
-                ).fade(duration: 400.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
+                child:
+                    SessionScheduleCard(
+                          entry: entry,
+                          isBooked: entry.isBooked,
+                          onTap: () => context.push(
+                            '/courses/${entry.courseId}',
+                            extra: entry.source,
+                          ),
+                          onReserve: () => onReserve(entry),
+                        )
+                        .animate(delay: (dayIndex * 80 + i * 50).ms)
+                        .fade(duration: 400.ms)
+                        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
               );
             }),
             const SizedBox(height: 12),
@@ -438,7 +488,11 @@ class _SessionSkeletonLoading extends StatelessWidget {
       children: [
         for (int d = 0; d < 3; d++) ...[
           _DayHeader(
-            dayName: d == 0 ? 'DIMANCHE' : d == 1 ? 'LUNDI' : 'MARDI',
+            dayName: d == 0
+                ? 'DIMANCHE'
+                : d == 1
+                ? 'LUNDI'
+                : 'MARDI',
             theme: theme,
           ),
           const SizedBox(height: 10),
@@ -479,7 +533,10 @@ class _SessionSkeletonCard extends StatelessWidget {
               Container(width: 88, color: Colors.white),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -487,13 +544,19 @@ class _SessionSkeletonCard extends StatelessWidget {
                       Container(
                         width: 160,
                         height: 15,
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Container(
                         width: 80,
                         height: 12,
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Row(
@@ -501,14 +564,20 @@ class _SessionSkeletonCard extends StatelessWidget {
                           Expanded(
                             child: Container(
                               height: 4,
-                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(2)),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Container(
                             width: 90,
                             height: 32,
-                            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
                           ),
                         ],
                       ),

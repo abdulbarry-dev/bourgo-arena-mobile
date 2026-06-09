@@ -41,9 +41,7 @@ class PaymentStep extends StatelessWidget {
             if (!success || !context.mounted) return;
 
             if (viewModel.requiresDeposit) {
-              context.push(
-                '/payment/${viewModel.createdReservationId}',
-              );
+              context.push('/payment/${viewModel.createdReservationId}');
             } else {
               context.push(
                 '/booking-success',

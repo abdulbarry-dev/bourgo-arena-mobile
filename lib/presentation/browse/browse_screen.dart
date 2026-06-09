@@ -21,17 +21,14 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-class ActivitiesScreen extends StatefulWidget {
-  /// Set before switching to this tab to open a specific sub-tab.
-  static int initialSubTab = 0;
-
-  const ActivitiesScreen({super.key});
+class BrowseScreen extends StatefulWidget {
+  const BrowseScreen({super.key});
 
   @override
-  State<ActivitiesScreen> createState() => _ActivitiesScreenState();
+  State<BrowseScreen> createState() => _BrowseScreenState();
 }
 
-class _ActivitiesScreenState extends State<ActivitiesScreen>
+class _BrowseScreenState extends State<BrowseScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
 
@@ -48,9 +45,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   @override
   void initState() {
     super.initState();
-    final initialIndex = ActivitiesScreen.initialSubTab.clamp(0, 2);
-    ActivitiesScreen.initialSubTab = 0;
-    _tabController = TabController(length: 3, vsync: this, initialIndex: initialIndex);
+    _tabController = TabController(length: 3, vsync: this);
     _loadAll();
   }
 
@@ -65,32 +60,59 @@ class _ActivitiesScreenState extends State<ActivitiesScreen>
   }
 
   Future<void> _loadActivities() async {
-    setState(() { _loadingActivities = true; _activitiesError = null; });
+    setState(() {
+      _loadingActivities = true;
+      _activitiesError = null;
+    });
     final result = await locator<GetActivitiesUseCase>()();
     if (!mounted) return;
     result.when(
-      success: (data) => setState(() { _activities = data; _loadingActivities = false; }),
-      failure: (f) => setState(() { _activitiesError = f.message; _loadingActivities = false; }),
+      success: (data) => setState(() {
+        _activities = data;
+        _loadingActivities = false;
+      }),
+      failure: (f) => setState(() {
+        _activitiesError = f.message;
+        _loadingActivities = false;
+      }),
     );
   }
 
   Future<void> _loadCourses() async {
-    setState(() { _loadingCourses = true; _coursesError = null; });
+    setState(() {
+      _loadingCourses = true;
+      _coursesError = null;
+    });
     final result = await locator<GetCoursesUseCase>()();
     if (!mounted) return;
     result.when(
-      success: (data) => setState(() { _courses = data; _loadingCourses = false; }),
-      failure: (f) => setState(() { _coursesError = f.message; _loadingCourses = false; }),
+      success: (data) => setState(() {
+        _courses = data;
+        _loadingCourses = false;
+      }),
+      failure: (f) => setState(() {
+        _coursesError = f.message;
+        _loadingCourses = false;
+      }),
     );
   }
 
   Future<void> _loadEvents() async {
-    setState(() { _loadingEvents = true; _eventsError = null; });
+    setState(() {
+      _loadingEvents = true;
+      _eventsError = null;
+    });
     final result = await locator<GetEventsUseCase>()();
     if (!mounted) return;
     result.when(
-      success: (data) => setState(() { _events = data; _loadingEvents = false; }),
-      failure: (f) => setState(() { _eventsError = f.message; _loadingEvents = false; }),
+      success: (data) => setState(() {
+        _events = data;
+        _loadingEvents = false;
+      }),
+      failure: (f) => setState(() {
+        _eventsError = f.message;
+        _loadingEvents = false;
+      }),
     );
   }
 
@@ -204,19 +226,16 @@ class _CoursesTab extends StatelessWidget {
         itemBuilder: (context, index) {
           final course = courses[index];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: PressableCard(
-              onTap: () =>
-                  context.push('/courses/${course.id}', extra: course),
-              child: CourseCard(course: course),
-            ),
-          ).animate(
-            delay: (index * 50).ms,
-          ).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          );
+                padding: const EdgeInsets.only(bottom: 12),
+                child: PressableCard(
+                  onTap: () =>
+                      context.push('/courses/${course.id}', extra: course),
+                  child: CourseCard(course: course),
+                ),
+              )
+              .animate(delay: (index * 50).ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
         },
       ),
     );
@@ -270,22 +289,19 @@ class _ActivitiesTab extends StatelessWidget {
         itemBuilder: (context, index) {
           final activity = activities[index];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: PressableCard(
-              onTap: () {
-                if (ensureAuthenticated(context)) {
-                  context.push('/booking', extra: activity);
-                }
-              },
-              child: ActivityCard(activity: activity),
-            ),
-          ).animate(
-            delay: (index * 50).ms,
-          ).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          );
+                padding: const EdgeInsets.only(bottom: 16),
+                child: PressableCard(
+                  onTap: () {
+                    if (ensureAuthenticated(context)) {
+                      context.push('/booking', extra: activity);
+                    }
+                  },
+                  child: ActivityCard(activity: activity),
+                ),
+              )
+              .animate(delay: (index * 50).ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
         },
       ),
     );
@@ -336,13 +352,10 @@ class _EventsTab extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         itemCount: events.length,
         itemBuilder: (context, index) {
-          return _EventTile(event: events[index]).animate(
-            delay: (index * 50).ms,
-          ).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          );
+          return _EventTile(event: events[index])
+              .animate(delay: (index * 50).ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
         },
       ),
     );
@@ -361,9 +374,9 @@ class _EventTile extends StatelessWidget {
     String? formattedDate;
     if (event.startDate != null) {
       try {
-        formattedDate = DateFormat('MMM d, yyyy').format(
-          DateTime.parse(event.startDate!),
-        );
+        formattedDate = DateFormat(
+          'MMM d, yyyy',
+        ).format(DateTime.parse(event.startDate!));
       } catch (_) {
         formattedDate = event.startDate;
       }

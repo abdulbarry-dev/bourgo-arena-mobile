@@ -44,9 +44,7 @@ class PaymentViewModel extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final result = await _reservationRepository.initiatePayment(
-      reservationId,
-    );
+    final result = await _reservationRepository.initiatePayment(reservationId);
 
     result.when(
       success: (data) {

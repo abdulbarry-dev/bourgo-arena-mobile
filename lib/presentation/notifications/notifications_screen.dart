@@ -176,9 +176,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           label: _filterLabel(key),
                           isSelected: isSelected,
                           onTap: () => setState(() {
-                              _selectedFilter = key;
-                              _scrollController.jumpTo(0);
-                            }),
+                            _selectedFilter = key;
+                            _scrollController.jumpTo(0);
+                          }),
                         ),
                       );
                     }).toList(),
@@ -221,7 +221,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
 
     if (errorMessage != null && _viewModel.notifications.isEmpty) {
-      return _buildErrorState(theme: theme, spacing: spacing, message: errorMessage, onRetry: onRetry);
+      return _buildErrorState(
+        theme: theme,
+        spacing: spacing,
+        message: errorMessage,
+        onRetry: onRetry,
+      );
     }
 
     if (_viewModel.notifications.isEmpty) {
@@ -229,7 +234,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
 
     if (filteredList.isEmpty) {
-      return _buildEmptyFilterState(theme: theme, spacing: spacing, appColors: appColors);
+      return _buildEmptyFilterState(
+        theme: theme,
+        spacing: spacing,
+        appColors: appColors,
+      );
     }
 
     return ListView.separated(
@@ -243,9 +252,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       separatorBuilder: (context, index) => SizedBox(height: spacing.sm),
       itemBuilder: (context, index) {
         if (index < filteredList.length) {
-          return _NotificationItem(
-            notification: filteredList[index],
-          );
+          return _NotificationItem(notification: filteredList[index]);
         }
         if (_viewModel.isLoadingMore) {
           return const Center(
@@ -255,7 +262,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           );
         }
-        return _buildCaughtUp(theme: theme, spacing: spacing, appColors: appColors);
+        return _buildCaughtUp(
+          theme: theme,
+          spacing: spacing,
+          appColors: appColors,
+        );
       },
     );
   }
@@ -389,8 +400,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               child: Icon(
                 Symbols.filter_alt_off,
                 size: 48,
-                color:
-                    theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.4,
+                ),
               ),
             ),
             SizedBox(height: spacing.lg),
@@ -435,8 +447,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             child: Icon(
               Symbols.done_all,
               size: 32,
-              color:
-                  theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
             ),
           ),
           SizedBox(height: spacing.sm),
@@ -445,8 +456,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,
-              color:
-                  theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.65),
             ),
           ),
         ],

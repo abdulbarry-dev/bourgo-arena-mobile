@@ -23,7 +23,9 @@ class AppToast {
         children: [
           Icon(icon, color: colors.text, size: 20),
           const SizedBox(width: 12),
-          Expanded(child: Text(message, style: TextStyle(color: colors.text))),
+          Expanded(
+            child: Text(message, style: TextStyle(color: colors.text)),
+          ),
         ],
       ),
       backgroundColor: colors.background,
@@ -33,7 +35,11 @@ class AppToast {
       duration: Duration(seconds: type == AppToastType.error ? 4 : 3),
       dismissDirection: DismissDirection.horizontal,
       action: actionLabel != null && onAction != null
-          ? SnackBarAction(label: actionLabel, textColor: colors.text, onPressed: onAction)
+          ? SnackBarAction(
+              label: actionLabel,
+              textColor: colors.text,
+              onPressed: onAction,
+            )
           : null,
     );
 
@@ -59,7 +65,10 @@ class AppToast {
 
     return switch (type) {
       AppToastType.success => const _ToastColors(successColor, Colors.white),
-      AppToastType.error => _ToastColors(theme.colorScheme.error, theme.colorScheme.onError),
+      AppToastType.error => _ToastColors(
+        theme.colorScheme.error,
+        theme.colorScheme.onError,
+      ),
       AppToastType.warning => const _ToastColors(warningColor, Colors.white),
       AppToastType.info => _ToastColors(
         theme.brightness == Brightness.dark

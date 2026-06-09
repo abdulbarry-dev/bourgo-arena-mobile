@@ -106,6 +106,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
     );
   }
 }
+
 class _PaymentStatus extends StatelessWidget {
   final PaymentViewModel viewModel;
   final VoidCallback onRetry;

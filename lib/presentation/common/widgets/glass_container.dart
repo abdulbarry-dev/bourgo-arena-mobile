@@ -44,10 +44,12 @@ class GlassContainer extends StatelessWidget {
                     begin: gradientBegin,
                     end: gradientEnd,
                     colors: [
-                      (tintColor ?? theme.colorScheme.surface)
-                          .withValues(alpha: 0.85),
-                      (tintColor ?? theme.colorScheme.surface)
-                          .withValues(alpha: 0.95),
+                      (tintColor ?? theme.colorScheme.surface).withValues(
+                        alpha: 0.85,
+                      ),
+                      (tintColor ?? theme.colorScheme.surface).withValues(
+                        alpha: 0.95,
+                      ),
                     ],
                   ),
                 ),

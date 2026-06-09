@@ -26,10 +26,7 @@ class ProgressStepper extends StatelessWidget {
               Symbols.sports_soccer,
               AppLocalizations.of(context)!.bookingStepSport,
             ),
-            (
-              Symbols.info,
-              AppLocalizations.of(context)!.bookingStepDetails,
-            ),
+            (Symbols.info, AppLocalizations.of(context)!.bookingStepDetails),
             (Symbols.schedule, AppLocalizations.of(context)!.bookingStepTime),
             (Symbols.payment, AppLocalizations.of(context)!.bookingStepPayment),
           ]
@@ -38,10 +35,7 @@ class ProgressStepper extends StatelessWidget {
               Symbols.sports_soccer,
               AppLocalizations.of(context)!.bookingStepSport,
             ),
-            (
-              Symbols.info,
-              AppLocalizations.of(context)!.bookingStepDetails,
-            ),
+            (Symbols.info, AppLocalizations.of(context)!.bookingStepDetails),
             (Symbols.schedule, AppLocalizations.of(context)!.bookingStepTime),
             (Symbols.payment, AppLocalizations.of(context)!.bookingStepPayment),
           ];

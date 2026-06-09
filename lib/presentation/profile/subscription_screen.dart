@@ -55,38 +55,49 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       children: [
                         if (subscription != null) ...[
                           _SubscriptionCard(
-                            subscription: subscription,
-                            appColors: theme.extension<AppColors>()!,
-                          ).animate().fade(duration: 400.ms).slideY(
-                            begin: 0.1,
-                            end: 0,
-                            curve: Curves.easeOutQuad,
-                          ),
+                                subscription: subscription,
+                                appColors: theme.extension<AppColors>()!,
+                              )
+                              .animate()
+                              .fade(duration: 400.ms)
+                              .slideY(
+                                begin: 0.1,
+                                end: 0,
+                                curve: Curves.easeOutQuad,
+                              ),
                           SizedBox(height: spacing.xl),
                           _PlanDetailsSection(
-                            subscription: subscription,
-                            appColors: theme.extension<AppColors>()!,
-                          ).animate(delay: 100.ms).fade(duration: 400.ms).slideY(
-                            begin: 0.1,
-                            end: 0,
-                            curve: Curves.easeOutQuad,
-                          ),
+                                subscription: subscription,
+                                appColors: theme.extension<AppColors>()!,
+                              )
+                              .animate(delay: 100.ms)
+                              .fade(duration: 400.ms)
+                              .slideY(
+                                begin: 0.1,
+                                end: 0,
+                                curve: Curves.easeOutQuad,
+                              ),
                           SizedBox(height: spacing.xl),
                           _ServiceSection(subscription: subscription)
-                              .animate(delay: 200.ms).fade(duration: 400.ms).slideY(
-                            begin: 0.1,
-                            end: 0,
-                            curve: Curves.easeOutQuad,
-                          ),
+                              .animate(delay: 200.ms)
+                              .fade(duration: 400.ms)
+                              .slideY(
+                                begin: 0.1,
+                                end: 0,
+                                curve: Curves.easeOutQuad,
+                              ),
                           SizedBox(height: spacing.xl),
                           _PaymentSection(
-                            subscription: subscription,
-                            appColors: theme.extension<AppColors>()!,
-                          ).animate(delay: 300.ms).fade(duration: 400.ms).slideY(
-                            begin: 0.1,
-                            end: 0,
-                            curve: Curves.easeOutQuad,
-                          ),
+                                subscription: subscription,
+                                appColors: theme.extension<AppColors>()!,
+                              )
+                              .animate(delay: 300.ms)
+                              .fade(duration: 400.ms)
+                              .slideY(
+                                begin: 0.1,
+                                end: 0,
+                                curve: Curves.easeOutQuad,
+                              ),
                         ] else if (_viewModel.errorMessage != null) ...[
                           _ErrorState(
                             message: _viewModel.errorMessage!,
@@ -96,32 +107,38 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                           _EmptyState(),
                         ],
                         SizedBox(height: spacing.lg),
-                          SizedBox(
-                            width: double.infinity,
-                            height: 56,
-                            child: ElevatedButton.icon(
-                              onPressed: () => context.push('/plans'),
-                              icon: const Icon(Symbols.explore, size: 20),
-                              label: const Text(
-                                'VOIR LES OFFRES',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: theme.colorScheme.primary,
-                                foregroundColor: theme.colorScheme.onPrimary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                            ).animate(delay: 400.ms).fade(duration: 400.ms).slideY(
-                              begin: 0.1,
-                              end: 0,
-                              curve: Curves.easeOutQuad,
-                            ),
-                          ),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child:
+                              ElevatedButton.icon(
+                                    onPressed: () => context.push('/plans'),
+                                    icon: const Icon(Symbols.explore, size: 20),
+                                    label: const Text(
+                                      'VOIR LES OFFRES',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.2,
+                                      ),
+                                    ),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          theme.colorScheme.primary,
+                                      foregroundColor:
+                                          theme.colorScheme.onPrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                  )
+                                  .animate(delay: 400.ms)
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                        ),
                         SizedBox(height: spacing.xl),
                       ],
                     ),
@@ -274,7 +291,9 @@ class _SubscriptionCard extends StatelessWidget {
               Icon(
                 Symbols.arrow_forward,
                 size: 16,
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.4,
+                ),
               ),
               SizedBox(width: spacing.sm),
               Expanded(
@@ -373,7 +392,8 @@ class _PlanDetailsSection extends StatelessWidget {
     final spacing = context.spacing;
     final description = subscription.plan?.description;
 
-    if (description == null || description.isEmpty) return const SizedBox.shrink();
+    if (description == null || description.isEmpty)
+      return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,7 +477,9 @@ class _ServiceSection extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(spacing.md),
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            color: theme.colorScheme.surfaceContainerHighest.withValues(
+              alpha: 0.3,
+            ),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
@@ -520,10 +542,7 @@ class _PaymentSection extends StatelessWidget {
   final Subscription subscription;
   final AppColors appColors;
 
-  const _PaymentSection({
-    required this.subscription,
-    required this.appColors,
-  });
+  const _PaymentSection({required this.subscription, required this.appColors});
 
   @override
   Widget build(BuildContext context) {
@@ -690,10 +709,7 @@ class _ErrorState extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  const _ErrorState({
-    required this.message,
-    required this.onRetry,
-  });
+  const _ErrorState({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {

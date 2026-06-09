@@ -47,5 +47,4 @@ class SubscriptionViewModel extends BaseViewModel {
       notifyListeners();
     }
   }
-
 }

@@ -5,9 +5,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 class CelebrationOverlay extends StatefulWidget {
   final Duration autoDismiss;
 
-  const CelebrationOverlay({super.key, this.autoDismiss = const Duration(seconds: 2)});
+  const CelebrationOverlay({
+    super.key,
+    this.autoDismiss = const Duration(seconds: 2),
+  });
 
-  static void show(BuildContext context, {Duration autoDismiss = const Duration(seconds: 2)}) {
+  static void show(
+    BuildContext context, {
+    Duration autoDismiss = const Duration(seconds: 2),
+  }) {
     showGeneralDialog(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.3),
@@ -87,33 +93,43 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
                   : 1.0,
               duration: Duration.zero,
               child: AnimatedOpacity(
-                opacity: _controller.value < 0.8 ? 1.0 : 1.0 - ((_controller.value - 0.8) / 0.2),
+                opacity: _controller.value < 0.8
+                    ? 1.0
+                    : 1.0 - ((_controller.value - 0.8) / 0.2),
                 duration: Duration.zero,
-                child: Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFAAFF00).withValues(alpha: 0.15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFFAAFF00).withValues(alpha: 0.3),
-                        blurRadius: 40,
-                        spreadRadius: 10,
-                      ),
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.check_rounded,
-                    size: 48,
-                    color: Color(0xFFAAFF00),
-                  ),
-                ).animate().fade(duration: 200.ms).scale(
-                  begin: const Offset(0, 0),
-                  end: const Offset(1, 1),
-                  curve: Curves.elasticOut,
-                  duration: 600.ms,
-                ),
+                child:
+                    Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(
+                              0xFFAAFF00,
+                            ).withValues(alpha: 0.15),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(
+                                  0xFFAAFF00,
+                                ).withValues(alpha: 0.3),
+                                blurRadius: 40,
+                                spreadRadius: 10,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.check_rounded,
+                            size: 48,
+                            color: Color(0xFFAAFF00),
+                          ),
+                        )
+                        .animate()
+                        .fade(duration: 200.ms)
+                        .scale(
+                          begin: const Offset(0, 0),
+                          end: const Offset(1, 1),
+                          curve: Curves.elasticOut,
+                          duration: 600.ms,
+                        ),
               ),
             ),
           ),
@@ -124,7 +140,12 @@ class _CelebrationOverlayState extends State<CelebrationOverlay>
   }
 
   Widget _buildParticle(_Particle particle) {
-    final progress = ((_controller.value * 1800) - particle.delay.inMilliseconds).clamp(0.0, 1800.0) / 1800.0;
+    final progress =
+        ((_controller.value * 1800) - particle.delay.inMilliseconds).clamp(
+          0.0,
+          1800.0,
+        ) /
+        1800.0;
     if (progress <= 0) return const SizedBox.shrink();
 
     final distance = particle.speed * progress;

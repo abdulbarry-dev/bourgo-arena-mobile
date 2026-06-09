@@ -136,8 +136,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                       SizedBox(height: spacing.lg),
                       _StatsDashboard(
                         user: user,
-                        ongoingReservationsCount: _viewModel.ongoingReservationsCount,
-                        successfulPaymentsCount: _viewModel.successfulPaymentsCount,
+                        ongoingReservationsCount:
+                            _viewModel.ongoingReservationsCount,
+                        successfulPaymentsCount:
+                            _viewModel.successfulPaymentsCount,
                         animation: _animationController,
                       ),
                       SizedBox(height: spacing.xl),
@@ -263,19 +265,22 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 fit: BoxFit.cover,
                                 loadingBuilder:
                                     (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Shimmer.fromColors(
-                                    baseColor:
-                                        theme.colorScheme.surfaceContainerHighest,
-                                    highlightColor: theme.colorScheme
-                                        .surfaceContainerHighest
-                                        .withValues(alpha: 0.4),
-                                    child: Container(
-                                      color: theme.colorScheme
-                                          .surfaceContainerHighest,
-                                    ),
-                                  );
-                                },
+                                      if (loadingProgress == null) return child;
+                                      return Shimmer.fromColors(
+                                        baseColor: theme
+                                            .colorScheme
+                                            .surfaceContainerHighest,
+                                        highlightColor: theme
+                                            .colorScheme
+                                            .surfaceContainerHighest
+                                            .withValues(alpha: 0.4),
+                                        child: Container(
+                                          color: theme
+                                              .colorScheme
+                                              .surfaceContainerHighest,
+                                        ),
+                                      );
+                                    },
                                 errorBuilder: (context, error, stackTrace) {
                                   return Container(
                                     decoration: BoxDecoration(
@@ -313,8 +318,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 child: Icon(
                                   Symbols.person_filled,
                                   size: 48,
-                                  color: theme.colorScheme.primary
-                                      .withValues(alpha: 0.5),
+                                  color: theme.colorScheme.primary.withValues(
+                                    alpha: 0.5,
+                                  ),
                                 ),
                               ),
                       ),
@@ -481,10 +487,7 @@ class _ReservationStatTile extends StatelessWidget {
   final int count;
   final VoidCallback onTap;
 
-  const _ReservationStatTile({
-    required this.count,
-    required this.onTap,
-  });
+  const _ReservationStatTile({required this.count, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -523,10 +526,7 @@ class _HistoryStatTile extends StatelessWidget {
   final int count;
   final VoidCallback onTap;
 
-  const _HistoryStatTile({
-    required this.count,
-    required this.onTap,
-  });
+  const _HistoryStatTile({required this.count, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

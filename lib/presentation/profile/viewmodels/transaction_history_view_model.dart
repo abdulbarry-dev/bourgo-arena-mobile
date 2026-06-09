@@ -21,9 +21,7 @@ class PaymentHistoryViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   HistoryTab get selectedTab => _selectedTab;
 
-  PaymentHistoryViewModel(
-    this._getPaymentHistoryUseCase,
-  );
+  PaymentHistoryViewModel(this._getPaymentHistoryUseCase);
 
   void selectTab(HistoryTab tab) {
     _selectedTab = tab;

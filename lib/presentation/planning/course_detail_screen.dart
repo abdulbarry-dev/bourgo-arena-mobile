@@ -44,15 +44,25 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   }
 
   Future<void> _loadSessions() async {
-    setState(() { _isLoading = true; _accessDenied = false; });
+    setState(() {
+      _isLoading = true;
+      _accessDenied = false;
+    });
     final result = await _courseRepository.getCourseSessions(widget.courseId);
     result.when(
       success: (sessions) {
-        if (mounted) setState(() { _sessions = sessions; _isLoading = false; });
+        if (mounted)
+          setState(() {
+            _sessions = sessions;
+            _isLoading = false;
+          });
       },
       failure: (failure) {
         if (mounted) {
-          setState(() { _accessDenied = true; _isLoading = false; });
+          setState(() {
+            _accessDenied = true;
+            _isLoading = false;
+          });
         }
       },
     );
@@ -61,10 +71,17 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   Future<void> _handleBookSession(CourseSession session) async {
     if (_bookingSessionId != null) return;
 
-    final targetWeekday = session.dayOfWeek == 0 ? DateTime.sunday : session.dayOfWeek;
-    final today = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+    final targetWeekday = session.dayOfWeek == 0
+        ? DateTime.sunday
+        : session.dayOfWeek;
+    final today = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    );
     final nextDate = _findNextMatchingDate(today, targetWeekday);
-    final dateStr = '${nextDate.year}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}';
+    final dateStr =
+        '${nextDate.year}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}';
 
     final confirmed = await _showBookingModal(context, session, nextDate);
     if (!confirmed || !mounted) return;
@@ -79,69 +96,102 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       success: (_) {
         CelebrationOverlay.show(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Réservé ${session.title} le $dateStr à ${session.startTime}')),
+          SnackBar(
+            content: Text(
+              'Réservé ${session.title} le $dateStr à ${session.startTime}',
+            ),
+          ),
         );
         _loadSessions();
       },
       failure: (f) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(f.message), backgroundColor: Theme.of(context).colorScheme.error),
+          SnackBar(
+            content: Text(f.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
         );
       },
     );
   }
 
-  Future<bool> _showBookingModal(BuildContext context, CourseSession session, DateTime nextDate) async {
+  Future<bool> _showBookingModal(
+    BuildContext context,
+    CourseSession session,
+    DateTime nextDate,
+  ) async {
     final theme = Theme.of(context);
     final capitalDay = _formatDayName(session.dayOfWeek);
     const months = [
-      'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-      'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre',
+      'Janvier',
+      'Février',
+      'Mars',
+      'Avril',
+      'Mai',
+      'Juin',
+      'Juillet',
+      'Août',
+      'Septembre',
+      'Octobre',
+      'Novembre',
+      'Décembre',
     ];
-    final formattedDate = '$capitalDay ${nextDate.day} ${months[nextDate.month - 1]} ${nextDate.year}';
+    final formattedDate =
+        '$capitalDay ${nextDate.day} ${months[nextDate.month - 1]} ${nextDate.year}';
 
     return await ConfirmActionModal.show(
-      context: context,
-      icon: Symbols.event,
-      title: 'RÉSERVER',
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            session.title.toUpperCase(),
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: theme.colorScheme.primary,
-              fontFamily: AppConstants.displayFontFamily,
-              letterSpacing: 1,
-            ),
-            textAlign: TextAlign.center,
+          context: context,
+          icon: Symbols.event,
+          title: 'RÉSERVER',
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                session.title.toUpperCase(),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: theme.colorScheme.primary,
+                  fontFamily: AppConstants.displayFontFamily,
+                  letterSpacing: 1,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                formattedDate,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '${session.startTime} - ${session.endTime}',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.7,
+                  ),
+                  height: 1.5,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            formattedDate,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${session.startTime} - ${session.endTime}',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-              height: 1.5,
-            ),
-          ),
-        ],
-      ),
-    ) ?? false;
+        ) ??
+        false;
   }
 
   String _formatDayName(int dayOfWeek) {
-    const raw = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const raw = [
+      'Dimanche',
+      'Lundi',
+      'Mardi',
+      'Mercredi',
+      'Jeudi',
+      'Vendredi',
+      'Samedi',
+    ];
     return raw[dayOfWeek];
   }
 
@@ -235,11 +285,16 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     const SizedBox(height: 8),
                     if (_course!.status != null)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: _course!.status == 'active'
                               ? theme.colorScheme.primary.withValues(alpha: 0.1)
-                              : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.1),
+                              : theme.colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.1,
+                                ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -253,7 +308,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           ),
                         ),
                       ),
-                    if (_course!.description != null && _course!.description!.isNotEmpty) ...[
+                    if (_course!.description != null &&
+                        _course!.description!.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       Text(
                         _course!.description!,
@@ -292,16 +348,17 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     else
                       ...List.generate(_sessions.length, (i) {
                         return _SessionTile(
-                          session: _sessions[i],
-                          isBooking: _bookingSessionId == _sessions[i].id,
-                          onBook: () => _handleBookSession(_sessions[i]),
-                        ).animate(
-                          delay: (i * 50).ms,
-                        ).fade(duration: 400.ms).slideY(
-                          begin: 0.1,
-                          end: 0,
-                          curve: Curves.easeOutQuad,
-                        );
+                              session: _sessions[i],
+                              isBooking: _bookingSessionId == _sessions[i].id,
+                              onBook: () => _handleBookSession(_sessions[i]),
+                            )
+                            .animate(delay: (i * 50).ms)
+                            .fade(duration: 400.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
+                            );
                       }),
                   ],
                 ],
@@ -314,58 +371,59 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   }
 
   Widget _buildImageCarousel(List<String> images, ThemeData theme) {
-    return Stack(children: [
-      PageView.builder(
-        itemCount: images.length,
-        onPageChanged: (i) => setState(() => _currentImageIndex = i),
-        itemBuilder: (_, i) => CachedNetworkImage(
-          imageUrl: images[i],
-          fit: BoxFit.cover,
-          errorWidget: (_, __, ___) => Container(
-            color: theme.colorScheme.surfaceContainerHighest,
+    return Stack(
+      children: [
+        PageView.builder(
+          itemCount: images.length,
+          onPageChanged: (i) => setState(() => _currentImageIndex = i),
+          itemBuilder: (_, i) => CachedNetworkImage(
+            imageUrl: images[i],
+            fit: BoxFit.cover,
+            errorWidget: (_, __, ___) =>
+                Container(color: theme.colorScheme.surfaceContainerHighest),
           ),
         ),
-      ),
-      Positioned.fill(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withValues(alpha: 0.5),
-              ],
-              stops: const [0.5, 1.0],
-            ),
-          ),
-        ),
-      ),
-      if (images.length > 1)
-        Positioned(
-          bottom: 16,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              images.length,
-              (i) => AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                width: _currentImageIndex == i ? 24 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: _currentImageIndex == i
-                      ? theme.colorScheme.primary
-                      : Colors.white.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(4),
-                ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.5),
+                ],
+                stops: const [0.5, 1.0],
               ),
             ),
           ),
         ),
-    ]);
+        if (images.length > 1)
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                images.length,
+                (i) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentImageIndex == i ? 24 : 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: _currentImageIndex == i
+                        ? theme.colorScheme.primary
+                        : Colors.white.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 
   Widget _buildAccessDenied(ThemeData theme) {
@@ -376,44 +434,57 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(children: [
-        Icon(Symbols.lock, size: 48, color: theme.colorScheme.onSurfaceVariant),
-        const SizedBox(height: 12),
-        Text(
-          'SUBSCRIPTION REQUIRED',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontFamily: AppConstants.displayFontFamily,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1,
-            color: theme.colorScheme.onSurface,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          isAuthenticated
-              ? 'You need an active subscription to view and book sessions for this course.'
-              : 'Sign in and subscribe to a plan to view and book sessions.',
-          style: theme.textTheme.bodyMedium?.copyWith(
+      child: Column(
+        children: [
+          Icon(
+            Symbols.lock,
+            size: 48,
             color: theme.colorScheme.onSurfaceVariant,
           ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () => isAuthenticated ? context.push('/plans') : context.push('/login'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: theme.colorScheme.primary,
-            foregroundColor: theme.colorScheme.onPrimary,
-            minimumSize: const Size(double.infinity, 48),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          const SizedBox(height: 12),
+          Text(
+            'SUBSCRIPTION REQUIRED',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontFamily: AppConstants.displayFontFamily,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1,
+              color: theme.colorScheme.onSurface,
+            ),
+            textAlign: TextAlign.center,
           ),
-          child: Text(
-            isAuthenticated ? 'VIEW PLANS' : 'SIGN IN',
-            style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+          const SizedBox(height: 8),
+          Text(
+            isAuthenticated
+                ? 'You need an active subscription to view and book sessions for this course.'
+                : 'Sign in and subscribe to a plan to view and book sessions.',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
           ),
-        ),
-      ]),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () => isAuthenticated
+                ? context.push('/plans')
+                : context.push('/login'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              minimumSize: const Size(double.infinity, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              isAuthenticated ? 'VIEW PLANS' : 'SIGN IN',
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -521,7 +592,9 @@ class _SessionTile extends StatelessWidget {
   }
 
   Widget _buildCapacityBar(ThemeData theme) {
-    final ratio = session.capacity > 0 ? session.enrolled / session.capacity : 0.0;
+    final ratio = session.capacity > 0
+        ? session.enrolled / session.capacity
+        : 0.0;
     final remaining = session.capacity - session.enrolled;
 
     return Column(
@@ -543,9 +616,7 @@ class _SessionTile extends StatelessWidget {
                 ),
                 Flexible(
                   flex: ((1 - ratio) * 100).round().clamp(1, 100),
-                  child: Container(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
+                  child: Container(color: theme.colorScheme.outlineVariant),
                 ),
               ],
             ),
@@ -556,14 +627,14 @@ class _SessionTile extends StatelessWidget {
           session.isBooked
               ? 'RÉSERVÉ'
               : session.isFull
-                  ? 'COMPLET'
-                  : '$remaining PLACES',
+              ? 'COMPLET'
+              : '$remaining PLACES',
           style: theme.textTheme.labelSmall?.copyWith(
             color: session.isBooked
                 ? theme.colorScheme.primary
                 : session.isFull
-                    ? theme.colorScheme.error
-                    : theme.colorScheme.onSurfaceVariant,
+                ? theme.colorScheme.error
+                : theme.colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.5,
             fontFamily: GoogleFonts.lexend().fontFamily,
@@ -628,7 +699,10 @@ class _SessionTile extends StatelessWidget {
             ? const SizedBox(
                 width: 16,
                 height: 16,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black),
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.black,
+                ),
               )
             : Text(session.isFull ? 'COMPLET' : 'RESERVER'),
       ),
@@ -684,7 +758,10 @@ class _SkeletonShimmer extends StatelessWidget {
               Container(width: 88, color: Colors.white),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,

@@ -71,7 +71,11 @@ class ProfileViewModel extends BaseViewModel {
     paymentResult.fold(
       onSuccess: (payments) {
         _successfulPaymentsCount = payments
-            .where((p) => p.status.toLowerCase() == 'success' || p.status.toLowerCase() == 'paid')
+            .where(
+              (p) =>
+                  p.status.toLowerCase() == 'success' ||
+                  p.status.toLowerCase() == 'paid',
+            )
             .length;
       },
       onFailure: (_) {},

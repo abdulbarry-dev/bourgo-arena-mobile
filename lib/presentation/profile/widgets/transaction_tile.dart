@@ -47,7 +47,8 @@ class TransactionTile extends StatelessWidget {
     final appColors = theme.extension<AppColors>()!;
     final formattedDate = DateFormat('d MMM yyyy').format(payment.createdAt);
     final formattedTime = DateFormat.Hm().format(payment.createdAt);
-    final isSuccess = payment.status.toLowerCase() == 'paid' ||
+    final isSuccess =
+        payment.status.toLowerCase() == 'paid' ||
         payment.status.toLowerCase() == 'success';
     final isPending = payment.status.toLowerCase() == 'initiated';
 
@@ -70,8 +71,8 @@ class TransactionTile extends StatelessWidget {
                 color: isSuccess
                     ? theme.colorScheme.primary.withValues(alpha: 0.12)
                     : isPending
-                        ? Colors.amber.withValues(alpha: 0.12)
-                        : theme.colorScheme.error.withValues(alpha: 0.1),
+                    ? Colors.amber.withValues(alpha: 0.12)
+                    : theme.colorScheme.error.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
@@ -79,8 +80,8 @@ class TransactionTile extends StatelessWidget {
                 color: isSuccess
                     ? theme.colorScheme.primary
                     : isPending
-                        ? Colors.amber.shade700
-                        : theme.colorScheme.error,
+                    ? Colors.amber.shade700
+                    : theme.colorScheme.error,
                 size: 22,
               ),
             ),
@@ -96,10 +97,10 @@ class TransactionTile extends StatelessWidget {
                           payment.description.isNotEmpty
                               ? payment.description
                               : payment.type == 'subscription'
-                                  ? 'Subscription'
-                                  : payment.type == 'reservation_deposit'
-                                      ? 'Reservation Deposit'
-                                      : 'Reservation',
+                              ? 'Subscription'
+                              : payment.type == 'reservation_deposit'
+                              ? 'Reservation Deposit'
+                              : 'Reservation',
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontFamily: AppConstants.displayFontFamily,
                             fontWeight: FontWeight.w700,
@@ -127,15 +128,17 @@ class TransactionTile extends StatelessWidget {
                       Icon(
                         Symbols.schedule,
                         size: 14,
-                        color: theme.colorScheme.onSurfaceVariant
-                            .withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                       const SizedBox(width: 4),
                       Text(
                         '$formattedDate · $formattedTime',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.6),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.6,
+                          ),
                         ),
                       ),
                     ],
@@ -147,8 +150,9 @@ class TransactionTile extends StatelessWidget {
                         Icon(
                           Symbols.tag,
                           size: 14,
-                          color: theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.4),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.4,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -223,8 +227,8 @@ class TransactionTile extends StatelessWidget {
                     color: isSuccess
                         ? theme.colorScheme.primary.withValues(alpha: 0.12)
                         : isPending
-                            ? Colors.amber.withValues(alpha: 0.12)
-                            : theme.colorScheme.error.withValues(alpha: 0.1),
+                        ? Colors.amber.withValues(alpha: 0.12)
+                        : theme.colorScheme.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -233,8 +237,8 @@ class TransactionTile extends StatelessWidget {
                       color: isSuccess
                           ? theme.colorScheme.primary
                           : isPending
-                              ? Colors.amber.shade700
-                              : theme.colorScheme.error,
+                          ? Colors.amber.shade700
+                          : theme.colorScheme.error,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
                     ),

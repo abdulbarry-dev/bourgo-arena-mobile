@@ -54,6 +54,8 @@ import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/transaction_
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/presentation/events/events_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/events/event_detail_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/courses/courses_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/activities_list/activities_list_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/payment_gateway_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_management_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/plan_detail_screen.dart';
@@ -409,10 +411,8 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/subscription',
-      pageBuilder: (context, state) => AppPageTransitions.pushPage(
-        state,
-        const SubscriptionScreen(),
-      ),
+      pageBuilder: (context, state) =>
+          AppPageTransitions.pushPage(state, const SubscriptionScreen()),
     ),
     GoRoute(
       path: '/plans',
@@ -440,9 +440,7 @@ GoRouter createRouter(
         final extra = state.extra! as Map<String, dynamic>;
         return AppPageTransitions.pushPage(
           state,
-          PaymentSelectionScreen(
-            plan: extra['plan'] as Plan,
-          ),
+          PaymentSelectionScreen(plan: extra['plan'] as Plan),
         );
       },
     ),
@@ -492,6 +490,14 @@ GoRouter createRouter(
       },
     ),
     GoRoute(
+      path: '/courses',
+      builder: (context, state) => const CoursesScreen(),
+    ),
+    GoRoute(
+      path: '/activities',
+      builder: (context, state) => const ActivitiesListScreen(),
+    ),
+    GoRoute(
       path: '/services/:id',
       builder: (context, state) {
         final serviceId = state.pathParameters['id']!;
@@ -522,9 +528,8 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/transactions',
-      builder: (context, state) => PaymentHistoryScreen(
-        viewModel: locator<PaymentHistoryViewModel>(),
-      ),
+      builder: (context, state) =>
+          PaymentHistoryScreen(viewModel: locator<PaymentHistoryViewModel>()),
     ),
     GoRoute(path: '/events', builder: (context, state) => const EventsScreen()),
     GoRoute(

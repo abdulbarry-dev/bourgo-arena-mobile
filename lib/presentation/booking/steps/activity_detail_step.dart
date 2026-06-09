@@ -23,7 +23,9 @@ class ActivityDetailStep extends StatelessWidget {
 
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
-    final images = activity.images.isNotEmpty ? activity.images : <String>[if (activity.imageUrl.isNotEmpty) activity.imageUrl];
+    final images = activity.images.isNotEmpty
+        ? activity.images
+        : <String>[if (activity.imageUrl.isNotEmpty) activity.imageUrl];
 
     return Column(
       children: [
@@ -108,8 +110,7 @@ class ActivityDetailStep extends StatelessWidget {
                                 style: theme.textTheme.labelSmall?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.5,
-                                  color:
-                                      theme.colorScheme.onSurfaceVariant,
+                                  color: theme.colorScheme.onSurfaceVariant,
                                 ),
                               ),
                             ),
@@ -130,8 +131,9 @@ class ActivityDetailStep extends StatelessWidget {
                       Text(
                         activity.description,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.8),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.8,
+                          ),
                           height: 1.6,
                         ),
                       ),
@@ -163,10 +165,7 @@ class ActivityDetailStep extends StatelessWidget {
             ],
           ),
         ),
-        _BottomReserveBar(
-          onPressed: onConfirm,
-          price: viewModel.priceToPay,
-        ),
+        _BottomReserveBar(onPressed: onConfirm, price: viewModel.priceToPay),
       ],
     );
   }
@@ -232,8 +231,9 @@ class _ImageCarouselState extends State<_ImageCarousel> {
                   decoration: BoxDecoration(
                     color: _currentIndex == i
                         ? widget.theme.colorScheme.primary
-                        : widget.theme.colorScheme.onPrimary
-                            .withValues(alpha: 0.5),
+                        : widget.theme.colorScheme.onPrimary.withValues(
+                            alpha: 0.5,
+                          ),
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
@@ -269,10 +269,7 @@ class _BottomReserveBar extends StatelessWidget {
   final VoidCallback onPressed;
   final double price;
 
-  const _BottomReserveBar({
-    required this.onPressed,
-    required this.price,
-  });
+  const _BottomReserveBar({required this.onPressed, required this.price});
 
   @override
   Widget build(BuildContext context) {

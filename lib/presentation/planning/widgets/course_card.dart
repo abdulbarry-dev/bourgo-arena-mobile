@@ -35,10 +35,7 @@ class CourseCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildImageSection(theme),
-            _buildContentSection(theme),
-          ],
+          children: [_buildImageSection(theme), _buildContentSection(theme)],
         ),
       ),
     );
@@ -85,10 +82,7 @@ class CourseCard extends StatelessWidget {
             Positioned(
               left: 16,
               bottom: 16,
-              child: _StatusBadge(
-                status: course.status!,
-                theme: theme,
-              ),
+              child: _StatusBadge(status: course.status!, theme: theme),
             ),
         ],
       ),

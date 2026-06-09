@@ -58,10 +58,7 @@ class ActivityCard extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (activity.imageUrl.isNotEmpty)
-            PremiumNetworkImage(
-              imageUrl: activity.imageUrl,
-              fit: BoxFit.cover,
-            )
+            PremiumNetworkImage(imageUrl: activity.imageUrl, fit: BoxFit.cover)
           else
             Container(
               color: theme.colorScheme.surfaceContainerHighest,
@@ -134,7 +131,13 @@ class ActivityCard extends StatelessWidget {
               runSpacing: 6,
               children: activity.features
                   .take(4)
-                  .map((f) => _FeatureChip(label: f, theme: theme, appColors: appColors))
+                  .map(
+                    (f) => _FeatureChip(
+                      label: f,
+                      theme: theme,
+                      appColors: appColors,
+                    ),
+                  )
                   .toList(),
             ),
           ],

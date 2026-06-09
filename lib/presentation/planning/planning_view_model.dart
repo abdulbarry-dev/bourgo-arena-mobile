@@ -138,9 +138,7 @@ class PlanningViewModel extends BaseViewModel {
   Future<void> _loadAllCourseSessions() async {
     if (_allCourses.isEmpty) return;
 
-    final futures = _allCourses.map(
-      (c) => _getCourseSessionsUseCase(c.id),
-    );
+    final futures = _allCourses.map((c) => _getCourseSessionsUseCase(c.id));
     final results = await Future.wait(futures);
 
     final entries = <PlanningEntry>[];
@@ -150,31 +148,31 @@ class PlanningViewModel extends BaseViewModel {
           if (sessions.isEmpty) return;
           final course = _allCourses[i];
           for (final session in sessions) {
-            entries.add(PlanningEntry(
-              id: session.id,
-              title: session.title,
-              imageUrl:
-                  session.imageUrl ??
-                  course.imageUrl ??
-                  (course.images.isNotEmpty ? course.images.first : null),
-              description: null,
-              status: course.status,
-              source: course,
-              courseId: course.id,
-              dayOfWeek: session.dayOfWeek,
-              startTime: session.startTime,
-              endTime: session.endTime,
-              capacity: session.capacity,
-              enrolled: session.enrolled,
-              isFull: session.isFull,
-              isBooked: session.isBooked,
-            ));
+            entries.add(
+              PlanningEntry(
+                id: session.id,
+                title: session.title,
+                imageUrl:
+                    session.imageUrl ??
+                    course.imageUrl ??
+                    (course.images.isNotEmpty ? course.images.first : null),
+                description: null,
+                status: course.status,
+                source: course,
+                courseId: course.id,
+                dayOfWeek: session.dayOfWeek,
+                startTime: session.startTime,
+                endTime: session.endTime,
+                capacity: session.capacity,
+                enrolled: session.enrolled,
+                isFull: session.isFull,
+                isBooked: session.isBooked,
+              ),
+            );
           }
         },
         failure: (f) {
-          developer.log(
-            'Skipping course ${_allCourses[i].id}: ${f.message}',
-          );
+          developer.log('Skipping course ${_allCourses[i].id}: ${f.message}');
         },
       );
     }
@@ -217,7 +215,11 @@ class PlanningViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<String?> bookSession(String courseId, String sessionId, String date) async {
+  Future<String?> bookSession(
+    String courseId,
+    String sessionId,
+    String date,
+  ) async {
     final result = await _bookSessionUseCase(courseId, sessionId, date);
     return result.when(
       success: (_) {

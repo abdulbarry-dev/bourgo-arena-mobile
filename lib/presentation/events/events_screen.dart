@@ -138,7 +138,9 @@ class _EventsScreenState extends State<EventsScreen> {
             Text(
               'Check back soon for upcoming events.',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.7,
+                ),
               ),
             ),
           ],
@@ -159,37 +161,40 @@ class _EventsScreenState extends State<EventsScreen> {
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),
-            child: _EventCard(
-              event: event,
-              isRegistering: isRegistering,
-              onTap: () => context.push('/events/${event.id}', extra: event),
-              onRegister: () async {
-                final success = await _viewModel.registerForEvent(event.id);
-                if (!mounted) return;
-                if (success) {
-                  final status = _viewModel.lastRegistrationStatus;
-                  final msg = status == 'waitlisted'
-                      ? 'Added to waitlist.'
-                      : 'Successfully registered!';
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(msg)),
-                  );
-                } else if (_viewModel.errorMessage != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(_viewModel.errorMessage!),
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                    ),
-                  );
-                }
-              },
-            ).animate(
-              delay: (index * 50).ms,
-            ).fade(duration: 400.ms).slideY(
-              begin: 0.1,
-              end: 0,
-              curve: Curves.easeOutQuad,
-            ),
+            child:
+                _EventCard(
+                      event: event,
+                      isRegistering: isRegistering,
+                      onTap: () =>
+                          context.push('/events/${event.id}', extra: event),
+                      onRegister: () async {
+                        final success = await _viewModel.registerForEvent(
+                          event.id,
+                        );
+                        if (!mounted) return;
+                        if (success) {
+                          final status = _viewModel.lastRegistrationStatus;
+                          final msg = status == 'waitlisted'
+                              ? 'Added to waitlist.'
+                              : 'Successfully registered!';
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(msg)));
+                        } else if (_viewModel.errorMessage != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(_viewModel.errorMessage!),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.error,
+                            ),
+                          );
+                        }
+                      },
+                    )
+                    .animate(delay: (index * 50).ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           );
         },
       ),
@@ -235,9 +240,9 @@ class _EventCard extends StatelessWidget {
     String? formattedDate;
     if (event.startDate != null) {
       try {
-        formattedDate = DateFormat('dd MMM yyyy').format(
-          DateTime.parse(event.startDate!),
-        );
+        formattedDate = DateFormat(
+          'dd MMM yyyy',
+        ).format(DateTime.parse(event.startDate!));
       } catch (_) {
         formattedDate = event.startDate;
       }
@@ -274,10 +279,7 @@ class _EventCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (hasImage)
-                    PremiumNetworkImage(
-                      imageUrl: imageSrc!,
-                      fit: BoxFit.cover,
-                    )
+                    PremiumNetworkImage(imageUrl: imageSrc!, fit: BoxFit.cover)
                   else
                     Container(
                       color: theme.colorScheme.surfaceContainerHighest,
@@ -444,9 +446,7 @@ class _EventCard extends StatelessWidget {
                                   color: Colors.black,
                                 ),
                               )
-                            : Text(
-                                'REGISTER'.toUpperCase(),
-                              ),
+                            : Text('REGISTER'.toUpperCase()),
                       ),
                     ),
                   ],

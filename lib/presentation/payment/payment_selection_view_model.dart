@@ -137,7 +137,9 @@ class PaymentSelectionViewModel extends ChangeNotifier {
         notifyListeners();
       },
       onFailure: (failure) async {
-        if (failure.message.toLowerCase().contains('credentials not configured')) {
+        if (failure.message.toLowerCase().contains(
+          'credentials not configured',
+        )) {
           final retryResult = await _paymentRepository.initiatePayment(
             amount: amount,
             provider: 'test',

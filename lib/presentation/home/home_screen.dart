@@ -9,8 +9,7 @@ import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart'
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
+
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -45,11 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _viewModel.dispose();
     super.dispose();
-  }
-
-  void _goToBrowseTab(int subTab) {
-    ActivitiesScreen.initialSubTab = subTab;
-    MainLayout.tabController.value = 1;
   }
 
   @override
@@ -119,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   isEmpty: _viewModel.events.isEmpty,
                   itemCount: _viewModel.events.length,
                   cardWidth: 200,
-                  onSeeAll: () => _goToBrowseTab(2),
+                  onSeeAll: () => context.push('/events'),
                   onRetry: () => _viewModel.loadHomeData(),
                   itemBuilder: (context, index) => _EventCard(
                     event: _viewModel.events[index],
@@ -139,7 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   isEmpty: _viewModel.courses.isEmpty,
                   itemCount: _viewModel.courses.length,
                   cardWidth: 200,
-                  onSeeAll: () => _goToBrowseTab(0),
+                  onSeeAll: () => context.push('/courses'),
                   onRetry: () => _viewModel.loadHomeData(),
                   itemBuilder: (context, index) => _CourseCard(
                     course: _viewModel.courses[index],
@@ -159,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   isEmpty: _viewModel.activities.isEmpty,
                   itemCount: _viewModel.activities.length,
                   cardWidth: 200,
-                  onSeeAll: () => _goToBrowseTab(1),
+                  onSeeAll: () => context.push('/activities'),
                   onRetry: () => _viewModel.loadHomeData(),
                   itemBuilder: (context, index) => _ActivityCard(
                     activity: _viewModel.activities[index],
@@ -179,11 +173,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   isLoading: _viewModel.servicesLoading,
                   error: _viewModel.servicesError,
                   onRetry: () => _viewModel.loadHomeData(),
+                  onServiceTap: (service) =>
+                      context.push('/services/${service.id}', extra: service),
                 ),
 
-                const SliverToBoxAdapter(
-                  child: SizedBox(height: 100),
-                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
               ],
             ),
           ),
@@ -222,39 +216,38 @@ class _HeroSection extends SliverToBoxAdapter {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(24),
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _greeting(),
-                          style: theme.textTheme.labelMedium?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5,
-                          ),
+                      padding: const EdgeInsets.all(24),
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _greeting(),
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Discover Your\nNext Challenge',
+                              style: theme.textTheme.displaySmall?.copyWith(
+                                color: Colors.white,
+                                fontFamily: AppConstants.displayFontFamily,
+                                fontWeight: FontWeight.bold,
+                                height: 1.1,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Discover Your\nNext Challenge',
-                          style: theme.textTheme.displaySmall?.copyWith(
-                            color: Colors.white,
-                            fontFamily: AppConstants.displayFontFamily,
-                            fontWeight: FontWeight.bold,
-                            height: 1.1,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ).animate().fade(duration: 500.ms).slideY(
-                  begin: 0.1,
-                  end: 0,
-                  curve: Curves.easeOutQuad,
-                ),
+                      ),
+                    )
+                    .animate()
+                    .fade(duration: 500.ms)
+                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
               ],
             ),
           ).animate().fade(delay: 300.ms),
@@ -340,44 +333,47 @@ class _DashboardSection extends SliverToBoxAdapter {
     required VoidCallback onRetry,
     required Widget Function(BuildContext context, int index) itemBuilder,
   }) : super(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SectionHeader(
-                title: title,
-                icon: icon,
-                onSeeAll: onSeeAll,
-                accentColor: accentColor,
-              ),
-              if (isLoading)
-                _SkeletonRow(cardWidth: cardWidth)
-              else if (error != null)
-                _ErrorRow(
-                  message: error,
-                  accentColor: accentColor,
-                  onRetry: onRetry,
-                )
-              else if (isEmpty)
-                _EmptyRow(message: 'No $title available', accentColor: accentColor)
-              else
-                SizedBox(
-                  height: 200,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.only(left: 24, right: 8),
-                    itemCount: itemCount,
-                    itemBuilder: (context, index) => Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: SizedBox(
-                        width: cardWidth,
-                        child: itemBuilder(context, index),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
+         child: Column(
+           crossAxisAlignment: CrossAxisAlignment.start,
+           children: [
+             _SectionHeader(
+               title: title,
+               icon: icon,
+               onSeeAll: onSeeAll,
+               accentColor: accentColor,
+             ),
+             if (isLoading)
+               _SkeletonRow(cardWidth: cardWidth)
+             else if (error != null)
+               _ErrorRow(
+                 message: error,
+                 accentColor: accentColor,
+                 onRetry: onRetry,
+               )
+             else if (isEmpty)
+               _EmptyRow(
+                 message: 'No $title available',
+                 accentColor: accentColor,
+               )
+             else
+               SizedBox(
+                 height: 200,
+                 child: ListView.builder(
+                   scrollDirection: Axis.horizontal,
+                   padding: const EdgeInsets.only(left: 24, right: 8),
+                   itemCount: itemCount,
+                   itemBuilder: (context, index) => Padding(
+                     padding: const EdgeInsets.only(right: 12),
+                     child: SizedBox(
+                       width: cardWidth,
+                       child: itemBuilder(context, index),
+                     ),
+                   ),
+                 ),
+               ),
+           ],
+         ),
+       );
 }
 
 class _SkeletonRow extends StatelessWidget {
@@ -525,7 +521,9 @@ class _EventCard extends StatelessWidget {
     String? formattedDate;
     if (event.startDate != null) {
       try {
-        formattedDate = DateFormat('MMM d').format(DateTime.parse(event.startDate!));
+        formattedDate = DateFormat(
+          'MMM d',
+        ).format(DateTime.parse(event.startDate!));
       } catch (_) {
         formattedDate = event.startDate;
       }
@@ -543,10 +541,7 @@ class _EventCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              flex: 3,
-              child: _buildImage(theme, appColors),
-            ),
+            Expanded(flex: 3, child: _buildImage(theme, appColors)),
             Expanded(
               flex: 2,
               child: Padding(
@@ -601,10 +596,7 @@ class _EventCard extends StatelessWidget {
         color: hasImage ? null : Colors.purple.withValues(alpha: 0.1),
       ),
       child: hasImage
-          ? PremiumNetworkImage(
-              imageUrl: event.images.first,
-              fit: BoxFit.cover,
-            )
+          ? PremiumNetworkImage(imageUrl: event.images.first, fit: BoxFit.cover)
           : Center(
               child: Icon(
                 Symbols.emoji_events,
@@ -688,7 +680,9 @@ class _CourseCard extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: isActive
                               ? theme.colorScheme.primary
-                              : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                              : theme.colorScheme.onSurfaceVariant.withValues(
+                                  alpha: 0.3,
+                                ),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -811,20 +805,23 @@ class _ServicesSection extends SliverToBoxAdapter {
     required bool isLoading,
     required String? error,
     required VoidCallback onRetry,
+    required void Function(Service service) onServiceTap,
   }) : super(
-          child: _buildServices(
-            services: services,
-            isLoading: isLoading,
-            error: error,
-            onRetry: onRetry,
-          ),
-        );
+         child: _buildServices(
+           services: services,
+           isLoading: isLoading,
+           error: error,
+           onRetry: onRetry,
+           onServiceTap: onServiceTap,
+         ),
+       );
 
   static Widget _buildServices({
     required List<Service> services,
     required bool isLoading,
     required String? error,
     required VoidCallback onRetry,
+    required void Function(Service service) onServiceTap,
   }) {
     final accentColor = Colors.blue.shade400;
 
@@ -889,11 +886,11 @@ class _ServicesSection extends SliverToBoxAdapter {
             crossAxisSpacing: 12,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.6,
+            childAspectRatio: 0.85,
             children: services.map((service) {
               return _ServiceCard(
                 service: service,
-                onTap: () {},
+                onTap: () => onServiceTap(service),
               );
             }).toList(),
           ),
@@ -913,6 +910,7 @@ class _ServiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
+    final hasImage = service.imageUrl != null;
 
     return GestureDetector(
       onTap: onTap,
@@ -922,42 +920,124 @@ class _ServiceCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: appColors.bgBorder),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                service.name.toUpperCase(),
-                style: theme.textTheme.labelLarge?.copyWith(
-                  fontFamily: AppConstants.displayFontFamily,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 12,
-                  letterSpacing: 0.5,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 6),
-              Row(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 6,
+              child: Stack(
+                fit: StackFit.expand,
                 children: [
-                  if (service.coursesCount > 0)
-                    _ServiceStat(
-                      label: '${service.coursesCount} courses',
-                      theme: theme,
+                  if (hasImage)
+                    PremiumNetworkImage(
+                      imageUrl: service.imageUrl!,
+                      fit: BoxFit.cover,
+                    )
+                  else
+                    Container(
+                      color: Colors.blue.withValues(alpha: 0.08),
+                      child: Center(
+                        child: Icon(
+                          Symbols.build,
+                          size: 28,
+                          color: Colors.blue.shade300.withValues(alpha: 0.5),
+                        ),
+                      ),
                     ),
-                  if (service.coursesCount > 0 && service.eventsCount > 0)
-                    const SizedBox(width: 8),
-                  if (service.eventsCount > 0)
-                    _ServiceStat(
-                      label: '${service.eventsCount} events',
-                      theme: theme,
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.6),
+                        ],
+                        stops: const [0.4, 1.0],
+                      ),
                     ),
+                  ),
+                  Positioned(
+                    left: 10,
+                    bottom: 8,
+                    child: Text(
+                      service.name.toUpperCase(),
+                      style: TextStyle(
+                        fontFamily: AppConstants.displayFontFamily,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 11,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withValues(alpha: 0.6),
+                            blurRadius: 4,
+                          ),
+                        ],
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (service.description != null &&
+                        service.description!.isNotEmpty)
+                      Text(
+                        service.description!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 9,
+                          height: 1.3,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        if (service.plansCount > 0)
+                          _ServiceStat(
+                            label: '${service.plansCount}p',
+                            color: theme.colorScheme.primary,
+                          ),
+                        if (service.plansCount > 0 && service.coursesCount > 0)
+                          const SizedBox(width: 4),
+                        if (service.coursesCount > 0)
+                          _ServiceStat(
+                            label: '${service.coursesCount}c',
+                            color: Colors.orange.shade400,
+                          ),
+                        if (service.coursesCount > 0 && service.eventsCount > 0)
+                          const SizedBox(width: 4),
+                        if (service.eventsCount > 0)
+                          _ServiceStat(
+                            label: '${service.eventsCount}e',
+                            color: Colors.purple.shade400,
+                          ),
+                        if (service.eventsCount > 0 &&
+                            service.activitiesCount > 0)
+                          const SizedBox(width: 4),
+                        if (service.activitiesCount > 0)
+                          _ServiceStat(
+                            label: '${service.activitiesCount}a',
+                            color: Colors.teal.shade400,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -966,24 +1046,25 @@ class _ServiceCard extends StatelessWidget {
 
 class _ServiceStat extends StatelessWidget {
   final String label;
-  final ThemeData theme;
+  final Color color;
 
-  const _ServiceStat({required this.label, required this.theme});
+  const _ServiceStat({required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withValues(alpha: 0.08),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(4),
       ),
       child: Text(
         label,
         style: TextStyle(
-          fontSize: 9,
-          fontWeight: FontWeight.w600,
-          color: theme.colorScheme.primary,
+          fontSize: 8,
+          fontWeight: FontWeight.w700,
+          color: color,
+          letterSpacing: 0.3,
         ),
       ),
     );

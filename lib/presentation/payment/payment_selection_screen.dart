@@ -263,95 +263,89 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
         children: [
           // Order Summary
           Center(
-            child: Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: appColors.bgElevated,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: appColors.bgElevated,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Icon(
+                    Symbols.shopping_cart_checkout,
+                    size: 48,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-              ),
-              child: Icon(
-                Symbols.shopping_cart_checkout,
-                size: 48,
-                color: theme.colorScheme.primary,
-              ),
-            ),
-          ).animate().fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+              )
+              .animate()
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           const SizedBox(height: 24),
           Text(
-            'TOTAL AMOUNT',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2.0,
-            ),
-            textAlign: TextAlign.center,
-          ).animate(delay: 50.ms).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+                'TOTAL AMOUNT',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2.0,
+                ),
+                textAlign: TextAlign.center,
+              )
+              .animate(delay: 50.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           const SizedBox(height: 8),
           Text(
-            '${widget.plan.price.toStringAsFixed(0)} TND',
-            style: theme.textTheme.displayMedium?.copyWith(
-              fontFamily: AppConstants.displayFontFamily,
-              fontWeight: FontWeight.w900,
-              color: theme.colorScheme.onSurface,
-            ),
-            textAlign: TextAlign.center,
-          ).animate(delay: 100.ms).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+                '${widget.plan.price.toStringAsFixed(0)} TND',
+                style: theme.textTheme.displayMedium?.copyWith(
+                  fontFamily: AppConstants.displayFontFamily,
+                  fontWeight: FontWeight.w900,
+                  color: theme.colorScheme.onSurface,
+                ),
+                textAlign: TextAlign.center,
+              )
+              .animate(delay: 100.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           Text(
-            'For ${widget.plan.name}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-            textAlign: TextAlign.center,
-          ).animate(delay: 150.ms).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+                'For ${widget.plan.name}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              )
+              .animate(delay: 150.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           const SizedBox(height: 48),
 
           Text(
-            'SELECT PAYMENT METHOD',
-            style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.onSurface,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5,
-            ),
-          ).animate(delay: 200.ms).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+                'SELECT PAYMENT METHOD',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                ),
+              )
+              .animate(delay: 200.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           const SizedBox(height: 16),
 
           // Konnect Button
           _PaymentMethodCard(
-            title: 'Pay with Konnect',
-            subtitle: 'Bank Cards, E-Dinar, Wallets',
-            icon: Symbols.credit_card,
-            brandColor: const Color(0xFF005AE2),
-            theme: theme,
-            appColors: appColors,
-            onTap: () => _startPayment('konnect'),
-          ).animate(delay: 250.ms).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+                title: 'Pay with Konnect',
+                subtitle: 'Bank Cards, E-Dinar, Wallets',
+                icon: Symbols.credit_card,
+                brandColor: const Color(0xFF005AE2),
+                theme: theme,
+                appColors: appColors,
+                onTap: () => _startPayment('konnect'),
+              )
+              .animate(delay: 250.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           const SizedBox(height: 32),
 
           // Divider
@@ -375,21 +369,20 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
 
           // Loyalty Balance Button
           _PaymentMethodCard(
-            title: 'Pay with Loyalty Balance',
-            subtitle: 'Use your accumulated points',
-            icon: Symbols.stars,
-            brandColor: theme.colorScheme.primary,
-            theme: theme,
-            appColors: appColors,
-            isPrimary: true,
-            onTap: () {
-              _startPayment('loyalty');
-            },
-          ).animate(delay: 350.ms).fade(duration: 400.ms).slideY(
-            begin: 0.1,
-            end: 0,
-            curve: Curves.easeOutQuad,
-          ),
+                title: 'Pay with Loyalty Balance',
+                subtitle: 'Use your accumulated points',
+                icon: Symbols.stars,
+                brandColor: theme.colorScheme.primary,
+                theme: theme,
+                appColors: appColors,
+                isPrimary: true,
+                onTap: () {
+                  _startPayment('loyalty');
+                },
+              )
+              .animate(delay: 350.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
         ],
       ),
     );

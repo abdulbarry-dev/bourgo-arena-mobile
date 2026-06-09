@@ -62,8 +62,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen>
           indicatorColor: theme.colorScheme.primary,
           indicatorWeight: 3,
           labelColor: theme.colorScheme.primary,
-          unselectedLabelColor:
-              theme.colorScheme.onSurface.withValues(alpha: 0.4),
+          unselectedLabelColor: theme.colorScheme.onSurface.withValues(
+            alpha: 0.4,
+          ),
           labelStyle: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w900,
@@ -210,8 +211,9 @@ class _PaymentList extends StatelessWidget {
                 fontFamily: AppConstants.displayFontFamily,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.5,
-                color: theme.colorScheme.onSurfaceVariant
-                    .withValues(alpha: 0.5),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.5,
+                ),
               ),
               textAlign: TextAlign.center,
             ),
@@ -219,8 +221,9 @@ class _PaymentList extends StatelessWidget {
             Text(
               'Completed payments will appear here.',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant
-                    .withValues(alpha: 0.35),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.35,
+                ),
               ),
             ),
           ],

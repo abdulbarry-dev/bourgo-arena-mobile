@@ -30,10 +30,7 @@ class AppRefreshIndicator extends StatelessWidget {
           ? CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: child,
-                ),
+                SliverFillRemaining(hasScrollBody: false, child: child),
               ],
             )
           : child,

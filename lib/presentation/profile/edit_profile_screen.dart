@@ -131,7 +131,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.1),
+                  color: Theme.of(
+                    ctx,
+                  ).colorScheme.onSurface.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -144,105 +146,120 @@ class _EditProfileScreenState extends State<EditProfileScreen>
               ),
               const SizedBox(height: 24),
               ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Theme.of(ctx).colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Symbols.camera_alt,
-                    color: Theme.of(ctx).colorScheme.primary,
-                    size: 22,
-                  ),
-                ),
-                title: Text(
-                  "PRENDRE UNE PHOTO",
-                  style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _pickAndUploadAvatar(ImageSource.camera);
-                },
-              ).animate(delay: 100.ms).fade(duration: 400.ms).slideY(
-                  begin: 0.15,
-                  end: 0,
-                  duration: 400.ms,
-                  curve: Curves.easeOut,
-                ),
-              const SizedBox(height: 4),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Theme.of(ctx).colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    Symbols.photo_library,
-                    color: Theme.of(ctx).colorScheme.primary,
-                    size: 22,
-                  ),
-                ),
-                title: Text(
-                  "CHOISIR UNE PHOTO",
-                  style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                onTap: () {
-                  Navigator.pop(ctx);
-                  _pickAndUploadAvatar(ImageSource.gallery);
-                },
-              ).animate(delay: 200.ms).fade(duration: 400.ms).slideY(
-                  begin: 0.15,
-                  end: 0,
-                  duration: 400.ms,
-                  curve: Curves.easeOut,
-                ),
-              if (avatarUrl != null) ...[
-                const SizedBox(height: 4),
-                ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Theme.of(ctx).colorScheme.error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          ctx,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Symbols.camera_alt,
+                        color: Theme.of(ctx).colorScheme.primary,
+                        size: 22,
+                      ),
                     ),
-                    child: Icon(
-                      Symbols.delete,
-                      color: Theme.of(ctx).colorScheme.error,
-                      size: 22,
+                    title: Text(
+                      "PRENDRE UNE PHOTO",
+                      style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  title: Text(
-                    "SUPPRIMER LA PHOTO",
-                    style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(ctx).colorScheme.error,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _handleDeleteAvatar();
-                  },
-                ).animate(delay: 300.ms).fade(duration: 400.ms).slideY(
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _pickAndUploadAvatar(ImageSource.camera);
+                    },
+                  )
+                  .animate(delay: 100.ms)
+                  .fade(duration: 400.ms)
+                  .slideY(
                     begin: 0.15,
                     end: 0,
                     duration: 400.ms,
                     curve: Curves.easeOut,
                   ),
+              const SizedBox(height: 4),
+              ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          ctx,
+                        ).colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        Symbols.photo_library,
+                        color: Theme.of(ctx).colorScheme.primary,
+                        size: 22,
+                      ),
+                    ),
+                    title: Text(
+                      "CHOISIR UNE PHOTO",
+                      style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _pickAndUploadAvatar(ImageSource.gallery);
+                    },
+                  )
+                  .animate(delay: 200.ms)
+                  .fade(duration: 400.ms)
+                  .slideY(
+                    begin: 0.15,
+                    end: 0,
+                    duration: 400.ms,
+                    curve: Curves.easeOut,
+                  ),
+              if (avatarUrl != null) ...[
+                const SizedBox(height: 4),
+                ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            ctx,
+                          ).colorScheme.error.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Symbols.delete,
+                          color: Theme.of(ctx).colorScheme.error,
+                          size: 22,
+                        ),
+                      ),
+                      title: Text(
+                        "SUPPRIMER LA PHOTO",
+                        style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(ctx).colorScheme.error,
+                        ),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _handleDeleteAvatar();
+                      },
+                    )
+                    .animate(delay: 300.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(
+                      begin: 0.15,
+                      end: 0,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
               ],
             ],
           ),
@@ -280,9 +297,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text(
           "SUPPRIMER LA PHOTO",
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
@@ -1181,7 +1196,11 @@ class _AvatarSectionState extends State<_AvatarSection>
     );
   }
 
-  Widget _buildAvatarCore(ThemeData theme, String? avatarUrl, bool isUploading) {
+  Widget _buildAvatarCore(
+    ThemeData theme,
+    String? avatarUrl,
+    bool isUploading,
+  ) {
     return Hero(
       tag: 'profile_avatar',
       child: Container(
@@ -1236,23 +1255,17 @@ class _AvatarSectionState extends State<_AvatarSection>
       key: const ValueKey('avatar_placeholder'),
       radius: 60,
       backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-      child: Icon(
-        Symbols.person,
-        size: 60,
-        color: theme.colorScheme.primary,
-      ),
+      child: Icon(Symbols.person, size: 60, color: theme.colorScheme.primary),
     );
   }
 
   Widget _buildShimmer(ThemeData theme) {
     return Shimmer.fromColors(
       baseColor: theme.colorScheme.surfaceContainerHighest,
-      highlightColor:
-          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-      child: const CircleAvatar(
-        radius: 60,
-        backgroundColor: Colors.white,
+      highlightColor: theme.colorScheme.surfaceContainerHighest.withValues(
+        alpha: 0.4,
       ),
+      child: const CircleAvatar(radius: 60, backgroundColor: Colors.white),
     );
   }
 
@@ -1306,43 +1319,46 @@ class _AvatarSectionState extends State<_AvatarSection>
     return Positioned(
       bottom: 0,
       right: 0,
-      child: AnimatedScale(
-        scale: isUploading ? 0.85 : 1.0,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutBack,
-        child: GestureDetector(
-          onTap: isUploading ? null : onEditTap,
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: theme.scaffoldBackgroundColor,
-                width: 4,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.35),
-                  blurRadius: 14,
-                  offset: const Offset(0, 4),
+      child:
+          AnimatedScale(
+                scale: isUploading ? 0.85 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutBack,
+                child: GestureDetector(
+                  onTap: isUploading ? null : onEditTap,
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: theme.scaffoldBackgroundColor,
+                        width: 4,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.35,
+                          ),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Symbols.edit,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
-              ],
-            ),
-            child: const Icon(
-              Symbols.edit,
-              size: 18,
-              color: Colors.white,
-            ),
-          ),
-        ),
-      )
-          .animate(
-            autoPlay: true,
-            onInit: (controller) =>
-                controller.repeat(reverse: true, period: 3000.ms),
-          )
-          .shimmer(duration: 800.ms, delay: 1500.ms),
+              )
+              .animate(
+                autoPlay: true,
+                onInit: (controller) =>
+                    controller.repeat(reverse: true, period: 3000.ms),
+              )
+              .shimmer(duration: 800.ms, delay: 1500.ms),
     );
   }
 }

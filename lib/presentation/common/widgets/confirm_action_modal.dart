@@ -44,9 +44,7 @@ class ConfirmActionModal {
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(32),
                   ),
-                  border: Border.all(
-                    color: accentColor.withValues(alpha: 0.1),
-                  ),
+                  border: Border.all(color: accentColor.withValues(alpha: 0.1)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -56,8 +54,9 @@ class ConfirmActionModal {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 32),
                       decoration: BoxDecoration(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.1,
+                        ),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -87,8 +86,9 @@ class ConfirmActionModal {
                         message,
                         textAlign: TextAlign.center,
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant
-                              .withValues(alpha: 0.7),
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
                           height: 1.5,
                         ),
                       ),
@@ -106,11 +106,11 @@ class ConfirmActionModal {
                                 ? null
                                 : () => Navigator.pop(context, false),
                             style: OutlinedButton.styleFrom(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 18),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
                               side: BorderSide(
-                                color: theme.colorScheme.onSurface
-                                    .withValues(alpha: 0.1),
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.1,
+                                ),
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
@@ -134,10 +134,10 @@ class ConfirmActionModal {
                                 : () async {
                                     if (onConfirm != null) {
                                       setState(() => isConfirming = true);
-                                      final shouldClose =
-                                          await onConfirm(context);
-                                      setState(
-                                          () => isConfirming = false);
+                                      final shouldClose = await onConfirm(
+                                        context,
+                                      );
+                                      setState(() => isConfirming = false);
                                       if (shouldClose) {
                                         Navigator.pop(context, true);
                                       }
@@ -151,8 +151,7 @@ class ConfirmActionModal {
                                   ? theme.colorScheme.onError
                                   : theme.colorScheme.onPrimary,
                               elevation: 0,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 18),
+                              padding: const EdgeInsets.symmetric(vertical: 18),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),

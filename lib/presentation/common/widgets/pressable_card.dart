@@ -35,12 +35,11 @@ class _PressableCardState extends State<PressableCard>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: widget.pressedScale)
-        .animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: widget.pressedScale,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
     _controller.addListener(() => setState(() {}));
   }
 
@@ -82,10 +81,7 @@ class _PressableCardState extends State<PressableCard>
       onTapCancel: _onTapCancel,
       onLongPressStart: widget.onLongPress != null ? _onLongPressStart : null,
       onLongPressEnd: widget.onLongPress != null ? _onLongPressEnd : null,
-      child: Transform.scale(
-        scale: _scaleAnimation.value,
-        child: widget.child,
-      ),
+      child: Transform.scale(scale: _scaleAnimation.value, child: widget.child),
     );
   }
 }

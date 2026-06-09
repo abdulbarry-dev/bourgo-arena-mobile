@@ -265,9 +265,7 @@ class BookingViewModel extends BaseViewModel {
       memberId: member?.id,
       date: _selectedDate.toIso8601String().split('T')[0],
       time: slot.time,
-      duration: activity.id == 'padel-1'
-          ? '90 min'
-          : '60 min',
+      duration: activity.id == 'padel-1' ? '90 min' : '60 min',
       price: priceToPay,
       status: 'confirmed',
       paymentStatus: 'pending',

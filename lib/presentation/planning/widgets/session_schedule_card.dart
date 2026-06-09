@@ -136,9 +136,7 @@ class SessionScheduleCard extends StatelessWidget {
                 ),
                 Flexible(
                   flex: ((1 - ratio) * 100).round().clamp(1, 100),
-                  child: Container(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
+                  child: Container(color: theme.colorScheme.outlineVariant),
                 ),
               ],
             ),

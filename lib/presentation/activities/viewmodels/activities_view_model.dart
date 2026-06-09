@@ -38,8 +38,14 @@ class ActivitiesViewModel extends BaseViewModel {
       _activities.where((a) => !_isSport(a)).toList();
 
   static const _sportFeatures = {
-    'coaching', 'technique', 'conditioning', 'high-intensity',
-    'pad-work', 'court-hire', 'equipment', 'cardio',
+    'coaching',
+    'technique',
+    'conditioning',
+    'high-intensity',
+    'pad-work',
+    'court-hire',
+    'equipment',
+    'cardio',
   };
 
   bool _isSport(Activity a) {

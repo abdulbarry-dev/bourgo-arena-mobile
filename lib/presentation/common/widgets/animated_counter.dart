@@ -35,13 +35,12 @@ class _AnimatedCounterState extends State<AnimatedCounter>
   void initState() {
     super.initState();
     _previousValue = widget.value.toDouble();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
     _controller.addListener(() => setState(() {}));
-    _animation = Tween<double>(begin: 0, end: _previousValue)
-        .animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+    _animation = Tween<double>(
+      begin: 0,
+      end: _previousValue,
+    ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
     _controller.forward();
   }
 
@@ -50,8 +49,10 @@ class _AnimatedCounterState extends State<AnimatedCounter>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.value != widget.value) {
       _previousValue = _animation.value;
-      _animation = Tween<double>(begin: _previousValue, end: widget.value.toDouble())
-          .animate(CurvedAnimation(parent: _controller, curve: widget.curve));
+      _animation = Tween<double>(
+        begin: _previousValue,
+        end: widget.value.toDouble(),
+      ).animate(CurvedAnimation(parent: _controller, curve: widget.curve));
       _targetDecimal = null;
       _controller.reset();
       _controller.forward();
@@ -82,9 +83,6 @@ class _AnimatedCounterState extends State<AnimatedCounter>
     buffer.write(displayValue);
     if (widget.suffix != null) buffer.write(widget.suffix!);
 
-    return Text(
-      buffer.toString(),
-      style: widget.style,
-    );
+    return Text(buffer.toString(), style: widget.style);
   }
 }
