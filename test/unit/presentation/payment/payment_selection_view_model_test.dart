@@ -16,8 +16,12 @@ import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 
 class MockPaymentRepository extends Mock implements PaymentRepository {}
-class MockSubscribeToPlanUseCase extends Mock implements SubscribeToPlanUseCase {}
+
+class MockSubscribeToPlanUseCase extends Mock
+    implements SubscribeToPlanUseCase {}
+
 class MockPayWithLoyaltyUseCase extends Mock implements PayWithLoyaltyUseCase {}
+
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 Subscription testSubscription({String id = '43', String status = 'pending'}) {
@@ -74,9 +78,9 @@ void main() {
 
     test('subscribeAndPay Konnect success', () async {
       final sub = testSubscription();
-      when(() => mockSubscribe('3')).thenAnswer(
-        (_) async => Result<Subscription, Failure>.success(sub),
-      );
+      when(
+        () => mockSubscribe('3'),
+      ).thenAnswer((_) async => Result<Subscription, Failure>.success(sub));
       when(
         () => mockPaymentRepository.initiatePayment(
           amount: 150.0,
@@ -112,12 +116,10 @@ void main() {
 
     test('subscribeAndPay Loyalty success', () async {
       final sub = testSubscription(id: '43');
-      when(() => mockSubscribe('3')).thenAnswer(
-        (_) async => Result<Subscription, Failure>.success(sub),
-      );
       when(
-        () => mockLoyalty(type: 'subscription', id: 43),
-      ).thenAnswer(
+        () => mockSubscribe('3'),
+      ).thenAnswer((_) async => Result<Subscription, Failure>.success(sub));
+      when(() => mockLoyalty(type: 'subscription', id: 43)).thenAnswer(
         (_) async => Result<Map<String, dynamic>, Failure>.success({
           'status': 'paid',
           'points_used': 15000,
@@ -139,7 +141,10 @@ void main() {
     test('subscribeAndPay subscription failure', () async {
       when(() => mockSubscribe('99')).thenAnswer(
         (_) async => Result<Subscription, Failure>.failure(
-          const ValidationFailure(AppErrorCode.validationFailed, 'Plan not found'),
+          const ValidationFailure(
+            AppErrorCode.validationFailed,
+            'Plan not found',
+          ),
         ),
       );
 
@@ -156,15 +161,24 @@ void main() {
 
     test('reset returns to idle', () async {
       final sub = testSubscription();
-      when(() => mockSubscribe('3')).thenAnswer(
-        (_) async => Result<Subscription, Failure>.success(sub),
-      );
-      when(() => mockLoyalty(type: 'subscription', id: any(named: 'id'))).thenAnswer(
-        (_) async => Result<Map<String, dynamic>, Failure>.success({'status': 'paid'}),
+      when(
+        () => mockSubscribe('3'),
+      ).thenAnswer((_) async => Result<Subscription, Failure>.success(sub));
+      when(
+        () => mockLoyalty(
+          type: 'subscription',
+          id: any(named: 'id'),
+        ),
+      ).thenAnswer(
+        (_) async =>
+            Result<Map<String, dynamic>, Failure>.success({'status': 'paid'}),
       );
 
       await viewModel.subscribeAndPay(
-        planId: '3', amount: 100.0, provider: 'loyalty', description: 'desc',
+        planId: '3',
+        amount: 100.0,
+        provider: 'loyalty',
+        description: 'desc',
       );
       check(viewModel.state).equals(PaymentSelectionState.loyaltySuccess);
 
@@ -176,9 +190,9 @@ void main() {
 
     test('verifyPayment sets verified on paid status', () async {
       final sub = testSubscription();
-      when(() => mockSubscribe('3')).thenAnswer(
-        (_) async => Result<Subscription, Failure>.success(sub),
-      );
+      when(
+        () => mockSubscribe('3'),
+      ).thenAnswer((_) async => Result<Subscription, Failure>.success(sub));
       when(
         () => mockPaymentRepository.initiatePayment(
           amount: any(named: 'amount'),
@@ -201,13 +215,17 @@ void main() {
       );
 
       await viewModel.subscribeAndPay(
-        planId: '3', amount: 100.0, provider: 'konnect', description: 'desc',
+        planId: '3',
+        amount: 100.0,
+        provider: 'konnect',
+        description: 'desc',
       );
 
       when(
         () => mockPaymentRepository.verifyPayment(paymentReference: 'ref123'),
       ).thenAnswer(
-        (_) async => Result<Map<String, dynamic>, Failure>.success({'status': 'paid'}),
+        (_) async =>
+            Result<Map<String, dynamic>, Failure>.success({'status': 'paid'}),
       );
 
       await viewModel.verifyPayment();

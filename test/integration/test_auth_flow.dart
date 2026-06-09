@@ -1,17 +1,27 @@
+import 'package:bourgo_arena_mobile/core/utils/device_identity_storage.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_auth_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_device_registration_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/local_session_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/device_registration_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'dart:developer' as developer;
 
 void main() async {
   SharedPreferences.setMockInitialValues({});
-  final sessionRepo = LocalSessionRepository(
-    await SharedPreferences.getInstance(),
-  );
+  final prefs = await SharedPreferences.getInstance();
+  final sessionRepo = LocalSessionRepository(prefs);
   final apiClient = ApiClient(baseUrl: 'http://127.0.0.1:8000/api/v1');
-  final authRepo = ApiAuthRepository(apiClient, sessionRepo);
+  final deviceIdentityStorage = DeviceIdentityStorage(prefs);
+  final DeviceRegistrationRepository deviceRegistrationRepo =
+      ApiDeviceRegistrationRepository(apiClient);
+  final authRepo = ApiAuthRepository(
+    apiClient,
+    sessionRepo,
+    deviceIdentityStorage,
+    deviceRegistrationRepo,
+  );
 
   final user = User(
     id: '',

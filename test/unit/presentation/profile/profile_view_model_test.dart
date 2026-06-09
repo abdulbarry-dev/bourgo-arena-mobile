@@ -31,7 +31,7 @@ class MockGetOngoingReservationsUseCase extends Mock
 class MockGetFullPaymentHistoryUseCase extends Mock
     implements GetFullPaymentHistoryUseCase {}
 
-class FakeUser extends Fake implements User {}    
+class FakeUser extends Fake implements User {}
 
 void main() {
   late ProfileViewModel viewModel;

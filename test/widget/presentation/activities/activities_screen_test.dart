@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
-import 'package:bourgo_arena_mobile/presentation/activities/activities_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/browse/browse_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
@@ -75,11 +75,11 @@ void main() {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en'), Locale('fr')],
-      home: const ActivitiesScreen(),
+      home: const BrowseScreen(),
     );
   }
 
-  group('ActivitiesScreen Widget Tests', () {
+  group('BrowseScreen Widget Tests', () {
     testWidgets(
       'shows EmptyState for courses and GuestAuthState for reservations when unauthenticated',
       (tester) async {

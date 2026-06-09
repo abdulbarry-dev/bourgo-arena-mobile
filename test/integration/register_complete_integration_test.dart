@@ -1,10 +1,12 @@
+import 'package:bourgo_arena_mobile/core/utils/device_identity_storage.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
-import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_auth_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/device_registration_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:flutter/material.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
@@ -14,15 +16,29 @@ class MockApiClient extends Mock implements ApiClient {}
 
 class MockSessionRepository extends Mock implements SessionRepository {}
 
+class MockDeviceIdentityStorage extends Mock implements DeviceIdentityStorage {}
+
+class MockDeviceRegistrationRepository extends Mock
+    implements DeviceRegistrationRepository {}
+
 void main() {
   late MockApiClient apiClient;
   late MockSessionRepository sessionRepository;
+  late MockDeviceIdentityStorage deviceIdentityStorage;
+  late MockDeviceRegistrationRepository deviceRegistrationRepo;
   late ApiAuthRepository repository;
 
   setUp(() {
     apiClient = MockApiClient();
     sessionRepository = MockSessionRepository();
-    repository = ApiAuthRepository(apiClient, sessionRepository);
+    deviceIdentityStorage = MockDeviceIdentityStorage();
+    deviceRegistrationRepo = MockDeviceRegistrationRepository();
+    repository = ApiAuthRepository(
+      apiClient,
+      sessionRepository,
+      deviceIdentityStorage,
+      deviceRegistrationRepo,
+    );
 
     // Default stubs for session repository
     when(
@@ -98,7 +114,7 @@ void main() {
 
     // Default mock for profile update
     when(
-      () => apiClient.put('/user/profile', any()),
+      () => apiClient.put('/member/profile', any()),
     ).thenAnswer((_) async => {});
   });
 

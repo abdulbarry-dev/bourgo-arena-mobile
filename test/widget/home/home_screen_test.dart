@@ -59,18 +59,18 @@ void main() {
   });
 
   testWidgets('shows section headers after data loads', (tester) async {
-    when(() => mockActivities()).thenAnswer(
-      (_) async => Success([testActivityEntity()]),
-    );
-    when(() => mockCourses()).thenAnswer(
-      (_) async => Success([testCourseEntity()]),
-    );
-    when(() => mockEvents()).thenAnswer(
-      (_) async => Success([Event(id: 'e1', name: 'Tournament')]),
-    );
-    when(() => mockServices()).thenAnswer(
-      (_) async => Success([testServiceEntity()]),
-    );
+    when(
+      () => mockActivities(),
+    ).thenAnswer((_) async => Success([testActivityEntity()]));
+    when(
+      () => mockCourses(),
+    ).thenAnswer((_) async => Success([testCourseEntity()]));
+    when(
+      () => mockEvents(),
+    ).thenAnswer((_) async => Success([Event(id: 'e1', name: 'Tournament')]));
+    when(
+      () => mockServices(),
+    ).thenAnswer((_) async => Success([testServiceEntity()]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(seconds: 2));
@@ -86,18 +86,16 @@ void main() {
   });
 
   testWidgets('shows empty state messages when no data', (tester) async {
-    when(() => mockActivities()).thenAnswer(
-      (_) async => const Success(<Activity>[]),
-    );
-    when(() => mockCourses()).thenAnswer(
-      (_) async => const Success(<Course>[]),
-    );
-    when(() => mockEvents()).thenAnswer(
-      (_) async => const Success(<Event>[]),
-    );
-    when(() => mockServices()).thenAnswer(
-      (_) async => const Success(<Service>[]),
-    );
+    when(
+      () => mockActivities(),
+    ).thenAnswer((_) async => const Success(<Activity>[]));
+    when(
+      () => mockCourses(),
+    ).thenAnswer((_) async => const Success(<Course>[]));
+    when(() => mockEvents()).thenAnswer((_) async => const Success(<Event>[]));
+    when(
+      () => mockServices(),
+    ).thenAnswer((_) async => const Success(<Service>[]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(seconds: 2));
@@ -208,8 +206,71 @@ class _FakeHttpResponse extends Fake implements HttpClientResponse {
 }
 
 const List<int> _transparentPngBytes = <int>[
-  137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1,
-  0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137, 0, 0, 0, 12, 73, 68, 65, 84,
-  8, 153, 99, 0, 1, 0, 0, 5, 0, 1, 13, 10, 44, 90, 0, 0, 0, 0, 73, 69, 78,
-  68, 174, 66, 96, 130,
+  137,
+  80,
+  78,
+  71,
+  13,
+  10,
+  26,
+  10,
+  0,
+  0,
+  0,
+  13,
+  73,
+  72,
+  68,
+  82,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  1,
+  8,
+  6,
+  0,
+  0,
+  0,
+  31,
+  21,
+  196,
+  137,
+  0,
+  0,
+  0,
+  12,
+  73,
+  68,
+  65,
+  84,
+  8,
+  153,
+  99,
+  0,
+  1,
+  0,
+  0,
+  5,
+  0,
+  1,
+  13,
+  10,
+  44,
+  90,
+  0,
+  0,
+  0,
+  0,
+  73,
+  69,
+  78,
+  68,
+  174,
+  66,
+  96,
+  130,
 ];

@@ -127,11 +127,11 @@ void main() {
     when(
       () => mockGetUserBookingsUseCase(),
     ).thenAnswer((_) async => Result.success(tReservations));
-    when(
-      () => mockMakeReservationUseCase(any()),
-    ).thenAnswer((_) async => Result.success(
-      ReservationWithPayment(reservation: tReservations.first),
-    ));
+    when(() => mockMakeReservationUseCase(any())).thenAnswer(
+      (_) async => Result.success(
+        ReservationWithPayment(reservation: tReservations.first),
+      ),
+    );
     when(
       () => mockCancelBookingUseCase(any()),
     ).thenAnswer((_) async => Result.success(null));

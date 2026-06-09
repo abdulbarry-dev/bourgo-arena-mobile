@@ -55,13 +55,9 @@ void main() {
     ),
   ];
 
-  final testEvents = [
-    Event(id: 'e1', name: 'Tournament', status: 'open'),
-  ];
+  final testEvents = [Event(id: 'e1', name: 'Tournament', status: 'open')];
 
-  final testServices = [
-    const Service(id: 1, name: 'Coaching'),
-  ];
+  final testServices = [const Service(id: 1, name: 'Coaching')];
 
   setUp(() {
     mockGetActivities = _MockGetActivitiesUseCase();
@@ -97,9 +93,7 @@ void main() {
       when(
         () => mockGetCourses(),
       ).thenAnswer((_) async => Success(testCourses));
-      when(
-        () => mockGetEvents(),
-      ).thenAnswer((_) async => Success(testEvents));
+      when(() => mockGetEvents()).thenAnswer((_) async => Success(testEvents));
       when(
         () => mockGetServices(),
       ).thenAnswer((_) async => Success(testServices));
@@ -138,12 +132,8 @@ void main() {
       when(
         () => mockGetActivities(),
       ).thenAnswer((_) async => Success(manyActivities));
-      when(
-        () => mockGetCourses(),
-      ).thenAnswer((_) async => Success(<Course>[]));
-      when(
-        () => mockGetEvents(),
-      ).thenAnswer((_) async => Success(<Event>[]));
+      when(() => mockGetCourses()).thenAnswer((_) async => Success(<Course>[]));
+      when(() => mockGetEvents()).thenAnswer((_) async => Success(<Event>[]));
       when(
         () => mockGetServices(),
       ).thenAnswer((_) async => Success(<Service>[]));
@@ -159,15 +149,15 @@ void main() {
           const ServerFailure(AppErrorCode.serverError, 'Activities error'),
         ),
       );
-      when(() => mockGetCourses()).thenAnswer(
-        (_) async => const Success(<Course>[]),
-      );
-      when(() => mockGetEvents()).thenAnswer(
-        (_) async => const Success(<Event>[]),
-      );
-      when(() => mockGetServices()).thenAnswer(
-        (_) async => const Success(<Service>[]),
-      );
+      when(
+        () => mockGetCourses(),
+      ).thenAnswer((_) async => const Success(<Course>[]));
+      when(
+        () => mockGetEvents(),
+      ).thenAnswer((_) async => const Success(<Event>[]));
+      when(
+        () => mockGetServices(),
+      ).thenAnswer((_) async => const Success(<Service>[]));
 
       await viewModel.loadHomeData();
 

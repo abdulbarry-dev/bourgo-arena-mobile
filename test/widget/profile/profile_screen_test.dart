@@ -195,9 +195,7 @@ void main() {
     when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
     when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
 
-    when(
-      () => mockAuthRepository.getMemberTier(),
-    ).thenAnswer(
+    when(() => mockAuthRepository.getMemberTier()).thenAnswer(
       (_) async => Result.success(
         AuthSession(user: testUser, state: AuthState.authenticated),
       ),

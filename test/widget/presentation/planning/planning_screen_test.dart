@@ -36,7 +36,8 @@ class MockGetActiveSubscriptionsUseCase extends Mock
 class MockGetCourseSessionsUseCase extends Mock
     implements GetCourseSessionsUseCase {}
 
-class MockBookCourseSessionUseCase extends Mock implements BookCourseSessionUseCase {}
+class MockBookCourseSessionUseCase extends Mock
+    implements BookCourseSessionUseCase {}
 
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
