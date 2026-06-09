@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @navActivities.
   ///
   /// In fr, this message translates to:
-  /// **'ACTIVITÉS'**
+  /// **'PARCOURIR'**
   String get navActivities;
 
   /// No description provided for @navPlanning.
@@ -1159,6 +1159,12 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'SPORT'**
   String get bookingStepSport;
+
+  /// No description provided for @bookingStepDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉTAILS'**
+  String get bookingStepDetails;
 
   /// No description provided for @bookingStepTime.
   ///

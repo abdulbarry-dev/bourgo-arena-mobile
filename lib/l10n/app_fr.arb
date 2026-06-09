@@ -30,7 +30,7 @@
   "guestBrowse": "CONTINUER EN TANT QU'INVITÉ",
   
   "navHome": "ACCUEIL",
-  "navActivities": "ACTIVITÉS",
+  "navActivities": "PARCOURIR",
   "navPlanning": "PLANNING",
   "navProfile": "COMPTE",
   
@@ -191,6 +191,7 @@
   "planningCategoryWellness": "Wellness",
   
   "bookingStepSport": "SPORT",
+  "bookingStepDetails": "DÉTAILS",
   "bookingStepTime": "HORAIRE",
   "bookingStepPayment": "PAIEMENT",
 

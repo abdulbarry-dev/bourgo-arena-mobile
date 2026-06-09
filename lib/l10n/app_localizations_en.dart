@@ -93,7 +93,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navHome => 'HOME';
 
   @override
-  String get navActivities => 'ACTIVITIES';
+  String get navActivities => 'BROWSE';
 
   @override
   String get navPlanning => 'PLANNING';
@@ -559,6 +559,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookingStepSport => 'SPORT';
+
+  @override
+  String get bookingStepDetails => 'DETAILS';
 
   @override
   String get bookingStepTime => 'TIME';
