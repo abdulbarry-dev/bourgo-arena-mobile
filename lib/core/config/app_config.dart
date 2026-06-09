@@ -1,5 +1,4 @@
 import 'dart:io' as io;
-import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
 /// Centralized configuration for environment variables and platform-specific checks.
@@ -8,7 +7,7 @@ class AppConfig {
   /// Configured via --dart-define=BASE_URL=...
   static const String _rawBaseUrl = String.fromEnvironment(
     'BASE_URL',
-    defaultValue: 'http://192.168.1.47:8000/api/v1/',
+    defaultValue: 'http://192.168.1.47:8000/api/v1',
   );
 
   /// The base URL for the API.
