@@ -208,7 +208,7 @@ class ApiClient {
     String? authToken,
   }) async {
     try {
-      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
       final response = await _dio.get(
         normalizedPath,
         queryParameters: queryParameters,
@@ -235,7 +235,7 @@ class ApiClient {
     String? authToken,
   }) async {
     try {
-      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
       final response = await _dio.post(
         normalizedPath,
         data: body,
@@ -262,7 +262,7 @@ class ApiClient {
     String? authToken,
   }) async {
     try {
-      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
       final response = await _dio.put(
         normalizedPath,
         data: body,
@@ -288,7 +288,7 @@ class ApiClient {
     String? authToken,
   }) async {
     try {
-      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
       final response = await _dio.delete(
         normalizedPath,
         options: Options(extra: {
@@ -316,7 +316,7 @@ class ApiClient {
     String? authToken,
   }) async {
     try {
-      final normalizedPath = path.startsWith('/') ? path.substring(1) : path;
+      final normalizedPath = path.startsWith('/') ? path : '/$path';
       final formData = FormData.fromMap({
         fileFieldName: await MultipartFile.fromFile(filePath),
         if (extraFields != null) ...extraFields,
