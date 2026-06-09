@@ -29,7 +29,7 @@
   "guestBrowse": "CONTINUE AS GUEST",
 
   "navHome": "HOME",
-  "navActivities": "ACTIVITIES",
+  "navActivities": "BROWSE",
   "navPlanning": "PLANNING",
   "navProfile": "ACCOUNT",
   
@@ -190,6 +190,7 @@
   "planningCategoryWellness": "Wellness",
   
   "bookingStepSport": "SPORT",
+  "bookingStepDetails": "DETAILS",
   "bookingStepTime": "TIME",
   "bookingStepPayment": "PAYMENT",
 
