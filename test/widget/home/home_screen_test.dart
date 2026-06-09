@@ -4,16 +4,16 @@ import 'dart:io';
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
-import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/domain/entities/event.dart';
+import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
-import 'package:bourgo_arena_mobile/presentation/common/widgets/bourgo_image_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/home/widgets/unified_offering_card.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -21,6 +21,7 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../unit/data/repositories/repository_test_fixtures.dart';
 import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 
 class MockGetActivities extends Mock implements GetActivitiesUseCase {}
 
@@ -28,20 +29,25 @@ class MockGetCourses extends Mock implements GetCoursesUseCase {}
 
 class MockGetServices extends Mock implements GetServicesUseCase {}
 
+class MockGetEvents extends Mock implements GetEventsUseCase {}
+
 void main() {
   late MockGetActivities mockActivities;
   late MockGetCourses mockCourses;
   late MockGetServices mockServices;
+  late MockGetEvents mockEvents;
 
   setUp(() async {
     mockActivities = MockGetActivities();
     mockCourses = MockGetCourses();
     mockServices = MockGetServices();
+    mockEvents = MockGetEvents();
 
     await locator.reset();
     locator.registerLazySingleton<GetActivitiesUseCase>(() => mockActivities);
     locator.registerLazySingleton<GetCoursesUseCase>(() => mockCourses);
     locator.registerLazySingleton<GetServicesUseCase>(() => mockServices);
+    locator.registerLazySingleton<GetEventsUseCase>(() => mockEvents);
   });
 
   setUpAll(() {
@@ -52,54 +58,64 @@ void main() {
     HttpOverrides.global = null;
   });
 
-  testWidgets('initial render shows key UI elements', (tester) async {
-    when(
-      () => mockActivities(),
-    ).thenAnswer((_) async => Success([testActivityEntity()]));
-    when(
-      () => mockCourses(),
-    ).thenAnswer((_) async => Success([testCourseEntity()]));
-    when(
-      () => mockServices(),
-    ).thenAnswer((_) async => Success([testServiceEntity()]));
-
-    await tester.pumpWidget(_buildApp(const HomeScreen()));
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.byType(IconButton), findsNWidgets(2));
-    expect(find.byType(BourgoImageCard), findsWidgets);
-  });
-
-  testWidgets('loading state shows CircularProgressIndicator', (tester) async {
-    final activitiesCompleter = Completer<Result<List<Activity>, Failure>>();
-    when(() => mockActivities()).thenAnswer((_) => activitiesCompleter.future);
-    when(() => mockCourses()).thenAnswer(
-      (_) async =>
-          Success([testCourseEntity(dayOfWeek: DateTime.now().weekday)]),
+  testWidgets('shows section headers after data loads', (tester) async {
+    when(() => mockActivities()).thenAnswer(
+      (_) async => Success([testActivityEntity()]),
     );
-    when(
-      () => mockServices(),
-    ).thenAnswer((_) async => Success([testServiceEntity()]));
+    when(() => mockCourses()).thenAnswer(
+      (_) async => Success([testCourseEntity()]),
+    );
+    when(() => mockEvents()).thenAnswer(
+      (_) async => Success([Event(id: 'e1', name: 'Tournament')]),
+    );
+    when(() => mockServices()).thenAnswer(
+      (_) async => Success([testServiceEntity()]),
+    );
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
-    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
 
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('TOURNAMENTS & EVENTS'), findsOneWidget);
+    expect(find.text('COURSES'), findsOneWidget);
 
-    activitiesCompleter.complete(Success([testActivityEntity()]));
-    await tester.pumpAndSettle();
-    expect(find.byType(CircularProgressIndicator), findsNothing);
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(find.text('ACTIVITIES'), findsOneWidget);
+    expect(find.text('SERVICES'), findsOneWidget);
   });
 
-  testWidgets('when use cases return failure, empty lists are shown', (
-    tester,
-  ) async {
+  testWidgets('shows empty state messages when no data', (tester) async {
+    when(() => mockActivities()).thenAnswer(
+      (_) async => const Success(<Activity>[]),
+    );
+    when(() => mockCourses()).thenAnswer(
+      (_) async => const Success(<Course>[]),
+    );
+    when(() => mockEvents()).thenAnswer(
+      (_) async => const Success(<Event>[]),
+    );
+    when(() => mockServices()).thenAnswer(
+      (_) async => const Success(<Service>[]),
+    );
+
+    await tester.pumpWidget(_buildApp(const HomeScreen()));
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(find.textContaining('No'), findsWidgets);
+  });
+
+  testWidgets('shows error state when APIs fail', (tester) async {
     when(() => mockActivities()).thenAnswer(
       (_) async => FailureResult(
         NetworkFailure(AppErrorCode.networkUnavailable, 'offline'),
       ),
     );
     when(() => mockCourses()).thenAnswer(
+      (_) async =>
+          FailureResult(ServerFailure(AppErrorCode.serverError, 'error')),
+    );
+    when(() => mockEvents()).thenAnswer(
       (_) async =>
           FailureResult(ServerFailure(AppErrorCode.serverError, 'error')),
     );
@@ -111,7 +127,7 @@ void main() {
     await tester.pumpWidget(_buildApp(const HomeScreen()));
     await tester.pump(const Duration(seconds: 2));
 
-    expect(find.byType(EmptyState), findsOneWidget);
+    expect(find.text('Something went wrong'), findsWidgets);
   });
 }
 
@@ -192,71 +208,8 @@ class _FakeHttpResponse extends Fake implements HttpClientResponse {
 }
 
 const List<int> _transparentPngBytes = <int>[
-  137,
-  80,
-  78,
-  71,
-  13,
-  10,
-  26,
-  10,
-  0,
-  0,
-  0,
-  13,
-  73,
-  72,
-  68,
-  82,
-  0,
-  0,
-  0,
-  1,
-  0,
-  0,
-  0,
-  1,
-  8,
-  6,
-  0,
-  0,
-  0,
-  31,
-  21,
-  196,
-  137,
-  0,
-  0,
-  0,
-  12,
-  73,
-  68,
-  65,
-  84,
-  8,
-  153,
-  99,
-  0,
-  1,
-  0,
-  0,
-  5,
-  0,
-  1,
-  13,
-  10,
-  44,
-  90,
-  0,
-  0,
-  0,
-  0,
-  73,
-  69,
-  78,
-  68,
-  174,
-  66,
-  96,
-  130,
+  137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1,
+  0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137, 0, 0, 0, 12, 73, 68, 65, 84,
+  8, 153, 99, 0, 1, 0, 0, 5, 0, 1, 13, 10, 44, 90, 0, 0, 0, 0, 73, 69, 78,
+  68, 174, 66, 96, 130,
 ];

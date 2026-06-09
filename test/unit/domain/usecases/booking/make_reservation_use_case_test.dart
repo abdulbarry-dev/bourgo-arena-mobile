@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation_with_payment.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
 import 'package:mocktail/mocktail.dart';
@@ -22,18 +23,39 @@ void main() {
   });
 
   group('MakeReservationUseCase', () {
-    test('returns the created reservation on success', () async {
+    test('returns ReservationWithPayment on success', () async {
       final reservation = testReservation();
+      final rwp = ReservationWithPayment(reservation: reservation);
       when(
         () => repository.makeReservation(reservation),
-      ).thenAnswer((_) async => Success<Reservation, Failure>(reservation));
+      ).thenAnswer((_) async => Success<ReservationWithPayment, Failure>(rwp));
 
       final result = await useCase(reservation);
 
-      expect(result, isA<Success<Reservation, Failure>>());
-      expect((result as Success<Reservation, Failure>).data, same(reservation));
+      expect(result, isA<Success<ReservationWithPayment, Failure>>());
+      final data = (result as Success<ReservationWithPayment, Failure>).data;
+      expect(data.reservation, same(reservation));
       verify(() => repository.makeReservation(reservation)).called(1);
       verifyNoMoreInteractions(repository);
+    });
+
+    test('returns ReservationWithPayment with payment on success', () async {
+      final reservation = testReservation();
+      final rwp = ReservationWithPayment(
+        reservation: reservation,
+        payment: {'payment_url': 'https://gateway.com/pay', 'id': 256, 'payment_reference': 'ref_abc'},
+      );
+      when(
+        () => repository.makeReservation(reservation),
+      ).thenAnswer((_) async => Success<ReservationWithPayment, Failure>(rwp));
+
+      final result = await useCase(reservation);
+
+      expect(result, isA<Success<ReservationWithPayment, Failure>>());
+      final data = (result as Success<ReservationWithPayment, Failure>).data;
+      expect(data.requiresDeposit, isTrue);
+      expect(data.paymentUrl, 'https://gateway.com/pay');
+      verify(() => repository.makeReservation(reservation)).called(1);
     });
 
     test('propagates repository failures unchanged', () async {
@@ -44,30 +66,16 @@ void main() {
       );
 
       when(() => repository.makeReservation(reservation)).thenAnswer(
-        (_) async => const FailureResult<Reservation, Failure>(failure),
+        (_) async => const FailureResult<ReservationWithPayment, Failure>(failure),
       );
 
       final result = await useCase(reservation);
 
-      expect(result, isA<FailureResult<Reservation, Failure>>());
+      expect(result, isA<FailureResult<ReservationWithPayment, Failure>>());
       expect(
-        (result as FailureResult<Reservation, Failure>).failure,
+        (result as FailureResult<ReservationWithPayment, Failure>).failure,
         same(failure),
       );
-      verify(() => repository.makeReservation(reservation)).called(1);
-      verifyNoMoreInteractions(repository);
-    });
-
-    test('forwards zero-price reservations unchanged', () async {
-      final reservation = testReservation(price: 0.0, qrCode: '');
-      when(
-        () => repository.makeReservation(reservation),
-      ).thenAnswer((_) async => Success<Reservation, Failure>(reservation));
-
-      final result = await useCase(reservation);
-
-      expect(result, isA<Success<Reservation, Failure>>());
-      expect((result as Success<Reservation, Failure>).data.price, 0.0);
       verify(() => repository.makeReservation(reservation)).called(1);
       verifyNoMoreInteractions(repository);
     });

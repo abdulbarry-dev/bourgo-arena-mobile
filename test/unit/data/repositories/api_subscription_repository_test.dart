@@ -66,14 +66,33 @@ void main() {
       },
     );
 
-    test('subscribeToPlan returns success on API success', () async {
+    test('subscribeToPlan returns subscription on API success', () async {
+      final tSubResp = {
+        'data': {
+          'id': 43,
+          'plan': {'id': '3', 'name': 'Premium', 'price': 149.999, 'has_all_courses': true},
+          'service': {'id': '1', 'name': 'Fitness', 'slug': 'fitness', 'image_url': 'https://img.com/f.jpg', 'status': 'active'},
+          'status': 'pending',
+          'starts_at': '2026-06-15',
+          'ends_at': null,
+          'days_remaining': 0,
+          'payment_method': 'konnect',
+          'amount_paid': 0.0,
+          'is_active': false,
+          'receipt_url': null,
+        },
+      };
       when(
         () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
-      ).thenAnswer((_) async => {});
+      ).thenAnswer((_) async => tSubResp);
 
       final result = await repository.subscribeToPlan('p1');
 
-      expect(result, isA<Success<void, Failure>>());
+      expect(result, isA<Success<Subscription, Failure>>());
+      final sub = (result as Success<Subscription, Failure>).data;
+      expect(sub.id, '43');
+      expect(sub.status, 'pending');
+      expect(sub.amountPaid, 0.0);
       verify(
         () => apiClient.post('/subscriptions', {'plan_id': 'p1'}),
       ).called(1);
