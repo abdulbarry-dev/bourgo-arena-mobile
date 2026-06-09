@@ -1,9 +1,11 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// A card widget representing a group course session.
 class CourseCard extends StatelessWidget {
   final Course course;
   final VoidCallback? onTap;
@@ -13,202 +15,170 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.outline.withValues(alpha: 0.5),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: appColors.bgBorder),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildImageSection(theme),
+            _buildContentSection(theme),
+          ],
         ),
       ),
-      child: Row(
+    );
+  }
+
+  Widget _buildImageSection(ThemeData theme) {
+    final hasImage = course.images.isNotEmpty;
+
+    return SizedBox(
+      height: 180,
+      child: Stack(
+        fit: StackFit.expand,
         children: [
-          _TimeColumn(startTime: course.startTime, endTime: course.endTime),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        course.title.toUpperCase(),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    _CategoryBadge(category: course.category),
+          if (hasImage)
+            PremiumNetworkImage(
+              imageUrl: course.images.first,
+              fit: BoxFit.cover,
+            )
+          else
+            Container(
+              color: theme.colorScheme.surfaceContainerHighest,
+              child: Icon(
+                Symbols.school,
+                size: 48,
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
+              ),
+            ),
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.6),
                   ],
+                  stops: const [0.6, 1.0],
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Symbols.person,
-                      size: 14,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
-                        course.instructor,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontSize: 13,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(
-                      Symbols.groups,
-                      size: 14,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${course.enrolled}/${course.capacity}',
-                      style: TextStyle(
-                        color: course.isFull
-                            ? Colors.redAccent
-                            : theme.colorScheme.onSurfaceVariant,
-                        fontSize: 13,
-                        fontWeight: course.isFull
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-          const SizedBox(width: 12),
-          _ActionButton(isFull: course.isFull, onTap: onTap),
+          if (course.status != null)
+            Positioned(
+              left: 16,
+              bottom: 16,
+              child: _StatusBadge(
+                status: course.status!,
+                theme: theme,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildContentSection(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            course.name.toUpperCase(),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontFamily: AppConstants.displayFontFamily,
+              fontWeight: FontWeight.w900,
+              fontSize: 18,
+              letterSpacing: 0.5,
+              color: theme.colorScheme.onSurface,
+              height: 1.1,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (course.description != null && course.description!.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              course.description!,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                height: 1.4,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+          const SizedBox(height: 12),
+          _ActionLabel(theme: theme),
         ],
       ),
     );
   }
 }
 
-class _TimeColumn extends StatelessWidget {
-  final String startTime;
-  final String endTime;
+class _StatusBadge extends StatelessWidget {
+  final String status;
+  final ThemeData theme;
 
-  const _TimeColumn({required this.startTime, required this.endTime});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Column(
-      children: [
-        Text(
-          startTime,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        Container(
-          width: 2,
-          height: 12,
-          color: theme.colorScheme.outline,
-          margin: const EdgeInsets.symmetric(vertical: 2),
-        ),
-        Text(
-          endTime,
-          style: TextStyle(
-            color: theme.colorScheme.onSurfaceVariant,
-            fontSize: 12,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _CategoryBadge extends StatelessWidget {
-  final String category;
-
-  const _CategoryBadge({required this.category});
+  const _StatusBadge({required this.status, required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final color = _getCategoryColor(category, theme);
-
+    final isActive = status == 'active';
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withAlpha(30),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withAlpha(50)),
+        color: isActive
+            ? theme.colorScheme.primary
+            : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        category.toUpperCase(),
+        status.toUpperCase(),
         style: TextStyle(
-          color: color,
-          fontSize: 9,
-          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onPrimary,
+          fontWeight: FontWeight.w900,
+          fontSize: 12,
+          fontFamily: GoogleFonts.lexend().fontFamily,
+          letterSpacing: 1,
         ),
       ),
     );
   }
-
-  Color _getCategoryColor(String cat, ThemeData theme) {
-    switch (cat) {
-      case AppConstants.planningCategoryFitness:
-        return theme.colorScheme.primary;
-      case AppConstants.planningCategoryAcademy:
-        return Colors.orangeAccent;
-      case AppConstants.planningCategoryWellness:
-        return Colors.lightBlueAccent;
-      default:
-        return theme.colorScheme.onSurfaceVariant;
-    }
-  }
 }
 
-class _ActionButton extends StatelessWidget {
-  final bool isFull;
+class _ActionLabel extends StatelessWidget {
+  final ThemeData theme;
 
-  final VoidCallback? onTap;
-
-  const _ActionButton({required this.isFull, this.onTap});
+  const _ActionLabel({required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isFull
-              ? theme.colorScheme.onSurface.withValues(alpha: 0.1)
-              : theme.colorScheme.primary.withValues(alpha: 0.15),
-          border: Border.all(
-            color: isFull
-                ? theme.colorScheme.outline
-                : theme.colorScheme.primary.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Icon(
-          isFull ? Symbols.lock : Symbols.add,
-          size: 20,
-          color: isFull
-              ? theme.colorScheme.onSurfaceVariant
-              : theme.colorScheme.primary,
-        ),
+    return Text(
+      'VIEW DETAILS',
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: theme.colorScheme.primary,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 2,
+        fontFamily: GoogleFonts.lexend().fontFamily,
       ),
     );
   }

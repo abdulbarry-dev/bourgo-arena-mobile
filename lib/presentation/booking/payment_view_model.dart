@@ -10,7 +10,6 @@ enum PaymentState { idle, initiating, awaitingVerification, verified, failed }
 class PaymentViewModel extends ChangeNotifier {
   final ReservationRepository _reservationRepository;
   final String reservationId;
-  final String gateway;
 
   PaymentState _state = PaymentState.idle;
   String? _paymentUrl;
@@ -22,7 +21,6 @@ class PaymentViewModel extends ChangeNotifier {
   PaymentViewModel({
     required ReservationRepository reservationRepository,
     required this.reservationId,
-    required this.gateway,
   }) : _reservationRepository = reservationRepository;
 
   /// Current payment flow state.
@@ -48,7 +46,6 @@ class PaymentViewModel extends ChangeNotifier {
 
     final result = await _reservationRepository.initiatePayment(
       reservationId,
-      gateway,
     );
 
     result.when(

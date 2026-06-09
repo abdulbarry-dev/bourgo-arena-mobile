@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/payment.dart';
 import 'package:flutter/material.dart';
@@ -11,22 +12,30 @@ class TransactionTile extends StatelessWidget {
   const TransactionTile({super.key, required this.payment, this.onTapReceipt});
 
   IconData _iconForType(String type) {
-    switch (type.toLowerCase()) {
+    switch (type) {
       case 'subscription':
         return Symbols.card_membership;
       case 'reservation':
+      case 'reservation_deposit':
         return Symbols.event;
+      case 'loyalty_points':
+        return Symbols.stars;
       default:
         return Symbols.payments;
     }
   }
 
-  String _gatewayLabel(String gateway) {
+  String? _gatewayLabel(String? gateway) {
+    if (gateway == null) return null;
     switch (gateway.toLowerCase()) {
       case 'konnect':
         return 'Konnect';
       case 'flouci':
         return 'Flouci';
+      case 'loyalty_points':
+        return 'Fidelity';
+      case 'manual_admin':
+        return 'Manual';
       default:
         return gateway;
     }
@@ -36,125 +45,205 @@ class TransactionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
-    final spacing = context.spacing;
-
-    final formattedDate = DateFormat.yMMMd().format(payment.createdAt);
+    final formattedDate = DateFormat('d MMM yyyy').format(payment.createdAt);
     final formattedTime = DateFormat.Hm().format(payment.createdAt);
-    final isSuccess =
-        payment.status.toLowerCase() == 'success' ||
-        payment.status.toLowerCase() == 'paid';
+    final isSuccess = payment.status.toLowerCase() == 'paid' ||
+        payment.status.toLowerCase() == 'success';
+    final isPending = payment.status.toLowerCase() == 'initiated';
 
-    return Container(
-      margin: EdgeInsets.only(bottom: spacing.sm),
-      padding: EdgeInsets.all(spacing.md),
-      decoration: BoxDecoration(
-        color: appColors.bgSurface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: appColors.bgBorder),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(spacing.sm),
-            decoration: BoxDecoration(
-              color: appColors.brandPrimaryGhost,
-              borderRadius: BorderRadius.circular(16),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: appColors.bgBorder),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: isSuccess
+                    ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                    : isPending
+                        ? Colors.amber.withValues(alpha: 0.12)
+                        : theme.colorScheme.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                _iconForType(payment.type),
+                color: isSuccess
+                    ? theme.colorScheme.primary
+                    : isPending
+                        ? Colors.amber.shade700
+                        : theme.colorScheme.error,
+                size: 22,
+              ),
             ),
-            child: Icon(
-              _iconForType(payment.type),
-              color: theme.colorScheme.primary,
-              size: 24,
-            ),
-          ),
-          SizedBox(width: spacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  payment.description,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                SizedBox(height: spacing.xxs),
-                Text(
-                  '$formattedDate à $formattedTime',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                SizedBox(height: spacing.xxs),
-                Text(
-                  '${payment.paymentReference} • ${_gatewayLabel(payment.gateway)}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                  ),
-                ),
-                if (payment.receiptUrl != null) ...[
-                  SizedBox(height: spacing.xs),
-                  GestureDetector(
-                    onTap: onTapReceipt,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Symbols.receipt_long,
-                          size: 14,
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          payment.description.isNotEmpty
+                              ? payment.description
+                              : payment.type == 'subscription'
+                                  ? 'Subscription'
+                                  : payment.type == 'reservation_deposit'
+                                      ? 'Reservation Deposit'
+                                      : 'Reservation',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontFamily: AppConstants.displayFontFamily,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.5,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${payment.amount.toStringAsFixed(2)} TND',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontFamily: AppConstants.displayFontFamily,
+                          fontWeight: FontWeight.w900,
                           color: theme.colorScheme.primary,
                         ),
-                        SizedBox(width: spacing.xxs),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Icon(
+                        Symbols.schedule,
+                        size: 14,
+                        color: theme.colorScheme.onSurfaceVariant
+                            .withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$formattedDate · $formattedTime',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant
+                              .withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (payment.paymentReference.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Icon(
+                          Symbols.tag,
+                          size: 14,
+                          color: theme.colorScheme.onSurfaceVariant
+                              .withValues(alpha: 0.4),
+                        ),
+                        const SizedBox(width: 4),
                         Text(
-                          'Voir le reçu',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w700,
+                          payment.paymentReference,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.45),
+                            fontSize: 11,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
-                  ),
+                  ],
+                  if (payment.receiptUrl != null) ...[
+                    const SizedBox(height: 8),
+                    GestureDetector(
+                      onTap: onTapReceipt,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Symbols.receipt_long,
+                            size: 16,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'View receipt',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              children: [
+                if (_gatewayLabel(payment.gateway) != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: appColors.bgSurface,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: appColors.bgBorder),
+                    ),
+                    child: Text(
+                      _gatewayLabel(payment.gateway)!,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: theme.colorScheme.onSurfaceVariant,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSuccess
+                        ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                        : isPending
+                            ? Colors.amber.withValues(alpha: 0.12)
+                            : theme.colorScheme.error.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    payment.status.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: isSuccess
+                          ? theme.colorScheme.primary
+                          : isPending
+                              ? Colors.amber.shade700
+                              : theme.colorScheme.error,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
               ],
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '${payment.amount.toStringAsFixed(3)} TND',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: theme.colorScheme.onSurface,
-                ),
-              ),
-              SizedBox(height: spacing.xxs),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing.sm,
-                  vertical: spacing.xxs,
-                ),
-                decoration: BoxDecoration(
-                  color: isSuccess
-                      ? theme.colorScheme.primary.withValues(alpha: 0.1)
-                      : theme.colorScheme.error.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  payment.status.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: isSuccess
-                        ? theme.colorScheme.primary
-                        : theme.colorScheme.error,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

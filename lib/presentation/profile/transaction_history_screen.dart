@@ -1,4 +1,4 @@
-import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/entities/payment.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/transaction_history_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/widgets/transaction_tile.dart';
@@ -35,145 +35,163 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final spacing = context.spacing;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: false,
-        title: Text(
-          'HISTORIQUE DES PAIEMENTS',
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
-        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
           onPressed: () => Navigator.pop(context),
           color: theme.colorScheme.onSurface,
+        ),
+        title: Text(
+          'PAYMENT HISTORY',
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontFamily: AppConstants.displayFontFamily,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.5,
+            color: theme.colorScheme.onSurface,
+          ),
         ),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: theme.colorScheme.primary,
           indicatorWeight: 3,
           labelColor: theme.colorScheme.primary,
-          unselectedLabelColor: theme.colorScheme.onSurface.withValues(
-            alpha: 0.4,
-          ),
+          unselectedLabelColor:
+              theme.colorScheme.onSurface.withValues(alpha: 0.4),
           labelStyle: const TextStyle(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 0.5,
             fontSize: 12,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.2,
           ),
           tabs: const [
-            Tab(text: 'TOUT'),
-            Tab(text: 'RÉSERVATIONS'),
-            Tab(text: 'ABONNEMENTS'),
+            Tab(text: 'ALL'),
+            Tab(text: 'RESERVATIONS'),
+            Tab(text: 'SUBSCRIPTIONS'),
           ],
         ),
       ),
-      body: ListenableBuilder(
-        listenable: widget.viewModel,
-        builder: (context, _) {
-          if (widget.viewModel.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: Column(
+        children: [
+          Expanded(
+            child: ListenableBuilder(
+              listenable: widget.viewModel,
+              builder: (context, _) {
+                if (widget.viewModel.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          if (widget.viewModel.errorMessage != null &&
-              widget.viewModel.payments.isEmpty) {
-            return Center(
-              child: Padding(
-                padding: spacing.screenPadding(context),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                if (widget.viewModel.errorMessage != null &&
+                    widget.viewModel.payments.isEmpty) {
+                  return _ErrorView(
+                    message: widget.viewModel.errorMessage!,
+                    onRetry: widget.viewModel.loadTransactions,
+                  );
+                }
+
+                return TabBarView(
+                  controller: _tabController,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(spacing.lg),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.error.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Symbols.wifi_off,
-                        size: 48,
-                        color: theme.colorScheme.error,
-                      ),
+                    _PaymentList(
+                      payments: widget.viewModel.payments,
+                      emptyMessage: 'No payments yet.',
                     ),
-                    SizedBox(height: spacing.lg),
-                    Text(
-                      'Chargement échoué',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                      textAlign: TextAlign.center,
+                    _PaymentList(
+                      payments: widget.viewModel.reservationPayments,
+                      emptyMessage: 'No reservation payments.',
                     ),
-                    SizedBox(height: spacing.sm),
-                    Text(
-                      widget.viewModel.errorMessage!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    SizedBox(height: spacing.xl),
-                    FilledButton.icon(
-                      onPressed: widget.viewModel.loadTransactions,
-                      icon: const Icon(Symbols.refresh, size: 20),
-                      label: const Text('Réessayer'),
-                      style: FilledButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: spacing.xl,
-                          vertical: spacing.md,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
+                    _PaymentList(
+                      payments: widget.viewModel.subscriptionPayments,
+                      emptyMessage: 'No subscription payments.',
                     ),
                   ],
-                ),
-              ),
-            );
-          }
-
-          return TabBarView(
-            controller: _tabController,
-            children: [
-              _PaymentListView(
-                payments: widget.viewModel.payments,
-                emptyMessage: 'Aucun paiement pour le moment.',
-              ),
-              _PaymentListView(
-                payments: widget.viewModel.reservationPayments,
-                emptyMessage: 'Aucun paiement de réservation.',
-              ),
-              _PaymentListView(
-                payments: widget.viewModel.subscriptionPayments,
-                emptyMessage: 'Aucun paiement d\'abonnement.',
-              ),
-            ],
-          );
-        },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _PaymentListView extends StatelessWidget {
-  final List<Payment> payments;
-  final String emptyMessage;
+class _ErrorView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
 
-  const _PaymentListView({required this.payments, required this.emptyMessage});
+  const _ErrorView({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final spacing = context.spacing;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.error.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Symbols.wifi_off,
+                size: 40,
+                color: theme.colorScheme.error,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Loading failed',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontFamily: AppConstants.displayFontFamily,
+                fontWeight: FontWeight.w900,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Symbols.refresh, size: 18),
+              label: const Text('Réessayer'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PaymentList extends StatelessWidget {
+  final List<Payment> payments;
+  final String emptyMessage;
+
+  const _PaymentList({required this.payments, required this.emptyMessage});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
 
     if (payments.isEmpty) {
       return Center(
@@ -182,22 +200,27 @@ class _PaymentListView extends StatelessWidget {
           children: [
             Icon(
               Symbols.payments,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+              size: 56,
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.18),
             ),
-            SizedBox(height: spacing.lg),
+            const SizedBox(height: 16),
             Text(
               emptyMessage,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: theme.colorScheme.onSurface,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontFamily: AppConstants.displayFontFamily,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+                color: theme.colorScheme.onSurfaceVariant
+                    .withValues(alpha: 0.5),
               ),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: spacing.sm),
+            const SizedBox(height: 6),
             Text(
-              'Les paiements effectués apparaîtront ici.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              'Completed payments will appear here.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant
+                    .withValues(alpha: 0.35),
               ),
             ),
           ],
@@ -206,7 +229,7 @@ class _PaymentListView extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: spacing.screenPadding(context),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       itemCount: payments.length,
       itemBuilder: (context, index) {
         final payment = payments[index];
