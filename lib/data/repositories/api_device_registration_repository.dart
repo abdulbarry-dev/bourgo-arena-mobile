@@ -27,7 +27,8 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
                   'platform': platform,
                   'app_version': appVersion,
                   if (fingerprint != null) 'device_fingerprint': fingerprint,
-                  'integrity_token': integrityToken ?? '',
+                  if (integrityToken != null && integrityToken.isNotEmpty)
+                    'integrity_token': integrityToken,
                 },
                 includeAuth: false,
                 fullResponse: true,
@@ -35,7 +36,8 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
               as Map<String, dynamic>;
 
       Map<String, dynamic> data = response;
-      if (response.containsKey('data') && response['data'] is Map<String, dynamic>) {
+      if (response.containsKey('data') &&
+          response['data'] is Map<String, dynamic>) {
         data = response['data'] as Map<String, dynamic>;
       }
 
@@ -59,7 +61,8 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
               as Map<String, dynamic>;
 
       Map<String, dynamic> data = response;
-      if (response.containsKey('data') && response['data'] is Map<String, dynamic>) {
+      if (response.containsKey('data') &&
+          response['data'] is Map<String, dynamic>) {
         data = response['data'] as Map<String, dynamic>;
       }
 
@@ -78,11 +81,9 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
   @override
   Future<Result<void, Failure>> link(String deviceId) {
     return executeApiCall(() async {
-      await _apiClient.post(
-        '/device/link',
-        {'device_id': deviceId},
-        useSanctumOnly: true,
-      );
+      await _apiClient.post('/device/link', {
+        'device_id': deviceId,
+      }, useSanctumOnly: true);
       return const Success(null);
     });
   }
