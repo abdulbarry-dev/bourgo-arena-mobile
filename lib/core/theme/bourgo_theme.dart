@@ -186,6 +186,102 @@ extension AppSpacingContext on BuildContext {
       Theme.of(this).extension<AppSpacing>() ?? AppSpacing.standard;
 }
 
+/// Animation duration and curve tokens for Bourgo Arena.
+class AppAnimation extends ThemeExtension<AppAnimation> {
+  final Duration fast;
+  final Duration normal;
+  final Duration smooth;
+  final Duration generous;
+  final Duration luxurious;
+  final Duration staggerInterval;
+
+  final Curve press;
+  final Curve entrance;
+  final Curve bounce;
+  final Curve elastic;
+
+  const AppAnimation({
+    required this.fast,
+    required this.normal,
+    required this.smooth,
+    required this.generous,
+    required this.luxurious,
+    required this.staggerInterval,
+    required this.press,
+    required this.entrance,
+    required this.bounce,
+    required this.elastic,
+  });
+
+  static const AppAnimation standard = AppAnimation(
+    fast: Duration(milliseconds: 150),
+    normal: Duration(milliseconds: 300),
+    smooth: Duration(milliseconds: 400),
+    generous: Duration(milliseconds: 600),
+    luxurious: Duration(milliseconds: 1000),
+    staggerInterval: Duration(milliseconds: 50),
+    press: Curves.easeOutCubic,
+    entrance: Curves.easeOutQuad,
+    bounce: Curves.easeOutBack,
+    elastic: Curves.elasticOut,
+  );
+
+  @override
+  ThemeExtension<AppAnimation> copyWith({
+    Duration? fast,
+    Duration? normal,
+    Duration? smooth,
+    Duration? generous,
+    Duration? luxurious,
+    Duration? staggerInterval,
+    Curve? press,
+    Curve? entrance,
+    Curve? bounce,
+    Curve? elastic,
+  }) {
+    return AppAnimation(
+      fast: fast ?? this.fast,
+      normal: normal ?? this.normal,
+      smooth: smooth ?? this.smooth,
+      generous: generous ?? this.generous,
+      luxurious: luxurious ?? this.luxurious,
+      staggerInterval: staggerInterval ?? this.staggerInterval,
+      press: press ?? this.press,
+      entrance: entrance ?? this.entrance,
+      bounce: bounce ?? this.bounce,
+      elastic: elastic ?? this.elastic,
+    );
+  }
+
+  @override
+  ThemeExtension<AppAnimation> lerp(ThemeExtension<AppAnimation>? other, double t) {
+    if (other is! AppAnimation) return this;
+    return AppAnimation(
+      fast: lerpDuration(fast, other.fast, t),
+      normal: lerpDuration(normal, other.normal, t),
+      smooth: lerpDuration(smooth, other.smooth, t),
+      generous: lerpDuration(generous, other.generous, t),
+      luxurious: lerpDuration(luxurious, other.luxurious, t),
+      staggerInterval: lerpDuration(staggerInterval, other.staggerInterval, t),
+      press: other.press,
+      entrance: other.entrance,
+      bounce: other.bounce,
+      elastic: other.elastic,
+    );
+  }
+
+  static Duration lerpDuration(Duration a, Duration b, double t) {
+    return Duration(
+      microseconds: lerpDouble(a.inMicroseconds, b.inMicroseconds, t)!.round(),
+    );
+  }
+}
+
+extension AppAnimationContext on BuildContext {
+  AppAnimation get anim =>
+      Theme.of(this).extension<AppAnimation>() ?? AppAnimation.standard;
+}
+
 /// Theming configuration for Bourgo Arena.
 class BourgoTheme {
   static const Color primaryNeon = Color(0xFFAAFF00);
@@ -225,6 +321,7 @@ class BourgoTheme {
           bgBorder: const Color(0xFFE9ECEF),
         ),
         AppSpacing.standard,
+        AppAnimation.standard,
       ],
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -286,6 +383,7 @@ class BourgoTheme {
           bgBorder: const Color(0xFF242424),
         ),
         AppSpacing.standard,
+        AppAnimation.standard,
       ],
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
