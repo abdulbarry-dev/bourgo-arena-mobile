@@ -18,6 +18,9 @@ void main() {
     mockDio = MockDio();
     mockInterceptors = MockInterceptors();
     when(() => mockDio.interceptors).thenReturn(mockInterceptors);
+    when(
+      () => mockDio.options,
+    ).thenReturn(BaseOptions(baseUrl: 'https://example.com'));
     client = ApiClient(baseUrl: 'https://example.com', dio: mockDio);
   });
 

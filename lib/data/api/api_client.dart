@@ -5,6 +5,7 @@ import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/core/config/app_config.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_identity_storage.dart';
 import 'dart:developer' as developer;
 
 /// A central client for making HTTP requests to the Laravel backend.
@@ -12,11 +13,19 @@ class ApiClient {
   final String baseUrl;
   late final Dio _dio;
   String? _token;
+  String? _deviceToken;
   void Function(String? state)? onAuthError;
+  String? _cachedDeviceId;
 
   final SharedPreferences? sharedPreferences;
+  final DeviceIdentityStorage? _deviceIdentityStorage;
 
-  ApiClient({required this.baseUrl, Dio? dio, this.sharedPreferences}) {
+  ApiClient({
+    required this.baseUrl,
+    Dio? dio,
+    this.sharedPreferences,
+    DeviceIdentityStorage? deviceIdentityStorage,
+  }) : _deviceIdentityStorage = deviceIdentityStorage {
     _dio =
         dio ??
         Dio(
@@ -47,9 +56,13 @@ class ApiClient {
     _dio.interceptors.add(
       QueuedInterceptorsWrapper(
         onRequest: (options, handler) {
-          if (_token != null && (options.extra['includeAuth'] ?? true)) {
-            options.headers['Authorization'] = 'Bearer $_token';
+          if (options.extra['includeAuth'] ?? true) {
+            final authToken = _token ?? _deviceToken;
+            if (authToken != null) {
+              options.headers['Authorization'] = 'Bearer $authToken';
+            }
           }
+          _attachDeviceIdHeader(options);
           developer.log('API ${options.method} Request: ${options.uri}');
           if (options.data != null) {
             developer.log('Body: ${jsonEncode(options.data)}');
@@ -134,8 +147,26 @@ class ApiClient {
     _token = token;
   }
 
+  void setDeviceToken(String? token) {
+    _deviceToken = token;
+  }
+
   /// Returns true if a token is currently set.
   bool get hasToken => _token != null;
+
+  void _attachDeviceIdHeader(RequestOptions options) {
+    if (_cachedDeviceId != null) {
+      options.headers['X-Device-ID'] = _cachedDeviceId;
+      return;
+    }
+    final storage = _deviceIdentityStorage;
+    if (storage == null) return;
+    final deviceId = storage.getDeviceId();
+    if (deviceId != null) {
+      _cachedDeviceId = deviceId;
+      options.headers['X-Device-ID'] = deviceId;
+    }
+  }
 
   /// Sends a GET request to the specified [path].
   Future<dynamic> get(
@@ -250,9 +281,7 @@ class ApiClient {
       final response = await _dio.post(
         normalizedPath,
         data: formData,
-        options: Options(
-          extra: {'includeAuth': includeAuth},
-        ),
+        options: Options(extra: {'includeAuth': includeAuth}),
       );
       return _handleResponse(response, fullResponse: fullResponse);
     } on DioException catch (e) {
@@ -270,7 +299,9 @@ class ApiClient {
     final Map<String, dynamic> body = decoded is Map<String, dynamic>
         ? decoded
         : {};
-    final bool success = body['success'] is bool ? body['success'] as bool : true;
+    final bool success = body['success'] is bool
+        ? body['success'] as bool
+        : true;
 
     if (success) {
       if (!fullResponse && body.containsKey('data') && body['data'] != null) {
