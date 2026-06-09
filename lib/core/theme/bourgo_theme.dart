@@ -254,7 +254,10 @@ class AppAnimation extends ThemeExtension<AppAnimation> {
   }
 
   @override
-  ThemeExtension<AppAnimation> lerp(ThemeExtension<AppAnimation>? other, double t) {
+  ThemeExtension<AppAnimation> lerp(
+    ThemeExtension<AppAnimation>? other,
+    double t,
+  ) {
     if (other is! AppAnimation) return this;
     return AppAnimation(
       fast: lerpDuration(fast, other.fast, t),

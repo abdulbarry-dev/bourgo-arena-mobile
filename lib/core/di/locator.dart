@@ -4,11 +4,15 @@ import "package:bourgo_arena_mobile/domain/usecases/settings/complete_theme_sele
 import "package:bourgo_arena_mobile/domain/usecases/settings/is_theme_selected_use_case.dart";
 import "package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart";
 import 'package:bourgo_arena_mobile/core/config/app_config.dart';
+import 'package:bourgo_arena_mobile/core/services/device_identity_service.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_identity_provider.dart';
+import 'package:bourgo_arena_mobile/core/utils/device_identity_storage.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_activity_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_auth_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_course_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_device_repository.dart';
+import 'package:bourgo_arena_mobile/data/repositories/api_device_registration_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_notification_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_reservation_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_pricing_repository.dart';
@@ -16,6 +20,7 @@ import 'package:bourgo_arena_mobile/data/repositories/api_subscription_repositor
 import 'package:bourgo_arena_mobile/data/repositories/api_user_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/local_session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/device_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/device_registration_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/subscription_repository.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_event_repository.dart';
@@ -43,10 +48,13 @@ import 'package:bourgo_arena_mobile/data/repositories/api_service_repository.dar
 import 'package:bourgo_arena_mobile/domain/repositories/service_repository.dart';
 // NFC-related imports removed — NFC functionality has been excised.
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/add_family_member_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/update_family_member_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/remove_family_member_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/disable_family_feature_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/enable_family_feature_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
@@ -58,11 +66,14 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_us
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_reservation_history_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_reservation_slots_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/get_session_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_balance_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_payments_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
@@ -82,6 +93,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_plans_use_c
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_subscription_history_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/cancel_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_service_details_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
@@ -104,10 +116,20 @@ Future<void> initLocator() async {
     () => LocalSessionRepository(sharedPrefs),
   );
 
+  // Device Identity — persisted separately from session (survives logout)
+  final deviceIdentityStorage = DeviceIdentityStorage(sharedPrefs);
+  locator.registerLazySingleton<DeviceIdentityStorage>(
+    () => deviceIdentityStorage,
+  );
+  locator.registerLazySingleton<DeviceIdentityProvider>(
+    () => DeviceIdentityProvider(),
+  );
+
   // Networking
   final apiClient = ApiClient(
     baseUrl: AppConfig.baseUrl,
     sharedPreferences: sharedPrefs,
+    deviceIdentityStorage: deviceIdentityStorage,
   );
 
   // Initialize the token from storage if it exists
@@ -131,9 +153,31 @@ Future<void> initLocator() async {
     return apiClient;
   });
 
+  // Device Registration Repository
+  locator.registerLazySingleton<DeviceRegistrationRepository>(
+    () => ApiDeviceRegistrationRepository(locator<ApiClient>()),
+  );
+
+  // Initialize device identity (register/refresh device token) before any API calls
+  final deviceIdentityService = DeviceIdentityService(
+    locator<DeviceIdentityProvider>(),
+    deviceIdentityStorage,
+    locator<DeviceRegistrationRepository>(),
+    apiClient,
+  );
+  await deviceIdentityService.initialize();
+  locator.registerLazySingleton<DeviceIdentityService>(
+    () => deviceIdentityService,
+  );
+
   // Repositories
   locator.registerLazySingleton<AuthRepository>(
-    () => ApiAuthRepository(locator<ApiClient>(), locator<SessionRepository>()),
+    () => ApiAuthRepository(
+      locator<ApiClient>(),
+      locator<SessionRepository>(),
+      locator<DeviceIdentityStorage>(),
+      locator<DeviceRegistrationRepository>(),
+    ),
   );
   locator.registerLazySingleton<ActivityRepository>(
     () => ApiActivityRepository(locator<ApiClient>()),
@@ -190,6 +234,7 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => CompleteRegistrationUseCase(locator()));
   locator.registerLazySingleton(() => SendOtpUseCase(locator()));
   locator.registerLazySingleton(() => GetServicesUseCase(locator()));
+  locator.registerLazySingleton(() => GetServiceDetailsUseCase(locator()));
   locator.registerLazySingleton(() => VerifyOtpUseCase(locator()));
   locator.registerLazySingleton(() => VerifyEmailUseCase(locator()));
   locator.registerLazySingleton(() => VerifyPhoneUseCase(locator()));
@@ -211,6 +256,8 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => GetCoursesUseCase(locator()));
   locator.registerLazySingleton(() => BookCourseSessionUseCase(locator()));
   locator.registerLazySingleton(() => GetCourseSessionsUseCase(locator()));
+  locator.registerLazySingleton(() => GetSessionBookingUseCase(locator()));
+  locator.registerLazySingleton(() => GetReservationSlotsUseCase(locator()));
   locator.registerLazySingleton(() => GetNotificationsUseCase(locator()));
   locator.registerLazySingleton(() => MarkNotificationsReadUseCase(locator()));
   locator.registerLazySingleton(() => SearchUseCase(locator()));
@@ -218,14 +265,14 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => UpdateUserProfileUseCase(locator()));
   locator.registerLazySingleton(() => GetChildrenUseCase(locator()));
   locator.registerLazySingleton(
-    () => GetFamilyMembersUseCase(
-      locator<UserRepository>(),
-      locator<FamilyRepository>(),
-    ),
+    () => GetFamilyMembersUseCase(locator<FamilyRepository>()),
   );
   locator.registerLazySingleton(() => AddChildUseCase(locator()));
   locator.registerLazySingleton(() => UpdateChildUseCase(locator()));
   locator.registerLazySingleton(() => RemoveChildUseCase(locator()));
+  locator.registerLazySingleton(() => AddFamilyMemberUseCase(locator()));
+  locator.registerLazySingleton(() => UpdateFamilyMemberUseCase(locator()));
+  locator.registerLazySingleton(() => RemoveFamilyMemberUseCase(locator()));
   locator.registerLazySingleton(() => DisableFamilyFeatureUseCase(locator()));
   locator.registerLazySingleton(() => EnableFamilyFeatureUseCase(locator()));
   locator.registerLazySingleton(() => GetActiveSubscriptionsUseCase(locator()));
@@ -237,6 +284,7 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => const GetMemberTierUseCase());
   locator.registerLazySingleton(() => const ProjectPointsUseCase());
   locator.registerLazySingleton(() => GetLoyaltyBalanceUseCase(locator()));
+  locator.registerLazySingleton(() => GetLoyaltyPaymentsUseCase(locator()));
   locator.registerLazySingleton(() => SubscribeToPlanUseCase(locator()));
   locator.registerLazySingleton(() => PayWithLoyaltyUseCase(locator()));
   locator.registerLazySingleton(() => GetEventsUseCase(locator()));
@@ -303,9 +351,7 @@ Future<void> initLocator() async {
   });
 
   locator.registerFactory<PaymentHistoryViewModel>(
-    () => PaymentHistoryViewModel(
-      locator<GetFullPaymentHistoryUseCase>(),
-    ),
+    () => PaymentHistoryViewModel(locator<GetFullPaymentHistoryUseCase>()),
   );
 
   locator.registerFactory<FamilyManagementViewModel>(
