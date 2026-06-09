@@ -7,6 +7,7 @@ class PlanService extends Equatable {
   final String? slug;
   final String? description;
   final String? imageUrl;
+  final List<String>? images;
   final String? status;
 
   const PlanService({
@@ -15,11 +16,12 @@ class PlanService extends Equatable {
     this.slug,
     this.description,
     this.imageUrl,
+    this.images,
     this.status,
   });
 
   @override
-  List<Object?> get props => [id, name, slug, description, imageUrl, status];
+  List<Object?> get props => [id, name, slug, description, imageUrl, images, status];
 }
 
 /// Entity representing a subscription plan matching PlanResource.

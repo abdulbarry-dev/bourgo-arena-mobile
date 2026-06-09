@@ -11,6 +11,7 @@ class PlanServiceModel {
   final String? slug;
   final String? description;
   final String? imageUrl;
+  final List<String>? images;
   final String? status;
 
   const PlanServiceModel({
@@ -19,6 +20,7 @@ class PlanServiceModel {
     this.slug,
     this.description,
     this.imageUrl,
+    this.images,
     this.status,
   });
 

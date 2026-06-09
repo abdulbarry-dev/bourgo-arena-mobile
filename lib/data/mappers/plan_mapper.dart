@@ -12,6 +12,7 @@ class PlanMapper {
         name: model.service!.name,
         description: model.service!.description,
         imageUrl: model.service!.imageUrl,
+        images: model.service!.images,
         status: model.service!.status,
       );
     }
@@ -37,6 +38,7 @@ class PlanMapper {
         name: entity.service!.name,
         description: entity.service!.description,
         imageUrl: entity.service!.imageUrl,
+        images: entity.service!.images,
         status: entity.service!.status,
       );
     }

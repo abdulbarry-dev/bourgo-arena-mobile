@@ -20,6 +20,7 @@ ActivityModel _$ActivityModelFromJson(Map<String, dynamic> json) =>
       features: (json['features'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+      capacity: (json['capacity'] as num?)?.toInt(),
       rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
       reviewCount: (json['review_count'] as num?)?.toInt() ?? 0,
       images: (json['images'] as List<dynamic>?)
@@ -39,6 +40,7 @@ Map<String, dynamic> _$ActivityModelToJson(ActivityModel instance) =>
       'icon': instance.icon,
       'description': instance.description,
       'features': instance.features,
+      'capacity': instance.capacity,
       'rating': instance.rating,
       'review_count': instance.reviewCount,
       'images': instance.images,

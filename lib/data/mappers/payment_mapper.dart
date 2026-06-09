@@ -14,6 +14,8 @@ class PaymentMapper {
       gateway: model.gateway,
       paymentReference: model.paymentReference,
       receiptUrl: model.receiptUrl,
+      reservationId: model.reservationId,
+      subscriptionId: model.subscriptionId,
       createdAt: model.createdAt,
     );
   }

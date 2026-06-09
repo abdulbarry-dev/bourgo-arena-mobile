@@ -5,8 +5,11 @@ class Activity {
   /// Unique identifier.
   final String id;
 
-  /// Title of the activity.
+  /// Primary display title.
   final String title;
+
+  /// Secondary display name.
+  final String name;
 
   /// Category (Outdoor, Indoor, Wellness).
   final String category;
@@ -20,6 +23,9 @@ class Activity {
   /// URL to the activity image.
   final String imageUrl;
 
+  /// All image URLs.
+  final List<String> images;
+
   /// Icon name.
   final String icon;
 
@@ -28,6 +34,9 @@ class Activity {
 
   /// List of key features or amenities.
   final List<String> features;
+
+  /// Display-only capacity info.
+  final int? capacity;
 
   /// Average rating
   final double rating;
@@ -39,13 +48,16 @@ class Activity {
   const Activity({
     required this.id,
     required this.title,
+    required this.name,
     required this.category,
     required this.basePrice,
     required this.currency,
     required this.imageUrl,
+    required this.images,
     required this.icon,
     required this.description,
     required this.features,
+    this.capacity,
     this.rating = 0.0,
     this.reviewCount = 0,
   });
@@ -57,13 +69,16 @@ class Activity {
           runtimeType == other.runtimeType &&
           id == other.id &&
           title == other.title &&
+          name == other.name &&
           category == other.category &&
           basePrice == other.basePrice &&
           currency == other.currency &&
           imageUrl == other.imageUrl &&
+          _listEquality.equals(images, other.images) &&
           icon == other.icon &&
           description == other.description &&
           _listEquality.equals(features, other.features) &&
+          capacity == other.capacity &&
           rating == other.rating &&
           reviewCount == other.reviewCount;
 
@@ -71,13 +86,16 @@ class Activity {
   int get hashCode =>
       id.hashCode ^
       title.hashCode ^
+      name.hashCode ^
       category.hashCode ^
       basePrice.hashCode ^
       currency.hashCode ^
       imageUrl.hashCode ^
+      _listEquality.hash(images) ^
       icon.hashCode ^
       description.hashCode ^
       _listEquality.hash(features) ^
+      capacity.hashCode ^
       rating.hashCode ^
       reviewCount.hashCode;
 

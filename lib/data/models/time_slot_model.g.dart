@@ -17,6 +17,8 @@ TimeSlotModel _$TimeSlotModelFromJson(Map<String, dynamic> json) =>
       bookedCount: (json['booked_count'] as num?)?.toInt(),
       isAvailable: json['is_available'] as bool?,
       isFullyBooked: json['is_fully_booked'] as bool?,
+      dayOfWeek: (json['day_of_week'] as num?)?.toInt(),
+      durationMinutes: (json['duration_minutes'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$TimeSlotModelToJson(TimeSlotModel instance) =>
@@ -30,4 +32,6 @@ Map<String, dynamic> _$TimeSlotModelToJson(TimeSlotModel instance) =>
       'booked_count': instance.bookedCount,
       'is_available': instance.isAvailable,
       'is_fully_booked': instance.isFullyBooked,
+      'day_of_week': instance.dayOfWeek,
+      'duration_minutes': instance.durationMinutes,
     };

@@ -18,6 +18,8 @@ class TimeSlotMapper {
       capacity: model.capacity,
       bookedCount: model.bookedCount,
       isFullyBooked: model.isFullyBooked ?? false,
+      dayOfWeek: model.dayOfWeek,
+      durationMinutes: model.durationMinutes,
     );
   }
 
@@ -32,6 +34,8 @@ class TimeSlotMapper {
       capacity: domainEntity.capacity,
       bookedCount: domainEntity.bookedCount,
       isFullyBooked: domainEntity.isFullyBooked,
+      dayOfWeek: domainEntity.dayOfWeek,
+      durationMinutes: domainEntity.durationMinutes,
     );
   }
 }

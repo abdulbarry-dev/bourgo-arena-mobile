@@ -20,6 +20,7 @@ class ActivityModel {
   final String? icon;
   final String? description;
   final List<String>? features;
+  final int? capacity;
   @JsonKey(defaultValue: 0.0)
   final double? rating;
   @JsonKey(defaultValue: 0)
@@ -37,6 +38,7 @@ class ActivityModel {
     this.icon,
     this.description,
     this.features,
+    this.capacity,
     this.rating,
     this.reviewCount,
     this.images,
