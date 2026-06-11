@@ -14,6 +14,13 @@ ChildProfileModel _$ChildProfileModelFromJson(Map<String, dynamic> json) =>
       birthDate: DateTime.parse(json['birth_date'] as String),
       gender: json['gender'] as String?,
       avatarUrl: json['avatar_url'] as String?,
+      status: json['status'] as String?,
+      isArchived: json['is_archived'] as bool?,
+      hasActiveSubscription: json['has_active_subscription'] as bool?,
+      activeSubscription: ChildProfileModel._activeSubFromJson(
+        json['active_subscription'] as Map<String, dynamic>?,
+      ),
+      createdAt: json['created_at'] as String?,
     );
 
 Map<String, dynamic> _$ChildProfileModelToJson(ChildProfileModel instance) =>
@@ -24,4 +31,9 @@ Map<String, dynamic> _$ChildProfileModelToJson(ChildProfileModel instance) =>
       'birth_date': instance.birthDate.toIso8601String(),
       'gender': instance.gender,
       'avatar_url': instance.avatarUrl,
+      'status': instance.status,
+      'is_archived': instance.isArchived,
+      'has_active_subscription': instance.hasActiveSubscription,
+      'active_subscription': instance.activeSubscription,
+      'created_at': instance.createdAt,
     };

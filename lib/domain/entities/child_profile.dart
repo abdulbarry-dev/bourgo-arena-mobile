@@ -1,24 +1,18 @@
-/// Pure domain entity representing a child's profile.
+import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
+
 class ChildProfile {
-  /// Unique identifier.
   final String id;
-
-  /// First name.
   final String firstName;
-
-  /// Last name.
   final String lastName;
-
-  /// Birth date.
   final DateTime birthDate;
-
-  /// Gender (optional).
   final String? gender;
-
-  /// URL to avatar image (optional).
   final String? avatarUrl;
+  final String status;
+  final bool isArchived;
+  final bool hasActiveSubscription;
+  final Subscription? activeSubscription;
+  final DateTime? createdAt;
 
-  /// Creates a new [ChildProfile] instance.
   const ChildProfile({
     required this.id,
     required this.firstName,
@@ -26,15 +20,24 @@ class ChildProfile {
     required this.birthDate,
     this.gender,
     this.avatarUrl,
+    this.status = 'active',
+    this.isArchived = false,
+    this.hasActiveSubscription = false,
+    this.activeSubscription,
+    this.createdAt,
   });
 
-  /// Creates a copy of this [ChildProfile] but with the given fields replaced.
   ChildProfile copyWith({
     String? firstName,
     String? lastName,
     DateTime? birthDate,
     String? gender,
     String? avatarUrl,
+    String? status,
+    bool? isArchived,
+    bool? hasActiveSubscription,
+    Subscription? activeSubscription,
+    DateTime? createdAt,
   }) {
     return ChildProfile(
       id: id,
@@ -43,10 +46,14 @@ class ChildProfile {
       birthDate: birthDate ?? this.birthDate,
       gender: gender ?? this.gender,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      status: status ?? this.status,
+      isArchived: isArchived ?? this.isArchived,
+      hasActiveSubscription: hasActiveSubscription ?? this.hasActiveSubscription,
+      activeSubscription: activeSubscription ?? this.activeSubscription,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
 
-  /// Returns the full name of the child.
   String get name => '$firstName $lastName';
 
   @override
@@ -59,7 +66,12 @@ class ChildProfile {
           lastName == other.lastName &&
           birthDate == other.birthDate &&
           gender == other.gender &&
-          avatarUrl == other.avatarUrl;
+          avatarUrl == other.avatarUrl &&
+          status == other.status &&
+          isArchived == other.isArchived &&
+          hasActiveSubscription == other.hasActiveSubscription &&
+          activeSubscription == other.activeSubscription &&
+          createdAt == other.createdAt;
 
   @override
   int get hashCode =>
@@ -68,5 +80,10 @@ class ChildProfile {
       lastName.hashCode ^
       birthDate.hashCode ^
       gender.hashCode ^
-      avatarUrl.hashCode;
+      avatarUrl.hashCode ^
+      status.hashCode ^
+      isArchived.hashCode ^
+      hasActiveSubscription.hashCode ^
+      activeSubscription.hashCode ^
+      createdAt.hashCode;
 }

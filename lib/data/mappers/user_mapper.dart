@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/data/mappers/subscription_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
 import 'package:bourgo_arena_mobile/data/models/user_profile_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
@@ -66,6 +67,15 @@ class ChildMapper {
       birthDate: model.birthDate,
       gender: model.gender,
       avatarUrl: model.avatarUrl,
+      status: model.status ?? 'active',
+      isArchived: model.isArchived ?? false,
+      hasActiveSubscription: model.hasActiveSubscription ?? false,
+      activeSubscription: model.activeSubscription != null
+          ? SubscriptionMapper.toEntity(model.activeSubscription!)
+          : null,
+      createdAt: model.createdAt != null
+          ? DateTime.tryParse(model.createdAt!)
+          : null,
     );
   }
 
@@ -78,6 +88,13 @@ class ChildMapper {
       birthDate: entity.birthDate,
       gender: entity.gender,
       avatarUrl: entity.avatarUrl,
+      status: entity.status,
+      isArchived: entity.isArchived,
+      hasActiveSubscription: entity.hasActiveSubscription,
+      activeSubscription: entity.activeSubscription != null
+          ? SubscriptionMapper.fromEntity(entity.activeSubscription!)
+          : null,
+      createdAt: entity.createdAt?.toIso8601String(),
     );
   }
 }
