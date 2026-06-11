@@ -4,6 +4,10 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_service_details_use_case.dart';
 
+/// ViewModel for the service detail screen.
+///
+/// Loads and exposes service information, session availability,
+/// and handles booking initiation.
 class ServiceDetailViewModel extends BaseViewModel {
   final GetServiceDetailsUseCase _getServiceDetailsUseCase;
 

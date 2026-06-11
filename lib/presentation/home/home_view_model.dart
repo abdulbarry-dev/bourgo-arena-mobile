@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
@@ -7,12 +8,14 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 
 class HomeViewModel extends BaseViewModel {
   final GetActivitiesUseCase _getActivitiesUseCase;
   final GetCoursesUseCase _getCoursesUseCase;
   final GetServicesUseCase _getServicesUseCase;
   final GetEventsUseCase _getEventsUseCase;
+  final AuthStateNotifier _authStateNotifier;
 
   bool _isDisposed = false;
 
@@ -21,10 +24,14 @@ class HomeViewModel extends BaseViewModel {
     required GetCoursesUseCase getCoursesUseCase,
     required GetServicesUseCase getServicesUseCase,
     required GetEventsUseCase getEventsUseCase,
+    required AuthStateNotifier authStateNotifier,
   }) : _getActivitiesUseCase = getActivitiesUseCase,
        _getCoursesUseCase = getCoursesUseCase,
        _getServicesUseCase = getServicesUseCase,
-       _getEventsUseCase = getEventsUseCase;
+       _getEventsUseCase = getEventsUseCase,
+       _authStateNotifier = authStateNotifier {
+    _authStateNotifier.addListener(notifyListeners);
+  }
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -56,6 +63,14 @@ class HomeViewModel extends BaseViewModel {
   bool get servicesLoading => _servicesLoading;
   String? _servicesError;
   String? get servicesError => _servicesError;
+
+  /// Whether the user has a family (parent) account enabled.
+  bool get isParentAccount =>
+      _authStateNotifier.currentUser?.isParentAccount ?? false;
+
+  /// The list of the parent's children profiles.
+  List<ChildProfile> get children =>
+      _authStateNotifier.currentUser?.children ?? [];
 
   Future<void> loadHomeData() async {
     if (_isDisposed) return;
@@ -150,6 +165,7 @@ class HomeViewModel extends BaseViewModel {
   @override
   void dispose() {
     _isDisposed = true;
+    _authStateNotifier.removeListener(notifyListeners);
     super.dispose();
   }
 }

@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
@@ -13,6 +14,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/widgets/profile_list_item.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -143,6 +145,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                         animation: _animationController,
                       ),
                       SizedBox(height: spacing.xl),
+                      if (_viewModel.isParentAccount &&
+                          _viewModel.children.isNotEmpty)
+                        _buildFamilySection(
+                            context, theme, _viewModel, spacing),
+                      if (_viewModel.isParentAccount &&
+                          _viewModel.children.isNotEmpty)
+                        SizedBox(height: spacing.xl),
                       _buildSectionHeader(context, l10n.profileSettings),
                       SizedBox(height: spacing.md),
                       _ProfileMenu(
@@ -346,6 +355,98 @@ class _ProfileScreenState extends State<ProfileScreen>
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFamilySection(
+    BuildContext context,
+    ThemeData theme,
+    ProfileViewModel viewModel,
+    AppSpacing spacing,
+  ) {
+    final children = viewModel.children;
+    final appColors = theme.extension<AppColors>()!;
+
+    return SlideTransition(
+      position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero)
+          .animate(
+            CurvedAnimation(
+              parent: _animationController,
+              curve: const Interval(0.15, 0.65, curve: Curves.easeOutCubic),
+            ),
+          ),
+      child: FadeTransition(
+        opacity: CurvedAnimation(
+          parent: _animationController,
+          curve: const Interval(0.15, 0.65, curve: Curves.easeIn),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: appColors.bgElevated,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: appColors.bgBorder.withValues(alpha: 0.5),
+            ),
+          ),
+          padding: EdgeInsets.all(spacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildSectionHeader(context, 'MY FAMILY'),
+                  TextButton(
+                    onPressed: () => context.push('/manage-children'),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Manage',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        Icon(
+                          Symbols.arrow_forward_ios,
+                          size: 12,
+                          color: theme.colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: spacing.md),
+              SizedBox(
+                height: 96,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: children.length,
+                  separatorBuilder: (_, __) => SizedBox(width: spacing.md),
+                  itemBuilder: (context, index) {
+                    final child = children[index];
+                    return _FamilyChildChip(
+                      child: child,
+                      onTap: () => context.push(
+                        '/family/children/${child.id}',
+                        extra: child,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -660,5 +761,73 @@ class _LogoutButton extends StatelessWidget {
     ).then((confirmed) {
       if (confirmed == true) onLogout();
     });
+  }
+}
+
+class _FamilyChildChip extends StatelessWidget {
+  final ChildProfile child;
+  final VoidCallback onTap;
+
+  const _FamilyChildChip({required this.child, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                width: 2,
+              ),
+            ),
+            child: ClipOval(
+              child: child.avatarUrl != null
+                  ? PremiumNetworkImage(
+                      imageUrl: child.avatarUrl!,
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      color: theme.colorScheme.primary
+                          .withValues(alpha: 0.1),
+                      child: Icon(
+                        child.gender?.toLowerCase() == 'female'
+                            ? Symbols.girl
+                            : Symbols.boy,
+                        color: theme.colorScheme.primary,
+                        size: 28,
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            width: 72,
+            child: Text(
+              child.firstName,
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Lexend',
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

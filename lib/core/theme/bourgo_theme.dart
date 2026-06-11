@@ -19,6 +19,7 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.bgBorder,
   });
 
+  /// Creates a copy of this [AppColors] with the given fields replaced.
   @override
   ThemeExtension<AppColors> copyWith({
     Color? brandPrimaryGhost,
@@ -36,6 +37,7 @@ class AppColors extends ThemeExtension<AppColors> {
     );
   }
 
+  /// Linearly interpolates between two [AppColors] instances.
   @override
   ThemeExtension<AppColors> lerp(ThemeExtension<AppColors>? other, double t) {
     if (other is! AppColors) return this;
@@ -123,6 +125,7 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
     return EdgeInsets.symmetric(horizontal: horizontal, vertical: vertical);
   }
 
+  /// Creates a copy of this [AppSpacing] with the given fields replaced.
   @override
   ThemeExtension<AppSpacing> copyWith({
     double? xxs,
@@ -153,6 +156,7 @@ class AppSpacing extends ThemeExtension<AppSpacing> {
     );
   }
 
+  /// Linearly interpolates between two [AppSpacing] instances.
   @override
   ThemeExtension<AppSpacing> lerp(ThemeExtension<AppSpacing>? other, double t) {
     if (other is! AppSpacing) return this;
@@ -226,6 +230,7 @@ class AppAnimation extends ThemeExtension<AppAnimation> {
     elastic: Curves.elasticOut,
   );
 
+  /// Creates a copy of this [AppAnimation] with the given fields replaced.
   @override
   ThemeExtension<AppAnimation> copyWith({
     Duration? fast,
@@ -253,6 +258,7 @@ class AppAnimation extends ThemeExtension<AppAnimation> {
     );
   }
 
+  /// Linearly interpolates between two [AppAnimation] instances.
   @override
   ThemeExtension<AppAnimation> lerp(
     ThemeExtension<AppAnimation>? other,

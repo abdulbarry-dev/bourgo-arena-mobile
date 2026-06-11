@@ -14,6 +14,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:shimmer/shimmer.dart';
 
+/// Screen for managing the user's active subscription,
+/// including upgrades, cancellations, and renewal details.
 class SubscriptionManagementScreen extends StatefulWidget {
   final Subscription? currentSubscription;
 

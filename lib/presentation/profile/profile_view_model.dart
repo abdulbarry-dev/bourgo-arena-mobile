@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
@@ -34,6 +35,12 @@ class ProfileViewModel extends BaseViewModel {
 
   /// The count of successfully completed payments.
   int get successfulPaymentsCount => _successfulPaymentsCount;
+
+  /// Whether the user has a family (parent) account enabled.
+  bool get isParentAccount => user?.isParentAccount ?? false;
+
+  /// The list of the parent's children profiles.
+  List<ChildProfile> get children => user?.children ?? [];
 
   /// Creates a new [ProfileViewModel] instance.
   ProfileViewModel({

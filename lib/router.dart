@@ -104,6 +104,8 @@ extension GoRouterStateExtraX on GoRouterState {
   }
 }
 
+/// Creates and configures the application [GoRouter] with all route
+/// definitions, redirect logic, and deep-link support.
 GoRouter createRouter(
   SettingsViewModel settingsViewModel,
   AuthStateNotifier authStateNotifier,

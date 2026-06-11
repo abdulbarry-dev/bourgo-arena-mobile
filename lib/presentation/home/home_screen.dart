@@ -2,9 +2,11 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
@@ -36,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       getCoursesUseCase: locator(),
       getServicesUseCase: locator(),
       getEventsUseCase: locator(),
+      authStateNotifier: locator<AuthStateNotifier>(),
     );
     _viewModel.loadHomeData();
   }
@@ -176,6 +179,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   onServiceTap: (service) =>
                       context.push('/services/${service.id}', extra: service),
                 ),
+                if (_viewModel.isParentAccount &&
+                    _viewModel.children.isNotEmpty)
+                  _FamilySection(
+                    children: _viewModel.children,
+                    onChildTap: (child) => context.push(
+                      '/family/children/${child.id}',
+                      extra: child,
+                    ),
+                    onManageTap: () => context.push('/manage-children'),
+                  ),
 
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
               ],
@@ -1065,6 +1078,184 @@ class _ServiceStat extends StatelessWidget {
           fontWeight: FontWeight.w700,
           color: color,
           letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+}
+
+class _FamilySection extends SliverToBoxAdapter {
+  final List<ChildProfile> children;
+  final ValueChanged<ChildProfile> onChildTap;
+  final VoidCallback onManageTap;
+
+  _FamilySection({
+    required this.children,
+    required this.onChildTap,
+    required this.onManageTap,
+  }) : super(
+          child: Builder(
+            builder: (context) {
+              final theme = Theme.of(context);
+              final spacing = context.spacing;
+
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing.xl),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SectionHeader(
+                      title: 'MY FAMILY',
+                      icon: Symbols.family_restroom,
+                      accentColor: theme.colorScheme.secondary,
+                    ),
+                    SizedBox(height: spacing.md),
+                    SizedBox(
+                      height: 100,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: children.length + 1,
+                        separatorBuilder: (_, __) =>
+                            SizedBox(width: spacing.md),
+                        itemBuilder: (context, index) {
+                          if (index == children.length) {
+                            return _ManageChildrenCard(onTap: onManageTap);
+                          }
+                          final child = children[index];
+                          return _FamilyChildCard(
+                            child: child,
+                            onTap: () => onChildTap(child),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: spacing.lg),
+                  ],
+                ),
+              );
+            },
+          ),
+        );
+}
+
+class _FamilyChildCard extends StatelessWidget {
+  final ChildProfile child;
+  final VoidCallback onTap;
+
+  const _FamilyChildCard({required this.child, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 80,
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appColors.bgBorder),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: theme.colorScheme.secondary
+                    .withValues(alpha: 0.1),
+              ),
+              child: child.avatarUrl != null
+                  ? ClipOval(
+                      child: PremiumNetworkImage(
+                        imageUrl: child.avatarUrl!,
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                      ),
+                    )
+                  : Icon(
+                      child.gender?.toLowerCase() == 'female'
+                          ? Symbols.girl
+                          : Symbols.boy,
+                      size: 22,
+                      color: theme.colorScheme.secondary,
+                    ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              child.firstName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Lexend',
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ManageChildrenCard extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _ManageChildrenCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 80,
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: theme.colorScheme.secondary.withValues(alpha: 0.3),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: theme.colorScheme.secondary
+                    .withValues(alpha: 0.08),
+              ),
+              child: Icon(
+                Symbols.add,
+                size: 22,
+                color: theme.colorScheme.secondary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Manage',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Lexend',
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.secondary,
+              ),
+            ),
+          ],
         ),
       ),
     );
