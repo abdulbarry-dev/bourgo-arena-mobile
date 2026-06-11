@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
+import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_service_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:checks/checks.dart';
@@ -31,7 +32,11 @@ void main() {
         ],
       };
       when(
-        () => mockApiClient.get(any()),
+        () => mockApiClient.get(
+          '/services',
+          fullResponse: true,
+          queryParameters: any(named: 'queryParameters'),
+        ),
       ).thenAnswer((_) async => jsonResponse);
 
       // Act
@@ -47,7 +52,13 @@ void main() {
       check(services.first.id).equals(1);
       check(services.first.name).equals('Service A');
 
-      verify(() => mockApiClient.get('/services?page=1&per_page=15')).called(1);
+      verify(
+        () => mockApiClient.get(
+          '/services',
+          fullResponse: true,
+          queryParameters: {'page': '1', 'per_page': '15'},
+        ),
+      ).called(1);
     });
 
     test('getServiceDetails returns service details', () async {
@@ -61,7 +72,7 @@ void main() {
         },
       };
       when(
-        () => mockApiClient.get(any()),
+        () => mockApiClient.get('/services/1', fullResponse: true),
       ).thenAnswer((_) async => jsonResponse);
 
       // Act
@@ -76,12 +87,14 @@ void main() {
       check(service.id).equals(1);
       check(service.name).equals('Service A');
 
-      verify(() => mockApiClient.get('/services/1')).called(1);
+      verify(() => mockApiClient.get('/services/1', fullResponse: true)).called(1);
     });
 
     test('getServices returns failure on exception', () async {
       // Arrange
-      when(() => mockApiClient.get(any())).thenThrow(Exception('Server error'));
+      when(
+        () => mockApiClient.get('/services', fullResponse: true, queryParameters: any(named: 'queryParameters')),
+      ).thenThrow(const ServerException('Server error'));
 
       // Act
       final result = await repository.getServices();
