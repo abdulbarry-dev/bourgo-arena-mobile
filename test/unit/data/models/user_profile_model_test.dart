@@ -36,7 +36,7 @@ void main() {
       'avatar_url': 'https://example.com/avatar.png',
       'loyalty_points': 100,
       'subscription_level': 'Premium',
-      'subscription_expiry': '2024-12-31',
+      'subscription_expiry': '2024-12-31T00:00:00.000Z',
       'birth_date': birthDate.toIso8601String(),
       'is_parent_account': true,
       'children': [
