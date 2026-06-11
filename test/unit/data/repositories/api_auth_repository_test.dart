@@ -110,7 +110,7 @@ void main() {
     ).thenAnswer((_) async => const Success(true));
 
     // Default mock for verification status endpoint
-    when(() => apiClient.get('/member/verification-status')).thenAnswer(
+    when(() => apiClient.get('/user/verification-status')).thenAnswer(
       (_) async => {
         'email_verified': true,
         'phone_verified': true,
@@ -1091,7 +1091,7 @@ void main() {
 
         when(
           () =>
-              apiClient.get('/member/verification-status', skipAuthError: true),
+              apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenAnswer((_) async => verificationStatusJson);
 
         final result = await repository.getVerificationStatus();
@@ -1103,14 +1103,14 @@ void main() {
         expect(status.email, 'alex@example.com');
         verify(
           () =>
-              apiClient.get('/member/verification-status', skipAuthError: true),
+              apiClient.get('/user/verification-status', skipAuthError: true),
         ).called(1);
       });
 
       test('returns failure on server error', () async {
         when(
           () =>
-              apiClient.get('/member/verification-status', skipAuthError: true),
+              apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenThrow(const ServerException('Server error'));
 
         final result = await repository.getVerificationStatus();
@@ -1125,7 +1125,7 @@ void main() {
       test('returns failure on network error', () async {
         when(
           () =>
-              apiClient.get('/member/verification-status', skipAuthError: true),
+              apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenThrow(const NetworkException('Connection error'));
 
         final result = await repository.getVerificationStatus();
@@ -1146,7 +1146,7 @@ void main() {
 
         when(
           () =>
-              apiClient.get('/member/verification-status', skipAuthError: true),
+              apiClient.get('/user/verification-status', skipAuthError: true),
         ).thenAnswer((_) async => verificationStatusJson);
 
         final result = await repository.getVerificationStatus();

@@ -77,8 +77,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
               ),
             ),
             actions: [
-              if (_viewModel.isParentAccount &&
-                  _viewModel.familyMembers.length > 1)
+              if (_viewModel.familyMembers.length > 1)
                 _MemberSelector(viewModel: _viewModel),
               const SizedBox(width: 8),
             ],

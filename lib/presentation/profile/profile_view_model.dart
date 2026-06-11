@@ -1,12 +1,12 @@
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'dart:developer' as developer;
@@ -19,10 +19,12 @@ class ProfileViewModel extends BaseViewModel {
   final AuthStateNotifier _authStateNotifier;
   final GetOngoingReservationsUseCase _getOngoingReservationsUseCase;
   final GetFullPaymentHistoryUseCase _getFullPaymentHistoryUseCase;
+  final GetMyEventsUseCase _getMyEventsUseCase;
 
   bool _isLoading = false;
   int _ongoingReservationsCount = 0;
   int _successfulPaymentsCount = 0;
+  int _myEventsCount = 0;
 
   /// The user's profile data, sourced from the global AuthStateNotifier.
   User? get user => _authStateNotifier.currentUser;
@@ -36,11 +38,8 @@ class ProfileViewModel extends BaseViewModel {
   /// The count of successfully completed payments.
   int get successfulPaymentsCount => _successfulPaymentsCount;
 
-  /// Whether the user has a family (parent) account enabled.
-  bool get isParentAccount => user?.isParentAccount ?? false;
-
-  /// The list of the parent's children profiles.
-  List<ChildProfile> get children => user?.children ?? [];
+  /// The count of the user's event participations.
+  int get myEventsCount => _myEventsCount;
 
   /// Creates a new [ProfileViewModel] instance.
   ProfileViewModel({
@@ -50,12 +49,14 @@ class ProfileViewModel extends BaseViewModel {
     required AuthStateNotifier authStateNotifier,
     required GetOngoingReservationsUseCase getOngoingReservationsUseCase,
     required GetFullPaymentHistoryUseCase getFullPaymentHistoryUseCase,
+    required GetMyEventsUseCase getMyEventsUseCase,
   }) : _authRepository = authRepository,
        _logoutUseCase = logoutUseCase,
        _deleteAccountUseCase = deleteAccountUseCase,
        _authStateNotifier = authStateNotifier,
        _getOngoingReservationsUseCase = getOngoingReservationsUseCase,
-       _getFullPaymentHistoryUseCase = getFullPaymentHistoryUseCase {
+       _getFullPaymentHistoryUseCase = getFullPaymentHistoryUseCase,
+       _getMyEventsUseCase = getMyEventsUseCase {
     _authStateNotifier.addListener(notifyListeners);
     if (user == null) {
       loadProfile();
@@ -66,16 +67,20 @@ class ProfileViewModel extends BaseViewModel {
   }
 
   Future<void> _loadCounts() async {
-    final reservationResult = await _getOngoingReservationsUseCase();
-    reservationResult.fold(
+    final results = await Future.wait([
+      _getOngoingReservationsUseCase(),
+      _getFullPaymentHistoryUseCase.execute(),
+      _getMyEventsUseCase(),
+    ]);
+
+    (results[0] as Result<List<dynamic>, Failure>).fold(
       onSuccess: (reservations) {
         _ongoingReservationsCount = reservations.length;
       },
       onFailure: (_) {},
     );
 
-    final paymentResult = await _getFullPaymentHistoryUseCase.execute();
-    paymentResult.fold(
+    (results[1] as Result<List<dynamic>, Failure>).fold(
       onSuccess: (payments) {
         _successfulPaymentsCount = payments
             .where(
@@ -83,6 +88,15 @@ class ProfileViewModel extends BaseViewModel {
                   p.status.toLowerCase() == 'success' ||
                   p.status.toLowerCase() == 'paid',
             )
+            .length;
+      },
+      onFailure: (_) {},
+    );
+
+    (results[2] as Result<List<dynamic>, Failure>).fold(
+      onSuccess: (participants) {
+        _myEventsCount = participants
+            .where((p) => p.status != 'withdrawn')
             .length;
       },
       onFailure: (_) {},

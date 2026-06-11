@@ -90,7 +90,6 @@ class PlanningViewModel extends BaseViewModel {
   bool get hasActivePlan => _selectedMemberTier != MemberTier.public;
   bool get isSubscriptionGate => _isSubscriptionGate;
   bool get hasSessions => _allSessions.isNotEmpty;
-  bool get isParentAccount => _authStateNotifier.currentUser?.isParentAccount ?? false;
 
   PlanningViewModel({
     required GetCoursesUseCase getCoursesUseCase,

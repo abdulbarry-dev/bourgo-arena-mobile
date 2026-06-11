@@ -76,6 +76,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_balance_
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_payments_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/device/register_device_token_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';

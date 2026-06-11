@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/format.dart';
 import 'package:bourgo_arena_mobile/domain/entities/loyalty_balance.dart';
 import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_model.dart';
@@ -198,9 +199,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     int points,
     MemberTier tier,
   ) {
-    final formattedPoints = NumberFormat(
-      '#,###',
-    ).format(points).replaceAll(',', ' ');
+    final formattedPoints = compactPoints(points);
 
     return Container(
       width: double.infinity,
@@ -289,7 +288,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     MemberTier nextTier,
   ) {
     final appColors = theme.extension<AppColors>()!;
-    final formattedPoints = NumberFormat('#,###').format(pointsToNext);
+    final formattedPoints = compactPoints(pointsToNext);
 
     return Container(
       padding: EdgeInsets.all(spacing.md),

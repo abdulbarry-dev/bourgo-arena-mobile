@@ -37,14 +37,6 @@ class RegisterForEventUseCase {
       _repository.registerForEvent(eventId);
 }
 
-class GetMyEventsUseCase {
-  final EventRepository _repository;
-  const GetMyEventsUseCase(this._repository);
-
-  Future<Result<List<EventParticipant>, Failure>> call() =>
-      _repository.getMyEvents();
-}
-
 class WithdrawFromEventUseCase {
   final EventRepository _repository;
   const WithdrawFromEventUseCase(this._repository);

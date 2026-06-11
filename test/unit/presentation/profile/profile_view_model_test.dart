@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_view_model.dart';
@@ -31,6 +32,8 @@ class MockGetOngoingReservationsUseCase extends Mock
 class MockGetFullPaymentHistoryUseCase extends Mock
     implements GetFullPaymentHistoryUseCase {}
 
+class MockGetMyEventsUseCase extends Mock implements GetMyEventsUseCase {}
+
 class FakeUser extends Fake implements User {}
 
 void main() {
@@ -41,6 +44,7 @@ void main() {
   late MockAuthStateNotifier mockAuthStateNotifier;
   late MockGetOngoingReservationsUseCase mockGetOngoingReservationsUseCase;
   late MockGetFullPaymentHistoryUseCase mockGetFullPaymentHistoryUseCase;
+  late MockGetMyEventsUseCase mockGetMyEventsUseCase;
 
   final testUser = User(
     id: 'user-1',
@@ -78,6 +82,7 @@ void main() {
     mockAuthStateNotifier = MockAuthStateNotifier();
     mockGetOngoingReservationsUseCase = MockGetOngoingReservationsUseCase();
     mockGetFullPaymentHistoryUseCase = MockGetFullPaymentHistoryUseCase();
+    mockGetMyEventsUseCase = MockGetMyEventsUseCase();
 
     // Default behavior for constructor's loadProfile call
     when(
@@ -101,6 +106,9 @@ void main() {
       () => mockGetFullPaymentHistoryUseCase.execute(),
     ).thenAnswer((_) async => Result.success([]));
 
+    when(() => mockGetMyEventsUseCase())
+        .thenAnswer((_) async => Result.success([]));
+
     viewModel = ProfileViewModel(
       authRepository: mockAuthRepository,
       logoutUseCase: mockLogoutUseCase,
@@ -108,6 +116,7 @@ void main() {
       authStateNotifier: mockAuthStateNotifier,
       getOngoingReservationsUseCase: mockGetOngoingReservationsUseCase,
       getFullPaymentHistoryUseCase: mockGetFullPaymentHistoryUseCase,
+      getMyEventsUseCase: mockGetMyEventsUseCase,
     );
   });
 
@@ -131,6 +140,7 @@ void main() {
         authStateNotifier: mockAuthStateNotifier,
         getOngoingReservationsUseCase: mockGetOngoingReservationsUseCase,
         getFullPaymentHistoryUseCase: mockGetFullPaymentHistoryUseCase,
+        getMyEventsUseCase: mockGetMyEventsUseCase,
       );
 
       when(() => mockAuthRepository.getUserProfile()).thenAnswer(

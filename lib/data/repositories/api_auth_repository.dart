@@ -84,6 +84,17 @@ class ApiAuthRepository implements AuthRepository {
           developer.log(
             'Verification status: ${status.isFullyVerified ? 'Verified' : 'Unverified'}, method: ${status.unverifiedMethod}',
           );
+
+          // Never downgrade an already-authenticated session. A transient
+          // 401 on an unrelated endpoint must not change the user's auth
+          // state to pending verification/onboarding — the token is valid.
+          if (_currentSession?.state == AuthState.authenticated) {
+            developer.log(
+              'Session is already authenticated — keeping current state.',
+            );
+            return;
+          }
+
           if (!status.isFullyVerified) {
             if (_currentSession != null) {
               _updateSession(
@@ -111,12 +122,17 @@ class ApiAuthRepository implements AuthRepository {
           developer.log(
             'Failed to fetch verification status: ${failure.message}',
           );
-          // If status check fails, logout
-          _apiClient.setToken(null);
-          _sessionRepository.clearSession();
-          if (_currentSession != null) {
-            _currentSession = null;
-            _authStateController.add(AuthSession.unauthenticated());
+          // Only wipe the session on transient failures if we are NOT
+          // already authenticated. Transient failures should not log out
+          // active users — the token is still valid, keep the session.
+          if (_currentSession == null ||
+              _currentSession!.state != AuthState.authenticated) {
+            _apiClient.setToken(null);
+            _sessionRepository.clearSession();
+            if (_currentSession != null) {
+              _currentSession = null;
+              _authStateController.add(AuthSession.unauthenticated());
+            }
           }
         },
       );
@@ -856,10 +872,15 @@ class ApiAuthRepository implements AuthRepository {
         developer.log(
           'getUserProfile failed with AuthFailure: ${result.failure.message}',
         );
-        // If profile fetch fails due to auth, clear everything
-        _apiClient.setToken(null);
-        await _sessionRepository.clearSession();
-        _authStateController.add(AuthSession.unauthenticated());
+        // Only wipe the session if we are not already authenticated.
+        // A transient AuthFailure on a subsequent profile fetch should not
+        // log out an active user — the existing token may still be valid.
+        if (_currentSession == null ||
+            _currentSession!.state != AuthState.authenticated) {
+          _apiClient.setToken(null);
+          await _sessionRepository.clearSession();
+          _authStateController.add(AuthSession.unauthenticated());
+        }
       } else {
         developer.log(
           'getUserProfile failed with: ${result.failure.runtimeType}, ${result.failure.message}',
@@ -992,7 +1013,7 @@ class ApiAuthRepository implements AuthRepository {
     return executeApiCall(() async {
       final response =
           await _apiClient.get(
-                '/member/verification-status',
+                '/user/verification-status',
                 skipAuthError: true,
               )
               as Map<String, dynamic>;
