@@ -1,15 +1,33 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
+import 'package:bourgo_arena_mobile/data/mappers/child_booking_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/completed_item_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/course_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/reservation_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/schedule_item_mapper.dart';
+import 'package:bourgo_arena_mobile/data/mappers/subscription_mapper.dart';
 import 'package:bourgo_arena_mobile/data/mappers/user_mapper.dart';
+import 'package:bourgo_arena_mobile/data/models/child_booking_model.dart';
 import 'package:bourgo_arena_mobile/data/models/child_profile_model.dart';
+import 'package:bourgo_arena_mobile/data/models/completed_item_model.dart';
+import 'package:bourgo_arena_mobile/data/models/course_session_model.dart';
 import 'package:bourgo_arena_mobile/data/models/family_member_profile_model.dart';
+import 'package:bourgo_arena_mobile/data/models/reservation_model.dart';
+import 'package:bourgo_arena_mobile/data/models/schedule_item_model.dart';
+import 'package:bourgo_arena_mobile/data/models/subscription_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/core/paginated_result.dart';
+import 'package:bourgo_arena_mobile/domain/entities/child_booking.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/completed_item.dart';
+import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/family_member_profile.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/schedule_item.dart';
+import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/family_repository.dart';
 
-/// Laravel API implementation of [FamilyRepository].
 class ApiFamilyRepository implements FamilyRepository {
   final ApiClient _apiClient;
 
@@ -179,5 +197,255 @@ class ApiFamilyRepository implements FamilyRepository {
       await _apiClient.post('/family/enable-feature', {});
       return Result.success(null);
     });
+  }
+
+  @override
+  Future<Result<ChildProfile, Failure>> getChildProfile(String childId) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get('/family/children/$childId/profile')
+              as Map<String, dynamic>;
+      return Result.success(
+        ChildMapper.toEntity(ChildProfileModel.fromJson(response)),
+      );
+    });
+  }
+
+  @override
+  Future<Result<Subscription, Failure>> buyChildSubscription({
+    required String childId,
+    required String planId,
+    String? startsAt,
+  }) {
+    return executeApiCall(() async {
+      final body = <String, dynamic>{'plan_id': planId};
+      if (startsAt != null) body['starts_at'] = startsAt;
+      final response =
+          await _apiClient.post(
+                '/family/children/$childId/subscriptions',
+                body,
+              )
+              as Map<String, dynamic>;
+      return Result.success(
+        SubscriptionMapper.toEntity(SubscriptionModel.fromJson(response)),
+      );
+    });
+  }
+
+  @override
+  Future<Result<PaginatedResult<Subscription>, Failure>> getChildSubscriptions({
+    required String childId,
+    int perPage = 15,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/family/children/$childId/subscriptions',
+                fullResponse: true,
+                queryParameters: {'per_page': perPage.toString()},
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final meta = response['meta'] as Map<String, dynamic>? ?? {};
+      final entities = data
+          .map(
+            (json) => SubscriptionMapper.toEntity(
+              SubscriptionModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(_toPaginated(entities, meta));
+    });
+  }
+
+  @override
+  Future<Result<PaginatedResult<ChildBooking>, Failure>> getChildBookings({
+    required String childId,
+    String filter = 'all',
+    int perPage = 15,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/family/children/$childId/bookings',
+                fullResponse: true,
+                queryParameters: {
+                  'filter': filter,
+                  'per_page': perPage.toString(),
+                },
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final meta = response['meta'] as Map<String, dynamic>? ?? {};
+      final entities = data
+          .map(
+            (json) => ChildBookingMapper.toEntity(
+              ChildBookingModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(_toPaginated(entities, meta));
+    });
+  }
+
+  @override
+  Future<Result<PaginatedResult<CourseSession>, Failure>>
+      getChildAvailableSessions({
+    required String childId,
+    int perPage = 15,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/family/children/$childId/sessions',
+                fullResponse: true,
+                queryParameters: {'per_page': perPage.toString()},
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final meta = response['meta'] as Map<String, dynamic>? ?? {};
+      final entities = data
+          .map(
+            (json) => CourseMapper.toSessionEntity(
+              CourseSessionModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(_toPaginated(entities, meta));
+    });
+  }
+
+  @override
+  Future<Result<ChildBooking, Failure>> bookChildSession({
+    required String childId,
+    required String sessionId,
+    required String date,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post(
+                '/family/children/$childId/sessions/$sessionId/book',
+                {'date': date},
+              )
+              as Map<String, dynamic>;
+      return Result.success(
+        ChildBookingMapper.toEntity(ChildBookingModel.fromJson(response)),
+      );
+    });
+  }
+
+  @override
+  Future<Result<PaginatedResult<Reservation>, Failure>> getChildReservations({
+    required String childId,
+    String filter = 'all',
+    int perPage = 10,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/family/children/$childId/reservations',
+                fullResponse: true,
+                queryParameters: {
+                  'filter': filter,
+                  'per_page': perPage.toString(),
+                },
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final meta = response['meta'] as Map<String, dynamic>? ?? {};
+      final entities = data
+          .map(
+            (json) => ReservationMapper.toEntity(
+              ReservationModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(_toPaginated(entities, meta));
+    });
+  }
+
+  @override
+  Future<Result<List<ScheduleItem>, Failure>> getChildSchedule({
+    required String childId,
+    required String from,
+    required String to,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/family/children/$childId/schedule',
+                fullResponse: true,
+                queryParameters: {'from': from, 'to': to},
+              )
+              as Map<String, dynamic>;
+      final responseData = response['data'] as Map<String, dynamic>? ?? {};
+      final scheduleData = responseData['schedule'] as List<dynamic>? ?? [];
+      final entities = scheduleData
+          .map(
+            (json) => ScheduleItemMapper.toEntity(
+              ScheduleItemModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(entities);
+    });
+  }
+
+  @override
+  Future<Result<ChildBooking, Failure>> completeChildBooking({
+    required String childId,
+    required String bookingId,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.post(
+                '/family/children/$childId/bookings/$bookingId/complete',
+                {},
+              )
+              as Map<String, dynamic>;
+      return Result.success(
+        ChildBookingMapper.toEntity(ChildBookingModel.fromJson(response)),
+      );
+    });
+  }
+
+  @override
+  Future<Result<PaginatedResult<CompletedItem>, Failure>> getChildCompletedItems({
+    required String childId,
+    int perPage = 15,
+  }) {
+    return executeApiCall(() async {
+      final response =
+          await _apiClient.get(
+                '/family/children/$childId/completed',
+                fullResponse: true,
+                queryParameters: {'per_page': perPage.toString()},
+              )
+              as Map<String, dynamic>;
+      final data = response['data'] as List<dynamic>? ?? [];
+      final meta = response['meta'] as Map<String, dynamic>? ?? {};
+      final entities = data
+          .map(
+            (json) => CompletedItemMapper.toEntity(
+              CompletedItemModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(_toPaginated(entities, meta));
+    });
+  }
+
+  PaginatedResult<T> _toPaginated<T>(
+    List<T> items,
+    Map<String, dynamic> meta,
+  ) {
+    return PaginatedResult(
+      data: items,
+      currentPage: meta['current_page'] as int? ?? 1,
+      lastPage: meta['last_page'] as int? ?? 1,
+      total: meta['total'] as int? ?? items.length,
+      hasMore: (meta['current_page'] as int? ?? 1) <
+          (meta['last_page'] as int? ?? 1),
+    );
   }
 }
