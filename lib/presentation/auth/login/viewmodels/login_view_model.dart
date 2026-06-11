@@ -20,6 +20,8 @@ class LoginViewModel extends ChangeNotifier {
   bool _isRememberMeChecked = false;
   bool get isRememberMeChecked => _isRememberMeChecked;
 
+  bool _disposed = false;
+
   LoginViewModel(this._loginUseCase, this._sessionRepository);
 
   /// Initializes the ViewModel by loading the remembered identifier if any.
@@ -43,6 +45,7 @@ class LoginViewModel extends ChangeNotifier {
   }
 
   void setLoading(bool value) {
+    if (_disposed) return;
     _isLoading = value;
     notifyListeners();
   }
@@ -57,7 +60,9 @@ class LoginViewModel extends ChangeNotifier {
         passwordController.text,
       );
 
-      setLoading(false);
+      if (context.mounted) {
+        setLoading(false);
+      }
 
       result.fold(
         onFailure: (failure) {
@@ -112,6 +117,7 @@ class LoginViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _disposed = true;
     identifierController.dispose();
     passwordController.dispose();
     super.dispose();

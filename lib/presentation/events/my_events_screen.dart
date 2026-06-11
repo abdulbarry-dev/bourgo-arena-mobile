@@ -3,9 +3,12 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class MyEventsScreen extends StatefulWidget {
@@ -57,6 +60,7 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final spacing = context.spacing;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -73,6 +77,7 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
         title: Text(
           'MY EVENTS',
           style: theme.textTheme.titleSmall?.copyWith(
+            fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
             letterSpacing: 1.5,
           ),
@@ -84,21 +89,46 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
 
   Widget _buildBody(ThemeData theme) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator(strokeWidth: 2));
+      return AppShimmer(
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 24,
+            vertical: 16,
+          ),
+          child: Column(
+            children: List.generate(5, (_) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: AppShimmer.block(width: double.infinity, height: 88),
+              );
+            }),
+          ),
+        ),
+      );
     }
 
     if (_error != null) {
       return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Symbols.error, size: 48,
-                color: theme.colorScheme.error.withValues(alpha: 0.5)),
-            const SizedBox(height: 16),
-            Text(_error!, style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: _load, child: const Text('Retry')),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Symbols.error,
+                size: 48,
+                color: theme.colorScheme.error.withValues(alpha: 0.5),
+              ),
+              const SizedBox(height: 16),
+              Text(_error!, style: theme.textTheme.bodyMedium),
+              const SizedBox(height: 16),
+              FilledButton.icon(
+                onPressed: _load,
+                icon: const Icon(Symbols.refresh, size: 18),
+                label: const Text('Retry'),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -108,11 +138,16 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Symbols.emoji_events, size: 64,
-                color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+            Icon(
+              Symbols.emoji_events,
+              size: 64,
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+            ),
             const SizedBox(height: 16),
-            Text('No event participations yet',
-                style: theme.textTheme.titleMedium),
+            Text(
+              'No event participations yet',
+              style: theme.textTheme.titleMedium,
+            ),
           ],
         ),
       );
@@ -125,7 +160,6 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
         itemCount: _participants.length,
         itemBuilder: (context, index) {
           final p = _participants[index];
-          final event = p.event;
           return Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: _EventParticipantCard(participant: p),
@@ -152,73 +186,64 @@ class _EventParticipantCard extends StatelessWidget {
     final status = event.status ?? '';
     final imageUrl = event.imageUrl;
 
-    return GestureDetector(
+    return AppCard.compact(
       onTap: () => context.push('/events/${event.id}', extra: event),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: appColors.bgElevated,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: appColors.bgBorder),
-        ),
-        child: Row(
-          children: [
-            if (imageUrl != null)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: PremiumNetworkImage(
-                  imageUrl: imageUrl,
-                  width: 56,
-                  height: 56,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            if (imageUrl != null) const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    status.toUpperCase(),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: status == 'open'
-                          ? Colors.green
-                          : theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
+      child: Row(
+        children: [
+          if (imageUrl != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: PremiumNetworkImage(
+                imageUrl: imageUrl,
+                width: 56,
+                height: 56,
+                fit: BoxFit.cover,
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
+          if (imageUrl != null) const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  status.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: status == 'open'
+                        ? appColors.statusSuccess
+                        : theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: participant.status == 'withdrawn'
+                  ? theme.colorScheme.error.withValues(alpha: 0.1)
+                  : theme.colorScheme.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              (participant.status ?? '').toUpperCase(),
+              style: GoogleFonts.lexend(
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
                 color: participant.status == 'withdrawn'
-                    ? theme.colorScheme.error.withValues(alpha: 0.1)
-                    : theme.colorScheme.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                (participant.status ?? '').toUpperCase(),
-                style: TextStyle(
-                  fontFamily: 'Lexend',
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: participant.status == 'withdrawn'
-                      ? theme.colorScheme.error
-                      : theme.colorScheme.primary,
-                ),
+                    ? theme.colorScheme.error
+                    : theme.colorScheme.primary,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

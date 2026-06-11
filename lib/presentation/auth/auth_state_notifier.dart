@@ -245,8 +245,9 @@ class AuthStateNotifier extends ChangeNotifier {
               // but we keep the token so they aren't forced to login again
             );
           } else {
-            // If it's an AuthFailure (401), wipe the session.
-            _session = AuthSession.unauthenticated();
+            if (!_session.isAuthenticated) {
+              _session = AuthSession.unauthenticated();
+            }
           }
           notifyListeners();
         },

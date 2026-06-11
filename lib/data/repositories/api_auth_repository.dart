@@ -119,14 +119,9 @@ class ApiAuthRepository implements AuthRepository {
           }
         },
         onFailure: (failure) {
-          developer.log(
-            'Failed to fetch verification status: ${failure.message}',
-          );
-          // Only wipe the session on transient failures if we are NOT
-          // already authenticated. Transient failures should not log out
-          // active users — the token is still valid, keep the session.
-          if (_currentSession == null ||
-              _currentSession!.state != AuthState.authenticated) {
+          final shouldWipe = _currentSession == null ||
+              _currentSession!.state != AuthState.authenticated;
+          if (shouldWipe) {
             _apiClient.setToken(null);
             _sessionRepository.clearSession();
             if (_currentSession != null) {
@@ -137,8 +132,16 @@ class ApiAuthRepository implements AuthRepository {
         },
       );
     } else {
-      developer.log('Mapping backend state: $state');
       final authState = _mapBackendState(state);
+
+      if (_currentSession?.state == AuthState.authenticated &&
+          authState != AuthState.authenticated) {
+        developer.log(
+          'Session is already authenticated — keeping current state.',
+        );
+        return;
+      }
+
       if (_currentSession != null && _currentSession!.state != authState) {
         _updateSession(_currentSession!.copyWith(state: authState));
       } else if (_currentSession == null) {

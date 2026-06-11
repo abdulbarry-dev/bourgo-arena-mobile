@@ -71,8 +71,9 @@ class ApiClient {
             } else if (useSanctumOnly) {
               authToken = _token;
             } else {
-              // Persistence flow: backend recognizes device token as member if linked
-              authToken = _deviceToken ?? _token;
+              // Sanctum token takes priority; device token used as fallback
+              // for pre-auth/guest requests.
+              authToken = _token ?? _deviceToken;
             }
 
             if (authToken != null) {
@@ -407,6 +408,9 @@ class ApiClient {
           break;
         case 'ONBOARDING_INCOMPLETE':
           state = 'pending_onboarding';
+          break;
+        case 'UNAUTHENTICATED':
+          state = 'unauthenticated';
           break;
       }
     }

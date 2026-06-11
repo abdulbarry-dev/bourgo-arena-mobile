@@ -24,6 +24,9 @@ import 'package:shimmer/shimmer.dart';
     case 'welcome_bonus':
       return (label: 'Bonus de bienvenue', icon: Symbols.celebration);
     default:
+      if (sourceType.isEmpty) {
+        return (label: 'Transaction', icon: Symbols.receipt_long);
+      }
       final label = sourceType.replaceAll('_', ' ');
       return (
         label: label[0].toUpperCase() + label.substring(1),
