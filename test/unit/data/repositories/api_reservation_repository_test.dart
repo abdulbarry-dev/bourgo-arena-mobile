@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/data/api/api_exceptions.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_reservation_repository.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation_with_payment.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
@@ -24,10 +25,29 @@ void main() {
 
   group('ApiReservationRepository', () {
     group('getReservations', () {
-      test('returns Success on 200 with mapped reservations', () async {
+      final responseEnvelope = {
+        'data': [testReservationJson()],
+      };
+
+      void setUpSuccessStubs() {
         when(
-          () => apiClient.get('/reservations'),
-        ).thenAnswer((_) async => [testReservationJson()]);
+          () => apiClient.get(
+            '/reservations/ongoing',
+            fullResponse: true,
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer((_) async => responseEnvelope);
+        when(
+          () => apiClient.get(
+            '/reservations/history',
+            fullResponse: true,
+            queryParameters: any(named: 'queryParameters'),
+          ),
+        ).thenAnswer((_) async => {'data': []});
+      }
+
+      test('returns Success on 200 with mapped reservations', () async {
+        setUpSuccessStubs();
 
         final result = await repository.getReservations();
 
@@ -41,7 +61,11 @@ void main() {
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.get('/reservations'),
+          () => apiClient.get(
+            '/reservations/ongoing',
+            fullResponse: true,
+            queryParameters: any(named: 'queryParameters'),
+          ),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.getReservations();
@@ -55,7 +79,11 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.get('/reservations'),
+          () => apiClient.get(
+            '/reservations/ongoing',
+            fullResponse: true,
+            queryParameters: any(named: 'queryParameters'),
+          ),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.getReservations();
@@ -69,7 +97,11 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.get('/reservations'),
+          () => apiClient.get(
+            '/reservations/ongoing',
+            fullResponse: true,
+            queryParameters: any(named: 'queryParameters'),
+          ),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.getReservations();
@@ -91,11 +123,9 @@ void main() {
 
         final result = await repository.makeReservation(reservation);
 
-        expect(result, isA<Success<Reservation, Failure>>());
-        expect(
-          (result as Success<Reservation, Failure>).data.id,
-          reservation.id,
-        );
+        expect(result, isA<Success<ReservationWithPayment, Failure>>());
+        final data = (result as Success<ReservationWithPayment, Failure>).data;
+        expect(data.reservation.id, reservation.id);
         verify(
           () => apiClient.post('/reservations', {
             'activity_id': reservation.activityId,
@@ -114,9 +144,9 @@ void main() {
           testReservationEntity(),
         );
 
-        expect(result, isA<FailureResult<Reservation, Failure>>());
+        expect(result, isA<FailureResult<ReservationWithPayment, Failure>>());
         expect(
-          (result as FailureResult<Reservation, Failure>).failure,
+          (result as FailureResult<ReservationWithPayment, Failure>).failure,
           isA<AuthFailure>(),
         );
       });
@@ -130,9 +160,9 @@ void main() {
           testReservationEntity(),
         );
 
-        expect(result, isA<FailureResult<Reservation, Failure>>());
+        expect(result, isA<FailureResult<ReservationWithPayment, Failure>>());
         expect(
-          (result as FailureResult<Reservation, Failure>).failure,
+          (result as FailureResult<ReservationWithPayment, Failure>).failure,
           isA<NetworkFailure>(),
         );
       });
@@ -146,9 +176,9 @@ void main() {
           testReservationEntity(),
         );
 
-        expect(result, isA<FailureResult<Reservation, Failure>>());
+        expect(result, isA<FailureResult<ReservationWithPayment, Failure>>());
         expect(
-          (result as FailureResult<Reservation, Failure>).failure,
+          (result as FailureResult<ReservationWithPayment, Failure>).failure,
           isA<ServerFailure>(),
         );
       });
