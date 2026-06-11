@@ -167,6 +167,9 @@ void main() {
       ),
     ).thenAnswer((_) async {});
     when(
+      () => mockDeviceTokenRegistrar.unregister(),
+    ).thenAnswer((_) async {});
+    when(
       () => mockUserRepository.updatePreferences(any()),
     ).thenAnswer((_) async => Result.success(null));
 

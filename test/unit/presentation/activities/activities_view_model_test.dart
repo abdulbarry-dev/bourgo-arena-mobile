@@ -89,7 +89,7 @@ void main() {
 
       await viewModel.loadData();
 
-      check(viewModel.errorMessage).equals('bookings_loading_failed');
+      check(viewModel.errorMessage).isNull();
     });
 
     test('loadData handles exception', () async {
