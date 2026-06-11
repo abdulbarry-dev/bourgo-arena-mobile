@@ -26,6 +26,13 @@ import 'package:bourgo_arena_mobile/presentation/profile/subscription_screen.dar
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/manage_children_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/add_edit_child_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/screens/child_profile_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/screens/child_schedule_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/screens/child_subscriptions_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/screens/child_bookings_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/screens/child_sessions_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/screens/child_reservations_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/screens/child_completed_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/loyalty/loyalty_dashboard_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/search/search_screen.dart';
@@ -491,6 +498,48 @@ GoRouter createRouter(
         final child = state.extra as ChildProfile?;
         return AddEditChildScreen(childId: childId, child: child);
       },
+    ),
+    GoRoute(
+      path: '/child/:childId/profile',
+      builder: (context, state) => ChildProfileScreen(
+        childId: state.pathParameters['childId']!,
+      ),
+    ),
+    GoRoute(
+      path: '/child/:childId/schedule',
+      builder: (context, state) => ChildScheduleScreen(
+        childId: state.pathParameters['childId']!,
+      ),
+    ),
+    GoRoute(
+      path: '/child/:childId/subscriptions',
+      builder: (context, state) => ChildSubscriptionsScreen(
+        childId: state.pathParameters['childId']!,
+      ),
+    ),
+    GoRoute(
+      path: '/child/:childId/bookings',
+      builder: (context, state) => ChildBookingsScreen(
+        childId: state.pathParameters['childId']!,
+      ),
+    ),
+    GoRoute(
+      path: '/child/:childId/sessions',
+      builder: (context, state) => ChildSessionsScreen(
+        childId: state.pathParameters['childId']!,
+      ),
+    ),
+    GoRoute(
+      path: '/child/:childId/reservations',
+      builder: (context, state) => ChildReservationsScreen(
+        childId: state.pathParameters['childId']!,
+      ),
+    ),
+    GoRoute(
+      path: '/child/:childId/completed',
+      builder: (context, state) => ChildCompletedScreen(
+        childId: state.pathParameters['childId']!,
+      ),
     ),
     GoRoute(
       path: '/courses',

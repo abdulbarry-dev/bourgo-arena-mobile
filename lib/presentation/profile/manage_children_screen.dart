@@ -219,76 +219,79 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
     final l10n = AppLocalizations.of(context)!;
     final appColors = theme.extension<AppColors>()!;
 
-    return Container(
-      padding: EdgeInsets.all(spacing.lg),
-      decoration: BoxDecoration(
-        color: appColors.bgElevated,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: appColors.bgBorder),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.colorScheme.primary.withOpacity(0.1),
-            ),
-            child: Center(
-              child: Icon(
-                child.gender?.toLowerCase() == 'female'
-                    ? Symbols.girl
-                    : Symbols.boy,
-                color: theme.colorScheme.primary,
-                size: 32,
+    return GestureDetector(
+      onTap: () => context.push('/child/${child.id}/profile'),
+      child: Container(
+        padding: EdgeInsets.all(spacing.lg),
+        decoration: BoxDecoration(
+          color: appColors.bgElevated,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appColors.bgBorder),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: theme.colorScheme.primary.withOpacity(0.1),
+              ),
+              child: Center(
+                child: Icon(
+                  child.gender?.toLowerCase() == 'female'
+                      ? Symbols.girl
+                      : Symbols.boy,
+                  color: theme.colorScheme.primary,
+                  size: 32,
+                ),
               ),
             ),
-          ),
-          SizedBox(width: spacing.lg),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            SizedBox(width: spacing.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    child.name,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: spacing.xs),
+                  Text(
+                    child.gender ?? 'Not specified',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
               children: [
-                Text(
-                  child.name,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                IconButton(
+                  onPressed: () async {
+                    final updated = await context.push<bool>(
+                      '/edit-child/${child.id}',
+                      extra: child,
+                    );
+                    if (updated == true) {
+                      _viewModel.reloadChildren();
+                    }
+                  },
+                  icon: Icon(Symbols.edit, color: theme.colorScheme.primary),
+                  tooltip: l10n.profileEdit,
                 ),
-                SizedBox(height: spacing.xs),
-                Text(
-                  child.gender ?? 'Not specified',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+                IconButton(
+                  onPressed: () => _showDeleteConfirmation(child.id, child.name),
+                  icon: Icon(Symbols.delete, color: theme.colorScheme.error),
+                  tooltip: l10n.profileDelete,
                 ),
               ],
             ),
-          ),
-          Row(
-            children: [
-              IconButton(
-                onPressed: () async {
-                  final updated = await context.push<bool>(
-                    '/edit-child/${child.id}',
-                    extra: child,
-                  );
-                  if (updated == true) {
-                    _viewModel.reloadChildren();
-                  }
-                },
-                icon: Icon(Symbols.edit, color: theme.colorScheme.primary),
-                tooltip: l10n.profileEdit,
-              ),
-              IconButton(
-                onPressed: () => _showDeleteConfirmation(child.id, child.name),
-                icon: Icon(Symbols.delete, color: theme.colorScheme.error),
-                tooltip: l10n.profileDelete,
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

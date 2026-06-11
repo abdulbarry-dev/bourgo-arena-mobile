@@ -1,0 +1,226 @@
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/buy_child_subscription_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
+import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_subscriptions_view_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
+
+class ChildSubscriptionsScreen extends StatefulWidget {
+  final String childId;
+
+  const ChildSubscriptionsScreen({super.key, required this.childId});
+
+  @override
+  State<ChildSubscriptionsScreen> createState() => _ChildSubscriptionsScreenState();
+}
+
+class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
+  late final ChildSubscriptionsViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = ChildSubscriptionsViewModel(
+      getChildSubscriptionsUseCase: locator<GetChildSubscriptionsUseCase>(),
+      buyChildSubscriptionUseCase: locator<BuyChildSubscriptionUseCase>(),
+    );
+    _viewModel.load(widget.childId);
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
+
+  Color _statusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'active': return const Color(0xFF22C55E);
+      case 'expired': return const Color(0xFF9CA3AF);
+      case 'cancelled': return const Color(0xFFEF4444);
+      case 'pending': return const Color(0xFFF59E0B);
+      default: return const Color(0xFF9CA3AF);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = context.spacing;
+    final appColors = theme.extension<AppColors>()!;
+
+    return ListenableBuilder(
+      listenable: _viewModel,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          appBar: SubScreenAppBar(title: 'SUBSCRIPTIONS'),
+          body: _viewModel.isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : RefreshIndicator(
+                  onRefresh: () => _viewModel.load(widget.childId),
+                  color: theme.colorScheme.primary,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(spacing.lg),
+                    children: [
+                      if (_viewModel.subscriptions.isEmpty)
+                        _buildEmptyState(theme, spacing)
+                      else
+                        ..._viewModel.subscriptions.asMap().entries.map((entry) {
+                          return Padding(
+                            padding: EdgeInsets.only(bottom: spacing.md),
+                            child: _SubCard(
+                              subscription: entry.value,
+                              statusColor: _statusColor(entry.value.status),
+                              theme: theme,
+                              spacing: spacing,
+                              appColors: appColors,
+                            ).animate(delay: (entry.key * 50).ms)
+                              .fade(duration: 300.ms)
+                              .slideY(begin: 0.05, end: 0),
+                          );
+                        }),
+                      SizedBox(height: spacing.lg),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            context.push('/plans');
+                          },
+                          icon: const Icon(Symbols.add, size: 20),
+                          label: const Text('BUY NEW SUBSCRIPTION',
+                            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: theme.colorScheme.primary,
+                            foregroundColor: theme.colorScheme.onPrimary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: spacing.xl),
+                    ],
+                  ),
+                ),
+        );
+      },
+    );
+  }
+
+  Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+      child: Column(
+        children: [
+          Icon(Symbols.workspace_premium, size: 64,
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
+          SizedBox(height: spacing.lg),
+          Text('No subscriptions', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+          SizedBox(height: spacing.sm),
+          Text('Buy a subscription to get started.',
+            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubCard extends StatelessWidget {
+  final Subscription subscription;
+  final Color statusColor;
+  final ThemeData theme;
+  final AppSpacing spacing;
+  final AppColors appColors;
+
+  const _SubCard({
+    required this.subscription, required this.statusColor, required this.theme,
+    required this.spacing, required this.appColors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(spacing.lg),
+      decoration: BoxDecoration(
+        color: appColors.bgElevated,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: appColors.bgBorder),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xxs),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  subscription.status.toUpperCase(),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: statusColor, fontWeight: FontWeight.w900, letterSpacing: 1.0,
+                  ),
+                ),
+              ),
+              if (subscription.plan?.service?.imageUrl != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    subscription.plan!.service!.imageUrl!,
+                    width: 40, height: 40, fit: BoxFit.cover,
+                  ),
+                ),
+            ],
+          ),
+          SizedBox(height: spacing.md),
+          Text(
+            subscription.plan?.name?.toUpperCase() ?? '',
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+          ),
+          if (subscription.plan?.description != null && subscription.plan!.description!.isNotEmpty)
+            Padding(
+              padding: EdgeInsets.only(top: spacing.xs),
+              child: Text(subscription.plan!.description!,
+                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            ),
+          SizedBox(height: spacing.md),
+          Row(
+            children: [
+              Icon(Symbols.schedule, size: 14, color: theme.colorScheme.onSurfaceVariant),
+              SizedBox(width: spacing.xxs),
+              Text('${subscription.daysRemaining ?? 0} days remaining',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700, color: theme.colorScheme.onSurfaceVariant)),
+            ],
+          ),
+          SizedBox(height: spacing.sm),
+          Row(
+            children: [
+              Expanded(
+                child: Text('Start: ${subscription.startsAt ?? '—'}',
+                  style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              ),
+              Expanded(
+                child: Text('End: ${subscription.endsAt ?? '—'}',
+                  style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
