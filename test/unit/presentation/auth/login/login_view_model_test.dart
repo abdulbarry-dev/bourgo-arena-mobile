@@ -71,17 +71,26 @@ void main() {
     viewModel.passwordController.text = 'secret123';
 
     await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: Form(
-            key: viewModel.formKey,
-            child: Column(
-              children: [
-                TextFormField(controller: viewModel.identifierController),
-                TextFormField(controller: viewModel.passwordController),
-              ],
+      MaterialApp.router(
+        routerConfig: GoRouter(
+          initialLocation: '/',
+          routes: [
+            GoRoute(
+              path: '/',
+              builder: (context, state) => Scaffold(
+                body: Form(
+                  key: viewModel.formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(controller: viewModel.identifierController),
+                      TextFormField(controller: viewModel.passwordController),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
+            GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+          ],
         ),
       ),
     );
@@ -124,12 +133,21 @@ void main() {
       viewModel.toggleRememberMe(true);
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Form(
-              key: viewModel.formKey,
-              child: TextFormField(controller: viewModel.identifierController),
-            ),
+        MaterialApp.router(
+          routerConfig: GoRouter(
+            initialLocation: '/',
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => Scaffold(
+                  body: Form(
+                    key: viewModel.formKey,
+                    child: TextFormField(controller: viewModel.identifierController),
+                  ),
+                ),
+              ),
+              GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+            ],
           ),
         ),
       );
@@ -160,12 +178,21 @@ void main() {
       viewModel.toggleRememberMe(false);
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Form(
-              key: viewModel.formKey,
-              child: TextFormField(controller: viewModel.identifierController),
-            ),
+        MaterialApp.router(
+          routerConfig: GoRouter(
+            initialLocation: '/',
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => Scaffold(
+                  body: Form(
+                    key: viewModel.formKey,
+                    child: TextFormField(controller: viewModel.identifierController),
+                  ),
+                ),
+              ),
+              GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+            ],
           ),
         ),
       );
@@ -269,12 +296,21 @@ void main() {
       viewModel.addListener(() => notifyCount++);
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: Form(
-              key: viewModel.formKey,
-              child: TextFormField(controller: viewModel.identifierController),
-            ),
+        MaterialApp.router(
+          routerConfig: GoRouter(
+            initialLocation: '/',
+            routes: [
+              GoRoute(
+                path: '/',
+                builder: (context, state) => Scaffold(
+                  body: Form(
+                    key: viewModel.formKey,
+                    child: TextFormField(controller: viewModel.identifierController),
+                  ),
+                ),
+              ),
+              GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+            ],
           ),
         ),
       );
