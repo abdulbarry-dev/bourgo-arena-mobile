@@ -111,7 +111,69 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
+        _showSubscriptionGate();
       },
+    );
+  }
+
+  void _showSubscriptionGate() {
+    final theme = Theme.of(context);
+    final isAuthenticated = locator<AuthStateNotifier>().isAuthenticated;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        icon: Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Icon(
+            Symbols.lock,
+            size: 48,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        title: Text(
+          'SUBSCRIPTION REQUIRED',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontFamily: AppConstants.displayFontFamily,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1,
+          ),
+        ),
+        content: Text(
+          isAuthenticated
+              ? 'You need an active subscription to book sessions. Subscribe to a plan and try again.'
+              : 'Sign in and subscribe to a plan to book sessions.',
+          textAlign: TextAlign.center,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('CLOSE'),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                context.push(isAuthenticated ? '/plans' : '/login');
+              },
+              child: Text(
+                isAuthenticated ? 'VIEW PLANS' : 'SIGN IN',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
