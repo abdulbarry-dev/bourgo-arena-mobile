@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/bracket.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/event_repository.dart';
 
@@ -25,7 +26,7 @@ class GetEventBracketUseCase {
   final EventRepository _repository;
   const GetEventBracketUseCase(this._repository);
 
-  Future<Result<Map<String, dynamic>, Failure>> call(String eventId) =>
+  Future<Result<List<BracketRound>, Failure>> call(String eventId) =>
       _repository.getEventBracket(eventId);
 }
 

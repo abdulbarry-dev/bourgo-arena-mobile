@@ -22,6 +22,7 @@ class EventsScreen extends StatefulWidget {
 
 class _EventsScreenState extends State<EventsScreen> {
   late final EventsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -30,12 +31,22 @@ class _EventsScreenState extends State<EventsScreen> {
       getEventsUseCase: locator<GetEventsUseCase>(),
       registerForEventUseCase: locator<RegisterForEventUseCase>(),
     );
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   @override
@@ -153,9 +164,17 @@ class _EventsScreenState extends State<EventsScreen> {
       displacement: 20,
       color: theme.colorScheme.primary,
       child: ListView.builder(
+        controller: _scrollController,
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-        itemCount: _viewModel.events.length,
+        itemCount:
+            _viewModel.events.length + (_viewModel.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
+          if (index >= _viewModel.events.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 3)),
+            );
+          }
           final event = _viewModel.events[index];
           final isRegistering = _viewModel.registeringEventId == event.id;
 

@@ -60,6 +60,7 @@ class Event {
   final String? imageUrl;
   final String? status;
   final bool requiresCheckIn;
+  final bool isRegistered;
   final String? createdAt;
 
   const Event({
@@ -77,6 +78,7 @@ class Event {
     this.imageUrl,
     this.status,
     this.requiresCheckIn = false,
+    this.isRegistered = false,
     this.createdAt,
   });
 

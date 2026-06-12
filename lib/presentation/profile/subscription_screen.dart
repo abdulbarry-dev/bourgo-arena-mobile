@@ -1,7 +1,6 @@
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_subscriptions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_view_model.dart';
@@ -29,7 +28,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     _viewModel = SubscriptionViewModel(
       getActiveSubscriptionsUseCase: locator<GetActiveSubscriptionsUseCase>(),
       getChildrenUseCase: locator<GetChildrenUseCase>(),
-      getChildSubscriptionsUseCase: locator<GetChildSubscriptionsUseCase>(),
     );
   }
 
@@ -41,23 +39,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        final memberSubs = _viewModel.memberSubscriptions;
-        final subscriptions = memberSubs.map((m) => m.subscription).toList();
-
-        // Group: null childId → own subscriptions
-        final grouped = <String?, List<MemberSubscription>>{};
-        for (final ms in memberSubs) {
-          grouped.putIfAbsent(ms.childId, () => []).add(ms);
-        }
-        // Sort: own group first (null key), then alphabetical by childName
-        final groupKeys = grouped.keys.toList()
-          ..sort((a, b) {
-            if (a == null) return -1;
-            if (b == null) return 1;
-            final aName = grouped[a]!.first.childName ?? '';
-            final bName = grouped[b]!.first.childName ?? '';
-            return aName.compareTo(bName);
-          });
+        final subscriptions = _viewModel.memberSubscriptions;
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
@@ -74,70 +56,64 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (subscriptions.isNotEmpty) ...[
-                          for (int g = 0; g < groupKeys.length; g++) ...[
-                            if (g > 0) SizedBox(height: spacing.xxl),
-                            _OwnerSectionHeader(
-                              childName: grouped[groupKeys[g]]!.first.childName,
-                              isOwn: groupKeys[g] == null,
-                            ),
-                            SizedBox(height: spacing.md),
-                            for (final ms in grouped[groupKeys[g]]!) ...[
-                              if (grouped[groupKeys[g]]!.indexOf(ms) > 0) ...[
-                                SizedBox(height: spacing.xl),
-                                Container(
-                                  height: 1,
-                                  color: theme
-                                      .extension<AppColors>()!
-                                      .bgBorder
-                                      .withValues(alpha: 0.3),
-                                ),
-                                SizedBox(height: spacing.xl),
-                              ],
-                              _SubscriptionCard(
-                                    subscription: ms.subscription,
-                                    appColors: theme.extension<AppColors>()!,
-                                  )
-                                  .animate()
-                                  .fade(duration: 400.ms)
-                                  .slideY(
-                                    begin: 0.1,
-                                    end: 0,
-                                    curve: Curves.easeOutQuad,
-                                  ),
+                          for (int i = 0; i < subscriptions.length; i++) ...[
+                            if (i > 0) ...[
                               SizedBox(height: spacing.xl),
-                              _PlanDetailsSection(
-                                    subscription: ms.subscription,
-                                    appColors: theme.extension<AppColors>()!,
-                                  )
-                                  .animate(delay: 100.ms)
-                                  .fade(duration: 400.ms)
-                                  .slideY(
-                                    begin: 0.1,
-                                    end: 0,
-                                    curve: Curves.easeOutQuad,
-                                  ),
+                              Container(
+                                height: 1,
+                                color: theme
+                                    .extension<AppColors>()!
+                                    .bgBorder
+                                    .withValues(alpha: 0.3),
+                              ),
                               SizedBox(height: spacing.xl),
-                              _ServiceSection(subscription: ms.subscription)
-                                  .animate(delay: 200.ms)
-                                  .fade(duration: 400.ms)
-                                  .slideY(
-                                    begin: 0.1,
-                                    end: 0,
-                                    curve: Curves.easeOutQuad,
-                                  ),
-                              SizedBox(height: spacing.xl),
-                              _PaymentSection(
-                                    subscription: ms.subscription,
-                                    appColors: theme.extension<AppColors>()!,
-                                  )
-                                  .animate(delay: 300.ms)
-                                  .fade(duration: 400.ms)
-                                  .slideY(
-                                    begin: 0.1,
-                                    end: 0,
-                                    curve: Curves.easeOutQuad,
-                                  ),
                             ],
+                            _SubscriptionCard(
+                                  subscription: subscriptions[i].subscription,
+                                  appColors: theme.extension<AppColors>()!,
+                                )
+                                .animate()
+                                .fade(duration: 400.ms)
+                                .slideY(
+                                  begin: 0.1,
+                                  end: 0,
+                                  curve: Curves.easeOutQuad,
+                                ),
+                            SizedBox(height: spacing.xl),
+                            _PlanDetailsSection(
+                                  subscription: subscriptions[i].subscription,
+                                  appColors: theme.extension<AppColors>()!,
+                                )
+                                .animate(delay: 100.ms)
+                                .fade(duration: 400.ms)
+                                .slideY(
+                                  begin: 0.1,
+                                  end: 0,
+                                  curve: Curves.easeOutQuad,
+                                ),
+                            SizedBox(height: spacing.xl),
+                            _ServiceSection(
+                              subscription: subscriptions[i].subscription,
+                            )
+                                .animate(delay: 200.ms)
+                                .fade(duration: 400.ms)
+                                .slideY(
+                                  begin: 0.1,
+                                  end: 0,
+                                  curve: Curves.easeOutQuad,
+                                ),
+                            SizedBox(height: spacing.xl),
+                            _PaymentSection(
+                                  subscription: subscriptions[i].subscription,
+                                  appColors: theme.extension<AppColors>()!,
+                                )
+                                .animate(delay: 300.ms)
+                                .fade(duration: 400.ms)
+                                .slideY(
+                                  begin: 0.1,
+                                  end: 0,
+                                  curve: Curves.easeOutQuad,
+                                ),
                           ],
                         ] else if (_viewModel.errorMessage != null) ...[
                           _ErrorState(
@@ -187,48 +163,6 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 ),
         );
       },
-    );
-  }
-}
-
-class _OwnerSectionHeader extends StatelessWidget {
-  final String? childName;
-  final bool isOwn;
-
-  const _OwnerSectionHeader({
-    this.childName,
-    required this.isOwn,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final spacing = context.spacing;
-
-    return Row(
-      children: [
-        Container(
-          padding: EdgeInsets.all(spacing.sm),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            isOwn ? Symbols.person : Symbols.child_care,
-            size: 18,
-            color: theme.colorScheme.primary,
-          ),
-        ),
-        SizedBox(width: spacing.sm),
-        Text(
-          isOwn ? 'POUR MOI' : 'POUR ${childName?.toUpperCase()}',
-          style: theme.textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.2,
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-      ],
     );
   }
 }

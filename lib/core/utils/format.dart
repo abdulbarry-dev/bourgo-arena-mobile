@@ -1,9 +1,5 @@
-/// Formats a loyalty point total into a compact, fixed-width-friendly string.
-///
-/// Scales through K (thousand), M (million), B (billion), T (trillion) and
-/// Q (quadrillion) so even very large balances stay readable inside stat
-/// tiles. Values below 100 in their unit keep one decimal (e.g. `1.5K`), larger
-/// ones drop it (e.g. `123K`), and trailing `.0` is always stripped.
+/// Formats a loyalty point total into a compact, fixed-width-friendly string
+/// using K (thousand), M (million), B (billion) abbreviations.
 String compactPoints(int points) {
   if (points < 0) return '0';
   if (points < 1000) return points.toString();
@@ -33,4 +29,19 @@ String compactPoints(int points) {
     formatted = value.round().toString();
   }
   return '$formatted${units[unitIndex]}';
+}
+
+/// Formats a loyalty point total with space-separated thousands for
+/// clear, human-readable display (e.g. `1 500 000` instead of `1.5M`).
+String formatPoints(int points) {
+  if (points < 0) return '0';
+  final str = points.toString();
+  final buffer = StringBuffer();
+  for (var i = 0; i < str.length; i++) {
+    if (i > 0 && (str.length - i) % 3 == 0) {
+      buffer.write(' ');
+    }
+    buffer.write(str[i]);
+  }
+  return buffer.toString();
 }

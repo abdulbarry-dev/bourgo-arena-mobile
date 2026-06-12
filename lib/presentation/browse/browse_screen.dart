@@ -385,6 +385,8 @@ class _EventTile extends StatelessWidget {
     final count = event.participantsCount ?? 0;
     final max = event.maxParticipants ?? 0;
     final ratio = max > 0 ? count / max : 0.0;
+    final hasImage = event.imageUrl != null || event.images.isNotEmpty;
+    final imageSrc = event.imageUrl ?? (event.images.isNotEmpty ? event.images.first : null);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -400,54 +402,63 @@ class _EventTile extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (event.images.isNotEmpty)
-                SizedBox(
-                  height: 140,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
+              SizedBox(
+                height: 140,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (hasImage)
                       PremiumNetworkImage(
-                        imageUrl: event.images.first,
+                        imageUrl: imageSrc!,
                         fit: BoxFit.cover,
+                      )
+                    else
+                      Container(
+                        color: theme.colorScheme.surfaceContainerHighest,
+                        child: Icon(
+                          Symbols.emoji_events,
+                          size: 48,
+                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                        ),
                       ),
-                      Positioned.fill(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                Colors.transparent,
-                                Colors.black.withValues(alpha: 0.5),
-                              ],
-                              stops: const [0.5, 1.0],
-                            ),
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withValues(alpha: 0.5),
+                            ],
+                            stops: const [0.5, 1.0],
                           ),
                         ),
                       ),
-                      Positioned(
-                        left: 12,
-                        bottom: 12,
-                        child: Row(
-                          children: [
-                            if (event.format != null)
-                              _miniChip(
-                                theme,
-                                event.format!,
-                                theme.colorScheme.primary,
-                              ),
-                            const SizedBox(width: 6),
+                    ),
+                    Positioned(
+                      left: 12,
+                      bottom: 12,
+                      child: Row(
+                        children: [
+                          if (event.format != null)
                             _miniChip(
                               theme,
-                              (event.status ?? 'unknown').toUpperCase(),
-                              _chipColor(theme, event.status),
+                              event.format!,
+                              theme.colorScheme.primary,
                             ),
-                          ],
-                        ),
+                          const SizedBox(width: 6),
+                          _miniChip(
+                            theme,
+                            (event.status ?? 'unknown').toUpperCase(),
+                            _chipColor(theme, event.status),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(

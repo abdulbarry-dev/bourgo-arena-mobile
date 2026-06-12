@@ -48,6 +48,7 @@ class EventMapper {
           (model.images?.isNotEmpty == true ? model.images!.first : null),
       status: model.status,
       requiresCheckIn: model.requiresCheckIn ?? false,
+      isRegistered: model.isRegistered,
       createdAt: model.createdAt,
     );
   }

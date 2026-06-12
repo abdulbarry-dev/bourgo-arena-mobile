@@ -63,6 +63,7 @@ import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/presentation/events/events_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/events/event_detail_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/events/my_events_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/events/bracket_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/courses/courses_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/activities_list/activities_list_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/payment_gateway_screen.dart';
@@ -602,6 +603,16 @@ GoRouter createRouter(
         final event = state.extra as Event?;
         return EventDetailScreen(eventId: eventId, event: event);
       },
+      routes: [
+        GoRoute(
+          path: 'bracket',
+          builder: (context, state) {
+            final eventId = state.pathParameters['id']!;
+            final event = state.extra as Event?;
+            return BracketScreen(eventId: eventId, event: event);
+          },
+        ),
+      ],
     ),
     GoRoute(
       path: '/payment/:id',

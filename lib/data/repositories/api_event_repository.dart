@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/data/mappers/event_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/event_model.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/domain/entities/bracket.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/event_repository.dart';
 
@@ -51,15 +52,31 @@ class ApiEventRepository implements EventRepository {
   }
 
   @override
-  Future<Result<Map<String, dynamic>, Failure>> getEventBracket(
+  Future<Result<List<BracketRound>, Failure>> getEventBracket(
     String eventId,
   ) {
     return executeApiCall(() async {
-      final response =
-          await _apiClient.get('/events/$eventId/bracket')
-              as Map<String, dynamic>;
-      final data = response['data'] as Map<String, dynamic>? ?? response;
-      return Result.success(data);
+      final response = await _apiClient.get('/events/$eventId/bracket');
+      if (response is List) return Result.success([]);
+      final responseMap = response as Map<String, dynamic>;
+      final data = responseMap['data'] as Map<String, dynamic>? ?? responseMap;
+      final rounds = <BracketRound>[];
+      for (final entry in data.entries) {
+        final roundNumber = int.tryParse(
+              entry.key.replaceAll('round_', ''),
+            ) ??
+            0;
+        final matches = (entry.value as List)
+            .map(
+              (m) => EventMapper.toMatch(
+                MatchModel.fromJson(m as Map<String, dynamic>),
+              ),
+            )
+            .toList();
+        rounds.add(BracketRound(round: roundNumber, matches: matches));
+      }
+      rounds.sort((a, b) => a.round.compareTo(b.round));
+      return Result.success(rounds);
     });
   }
 

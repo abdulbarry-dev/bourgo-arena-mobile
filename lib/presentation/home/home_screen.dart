@@ -12,7 +12,6 @@ import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -101,7 +100,19 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               slivers: [
-                _HeroSection(theme: theme),
+                _ServicesHeroSection(
+                  services: _viewModel.services,
+                  isLoading: _viewModel.servicesLoading,
+                  error: _viewModel.servicesError,
+                  onRetry: () => _viewModel.loadHomeData(),
+                  onServiceTap: (service) =>
+                      context.push('/services/${service.id}', extra: service),
+                ),
+                if (_viewModel.services.isNotEmpty && !_viewModel.servicesLoading)
+                  _FeaturedServiceCard(
+                    service: _viewModel.services.first,
+                    theme: theme,
+                  ),
                 const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
                 _DashboardSection(
@@ -168,15 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
 
-                _ServicesSection(
-                  services: _viewModel.services,
-                  isLoading: _viewModel.servicesLoading,
-                  error: _viewModel.servicesError,
-                  onRetry: () => _viewModel.loadHomeData(),
-                  onServiceTap: (service) =>
-                      context.push('/services/${service.id}', extra: service),
-                ),
-
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
               ],
             ),
@@ -187,78 +189,349 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HeroSection extends SliverToBoxAdapter {
-  _HeroSection({required ThemeData theme})
-    : super(
-        child: Container(
-          height: 200,
-          margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  'assets/images/background.jpg',
-                  fit: BoxFit.cover,
-                  alignment: Alignment.centerRight,
+class _ServicesHeroSection extends SliverToBoxAdapter {
+  _ServicesHeroSection({
+    required List<Service> services,
+    required bool isLoading,
+    required String? error,
+    required VoidCallback onRetry,
+    required void Function(Service service) onServiceTap,
+  }) : super(
+          child: _ServicesHeroContent(
+            services: services,
+            isLoading: isLoading,
+            error: error,
+            onRetry: onRetry,
+            onServiceTap: onServiceTap,
+          ),
+        );
+}
+
+class _ServicesHeroContent extends StatelessWidget {
+  final List<Service> services;
+  final bool isLoading;
+  final String? error;
+  final VoidCallback onRetry;
+  final void Function(Service service) onServiceTap;
+
+  const _ServicesHeroContent({
+    required this.services,
+    required this.isLoading,
+    this.error,
+    required this.onRetry,
+    required this.onServiceTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    if (isLoading) {
+      return const SizedBox(
+        height: 180,
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (error != null) {
+      return SizedBox(
+        height: 180,
+        child: Center(
+          child: TextButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Symbols.refresh, size: 16),
+            label: const Text('RETRY'),
+          ),
+        ),
+      );
+    }
+    if (services.isEmpty) {
+      return const SizedBox(height: 180);
+    }
+
+    return Container(
+      height: 180,
+      margin: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Symbols.build, size: 20, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                'OUR SERVICES',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.5,
+                  color: theme.colorScheme.onSurface,
                 ),
-                DecoratedBox(
+              ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () => context.push('/services'),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'SEE ALL',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Symbols.chevron_right,
+                      size: 16,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: services.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (context, index) {
+                final service = services[index];
+                final hasImage = service.imageUrl != null;
+                return GestureDetector(
+                  onTap: () => onServiceTap(service),
+                  child: Container(
+                    width: 100,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: hasImage
+                                  ? null
+                                  : theme.colorScheme.primary.withValues(
+                                      alpha: 0.08,
+                                    ),
+                            ),
+                            child: hasImage
+                                ? PremiumNetworkImage(
+                                    imageUrl: service.imageUrl!,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Icon(
+                                    Symbols.build,
+                                    size: 28,
+                                    color: theme.colorScheme.primary.withValues(
+                                      alpha: 0.4,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 8,
+                          ),
+                          child: Text(
+                            service.name.toUpperCase(),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 10,
+                              color: theme.colorScheme.onSurface,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FeaturedServiceCard extends SliverToBoxAdapter {
+  _FeaturedServiceCard({
+    required Service service,
+    required ThemeData theme,
+  }) : super(
+          child: _FeaturedServiceContent(service: service, theme: theme),
+        );
+}
+
+class _FeaturedServiceContent extends StatelessWidget {
+  final Service service;
+  final ThemeData theme;
+
+  const _FeaturedServiceContent({
+    required this.service,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: GestureDetector(
+        onTap: () => context.push('/services/${service.id}', extra: service),
+        child: Container(
+          height: 220,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: theme.colorScheme.surfaceContainerHighest,
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (service.imageUrl != null)
+                PremiumNetworkImage(
+                  imageUrl: service.imageUrl!,
+                  fit: BoxFit.cover,
+                )
+              else
+                Container(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                  child: Icon(
+                    Symbols.build,
+                    size: 64,
+                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                  ),
+                ),
+              Positioned.fill(
+                child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.18),
-                        Colors.black.withValues(alpha: 0.52),
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.7),
                       ],
+                      stops: const [0.4, 1.0],
                     ),
                   ),
                 ),
-                Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _greeting(),
-                              style: theme.textTheme.labelMedium?.copyWith(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.5,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Discover Your\nNext Challenge',
-                              style: theme.textTheme.displaySmall?.copyWith(
-                                color: Colors.white,
-                                fontFamily: AppConstants.displayFontFamily,
-                                fontWeight: FontWeight.bold,
-                                height: 1.1,
-                              ),
-                            ),
-                          ],
+              ),
+              Positioned(
+                left: 20,
+                right: 20,
+                bottom: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      service.name.toUpperCase(),
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontFamily: AppConstants.displayFontFamily,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        if (service.plansCount > 0)
+                          _ServiceStatCompact(
+                            count: service.plansCount,
+                            label: 'plans',
+                          ),
+                        if (service.plansCount > 0 &&
+                            service.coursesCount > 0)
+                          const SizedBox(width: 8),
+                        if (service.coursesCount > 0)
+                          _ServiceStatCompact(
+                            count: service.coursesCount,
+                            label: 'courses',
+                          ),
+                        if (service.coursesCount > 0 &&
+                            service.eventsCount > 0)
+                          const SizedBox(width: 8),
+                        if (service.eventsCount > 0)
+                          _ServiceStatCompact(
+                            count: service.eventsCount,
+                            label: 'events',
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: 120,
+                      height: 36,
+                      child: ElevatedButton(
+                        onPressed: () => context.push(
+                          '/services/${service.id}',
+                          extra: service,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'EXPLORE',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12,
+                            letterSpacing: 1,
+                          ),
                         ),
                       ),
-                    )
-                    .animate()
-                    .fade(duration: 500.ms)
-                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
-              ],
-            ),
-          ).animate().fade(delay: 300.ms),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      );
+      ),
+    );
+  }
+}
 
-  static String _greeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'GOOD MORNING';
-    if (hour < 18) return 'GOOD AFTERNOON';
-    return 'GOOD EVENING';
+class _ServiceStatCompact extends StatelessWidget {
+  final int count;
+  final String label;
+
+  const _ServiceStatCompact({
+    required this.count,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        '$count ${label.toUpperCase()}',
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
   }
 }
 
@@ -637,7 +910,7 @@ class _CourseCard extends StatelessWidget {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  color: hasImage ? null : Colors.orange.withValues(alpha: 0.1),
+                  color: hasImage ? null : theme.colorScheme.surfaceContainerHighest,
                 ),
                 child: hasImage
                     ? PremiumNetworkImage(
@@ -648,7 +921,7 @@ class _CourseCard extends StatelessWidget {
                         child: Icon(
                           Symbols.school,
                           size: 32,
-                          color: Colors.orange.shade300.withValues(alpha: 0.5),
+                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
                         ),
                       ),
               ),
@@ -799,274 +1072,4 @@ class _ActivityCard extends StatelessWidget {
   }
 }
 
-class _ServicesSection extends SliverToBoxAdapter {
-  _ServicesSection({
-    required List<Service> services,
-    required bool isLoading,
-    required String? error,
-    required VoidCallback onRetry,
-    required void Function(Service service) onServiceTap,
-  }) : super(
-         child: _buildServices(
-           services: services,
-           isLoading: isLoading,
-           error: error,
-           onRetry: onRetry,
-           onServiceTap: onServiceTap,
-         ),
-       );
 
-  static Widget _buildServices({
-    required List<Service> services,
-    required bool isLoading,
-    required String? error,
-    required VoidCallback onRetry,
-    required void Function(Service service) onServiceTap,
-  }) {
-    final accentColor = Colors.blue.shade400;
-
-    if (isLoading) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionHeader(
-            title: 'SERVICES',
-            icon: Symbols.build,
-            accentColor: accentColor,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: _SkeletonRow(cardWidth: 200),
-          ),
-        ],
-      );
-    }
-
-    if (error != null) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionHeader(
-            title: 'SERVICES',
-            icon: Symbols.build,
-            accentColor: accentColor,
-          ),
-          _ErrorRow(message: error, accentColor: accentColor, onRetry: onRetry),
-        ],
-      );
-    }
-
-    if (services.isEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionHeader(
-            title: 'SERVICES',
-            icon: Symbols.build,
-            accentColor: accentColor,
-          ),
-          _EmptyRow(message: 'No services available', accentColor: accentColor),
-        ],
-      );
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _SectionHeader(
-          title: 'SERVICES',
-          icon: Symbols.build,
-          accentColor: accentColor,
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: GridView.count(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 0.85,
-            children: services.map((service) {
-              return _ServiceCard(
-                service: service,
-                onTap: () => onServiceTap(service),
-              );
-            }).toList(),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ServiceCard extends StatelessWidget {
-  final Service service;
-  final VoidCallback onTap;
-
-  const _ServiceCard({required this.service, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-    final hasImage = service.imageUrl != null;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          color: appColors.bgElevated,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: appColors.bgBorder),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              flex: 6,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  if (hasImage)
-                    PremiumNetworkImage(
-                      imageUrl: service.imageUrl!,
-                      fit: BoxFit.cover,
-                    )
-                  else
-                    Container(
-                      color: Colors.blue.withValues(alpha: 0.08),
-                      child: Center(
-                        child: Icon(
-                          Symbols.build,
-                          size: 28,
-                          color: Colors.blue.shade300.withValues(alpha: 0.5),
-                        ),
-                      ),
-                    ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withValues(alpha: 0.6),
-                        ],
-                        stops: const [0.4, 1.0],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: 10,
-                    bottom: 8,
-                    child: Text(
-                      service.name.toUpperCase(),
-                      style: TextStyle(
-                        fontFamily: AppConstants.displayFontFamily,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 11,
-                        color: Colors.white,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withValues(alpha: 0.6),
-                            blurRadius: 4,
-                          ),
-                        ],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (service.description != null &&
-                        service.description!.isNotEmpty)
-                      Text(
-                        service.description!,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                          fontSize: 9,
-                          height: 1.3,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        if (service.plansCount > 0)
-                          _ServiceStat(
-                            label: '${service.plansCount}p',
-                            color: theme.colorScheme.primary,
-                          ),
-                        if (service.plansCount > 0 && service.coursesCount > 0)
-                          const SizedBox(width: 4),
-                        if (service.coursesCount > 0)
-                          _ServiceStat(
-                            label: '${service.coursesCount}c',
-                            color: appColors.accentCourse,
-                          ),
-                        if (service.coursesCount > 0 && service.eventsCount > 0)
-                          const SizedBox(width: 4),
-                        if (service.eventsCount > 0)
-                          _ServiceStat(
-                            label: '${service.eventsCount}e',
-                            color: appColors.accentEvent,
-                          ),
-                        if (service.eventsCount > 0 &&
-                            service.activitiesCount > 0)
-                          const SizedBox(width: 4),
-                        if (service.activitiesCount > 0)
-                          _ServiceStat(
-                            label: '${service.activitiesCount}a',
-                            color: appColors.accentService,
-                          ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ServiceStat extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _ServiceStat({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 8,
-          fontWeight: FontWeight.w700,
-          color: color,
-          letterSpacing: 0.3,
-        ),
-      ),
-    );
-  }
-}

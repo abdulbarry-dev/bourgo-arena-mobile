@@ -64,29 +64,15 @@ class PremiumNetworkImage extends StatelessWidget {
               ? Border.all(color: appColors.bgBorder, width: 1)
               : null,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            errorIcon ??
-                Icon(
-                  Symbols.imagesmode,
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.5,
-                  ),
-                  size: 32,
-                ),
-            const SizedBox(height: 8),
-            Text(
-              'Image unavailable',
-              style: theme.textTheme.labelSmall?.copyWith(
+        child: Center(
+          child: errorIcon ??
+              Icon(
+                Symbols.imagesmode,
+                size: 24,
                 color: theme.colorScheme.onSurfaceVariant.withValues(
-                  alpha: 0.7,
+                  alpha: 0.5,
                 ),
-                fontWeight: FontWeight.w500,
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
         ),
       ),
     );

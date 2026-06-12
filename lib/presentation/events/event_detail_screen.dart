@@ -26,6 +26,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   bool _isActionLoading = false;
+  bool _isRegistered = false;
+  bool _isCheckedIn = false;
   int _currentImageIndex = 0;
 
   @override
@@ -33,10 +35,16 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     super.initState();
     if (widget.event != null) {
       _event = widget.event;
+      _isRegistered = widget.event!.isRegistered;
       _isLoading = false;
     } else {
       _loadEvent();
     }
+  }
+
+  void _onEventLoaded(Event event) {
+    _event = event;
+    _isRegistered = event.isRegistered;
   }
 
   Future<void> _loadEvent() async {
@@ -44,7 +52,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final result = await useCase(widget.eventId);
     result.when(
       success: (event) => setState(() {
-        _event = event;
+        _onEventLoaded(event);
         _isLoading = false;
       }),
       failure: (f) => setState(() {
@@ -95,6 +103,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     setState(() => _isActionLoading = false);
     result.when(
       success: (reg) {
+        setState(() => _isRegistered = true);
         if (reg.isWaitlisted) {
           ScaffoldMessenger.of(
             context,
@@ -136,6 +145,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     setState(() => _isActionLoading = false);
     result.when(
       success: (_) {
+        setState(() => _isRegistered = false);
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Withdrawn from event.')));
@@ -159,6 +169,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     setState(() => _isActionLoading = false);
     result.when(
       success: (_) {
+        setState(() => _isCheckedIn = true);
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text('Checked in!')));
@@ -415,6 +426,22 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               height: 1.5,
             ),
           ),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: () =>
+              context.push('/events/${_event!.id}/bracket', extra: _event),
+          icon: const Icon(Symbols.emoji_events, size: 18),
+          label: const Text('VIEW BRACKET'),
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size(double.infinity, 48),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            side: BorderSide(
+              color: theme.colorScheme.primary.withValues(alpha: 0.5),
+            ),
+          ),
+        ),
         const SizedBox(height: 80),
       ],
     );
@@ -501,13 +528,47 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
   }
 
+  bool _isEventDay() {
+    final start = _event!.startDate;
+    if (start == null) return false;
+    try {
+      final now = DateTime.now();
+      final eventDay = DateTime.parse(start);
+      return now.year == eventDay.year &&
+          now.month == eventDay.month &&
+          now.day == eventDay.day;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Widget _buildCTA(ThemeData theme) {
-    final isOpen = _event!.isRegistrationOpen;
+    final (String label, VoidCallback? action) = switch ((
+      _isActionLoading,
+      _isCheckedIn,
+      _isRegistered,
+      _event!
+    )) {
+      (true, _, _, _) => ('', null),
+      (_, true, _, _) => ('CHECKED IN', null),
+      (_, _, true, final e)
+          when e.requiresCheckIn && _isEventDay() =>
+        ('CHECK IN', _checkIn),
+      (_, _, true, final e) when e.status == 'open' => ('WITHDRAW', _withdraw),
+      (_, _, false, final e) when e.isRegistrationOpen =>
+        ('REGISTER FOR EVENT', _register),
+      _ => ('REGISTRATION CLOSED', null),
+    };
+
     return ElevatedButton(
-      onPressed: _isActionLoading ? null : (isOpen ? _register : null),
+      onPressed: _isActionLoading ? null : action,
       style: ElevatedButton.styleFrom(
-        backgroundColor: theme.colorScheme.primary,
-        foregroundColor: theme.colorScheme.onPrimary,
+        backgroundColor: _isCheckedIn
+            ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)
+            : theme.colorScheme.primary,
+        foregroundColor: _isCheckedIn
+            ? theme.colorScheme.onSurfaceVariant
+            : theme.colorScheme.onPrimary,
         minimumSize: const Size(double.infinity, 56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         disabledBackgroundColor: theme.colorScheme.primary.withValues(
@@ -524,7 +585,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
             )
           : Text(
-              isOpen ? 'REGISTER FOR EVENT' : 'REGISTRATION CLOSED',
+              label,
               style: const TextStyle(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.2,

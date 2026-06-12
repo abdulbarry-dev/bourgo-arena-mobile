@@ -202,7 +202,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     int points,
     MemberTier tier,
   ) {
-    final formattedPoints = compactPoints(points);
+    final formattedPoints = formatPoints(points);
 
     return Container(
       width: double.infinity,
@@ -291,7 +291,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     MemberTier nextTier,
   ) {
     final appColors = theme.extension<AppColors>()!;
-    final formattedPoints = compactPoints(pointsToNext);
+    final formattedPoints = formatPoints(pointsToNext);
 
     return Container(
       padding: EdgeInsets.all(spacing.md),

@@ -91,6 +91,8 @@ class EventModel {
   final String? endDate;
   final String? status;
   final bool? requiresCheckIn;
+  @JsonKey(defaultValue: false)
+  final bool isRegistered;
   final String? createdAt;
 
   const EventModel({
@@ -108,6 +110,7 @@ class EventModel {
     this.endDate,
     this.status,
     this.requiresCheckIn,
+    this.isRegistered = false,
     this.createdAt,
   });
 

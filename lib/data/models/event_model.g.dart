@@ -88,6 +88,7 @@ EventModel _$EventModelFromJson(Map<String, dynamic> json) => EventModel(
   endDate: json['end_date'] as String?,
   status: json['status'] as String?,
   requiresCheckIn: json['requires_check_in'] as bool?,
+  isRegistered: json['is_registered'] as bool? ?? false,
   createdAt: json['created_at'] as String?,
 );
 
@@ -107,6 +108,7 @@ Map<String, dynamic> _$EventModelToJson(EventModel instance) =>
       'end_date': instance.endDate,
       'status': instance.status,
       'requires_check_in': instance.requiresCheckIn,
+      'is_registered': instance.isRegistered,
       'created_at': instance.createdAt,
     };
 

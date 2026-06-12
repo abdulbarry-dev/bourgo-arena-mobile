@@ -318,16 +318,17 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       ),
       body: CustomScrollView(
         slivers: [
-          if (images.isNotEmpty)
-            SliverAppBar(
-              expandedHeight: 220,
-              pinned: true,
-              automaticallyImplyLeading: false,
-              backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
-              flexibleSpace: FlexibleSpaceBar(
-                background: _buildImageCarousel(images, theme),
-              ),
+          SliverAppBar(
+            expandedHeight: 220,
+            pinned: true,
+            automaticallyImplyLeading: false,
+            backgroundColor: appColors.bgSurface.withValues(alpha: 0.9),
+            flexibleSpace: FlexibleSpaceBar(
+              background: images.isNotEmpty
+                  ? _buildImageCarousel(images, theme)
+                  : _buildImagePlaceholder(theme),
             ),
+          ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -484,6 +485,38 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
               ),
             ),
           ),
+      ],
+    );
+  }
+
+  Widget _buildImagePlaceholder(ThemeData theme) {
+    return Stack(
+      children: [
+        Container(
+          color: theme.colorScheme.surfaceContainerHighest,
+          child: Center(
+            child: Icon(
+              Symbols.school,
+              size: 64,
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+            ),
+          ),
+        ),
+        Positioned.fill(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  Colors.black.withValues(alpha: 0.5),
+                ],
+                stops: const [0.5, 1.0],
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
