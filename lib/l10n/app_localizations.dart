@@ -1574,6 +1574,12 @@ abstract class AppLocalizations {
   /// **'Fille'**
   String get profileFemale;
 
+  /// No description provided for @profileGenderNotSpecified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non spécifié'**
+  String get profileGenderNotSpecified;
+
   /// No description provided for @profileBirthDate.
   ///
   /// In fr, this message translates to:

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
@@ -135,6 +136,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   }
 
   void _saveChanges() {
+    AppHaptics.light();
     _syncDataFromControllers();
     if (!_hasRequiredOnboardingData()) {
       _showValidationError();
@@ -215,16 +217,19 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
               content: Text(
                 'Your session needs to be refreshed. Please log in again.',
               ),
+              behavior: SnackBarBehavior.floating,
             ),
           );
           GoRouter.of(context).go('/login');
         }
       },
       onFailure: (failure) {
+        AppHaptics.error();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(failure.message),
             backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       },
@@ -267,16 +272,19 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
   }
 
   void _showValidationError() {
+    AppHaptics.error();
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
           'Please complete all required onboarding fields before continuing.',
         ),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
   void _onContinue() {
+    AppHaptics.light();
     unawaited(
       _sessionRepository.saveRegistrationDraft({
         'route': '/account-setup',
@@ -349,11 +357,13 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                               children: [
                                 InkWell(
                                   onTap: () {
+                                    AppHaptics.light();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
                                           l10n.commonImagePickerPlaceholder,
                                         ),
+                                        behavior: SnackBarBehavior.floating,
                                       ),
                                     );
                                   },
@@ -499,6 +509,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                                       label: l10n.commonGenderMale,
                                       isSelected: _selectedGender == 'male',
                                       onTap: () {
+                                        AppHaptics.selection();
                                         setState(
                                           () => _selectedGender = 'male',
                                         );
@@ -510,6 +521,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                                       label: l10n.commonGenderFemale,
                                       isSelected: _selectedGender == 'female',
                                       onTap: () {
+                                        AppHaptics.selection();
                                         setState(
                                           () => _selectedGender = 'female',
                                         );
@@ -579,7 +591,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                         SizedBox(height: spacing.lg),
                       ]
                       .animate(interval: 50.ms)
-                      .fade(duration: 300.ms)
+                      .fadeIn(duration: 350.ms)
                       .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
             ),
           ),
@@ -608,7 +620,9 @@ class _GenderOption extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
           padding: EdgeInsets.symmetric(vertical: context.spacing.md),
           decoration: BoxDecoration(
             color: isSelected
@@ -619,6 +633,7 @@ class _GenderOption extends StatelessWidget {
               color: isSelected
                   ? theme.colorScheme.primary
                   : theme.colorScheme.outlineVariant,
+              width: isSelected ? 2 : 1,
             ),
           ),
           child: Text(

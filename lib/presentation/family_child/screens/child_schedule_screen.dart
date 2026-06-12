@@ -1,8 +1,9 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/schedule_item.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_schedule_use_case.dart';
-import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_schedule_view_model.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +65,7 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: SubScreenAppBar(title: 'SCHEDULE'),
           body: _viewModel.isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
                   onRefresh: () async => _load(),
                   color: theme.colorScheme.primary,
@@ -74,7 +75,14 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildDateRangePicker(theme, spacing, appColors),
+                        _buildDateRangePicker(theme, spacing, appColors)
+                            .animate()
+                            .fadeIn(duration: 400.ms)
+                            .slideY(
+                              begin: 0.1,
+                              end: 0,
+                              curve: Curves.easeOutQuad,
+                            ),
                         SizedBox(height: spacing.xl),
                         if (_viewModel.items.isEmpty)
                           _buildEmptyState(theme, spacing)
@@ -112,7 +120,10 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
         children: [
           Expanded(
             child: GestureDetector(
-              onTap: () => _pickDate(true),
+              onTap: () {
+                AppHaptics.selection();
+                _pickDate(true);
+              },
               child: _DateChip(label: 'FROM', date: _toIsoDate(_from), theme: theme, spacing: spacing),
             ),
           ),
@@ -122,7 +133,10 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
           ),
           Expanded(
             child: GestureDetector(
-              onTap: () => _pickDate(false),
+              onTap: () {
+                AppHaptics.selection();
+                _pickDate(false);
+              },
               child: _DateChip(label: 'TO', date: _toIsoDate(_to), theme: theme, spacing: spacing),
             ),
           ),
@@ -152,22 +166,98 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
     }
   }
 
+  Widget _buildLoadingState(ThemeData theme, AppSpacing spacing) {
+    return AppShimmer(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              height: 64,
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surfaceContainerHighest
+                    .withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            SizedBox(height: spacing.xl),
+            ...List.generate(
+              5,
+              (_) => Padding(
+                padding: EdgeInsets.only(bottom: spacing.md),
+                child: Container(
+                  padding: EdgeInsets.all(spacing.lg),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.surfaceContainerHighest
+                        .withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      AppShimmer.block(width: 4, height: 56, borderRadius: 2),
+                      SizedBox(width: spacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            AppShimmer.block(width: 70, height: 14),
+                            SizedBox(height: spacing.sm),
+                            AppShimmer.block(width: 150, height: 16),
+                            SizedBox(height: spacing.sm),
+                            AppShimmer.block(width: 110, height: 12),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: spacing.xxl),
         child: Column(
           children: [
-            Icon(Symbols.schedule, size: 64, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
-            SizedBox(height: spacing.lg),
-            Text('No events scheduled', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+            Container(
+              width: 112,
+              height: 112,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                ),
+              ),
+              child: Icon(
+                Symbols.schedule,
+                size: 56,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            SizedBox(height: spacing.xl),
+            Text('No events scheduled',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
             SizedBox(height: spacing.sm),
             Text('No courses or activities in this date range.',
+              textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ],
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 300.ms).slideY(
+          begin: 0.08,
+          end: 0,
+          curve: Curves.easeOutQuad,
+        );
   }
 }
 
@@ -181,20 +271,26 @@ class _DateChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(spacing.sm),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        children: [
-          Text(label, style: theme.textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w900, letterSpacing: 1.0, color: theme.colorScheme.onSurfaceVariant,
-          )),
-          SizedBox(height: spacing.xxs),
-          Text(date, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
-        ],
+    return Semantics(
+      button: true,
+      label: '$label $date',
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: EdgeInsets.all(spacing.sm),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          children: [
+            Text(label, style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w900, letterSpacing: 1.0, color: theme.colorScheme.onSurfaceVariant,
+            )),
+            SizedBox(height: spacing.xxs),
+            Text(date, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+          ],
+        ),
       ),
     );
   }
@@ -262,7 +358,11 @@ class _ScheduleItemCard extends StatelessWidget {
                     ),
                     SizedBox(width: spacing.sm),
                     if (item.isCompleted)
-                      Icon(Symbols.check_circle, size: 14, color: const Color(0xFF22C55E)),
+                      Semantics(
+                        label: 'Completed',
+                        child: Icon(Symbols.check_circle,
+                            size: 14, color: appColors.statusSuccess),
+                      ),
                     const Spacer(),
                     Text(item.date, style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
@@ -289,6 +389,9 @@ class _ScheduleItemCard extends StatelessWidget {
           ),
         ],
       ),
-    ).animate(delay: (index * 50).ms).fade(duration: 300.ms).slideX(begin: -0.02, end: 0);
+    )
+        .animate(delay: (index.clamp(0, 8) * 50).ms)
+        .fadeIn(duration: 350.ms)
+        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
@@ -24,6 +25,8 @@ class AddEditChildScreen extends StatefulWidget {
 
 class _AddEditChildScreenState extends State<AddEditChildScreen> {
   late final AddEditChildViewModel _viewModel;
+  final _firstNameFocus = FocusNode();
+  final _lastNameFocus = FocusNode();
 
   @override
   void initState() {
@@ -37,11 +40,14 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
 
   @override
   void dispose() {
+    _firstNameFocus.dispose();
+    _lastNameFocus.dispose();
     _viewModel.dispose();
     super.dispose();
   }
 
   Future<void> _selectBirthDate() async {
+    AppHaptics.light();
     final picked = await showDatePicker(
       context: context,
       initialDate:
@@ -53,6 +59,43 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
 
     if (picked != null) {
       _viewModel.setBirthDate(picked);
+    }
+  }
+
+  Future<void> _onSubmit() async {
+    AppHaptics.light();
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+
+    final success = await _viewModel.submitChild();
+    if (!mounted) return;
+
+    if (success) {
+      AppHaptics.success();
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              _viewModel.isEditing
+                  ? l10n.profileChildUpdated
+                  : l10n.profileChildAdded,
+            ),
+            backgroundColor: appColors.statusSuccess,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      context.pop(true);
+    } else {
+      // Move focus to the first invalid text field so the user can fix it
+      // immediately (errors below gender/date are shown inline).
+      AppHaptics.error();
+      if (_viewModel.hasFirstNameError) {
+        _firstNameFocus.requestFocus();
+      } else if (_viewModel.hasLastNameError) {
+        _lastNameFocus.requestFocus();
+      }
     }
   }
 
@@ -97,6 +140,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                   label: l10n.profileFirstName,
                   hint: l10n.profileFirstNameHint,
                   controller: _viewModel.firstNameController,
+                  focusNode: _firstNameFocus,
                   leadingIcon: Symbols.person,
                   errorText: _viewModel.hasFirstNameError
                       ? l10n.commonRequiredField
@@ -109,6 +153,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                   label: l10n.profileLastName,
                   hint: l10n.profileLastNameHint,
                   controller: _viewModel.lastNameController,
+                  focusNode: _lastNameFocus,
                   leadingIcon: Symbols.person,
                   errorText: _viewModel.hasLastNameError
                       ? l10n.commonRequiredField
@@ -145,47 +190,52 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                   ),
                 ),
                 SizedBox(height: spacing.md),
-                GestureDetector(
-                  onTap: _selectBirthDate,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: spacing.lg,
-                      vertical: spacing.md,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: _viewModel.hasBirthDateError
-                            ? theme.colorScheme.error
-                            : theme.colorScheme.outlineVariant,
+                Semantics(
+                  button: true,
+                  label: l10n.profileBirthDate,
+                  child: InkWell(
+                    onTap: _selectBirthDate,
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.lg,
+                        vertical: spacing.md,
                       ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Symbols.calendar_today,
-                          color: theme.colorScheme.primary,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: _viewModel.hasBirthDateError
+                              ? theme.colorScheme.error
+                              : theme.colorScheme.outlineVariant,
                         ),
-                        SizedBox(width: spacing.md),
-                        Expanded(
-                          child: Text(
-                            _viewModel.selectedBirthDate != null
-                                ? DateFormat.yMMMd().format(
-                                    _viewModel.selectedBirthDate!,
-                                  )
-                                : l10n.profileSelectDate,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: _viewModel.selectedBirthDate != null
-                                  ? theme.colorScheme.onSurface
-                                  : theme.colorScheme.onSurfaceVariant,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Symbols.calendar_today,
+                            color: theme.colorScheme.primary,
+                          ),
+                          SizedBox(width: spacing.md),
+                          Expanded(
+                            child: Text(
+                              _viewModel.selectedBirthDate != null
+                                  ? DateFormat.yMMMd().format(
+                                      _viewModel.selectedBirthDate!,
+                                    )
+                                  : l10n.profileSelectDate,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: _viewModel.selectedBirthDate != null
+                                    ? theme.colorScheme.onSurface
+                                    : theme.colorScheme.onSurfaceVariant,
+                              ),
                             ),
                           ),
-                        ),
-                        Icon(
-                          Symbols.expand_more,
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ],
+                          Icon(
+                            Symbols.expand_more,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -209,42 +259,36 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                       color: theme.colorScheme.errorContainer,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      _viewModel.errorMessage!,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.error,
-                      ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Symbols.error,
+                          size: 20,
+                          color: theme.colorScheme.error,
+                        ),
+                        SizedBox(width: spacing.sm),
+                        Expanded(
+                          child: Text(
+                            _viewModel.errorMessage!,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 if (_viewModel.errorMessage != null)
                   SizedBox(height: spacing.lg),
 
                 // Submit Button
-                ElevatedButton(
-                  onPressed: _viewModel.isSubmitting
-                      ? null
-                      : () async {
-                          final success = await _viewModel.submitChild();
-                          if (!mounted) return;
-
-                          if (success) {
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    _viewModel.isEditing
-                                        ? l10n.profileChildUpdated
-                                        : l10n.profileChildAdded,
-                                  ),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                              context.pop(true);
-                            }
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
+                FilledButton(
+                  onPressed: _viewModel.isSubmitting ? null : _onSubmit,
+                  style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: spacing.lg),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                   child: _viewModel.isSubmitting
                       ? const SizedBox(
@@ -253,9 +297,14 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(
-                          _viewModel.isEditing
-                              ? l10n.commonSave
-                              : l10n.profileAddChild,
+                          (_viewModel.isEditing
+                                  ? l10n.commonSave
+                                  : l10n.profileAddChild)
+                              .toUpperCase(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                          ),
                         ),
                 ),
                 SizedBox(height: spacing.xl),
@@ -278,7 +327,10 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
             icon: Symbols.boy,
             label: l10n.profileMale,
             isSelected: _viewModel.selectedGender == 'male',
-            onTap: () => _viewModel.setGender('male'),
+            onTap: () {
+              AppHaptics.selection();
+              _viewModel.setGender('male');
+            },
           ),
         ),
         SizedBox(width: spacing.md),
@@ -287,7 +339,10 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
             icon: Symbols.girl,
             label: l10n.profileFemale,
             isSelected: _viewModel.selectedGender == 'female',
-            onTap: () => _viewModel.setGender('female'),
+            onTap: () {
+              AppHaptics.selection();
+              _viewModel.setGender('female');
+            },
           ),
         ),
       ],
@@ -313,42 +368,49 @@ class _GenderOption extends StatelessWidget {
     final theme = Theme.of(context);
     final spacing = context.spacing;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(spacing.md),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary.withOpacity(0.1)
-              : theme.colorScheme.surface,
-          border: Border.all(
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
             color: isSelected
-                ? theme.colorScheme.primary
-                : theme.colorScheme.outlineVariant,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              size: 40,
+                ? theme.colorScheme.primary.withValues(alpha: 0.1)
+                : theme.colorScheme.surface,
+            border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
+                  : theme.colorScheme.outlineVariant,
+              width: isSelected ? 2 : 1,
             ),
-            SizedBox(height: spacing.sm),
-            Text(
-              label,
-              style: theme.textTheme.labelSmall?.copyWith(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                icon,
+                size: 40,
                 color: isSelected
                     ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
-            ),
-          ],
+              SizedBox(height: spacing.sm),
+              Text(
+                label,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurfaceVariant,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

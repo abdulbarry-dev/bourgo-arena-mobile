@@ -16,6 +16,7 @@ import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_st
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -337,7 +338,12 @@ class _MemberSelector extends StatelessWidget {
 
     return PopupMenuButton<String>(
       initialValue: viewModel.selectedMember?.id,
+      tooltip: '',
+      splashRadius: 14,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      onOpened: AppHaptics.light,
       onSelected: (id) {
+        AppHaptics.selection();
         final member = viewModel.familyMembers.firstWhere((m) => m.id == id);
         viewModel.selectMember(member);
       },

@@ -1,9 +1,13 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/child_avatar.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/manage_children_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -39,6 +43,7 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
   void _showDeleteConfirmation(String childId, String childName) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
 
     showDialog(
       context: context,
@@ -60,28 +65,37 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
             isPrimary: true,
             isDestructive: true,
             onPressed: () async {
+              AppHaptics.medium();
               Navigator.pop(context);
               final success = await _viewModel.removeChild(childId);
 
               if (success) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l10n.profileChildRemoved),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+                  AppHaptics.success();
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(l10n.profileChildRemoved),
+                        backgroundColor: appColors.statusSuccess,
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
                 }
               } else {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        _viewModel.errorMessage ?? l10n.commonErrorOccurred,
+                  AppHaptics.error();
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          _viewModel.errorMessage ?? l10n.commonErrorOccurred,
+                        ),
+                        backgroundColor: theme.colorScheme.error,
+                        behavior: SnackBarBehavior.floating,
                       ),
-                      backgroundColor: theme.colorScheme.error,
-                    ),
-                  );
+                    );
                 }
               }
             },
@@ -121,7 +135,7 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
         listenable: _viewModel,
         builder: (context, _) {
           if (_viewModel.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return _buildLoadingState(theme, spacing);
           }
 
           final children = _viewModel.children;
@@ -136,23 +150,66 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
                 else
                   _buildChildrenList(context, children, theme, spacing),
                 SizedBox(height: spacing.xl),
-                ElevatedButton.icon(
+                FilledButton.icon(
                   onPressed: () async {
+                    AppHaptics.light();
                     final childAdded = await context.push<bool>('/add-child');
                     if (childAdded == true) {
                       await _viewModel.reloadChildren();
                     }
                   },
                   icon: const Icon(Symbols.add),
-                  label: Text(l10n.profileAddChild),
-                  style: ElevatedButton.styleFrom(
+                  label: Text(
+                    l10n.profileAddChild.toUpperCase(),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  style: FilledButton.styleFrom(
                     padding: EdgeInsets.symmetric(vertical: spacing.lg),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ),
               ],
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(ThemeData theme, AppSpacing spacing) {
+    return AppShimmer(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.xl),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: List.generate(
+            4,
+            (_) => Padding(
+              padding: EdgeInsets.only(bottom: spacing.lg),
+              child: Row(
+                children: [
+                  AppShimmer.block(width: 64, height: 64, borderRadius: 32),
+                  SizedBox(width: spacing.lg),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppShimmer.block(width: 140, height: 16),
+                        SizedBox(height: spacing.sm),
+                        AppShimmer.block(width: 80, height: 12),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -164,15 +221,26 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
     AppLocalizations l10n,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: spacing.xl),
+      padding: EdgeInsets.symmetric(vertical: spacing.xxl),
       child: Column(
         children: [
-          Icon(
-            Symbols.groups,
-            size: 80,
-            color: theme.colorScheme.primary.withOpacity(0.3),
+          Container(
+            width: 112,
+            height: 112,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.colorScheme.primary.withValues(alpha: 0.08),
+              border: Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.15),
+              ),
+            ),
+            child: Icon(
+              Symbols.groups,
+              size: 56,
+              color: theme.colorScheme.primary,
+            ),
           ),
-          SizedBox(height: spacing.lg),
+          SizedBox(height: spacing.xl),
           Text(
             l10n.profileNoChildren,
             textAlign: TextAlign.center,
@@ -190,7 +258,11 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
           ),
         ],
       ),
-    );
+    ).animate().fade(duration: 300.ms).slideY(
+          begin: 0.08,
+          end: 0,
+          curve: Curves.easeOutQuad,
+        );
   }
 
   Widget _buildChildrenList(
@@ -218,8 +290,13 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
     final spacing = context.spacing;
     final l10n = AppLocalizations.of(context)!;
     final appColors = theme.extension<AppColors>()!;
+    final isFemale = child.gender?.toLowerCase() == 'female';
+    final genderLabel = child.gender == null
+        ? l10n.profileGenderNotSpecified
+        : (isFemale ? l10n.profileFemale : l10n.profileMale);
 
-    return GestureDetector(
+    return PressableCard(
+      borderRadius: BorderRadius.circular(16),
       onTap: () => context.push('/child/${child.id}/profile'),
       child: Container(
         padding: EdgeInsets.all(spacing.lg),
@@ -230,21 +307,12 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
         ),
         child: Row(
           children: [
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withOpacity(0.1),
-              ),
-              child: Center(
-                child: Icon(
-                  child.gender?.toLowerCase() == 'female'
-                      ? Symbols.girl
-                      : Symbols.boy,
-                  color: theme.colorScheme.primary,
-                  size: 32,
-                ),
+            Semantics(
+              label: genderLabel,
+              child: ChildAvatar(
+                gender: child.gender,
+                size: 64,
+                heroTag: 'child-avatar-${child.id}',
               ),
             ),
             SizedBox(width: spacing.lg),
@@ -260,7 +328,7 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
                   ),
                   SizedBox(height: spacing.xs),
                   Text(
-                    child.gender ?? 'Not specified',
+                    genderLabel,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -268,27 +336,27 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
                 ],
               ),
             ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () async {
-                    final updated = await context.push<bool>(
-                      '/edit-child/${child.id}',
-                      extra: child,
-                    );
-                    if (updated == true) {
-                      _viewModel.reloadChildren();
-                    }
-                  },
-                  icon: Icon(Symbols.edit, color: theme.colorScheme.primary),
-                  tooltip: l10n.profileEdit,
-                ),
-                IconButton(
-                  onPressed: () => _showDeleteConfirmation(child.id, child.name),
-                  icon: Icon(Symbols.delete, color: theme.colorScheme.error),
-                  tooltip: l10n.profileDelete,
-                ),
-              ],
+            IconButton(
+              onPressed: () async {
+                AppHaptics.light();
+                final updated = await context.push<bool>(
+                  '/edit-child/${child.id}',
+                  extra: child,
+                );
+                if (updated == true) {
+                  _viewModel.reloadChildren();
+                }
+              },
+              icon: Icon(Symbols.edit, color: theme.colorScheme.primary),
+              tooltip: l10n.profileEdit,
+            ),
+            IconButton(
+              onPressed: () {
+                AppHaptics.light();
+                _showDeleteConfirmation(child.id, child.name);
+              },
+              icon: Icon(Symbols.delete, color: theme.colorScheme.error),
+              tooltip: l10n.profileDelete,
             ),
           ],
         ),

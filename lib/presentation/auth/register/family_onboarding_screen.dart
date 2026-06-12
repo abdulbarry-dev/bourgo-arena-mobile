@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
@@ -116,6 +117,7 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
   }
 
   void _onContinue() {
+    AppHaptics.light();
     _persistDraft();
     context.push(
       '/verification-method',
@@ -159,10 +161,18 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           AuthHeader(
-                            title: l10n.authFamilyOnboardingTitle,
-                            subtitle: l10n.authFamilyOnboardingSubtitle,
-                            subtitleColor: theme.colorScheme.onSurfaceVariant,
-                          ),
+                                title: l10n.authFamilyOnboardingTitle,
+                                subtitle: l10n.authFamilyOnboardingSubtitle,
+                                subtitleColor:
+                                    theme.colorScheme.onSurfaceVariant,
+                              )
+                              .animate()
+                              .fadeIn(duration: 400.ms)
+                              .slideY(
+                                begin: 0.1,
+                                end: 0,
+                                curve: Curves.easeOutQuad,
+                              ),
                           const SizedBox(height: 32),
                         ],
                       ),
@@ -200,7 +210,10 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                                     selectedGender: _viewModel.selectedGender,
                                     onGenderChanged: _viewModel.setGender,
                                     onSelectBirthDate: _selectBirthDate,
-                                    onAdd: _viewModel.addMember,
+                                    onAdd: () {
+                                      AppHaptics.selection();
+                                      _viewModel.addMember();
+                                    },
                                     firstNameError: _viewModel.hasFirstNameError
                                         ? l10n.commonRequiredField
                                         : null,
@@ -237,7 +250,7 @@ class _FamilyOnboardingScreenState extends State<FamilyOnboardingScreen> {
                                   ),
                                 ]
                                 .animate(interval: 50.ms)
-                                .fade(duration: 300.ms)
+                                .fadeIn(duration: 350.ms)
                                 .slideY(
                                   begin: 0.1,
                                   end: 0,
@@ -271,16 +284,19 @@ class _MembersList extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Text(
-            l10n.authAddedMembers.toUpperCase(),
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.5,
-            ),
-          ),
-        ),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Text(
+                l10n.authAddedMembers.toUpperCase(),
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.5,
+                ),
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms)
+            .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
         const SizedBox(height: 16),
         SizedBox(
           height: 140,
@@ -292,10 +308,20 @@ class _MembersList extends StatelessWidget {
             itemBuilder: (context, index) {
               final member = members[index];
               return FamilyMemberCard(
-                name: member.name,
-                gender: member.gender,
-                onRemove: () => onRemove(index),
-              );
+                    name: member.name,
+                    gender: member.gender,
+                    onRemove: () {
+                      AppHaptics.selection();
+                      onRemove(index);
+                    },
+                  )
+                  .animate(delay: (index.clamp(0, 8) * 50).ms)
+                  .fadeIn(duration: 350.ms)
+                  .slideY(
+                    begin: 0.08,
+                    end: 0,
+                    curve: Curves.easeOutCubic,
+                  );
             },
           ),
         ),

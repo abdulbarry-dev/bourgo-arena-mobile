@@ -14,6 +14,7 @@ class AuthTextField extends StatefulWidget {
   final String? errorText;
   final TextInputType keyboardType;
   final Widget? suffixIcon;
+  final FocusNode? focusNode;
 
   const AuthTextField({
     super.key,
@@ -28,6 +29,7 @@ class AuthTextField extends StatefulWidget {
     this.errorText,
     this.keyboardType = TextInputType.text,
     this.suffixIcon,
+    this.focusNode,
   });
 
   @override
@@ -62,6 +64,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
         SizedBox(height: spacing.xs),
         TextFormField(
           controller: widget.controller,
+          focusNode: widget.focusNode,
           obscureText: _obscureText,
           readOnly: widget.readOnly,
           onTap: widget.onTap,

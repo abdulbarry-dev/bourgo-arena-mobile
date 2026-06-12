@@ -1,7 +1,7 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/child_avatar.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_profile_view_model.dart';
 import 'package:flutter/material.dart';
@@ -107,20 +107,10 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
       ),
       child: Column(
         children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
-            ),
-            child: Center(
-              child: Icon(
-                Symbols.child_care,
-                color: theme.colorScheme.primary,
-                size: 40,
-              ),
-            ),
+          ChildAvatar(
+            gender: profile.gender,
+            size: 96,
+            heroTag: 'child-avatar-${widget.childId}',
           ),
           SizedBox(height: spacing.md),
           Text(

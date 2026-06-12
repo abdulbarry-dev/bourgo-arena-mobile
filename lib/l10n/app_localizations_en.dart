@@ -777,6 +777,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileFemale => 'Girl';
 
   @override
+  String get profileGenderNotSpecified => 'Not specified';
+
+  @override
   String get profileBirthDate => 'Date of Birth';
 
   @override

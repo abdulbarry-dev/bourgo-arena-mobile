@@ -268,6 +268,7 @@
   "profileGender": "Genre",
   "profileMale": "Garçon",
   "profileFemale": "Fille",
+  "profileGenderNotSpecified": "Non spécifié",
   "profileBirthDate": "Date de naissance",
   "profileSelectDate": "Sélectionnez la date de naissance",
   "profileNoChildrenDescription": "Commencez par ajouter le profil de votre enfant pour gérer ses activités.",

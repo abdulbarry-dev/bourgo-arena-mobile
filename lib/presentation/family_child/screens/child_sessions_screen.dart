@@ -1,8 +1,11 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/book_child_session_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_available_sessions_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_sessions_view_model.dart';
 import 'package:flutter/material.dart';
@@ -86,13 +89,20 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
               ),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(dialogContext),
+                  onPressed: () {
+                    AppHaptics.light();
+                    Navigator.pop(dialogContext);
+                  },
                   child: const Text('Cancel'),
                 ),
                 if (!session.isFull)
                   ElevatedButton(
                     onPressed: () async {
+                      AppHaptics.light();
                       Navigator.pop(dialogContext);
+                      final theme = Theme.of(this.context);
+                      final appColors = theme.extension<AppColors>()!;
+                      final messenger = ScaffoldMessenger.of(this.context);
                       final dateStr =
                           '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
                       final booking = await _viewModel.bookSession(
@@ -101,16 +111,26 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                         date: dateStr,
                       );
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              booking != null
-                                  ? 'Successfully booked!'
-                                  : _viewModel.errorMessage ?? 'Failed to book',
+                        if (booking != null) {
+                          AppHaptics.success();
+                        } else {
+                          AppHaptics.error();
+                        }
+                        messenger
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                booking != null
+                                    ? 'Successfully booked!'
+                                    : _viewModel.errorMessage ?? 'Failed to book',
+                              ),
+                              backgroundColor: booking != null
+                                  ? appColors.statusSuccess
+                                  : theme.colorScheme.error,
+                              behavior: SnackBarBehavior.floating,
                             ),
-                            backgroundColor: booking != null ? Colors.green : Theme.of(context).colorScheme.error,
-                          ),
-                        );
+                          );
                         if (booking != null) _viewModel.load(widget.childId);
                       }
                     },
@@ -137,7 +157,7 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: SubScreenAppBar(title: 'AVAILABLE SESSIONS'),
           body: _viewModel.isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
                   onRefresh: () => _viewModel.load(widget.childId),
                   color: theme.colorScheme.primary,
@@ -168,6 +188,47 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
     );
   }
 
+  Widget _buildLoadingState(ThemeData theme, AppSpacing spacing) {
+    return AppShimmer(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: List.generate(
+            5,
+            (_) => Padding(
+              padding: EdgeInsets.only(bottom: spacing.md),
+              child: Container(
+                padding: EdgeInsets.all(spacing.lg),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest
+                      .withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    AppShimmer.block(width: 44, height: 44, borderRadius: 12),
+                    SizedBox(width: spacing.lg),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppShimmer.block(width: 150, height: 16),
+                          SizedBox(height: spacing.sm),
+                          AppShimmer.block(width: 100, height: 12),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Center(
       child: Padding(
@@ -175,15 +236,34 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Symbols.sports_kabaddi, size: 64,
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
-            SizedBox(height: spacing.lg),
+            Container(
+              width: 112,
+              height: 112,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                ),
+              ),
+              child: Icon(
+                Symbols.sports_kabaddi,
+                size: 56,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            SizedBox(height: spacing.xl),
             Text('No sessions available',
+              textAlign: TextAlign.center,
               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
           ],
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 300.ms).slideY(
+          begin: 0.08,
+          end: 0,
+          curve: Curves.easeOutQuad,
+        );
   }
 }
 
@@ -207,7 +287,7 @@ class _SessionCard extends StatelessWidget {
         ? dayNames[session.dayOfWeek - 1]
         : '';
 
-    return Container(
+    final card = Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
         color: appColors.bgElevated,
@@ -226,7 +306,11 @@ class _SessionCard extends StatelessWidget {
                       style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                     if (session.isBooked) ...[
                       SizedBox(width: spacing.sm),
-                      Icon(Symbols.check_circle, size: 16, color: const Color(0xFF22C55E)),
+                      Semantics(
+                        label: 'Booked',
+                        child: Icon(Symbols.check_circle,
+                            size: 16, color: appColors.statusSuccess),
+                      ),
                     ],
                   ],
                 ),
@@ -251,7 +335,7 @@ class _SessionCard extends StatelessWidget {
                     SizedBox(width: spacing.xxs),
                     Text('${session.enrolled}/${session.capacity}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: session.isFull ? Colors.red : theme.colorScheme.onSurfaceVariant,
+                        color: session.isFull ? appColors.statusError : theme.colorScheme.onSurfaceVariant,
                         fontWeight: session.isFull ? FontWeight.w700 : FontWeight.normal,
                       )),
                     if (session.isFull) ...[
@@ -259,11 +343,11 @@ class _SessionCard extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
+                          color: appColors.statusError.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text('FULL', style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w900, color: Colors.red, fontSize: 9,
+                          fontWeight: FontWeight.w900, color: appColors.statusError, fontSize: 9,
                         )),
                       ),
                     ],
@@ -280,6 +364,19 @@ class _SessionCard extends StatelessWidget {
             ),
         ],
       ),
-    ).animate(delay: (index * 50).ms).fade(duration: 300.ms).slideX(begin: -0.02, end: 0);
+    );
+
+    final content = onBook != null
+        ? PressableCard(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onBook,
+            child: card,
+          )
+        : card;
+
+    return content
+        .animate(delay: (index.clamp(0, 8) * 50).ms)
+        .fadeIn(duration: 350.ms)
+        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic);
   }
 }

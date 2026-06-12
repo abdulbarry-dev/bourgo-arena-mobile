@@ -1,10 +1,12 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:flutter/material.dart';
@@ -62,6 +64,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
   }
 
   Future<void> _toggleFamilyAccount(bool value) async {
+    AppHaptics.selection();
     if (value) {
       final l10n = AppLocalizations.of(context)!;
       final status = await _viewModel.getVerificationStatus();
@@ -232,6 +235,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                       );
                       if (!context.mounted) return;
                       if (success) {
+                        AppHaptics.success();
                         Navigator.pop(context);
                         final messenger = ScaffoldMessenger.of(context);
                         final successMessage = AppLocalizations.of(
@@ -240,7 +244,10 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                         messenger.showSnackBar(
                           SnackBar(
                             content: Text(successMessage),
-                            backgroundColor: Colors.green,
+                            backgroundColor: theme
+                                .extension<AppColors>()!
+                                .statusSuccess,
+                            behavior: SnackBarBehavior.floating,
                           ),
                         );
                         if (context.mounted) {
@@ -294,7 +301,21 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
         listenable: _viewModel,
         builder: (context, _) {
           if (_viewModel.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return AppShimmer(
+              child: Padding(
+                padding: EdgeInsets.all(spacing.xl),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    AppShimmer.block(height: 88, borderRadius: 24),
+                    SizedBox(height: spacing.xl),
+                    AppShimmer.block(width: 180, height: 20),
+                    SizedBox(height: spacing.lg),
+                    AppShimmer.block(height: 56, borderRadius: 16),
+                  ],
+                ),
+              ),
+            );
           }
 
           final user = _viewModel.user;
@@ -331,8 +352,11 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                     ),
                   ),
                   SizedBox(height: spacing.lg),
-                  ElevatedButton.icon(
-                    onPressed: () => context.push('/manage-children'),
+                  FilledButton.icon(
+                    onPressed: () {
+                      AppHaptics.light();
+                      context.push('/manage-children');
+                    },
                     icon: const Icon(Symbols.groups),
                     label: Text(
                       l10n.profileManageChildren.toUpperCase(),
@@ -342,7 +366,7 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                         fontSize: 14,
                       ),
                     ),
-                    style: ElevatedButton.styleFrom(
+                    style: FilledButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: spacing.lg),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -350,15 +374,31 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
                     ),
                   ),
                 ] else ...[
+                  SizedBox(height: spacing.xxl),
                   Center(
                     child: Column(
                       children: [
-                        Icon(
-                          Symbols.family_restroom,
-                          size: 64,
-                          color: theme.colorScheme.primary.withOpacity(0.3),
+                        Container(
+                          width: 112,
+                          height: 112,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.08,
+                            ),
+                            border: Border.all(
+                              color: theme.colorScheme.primary.withValues(
+                                alpha: 0.15,
+                              ),
+                            ),
+                          ),
+                          child: Icon(
+                            Symbols.family_restroom,
+                            size: 56,
+                            color: theme.colorScheme.primary,
+                          ),
                         ),
-                        SizedBox(height: spacing.lg),
+                        SizedBox(height: spacing.xl),
                         Text(
                           l10n.profileFamilyNotEnabled,
                           textAlign: TextAlign.center,

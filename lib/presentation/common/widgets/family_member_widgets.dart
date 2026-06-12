@@ -1,6 +1,8 @@
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 /// A card displaying a family member's brief info.
@@ -41,7 +43,9 @@ class FamilyMemberCard extends StatelessWidget {
         genderColor = theme.colorScheme.primary;
     }
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutCubic,
       width: 130,
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
@@ -111,7 +115,10 @@ class FamilyMemberCard extends StatelessWidget {
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(
-                  onTap: onRemove,
+                  onTap: () {
+                    AppHaptics.light();
+                    onRemove();
+                  },
                   borderRadius: BorderRadius.circular(20),
                   child: Container(
                     padding: const EdgeInsets.all(4),
@@ -131,6 +138,11 @@ class FamilyMemberCard extends StatelessWidget {
           ],
         ),
       ),
+    ).animate().fadeIn(duration: 300.ms).scale(
+      duration: 300.ms,
+      curve: Curves.easeOutCubic,
+      begin: const Offset(0.95, 0.95),
+      end: const Offset(1, 1),
     );
   }
 }
@@ -155,19 +167,31 @@ class FamilyAccountToggle extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutCubic,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
+        color: value
+            ? theme.colorScheme.primary.withValues(alpha: 0.06)
+            : theme.colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant),
+        border: Border.all(
+          color: value
+              ? theme.colorScheme.primary.withValues(alpha: 0.4)
+              : theme.colorScheme.outlineVariant,
+        ),
       ),
       child: Row(
         children: [
-          Container(
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            curve: Curves.easeOutCubic,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              color: theme.colorScheme.primary.withValues(
+                alpha: value ? 0.16 : 0.1,
+              ),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -341,20 +365,29 @@ class FamilyMemberForm extends StatelessWidget {
                 icon: Symbols.male,
                 label: l10n.commonGenderMale,
                 isSelected: selectedGender == 'male',
-                onTap: () => onGenderChanged('male'),
+                onTap: () {
+                  AppHaptics.selection();
+                  onGenderChanged('male');
+                },
               ),
               const SizedBox(width: 12),
               _GenderButton(
                 icon: Symbols.female,
                 label: l10n.commonGenderFemale,
                 isSelected: selectedGender == 'female',
-                onTap: () => onGenderChanged('female'),
+                onTap: () {
+                  AppHaptics.selection();
+                  onGenderChanged('female');
+                },
               ),
             ],
           ),
           const SizedBox(height: 32),
           FilledButton.icon(
-            onPressed: onAdd,
+            onPressed: () {
+              AppHaptics.light();
+              onAdd();
+            },
             icon: const Icon(Symbols.add, size: 20),
             label: Text(addButtonLabel ?? l10n.authAddMember),
             style: FilledButton.styleFrom(
@@ -369,6 +402,10 @@ class FamilyMemberForm extends StatelessWidget {
           ),
         ],
       ),
+    ).animate().fadeIn(duration: 350.ms).slideY(
+      begin: 0.06,
+      end: 0,
+      curve: Curves.easeOutCubic,
     );
   }
 }
