@@ -13,8 +13,15 @@ class PaymentGatewayScreen extends StatefulWidget {
   /// The reservation ID to pay for.
   final String reservationId;
 
+  /// The deposit amount to pay (optional).
+  final double? amount;
+
   /// Creates a [PaymentGatewayScreen].
-  const PaymentGatewayScreen({super.key, required this.reservationId});
+  const PaymentGatewayScreen({
+    super.key,
+    required this.reservationId,
+    this.amount,
+  });
 
   @override
   State<PaymentGatewayScreen> createState() => _PaymentGatewayScreenState();
@@ -55,6 +62,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
     _viewModel = PaymentViewModel(
       reservationRepository: locator<ReservationRepository>(),
       reservationId: widget.reservationId,
+      amount: widget.amount,
     );
     setState(() {});
   }
@@ -64,7 +72,14 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
     await _viewModel!.initiatePayment();
 
     final url = _viewModel!.paymentUrl;
-    if (url == null || !mounted) return;
+    if (url == null) {
+      if (_viewModel!.paymentId != null) {
+        _didReturnFromBrowser = true;
+        _viewModel!.verifyPayment();
+      }
+      return;
+    }
+    if (!mounted) return;
 
     final uri = Uri.tryParse(url);
     if (uri != null && await canLaunchUrl(uri)) {

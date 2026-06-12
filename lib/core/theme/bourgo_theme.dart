@@ -304,34 +304,33 @@ class BourgoTheme {
     final isDark = brightness == Brightness.dark;
     final textColor = isDark ? Colors.white : const Color(0xFF1A1A1A);
 
-    return baseTextTheme.copyWith(
-      displayLarge: GoogleFonts.blackHanSans(
-        textStyle: baseTextTheme.displayLarge?.copyWith(
-          fontSize: 52,
-          fontWeight: FontWeight.w900,
-          height: 1.0,
-          letterSpacing: -1.0,
-        ),
-      ),
-      displayMedium: GoogleFonts.blackHanSans(
-        textStyle: baseTextTheme.displayMedium?.copyWith(
-          fontSize: 40,
-          fontWeight: FontWeight.w900,
-          height: 1.05,
-          letterSpacing: -0.5,
-        ),
-      ),
-      headlineLarge: GoogleFonts.lexend(
-        textStyle: baseTextTheme.headlineLarge?.copyWith(
-          fontSize: 28,
-          fontWeight: FontWeight.w800,
-          height: 1.1,
-          letterSpacing: -0.3,
-        ),
-      ),
-    ).apply(
-      displayColor: textColor,
-      bodyColor: textColor,
-    );
+    return baseTextTheme
+        .copyWith(
+          displayLarge: GoogleFonts.blackHanSans(
+            textStyle: baseTextTheme.displayLarge?.copyWith(
+              fontSize: 52,
+              fontWeight: FontWeight.w900,
+              height: 1.0,
+              letterSpacing: -1.0,
+            ),
+          ),
+          displayMedium: GoogleFonts.blackHanSans(
+            textStyle: baseTextTheme.displayMedium?.copyWith(
+              fontSize: 40,
+              fontWeight: FontWeight.w900,
+              height: 1.05,
+              letterSpacing: -0.5,
+            ),
+          ),
+          headlineLarge: GoogleFonts.lexend(
+            textStyle: baseTextTheme.headlineLarge?.copyWith(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              height: 1.1,
+              letterSpacing: -0.3,
+            ),
+          ),
+        )
+        .apply(displayColor: textColor, bodyColor: textColor);
   }
 }

@@ -15,8 +15,9 @@ class AppShimmer extends StatelessWidget {
 
     return Shimmer.fromColors(
       baseColor: theme.colorScheme.surfaceContainerHighest,
-      highlightColor:
-          theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+      highlightColor: theme.colorScheme.surfaceContainerHighest.withValues(
+        alpha: 0.4,
+      ),
       child: SingleChildScrollView(child: child),
     );
   }

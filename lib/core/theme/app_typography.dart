@@ -144,5 +144,6 @@ class AppTypography extends ThemeExtension<AppTypography> {
 
 extension AppTypographyContext on BuildContext {
   AppTypography get typography =>
-      Theme.of(this).extension<AppTypography>() ?? AppTypography.standard(Brightness.light);
+      Theme.of(this).extension<AppTypography>() ??
+      AppTypography.standard(Brightness.light);
 }

@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
@@ -109,7 +110,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   onServiceTap: (service) =>
                       context.push('/services/${service.id}', extra: service),
                 ),
-                if (_viewModel.services.isNotEmpty && !_viewModel.servicesLoading)
+                if (_viewModel.services.isNotEmpty &&
+                    !_viewModel.servicesLoading)
                   _RotatingServiceHero(
                     services: _viewModel.services,
                     onServiceTap: (service) =>
@@ -199,14 +201,14 @@ class _ServicesHeroSection extends SliverToBoxAdapter {
     required VoidCallback onRetry,
     required void Function(Service service) onServiceTap,
   }) : super(
-          child: _ServicesHeroContent(
-            services: services,
-            isLoading: isLoading,
-            error: error,
-            onRetry: onRetry,
-            onServiceTap: onServiceTap,
-          ),
-        );
+         child: _ServicesHeroContent(
+           services: services,
+           isLoading: isLoading,
+           error: error,
+           onRetry: onRetry,
+           onServiceTap: onServiceTap,
+         ),
+       );
 }
 
 class _ServicesHeroContent extends StatelessWidget {
@@ -266,7 +268,11 @@ class _ServicesHeroContent extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Symbols.grid_view, size: 20, color: theme.colorScheme.primary),
+              Icon(
+                Symbols.grid_view,
+                size: 20,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               Text(
                 'OUR SERVICES',
@@ -379,11 +385,11 @@ class _RotatingServiceHero extends SliverToBoxAdapter {
     required List<Service> services,
     required void Function(Service service) onServiceTap,
   }) : super(
-          child: _RotatingServiceHeroContent(
-            services: services,
-            onServiceTap: onServiceTap,
-          ),
-        );
+         child: _RotatingServiceHeroContent(
+           services: services,
+           onServiceTap: onServiceTap,
+         ),
+       );
 }
 
 class _RotatingServiceHeroContent extends StatefulWidget {
@@ -470,10 +476,8 @@ class _RotatingServiceHeroContentState
             children: [
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
-                transitionBuilder: (child, animation) => FadeTransition(
-                  opacity: animation,
-                  child: child,
-                ),
+                transitionBuilder: (child, animation) =>
+                    FadeTransition(opacity: animation, child: child),
                 child: SizedBox(
                   key: ValueKey(service.id),
                   child: Stack(
@@ -486,13 +490,15 @@ class _RotatingServiceHeroContentState
                         )
                       else
                         Container(
-                          color:
-                              theme.colorScheme.primary.withValues(alpha: 0.08),
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.08,
+                          ),
                           child: Icon(
                             Symbols.grid_view,
                             size: 64,
-                            color: theme.colorScheme.primary
-                                .withValues(alpha: 0.2),
+                            color: theme.colorScheme.primary.withValues(
+                              alpha: 0.2,
+                            ),
                           ),
                         ),
                       Positioned.fill(
@@ -573,8 +579,7 @@ class _RotatingServiceHeroContentState
                   bottom: 16,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children:
-                        List.generate(widget.services.length, (i) {
+                    children: List.generate(widget.services.length, (i) {
                       final isActive = i == _rotationIndex;
                       return Container(
                         margin: const EdgeInsets.only(left: 5),
@@ -621,42 +626,6 @@ class _StatBadge extends StatelessWidget {
       ),
     );
   }
-}
-
-class _DashedBorderPainter extends CustomPainter {
-  final Color color;
-  final double radius;
-
-  _DashedBorderPainter({required this.color, required this.radius});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5;
-
-    final rrect = RRect.fromRectAndRadius(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Radius.circular(radius),
-    );
-    final path = Path()..addRRect(rrect);
-
-    for (final metric in path.computeMetrics()) {
-      double distance = 0;
-      while (distance < metric.length) {
-        const dash = 8.0;
-        const gap = 4.0;
-        final end = (distance + dash).clamp(0.0, metric.length);
-        canvas.drawPath(metric.extractPath(distance, end), paint);
-        distance += dash + gap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.radius != radius;
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -747,12 +716,12 @@ class _DashboardSection extends SliverToBoxAdapter {
                  accentColor: accentColor,
                  onRetry: onRetry,
                )
-            else if (isEmpty)
-                _EmptyRow(
-                  message: 'No $title available',
-                  accentColor: accentColor,
-                  icon: icon,
-                )
+             else if (isEmpty)
+               _EmptyRow(
+                 message: 'No $title available',
+                 accentColor: accentColor,
+                 icon: icon,
+               )
              else
                SizedBox(
                  height: 200,
@@ -888,55 +857,12 @@ class _EmptyRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: TweenAnimationBuilder<double>(
-        tween: Tween(begin: 0.0, end: 1.0),
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeOutCubic,
-        builder: (context, value, child) => Opacity(
-          opacity: value,
-          child: Transform.translate(
-            offset: Offset(0, 20 * (1 - value)),
-            child: child,
-          ),
-        ),
-        child: SizedBox(
-          height: 200,
-          child: CustomPaint(
-            painter: _DashedBorderPainter(
-              color: accentColor.withValues(alpha: 0.15),
-              radius: 16,
-            ),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: accentColor.withValues(alpha: 0.03),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      icon,
-                      size: iconSize,
-                      color: accentColor.withValues(alpha: 0.25),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      message,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
+    return SizedBox(
+      height: 200,
+      child: EmptyState(
+        title: 'Nothing here yet',
+        message: message,
+        icon: icon,
       ),
     );
   }
@@ -1072,7 +998,9 @@ class _CourseCard extends StatelessWidget {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  color: hasImage ? null : theme.colorScheme.surfaceContainerHighest,
+                  color: hasImage
+                      ? null
+                      : theme.colorScheme.surfaceContainerHighest,
                 ),
                 child: hasImage
                     ? PremiumNetworkImage(
@@ -1083,7 +1011,9 @@ class _CourseCard extends StatelessWidget {
                         child: Icon(
                           Symbols.school,
                           size: 32,
-                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
               ),
@@ -1233,5 +1163,3 @@ class _ActivityCard extends StatelessWidget {
     );
   }
 }
-
-

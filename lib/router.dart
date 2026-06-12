@@ -318,7 +318,8 @@ GoRouter createRouter(
           sendOtpUseCase: locator<SendOtpUseCase>(),
           verifyOtpUseCase: locator<VerifyOtpUseCase>(),
           getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
-          requestFamilyAccountOtpUseCase: locator<RequestFamilyAccountOtpUseCase>(),
+          requestFamilyAccountOtpUseCase:
+              locator<RequestFamilyAccountOtpUseCase>(),
         );
       },
     ),
@@ -442,6 +443,8 @@ GoRouter createRouter(
     GoRoute(
       path: '/plans/:id',
       pageBuilder: (context, state) {
+        // The GoRouter matching rules guarantee that the ':id' parameter is non-null
+        // when routing to the plan details path.
         final planId = state.pathParameters['id']!;
         final plan = state.extra as Plan?;
         final childId = state.uri.queryParameters['childId'];
@@ -511,45 +514,38 @@ GoRouter createRouter(
     ),
     GoRoute(
       path: '/child/:childId/profile',
-      builder: (context, state) => ChildProfileScreen(
-        childId: state.pathParameters['childId']!,
-      ),
+      builder: (context, state) =>
+          ChildProfileScreen(childId: state.pathParameters['childId']!),
     ),
     GoRoute(
       path: '/child/:childId/schedule',
-      builder: (context, state) => ChildScheduleScreen(
-        childId: state.pathParameters['childId']!,
-      ),
+      builder: (context, state) =>
+          ChildScheduleScreen(childId: state.pathParameters['childId']!),
     ),
     GoRoute(
       path: '/child/:childId/subscriptions',
-      builder: (context, state) => ChildSubscriptionsScreen(
-        childId: state.pathParameters['childId']!,
-      ),
+      builder: (context, state) =>
+          ChildSubscriptionsScreen(childId: state.pathParameters['childId']!),
     ),
     GoRoute(
       path: '/child/:childId/bookings',
-      builder: (context, state) => ChildBookingsScreen(
-        childId: state.pathParameters['childId']!,
-      ),
+      builder: (context, state) =>
+          ChildBookingsScreen(childId: state.pathParameters['childId']!),
     ),
     GoRoute(
       path: '/child/:childId/sessions',
-      builder: (context, state) => ChildSessionsScreen(
-        childId: state.pathParameters['childId']!,
-      ),
+      builder: (context, state) =>
+          ChildSessionsScreen(childId: state.pathParameters['childId']!),
     ),
     GoRoute(
       path: '/child/:childId/reservations',
-      builder: (context, state) => ChildReservationsScreen(
-        childId: state.pathParameters['childId']!,
-      ),
+      builder: (context, state) =>
+          ChildReservationsScreen(childId: state.pathParameters['childId']!),
     ),
     GoRoute(
       path: '/child/:childId/completed',
-      builder: (context, state) => ChildCompletedScreen(
-        childId: state.pathParameters['childId']!,
-      ),
+      builder: (context, state) =>
+          ChildCompletedScreen(childId: state.pathParameters['childId']!),
     ),
     GoRoute(
       path: '/courses',
@@ -624,7 +620,14 @@ GoRouter createRouter(
       path: '/payment/:id',
       builder: (context, state) {
         final reservationId = state.pathParameters['id']!;
-        return PaymentGatewayScreen(reservationId: reservationId);
+        final amountString = state.uri.queryParameters['amount'];
+        final amount = amountString != null
+            ? double.tryParse(amountString)
+            : null;
+        return PaymentGatewayScreen(
+          reservationId: reservationId,
+          amount: amount,
+        );
       },
     ),
     GoRoute(

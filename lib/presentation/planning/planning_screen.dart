@@ -51,7 +51,8 @@ class _PlanningScreenState extends State<PlanningScreen> {
           getUserProfileUseCase: locator<GetUserProfileUseCase>(),
           bookSessionUseCase: locator<BookCourseSessionUseCase>(),
           authStateNotifier: locator<AuthStateNotifier>(),
-          getActiveSubscriptionsUseCase: locator<GetActiveSubscriptionsUseCase>(),
+          getActiveSubscriptionsUseCase:
+              locator<GetActiveSubscriptionsUseCase>(),
           getServicesUseCase: locator<GetServicesUseCase>(),
         );
     WidgetsBinding.instance.addPostFrameCallback((_) {

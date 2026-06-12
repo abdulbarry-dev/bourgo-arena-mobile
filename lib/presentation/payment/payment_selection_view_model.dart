@@ -66,7 +66,8 @@ class PaymentSelectionViewModel extends ChangeNotifier {
       onSuccess: (sub) => sub,
       onFailure: (failure) {
         if (_isChildOnlyPlanError(failure)) {
-          _errorMessage = 'This plan is for children only. Please go back and select a child.';
+          _errorMessage =
+              'This plan is for children only. Please go back and select a child.';
         } else {
           _errorMessage = failure.message;
         }

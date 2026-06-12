@@ -37,8 +37,9 @@ class AppListItem extends StatelessWidget {
     final appColors = theme.extension<AppColors>()!;
     final spacing = context.spacing;
 
-    final baseColor =
-        isDestructive ? theme.colorScheme.error : theme.colorScheme.onSurface;
+    final baseColor = isDestructive
+        ? theme.colorScheme.error
+        : theme.colorScheme.onSurface;
 
     final row = Container(
       padding: EdgeInsets.all(spacing.md),
@@ -87,8 +88,9 @@ class AppListItem extends StatelessWidget {
                   Text(
                     subtitle!,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant
-                          .withValues(alpha: 0.7),
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
                     ),
                   ),
                 ],
@@ -107,8 +109,7 @@ class AppListItem extends StatelessWidget {
               (showChevron
                   ? Icon(
                       Icons.chevron_right_rounded,
-                      color: theme.colorScheme.onSurface
-                          .withValues(alpha: 0.2),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
                       size: 20,
                     )
                   : const SizedBox.shrink()),

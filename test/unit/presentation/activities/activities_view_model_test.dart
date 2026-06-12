@@ -9,30 +9,45 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
+import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
+import 'package:bourgo_arena_mobile/domain/entities/reservation.dart';
 
-class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
+class FakeGetActivitiesUseCase implements GetActivitiesUseCase {
+  Result<List<Activity>, Failure> stubbedResult = const Success([]);
+  Object? exceptionToThrow;
 
-class MockGetUserBookingsUseCase extends Mock
-    implements GetUserBookingsUseCase {}
+  @override
+  Future<Result<List<Activity>, Failure>> call() async {
+    if (exceptionToThrow != null) throw exceptionToThrow!;
+    return stubbedResult;
+  }
+}
+
+class FakeGetUserBookingsUseCase implements GetUserBookingsUseCase {
+  Result<List<Reservation>, Failure> stubbedResult = const Success([]);
+
+  @override
+  Future<Result<List<Reservation>, Failure>> call() async => stubbedResult;
+}
 
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 void main() {
   late ActivitiesViewModel viewModel;
-  late MockGetActivitiesUseCase mockGetActivitiesUseCase;
-  late MockGetUserBookingsUseCase mockGetUserBookingsUseCase;
+  late FakeGetActivitiesUseCase fakeGetActivitiesUseCase;
+  late FakeGetUserBookingsUseCase fakeGetUserBookingsUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUp(() {
-    mockGetActivitiesUseCase = MockGetActivitiesUseCase();
-    mockGetUserBookingsUseCase = MockGetUserBookingsUseCase();
+    fakeGetActivitiesUseCase = FakeGetActivitiesUseCase();
+    fakeGetUserBookingsUseCase = FakeGetUserBookingsUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
 
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
 
     viewModel = ActivitiesViewModel(
-      getActivitiesUseCase: mockGetActivitiesUseCase,
-      getUserBookingsUseCase: mockGetUserBookingsUseCase,
+      getActivitiesUseCase: fakeGetActivitiesUseCase,
+      getUserBookingsUseCase: fakeGetUserBookingsUseCase,
       authStateNotifier: mockAuthStateNotifier,
     );
   });
@@ -49,12 +64,8 @@ void main() {
       final activities = [testActivityEntity(id: '1')];
       final reservations = [testReservationEntity(id: 'r1', activityId: '1')];
 
-      when(
-        () => mockGetActivitiesUseCase(),
-      ).thenAnswer((_) async => Success(activities));
-      when(
-        () => mockGetUserBookingsUseCase(),
-      ).thenAnswer((_) async => Success(reservations));
+      fakeGetActivitiesUseCase.stubbedResult = Success(activities);
+      fakeGetUserBookingsUseCase.stubbedResult = Success(reservations);
 
       await viewModel.loadData();
 
@@ -65,13 +76,10 @@ void main() {
     });
 
     test('loadData handles partial failure (activities)', () async {
-      when(() => mockGetActivitiesUseCase()).thenAnswer(
-        (_) async =>
-            FailureResult(Failure.server(AppErrorCode.serverError, 'fail')),
+      fakeGetActivitiesUseCase.stubbedResult = FailureResult(
+        Failure.server(AppErrorCode.serverError, 'fail'),
       );
-      when(
-        () => mockGetUserBookingsUseCase(),
-      ).thenAnswer((_) async => Success([]));
+      fakeGetUserBookingsUseCase.stubbedResult = const Success([]);
 
       await viewModel.loadData();
 
@@ -79,12 +87,9 @@ void main() {
     });
 
     test('loadData handles partial failure (bookings)', () async {
-      when(
-        () => mockGetActivitiesUseCase(),
-      ).thenAnswer((_) async => Success([]));
-      when(() => mockGetUserBookingsUseCase()).thenAnswer(
-        (_) async =>
-            FailureResult(Failure.server(AppErrorCode.serverError, 'fail')),
+      fakeGetActivitiesUseCase.stubbedResult = const Success([]);
+      fakeGetUserBookingsUseCase.stubbedResult = FailureResult(
+        Failure.server(AppErrorCode.serverError, 'fail'),
       );
 
       await viewModel.loadData();
@@ -93,7 +98,7 @@ void main() {
     });
 
     test('loadData handles exception', () async {
-      when(() => mockGetActivitiesUseCase()).thenThrow(Exception('crash'));
+      fakeGetActivitiesUseCase.exceptionToThrow = Exception('crash');
 
       await viewModel.loadData();
 

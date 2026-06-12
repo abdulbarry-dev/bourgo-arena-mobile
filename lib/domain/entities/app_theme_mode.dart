@@ -10,5 +10,5 @@ enum AppThemeMode {
   light,
 
   /// Always use dark theme.
-  dark;
+  dark,
 }

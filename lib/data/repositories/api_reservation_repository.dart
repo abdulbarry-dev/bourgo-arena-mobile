@@ -125,16 +125,20 @@ class ApiReservationRepository implements ReservationRepository {
     String? paymentMethod,
   }) {
     return executeApiCall(() async {
-      final body = {
+      final body = <String, dynamic>{
         'activity_id': reservation.activityId,
         'activity_slot_id': reservation.activitySlotId,
         'date': reservation.date,
+        'amount': reservation.price,
       };
       if (paymentMethod != null) {
         body['payment_method'] = paymentMethod;
       }
+      // fullResponse: true keeps the entire envelope so the top-level
+      // 'payment' key (sibling of 'data') is not stripped away.
       final response =
-          await _apiClient.post('/reservations', body) as Map<String, dynamic>;
+          await _apiClient.post('/reservations', body, fullResponse: true)
+              as Map<String, dynamic>;
       final data = response['data'] as Map<String, dynamic>? ?? response;
       final payment = response['payment'] as Map<String, dynamic>?;
       return Result.success(

@@ -386,7 +386,8 @@ class _EventTile extends StatelessWidget {
     final max = event.maxParticipants ?? 0;
     final ratio = max > 0 ? count / max : 0.0;
     final hasImage = event.imageUrl != null || event.images.isNotEmpty;
-    final imageSrc = event.imageUrl ?? (event.images.isNotEmpty ? event.images.first : null);
+    final imageSrc =
+        event.imageUrl ?? (event.images.isNotEmpty ? event.images.first : null);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -418,7 +419,9 @@ class _EventTile extends StatelessWidget {
                         child: Icon(
                           Symbols.emoji_events,
                           size: 48,
-                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
                     Positioned.fill(

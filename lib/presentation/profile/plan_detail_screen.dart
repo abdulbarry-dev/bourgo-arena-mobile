@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/buy_child_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/child_selector_sheet.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,12 @@ class PlanDetailScreen extends StatefulWidget {
   final Plan? plan;
   final String? childId;
 
-  const PlanDetailScreen({super.key, required this.planId, this.plan, this.childId});
+  const PlanDetailScreen({
+    super.key,
+    required this.planId,
+    this.plan,
+    this.childId,
+  });
 
   @override
   State<PlanDetailScreen> createState() => _PlanDetailScreenState();
@@ -31,17 +37,42 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   bool _isSubscribing = false;
   int _currentImageIndex = 0;
   String? _selectedChildId;
+  bool _showFamilyFeatures = false;
+  bool _isLoadingUser = true;
 
   @override
   void initState() {
     super.initState();
     _selectedChildId = widget.childId;
+    _loadUser();
     if (widget.plan != null) {
       _plan = widget.plan;
       _isLoading = false;
     } else {
       _loadPlan();
     }
+  }
+
+  Future<void> _loadUser() async {
+    final userRepository = locator<UserRepository>();
+    final result = await userRepository.getUserProfile();
+    if (!mounted) return;
+    result.when(
+      success: (user) {
+        final prefs = user.preferences ?? {};
+        final familyEnabled = prefs['app']?['family_enabled'] as bool? ?? false;
+        setState(() {
+          _showFamilyFeatures = familyEnabled || user.isParentAccount || user.children.isNotEmpty;
+          _isLoadingUser = false;
+        });
+      },
+      failure: (_) {
+        setState(() {
+          _showFamilyFeatures = false;
+          _isLoadingUser = false;
+        });
+      },
+    );
   }
 
   Future<void> _loadPlan() async {
@@ -82,7 +113,11 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
           setState(() => _isSubscribing = false);
           context.push(
             '/payment-selection',
-            extra: {'plan': _plan, 'subscription': subscription, 'childId': _selectedChildId},
+            extra: {
+              'plan': _plan,
+              'subscription': subscription,
+              'childId': _selectedChildId,
+            },
           );
         },
         failure: (failure) {
@@ -141,7 +176,11 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            Icon(Symbols.child_care, size: 24, color: theme.colorScheme.primary),
+            Icon(
+              Symbols.child_care,
+              size: 24,
+              color: theme.colorScheme.primary,
+            ),
             const SizedBox(width: 12),
             Text(
               'Child-Only Plan',
@@ -198,10 +237,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     });
 
     final buyChildUseCase = locator<BuyChildSubscriptionUseCase>();
-    final result = await buyChildUseCase(
-      childId: childId,
-      planId: _plan!.id,
-    );
+    final result = await buyChildUseCase(childId: childId, planId: _plan!.id);
 
     if (!mounted) return;
 
@@ -210,7 +246,11 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         setState(() => _isSubscribing = false);
         context.push(
           '/payment-selection',
-          extra: {'plan': _plan, 'subscription': subscription, 'childId': childId},
+          extra: {
+            'plan': _plan,
+            'subscription': subscription,
+            'childId': childId,
+          },
         );
       },
       failure: (failure) {
@@ -232,6 +272,14 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
+
+    if (_isLoading || _isLoadingUser) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: const SubScreenAppBar(title: 'PLAN DETAILS'),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -373,8 +421,10 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                               curve: Curves.easeOutQuad,
                             ),
                       const SizedBox(height: 40),
-                      _buildForWhom(theme, appColors),
-                      const SizedBox(height: 24),
+                      if (_showFamilyFeatures) ...[
+                        _buildForWhom(theme, appColors),
+                        const SizedBox(height: 24),
+                      ],
                     ],
                   ),
                 ),

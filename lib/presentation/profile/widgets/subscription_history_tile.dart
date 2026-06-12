@@ -6,13 +6,8 @@ import 'package:material_symbols_icons/symbols.dart';
 
 class SubscriptionHistoryTile extends StatelessWidget {
   final Subscription subscription;
-  final VoidCallback? onTapReceipt;
 
-  const SubscriptionHistoryTile({
-    super.key,
-    required this.subscription,
-    this.onTapReceipt,
-  });
+  const SubscriptionHistoryTile({super.key, required this.subscription});
 
   @override
   Widget build(BuildContext context) {
@@ -149,29 +144,6 @@ class SubscriptionHistoryTile extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ],
-          if (onTapReceipt != null) ...[
-            SizedBox(height: spacing.sm),
-            GestureDetector(
-              onTap: onTapReceipt,
-              child: Row(
-                children: [
-                  Icon(
-                    Symbols.receipt_long,
-                    size: 16,
-                    color: theme.colorScheme.primary,
-                  ),
-                  SizedBox(width: spacing.xxs),
-                  Text(
-                    'Download Receipt',
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ],
         ],

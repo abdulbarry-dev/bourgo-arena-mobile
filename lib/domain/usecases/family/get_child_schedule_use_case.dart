@@ -13,10 +13,6 @@ class GetChildScheduleUseCase {
     String? from,
     String? to,
   }) {
-    return _repository.getChildSchedule(
-      childId: childId,
-      from: from,
-      to: to,
-    );
+    return _repository.getChildSchedule(childId: childId, from: from, to: to);
   }
 }

@@ -44,15 +44,15 @@ void main() {
     );
     locator.registerFactory<GetEventsUseCase>(() => mockGetEventsUseCase);
 
-    when(() => mockGetCoursesUseCase.call()).thenAnswer(
-      (_) async => Result.success([]),
-    );
-    when(() => mockGetActivitiesUseCase.call()).thenAnswer(
-      (_) async => Result.success([]),
-    );
-    when(() => mockGetEventsUseCase.call()).thenAnswer(
-      (_) async => Result.success([]),
-    );
+    when(
+      () => mockGetCoursesUseCase.call(),
+    ).thenAnswer((_) async => Result.success([]));
+    when(
+      () => mockGetActivitiesUseCase.call(),
+    ).thenAnswer((_) async => Result.success([]));
+    when(
+      () => mockGetEventsUseCase.call(),
+    ).thenAnswer((_) async => Result.success([]));
   });
 
   tearDown(() {

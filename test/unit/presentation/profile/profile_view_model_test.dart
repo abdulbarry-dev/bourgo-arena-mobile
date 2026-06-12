@@ -106,8 +106,9 @@ void main() {
       () => mockGetFullPaymentHistoryUseCase.execute(),
     ).thenAnswer((_) async => Result.success([]));
 
-    when(() => mockGetMyEventsUseCase())
-        .thenAnswer((_) async => Result.success([]));
+    when(
+      () => mockGetMyEventsUseCase(),
+    ).thenAnswer((_) async => Result.success([]));
 
     viewModel = ProfileViewModel(
       authRepository: mockAuthRepository,

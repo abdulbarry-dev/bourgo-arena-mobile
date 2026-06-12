@@ -221,48 +221,47 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
     AppLocalizations l10n,
   ) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: spacing.xxl),
-      child: Column(
-        children: [
-          Container(
-            width: 112,
-            height: 112,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.colorScheme.primary.withValues(alpha: 0.08),
-              border: Border.all(
-                color: theme.colorScheme.primary.withValues(alpha: 0.15),
+          padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+          child: Column(
+            children: [
+              Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                  ),
+                ),
+                child: Icon(
+                  Symbols.groups,
+                  size: 56,
+                  color: theme.colorScheme.primary,
+                ),
               ),
-            ),
-            child: Icon(
-              Symbols.groups,
-              size: 56,
-              color: theme.colorScheme.primary,
-            ),
+              SizedBox(height: spacing.xl),
+              Text(
+                l10n.profileNoChildren,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: spacing.md),
+              Text(
+                l10n.profileNoChildrenDescription,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: spacing.xl),
-          Text(
-            l10n.profileNoChildren,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: spacing.md),
-          Text(
-            l10n.profileNoChildrenDescription,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    ).animate().fade(duration: 300.ms).slideY(
-          begin: 0.08,
-          end: 0,
-          curve: Curves.easeOutQuad,
-        );
+        )
+        .animate()
+        .fade(duration: 300.ms)
+        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
   }
 
   Widget _buildChildrenList(

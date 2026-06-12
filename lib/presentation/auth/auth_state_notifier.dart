@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart'
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer' as developer;
 
 /// Notifier for listening to authentication state changes.
 class AuthStateNotifier extends ChangeNotifier {
@@ -42,11 +43,9 @@ class AuthStateNotifier extends ChangeNotifier {
     } catch (_) {}
 
     // Developer-visible log for session applied
-    // Note: import of developer is not required here; keep minimal to avoid heavy deps
-    // but we can still print to console for debugging.
-    // ignore: avoid_print
-    print(
+    developer.log(
       'AuthStateNotifier._applySession: state=${session.state}, token=${session.token}, user=${session.user}',
+      name: 'bourgo.auth.session',
     );
     if (_skippedForSession &&
         session.user != null &&

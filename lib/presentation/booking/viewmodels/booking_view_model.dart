@@ -99,6 +99,24 @@ class BookingViewModel extends BaseViewModel {
   /// The time slot selected for booking.
   TimeSlot? get selectedSlot => _selectedSlot;
 
+  /// IDs of slots already reserved by this user for the selected
+  /// activity and date. Used to render those tiles as disabled.
+  Set<String> get reservedSlotIds {
+    final activity = _selectedActivity;
+    if (activity == null) return const {};
+    final dateStr = _selectedDate.toIso8601String().split('T')[0];
+    return _userBookings
+        .where(
+          (r) =>
+              r.status != 'cancelled' &&
+              r.activityId == activity.id &&
+              r.date == dateStr &&
+              r.activitySlotId != null,
+        )
+        .map((r) => r.activitySlotId!)
+        .toSet();
+  }
+
   /// The selected payment method identifier.
   String get paymentMethod => _paymentMethod;
 
@@ -120,6 +138,9 @@ class BookingViewModel extends BaseViewModel {
       _contextualPrice ?? _selectedActivity?.basePrice ?? 0;
   bool get hasContextualPrice => _contextualPrice != null;
   MemberTier get memberTier => _memberTier;
+
+  /// The required deposit amount (10% of the full price).
+  double get depositAmount => priceToPay * 0.10;
 
   String? get depositUrl => _depositUrl;
   int? get depositPaymentId => _depositPaymentId;
@@ -270,13 +291,14 @@ class BookingViewModel extends BaseViewModel {
       date: _selectedDate.toIso8601String().split('T')[0],
       time: slot.time,
       duration: activity.id == 'padel-1' ? '90 min' : '60 min',
-      price: priceToPay,
+      price: depositAmount,
       status: 'confirmed',
       paymentStatus: 'pending',
       qrCode: '',
     );
 
-    final apiPaymentMethod = _paymentMethod == AppConstants.paymentMethodWalletId
+    final apiPaymentMethod =
+        _paymentMethod == AppConstants.paymentMethodWalletId
         ? AppConstants.paymentMethodApiLoyalty
         : AppConstants.paymentMethodApiKonnect;
 
@@ -294,7 +316,6 @@ class BookingViewModel extends BaseViewModel {
           _depositUrl = data.paymentUrl;
           _depositPaymentId = data.depositPaymentId;
         }
-        _resetForm();
       },
       failure: (failure) {
         setErrorMessage('reservation_failed');
@@ -305,14 +326,6 @@ class BookingViewModel extends BaseViewModel {
     _isLoading = false;
     notifyListeners();
     return success;
-  }
-
-  void _resetForm() {
-    _selectedActivity = null;
-    _selectedSlot = null;
-    _currentStep = _isFamilyAccount ? 0 : 0;
-    _availableSlots = [];
-    _contextualPrice = null;
   }
 
   Future<void> _loadActivities() async {

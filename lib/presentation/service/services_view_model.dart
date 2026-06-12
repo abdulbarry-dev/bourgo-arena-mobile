@@ -19,9 +19,8 @@ class ServicesViewModel extends ChangeNotifier {
   String _searchQuery = '';
   ServiceFilterType _filterType = ServiceFilterType.all;
 
-  ServicesViewModel({
-    required GetServicesUseCase getServicesUseCase,
-  }) : _getServicesUseCase = getServicesUseCase {
+  ServicesViewModel({required GetServicesUseCase getServicesUseCase})
+    : _getServicesUseCase = getServicesUseCase {
     loadServices();
   }
 
@@ -39,7 +38,9 @@ class ServicesViewModel extends ChangeNotifier {
 
     if (_searchQuery.isNotEmpty) {
       final query = _searchQuery.toLowerCase();
-      result = result.where((s) => s.name.toLowerCase().contains(query)).toList();
+      result = result
+          .where((s) => s.name.toLowerCase().contains(query))
+          .toList();
     }
 
     switch (_filterType) {

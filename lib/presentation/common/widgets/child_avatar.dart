@@ -57,7 +57,9 @@ class ChildAvatar extends StatelessWidget {
         ),
         border: Border.all(color: primary.withValues(alpha: 0.22), width: 1.5),
       ),
-      child: Center(child: Icon(glyph, color: primary, size: size * 0.5)),
+      child: Center(
+        child: Icon(glyph, color: primary, size: size * 0.5),
+      ),
     );
 
     if (heroTag == null) return avatar;

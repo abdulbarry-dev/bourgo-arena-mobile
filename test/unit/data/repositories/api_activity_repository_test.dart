@@ -25,7 +25,9 @@ void main() {
     group('getActivities', () {
       test('returns Success on 200 with mapped activities', () async {
         final json = [testActivityJson()];
-          when(() => apiClient.get('/activities', fullResponse: true)).thenAnswer((_) async => {'data': json});
+        when(
+          () => apiClient.get('/activities', fullResponse: true),
+        ).thenAnswer((_) async => {'data': json});
 
         final result = await repository.getActivities();
 
@@ -135,8 +137,13 @@ void main() {
 
     group('getTimeSlots', () {
       test('returns Success on 200 with mapped time slots', () async {
-        when(() => apiClient.get('/activities/activity-1/slots', fullResponse: true)).thenAnswer(
-          (_) async => {'data': [testTimeSlotJson(), testTimeSlotJson(time: '19:00')]},
+        when(
+          () =>
+              apiClient.get('/activities/activity-1/slots', fullResponse: true),
+        ).thenAnswer(
+          (_) async => {
+            'data': [testTimeSlotJson(), testTimeSlotJson(time: '19:00')],
+          },
         );
 
         final result = await repository.getTimeSlots('activity-1');
@@ -148,7 +155,8 @@ void main() {
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.get('/activities/activity-1/slots', fullResponse: true),
+          () =>
+              apiClient.get('/activities/activity-1/slots', fullResponse: true),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.getTimeSlots('activity-1');
@@ -162,7 +170,8 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.get('/activities/activity-1/slots', fullResponse: true),
+          () =>
+              apiClient.get('/activities/activity-1/slots', fullResponse: true),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.getTimeSlots('activity-1');
@@ -176,7 +185,8 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.get('/activities/activity-1/slots', fullResponse: true),
+          () =>
+              apiClient.get('/activities/activity-1/slots', fullResponse: true),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.getTimeSlots('activity-1');

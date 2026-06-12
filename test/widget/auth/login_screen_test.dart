@@ -40,10 +40,13 @@ void main() {
     await setupScreenSize(tester);
     final router = GoRouter(
       routes: [
-        GoRoute(path: '/', builder: (context, state) => LoginScreen(
-          loginUseCase: mockLoginUseCase,
-          sessionRepository: mockSessionRepository,
-        )),
+        GoRoute(
+          path: '/',
+          builder: (context, state) => LoginScreen(
+            loginUseCase: mockLoginUseCase,
+            sessionRepository: mockSessionRepository,
+          ),
+        ),
       ],
     );
 
@@ -89,10 +92,13 @@ void main() {
 
     final router = GoRouter(
       routes: [
-        GoRoute(path: '/', builder: (context, state) => LoginScreen(
-          loginUseCase: mockLoginUseCase,
-          sessionRepository: mockSessionRepository,
-        )),
+        GoRoute(
+          path: '/',
+          builder: (context, state) => LoginScreen(
+            loginUseCase: mockLoginUseCase,
+            sessionRepository: mockSessionRepository,
+          ),
+        ),
       ],
     );
 
@@ -134,10 +140,13 @@ void main() {
 
     final router = GoRouter(
       routes: [
-        GoRoute(path: '/', builder: (context, state) => LoginScreen(
-          loginUseCase: mockLoginUseCase,
-          sessionRepository: mockSessionRepository,
-        )),
+        GoRoute(
+          path: '/',
+          builder: (context, state) => LoginScreen(
+            loginUseCase: mockLoginUseCase,
+            sessionRepository: mockSessionRepository,
+          ),
+        ),
       ],
     );
 

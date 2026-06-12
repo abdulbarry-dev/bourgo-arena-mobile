@@ -26,8 +26,8 @@ class SubscriptionViewModel extends BaseViewModel {
   SubscriptionViewModel({
     required GetActiveSubscriptionsUseCase getActiveSubscriptionsUseCase,
     required GetChildrenUseCase getChildrenUseCase,
-  })  : _getActiveSubscriptionsUseCase = getActiveSubscriptionsUseCase,
-        _getChildrenUseCase = getChildrenUseCase {
+  }) : _getActiveSubscriptionsUseCase = getActiveSubscriptionsUseCase,
+       _getChildrenUseCase = getChildrenUseCase {
     loadSubscription();
   }
 
@@ -51,7 +51,8 @@ class SubscriptionViewModel extends BaseViewModel {
           childrenResult.when(
             success: (children) {
               for (final child in children) {
-                if (child.hasActiveSubscription && child.activeSubscription != null) {
+                if (child.hasActiveSubscription &&
+                    child.activeSubscription != null) {
                   childSubIds.add(child.activeSubscription!.id);
                 }
               }

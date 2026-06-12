@@ -116,13 +116,15 @@ class NotificationsPreferencesScreen extends StatelessWidget {
                         context: context,
                         title: 'COMMUNITY & OFFERS',
                         children: [
-                          _NotificationSwitchTile(
-                            icon: Symbols.family_restroom,
-                            title: 'Family Activity',
-                            subtitle: 'Child account activities and approvals',
-                            value: viewModel.familyNotificationsEnabled,
-                            onChanged: viewModel.toggleFamilyNotifications,
-                          ),
+                          if (viewModel.showFamilyManagement)
+                            _NotificationSwitchTile(
+                              icon: Symbols.family_restroom,
+                              title: 'Family Activity',
+                              subtitle:
+                                  'Child account activities and approvals',
+                              value: viewModel.familyNotificationsEnabled,
+                              onChanged: viewModel.toggleFamilyNotifications,
+                            ),
                           _NotificationSwitchTile(
                             icon: Symbols.star,
                             title: 'Loyalty & Points',

@@ -18,7 +18,8 @@ class ChildSubscriptionsScreen extends StatefulWidget {
   const ChildSubscriptionsScreen({super.key, required this.childId});
 
   @override
-  State<ChildSubscriptionsScreen> createState() => _ChildSubscriptionsScreenState();
+  State<ChildSubscriptionsScreen> createState() =>
+      _ChildSubscriptionsScreenState();
 }
 
 class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
@@ -54,11 +55,16 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
 
   Color _statusColor(String status, AppColors appColors) {
     switch (status.toLowerCase()) {
-      case 'active': return appColors.statusSuccess;
-      case 'expired': return const Color(0xFF9CA3AF);
-      case 'cancelled': return appColors.statusError;
-      case 'pending': return appColors.statusWarning;
-      default: return const Color(0xFF9CA3AF);
+      case 'active':
+        return appColors.statusSuccess;
+      case 'expired':
+        return const Color(0xFF9CA3AF);
+      case 'cancelled':
+        return appColors.statusError;
+      case 'pending':
+        return appColors.statusWarning;
+      default:
+        return const Color(0xFF9CA3AF);
     }
   }
 
@@ -87,25 +93,31 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                       if (_viewModel.subscriptions.isEmpty)
                         _buildEmptyState(theme, spacing)
                       else ...[
-                        ..._viewModel.subscriptions.asMap().entries.map((entry) {
+                        ..._viewModel.subscriptions.asMap().entries.map((
+                          entry,
+                        ) {
                           return Padding(
                             padding: EdgeInsets.only(bottom: spacing.md),
-                            child: _SubCard(
-                              subscription: entry.value,
-                              statusColor:
-                                  _statusColor(entry.value.status, appColors),
-                              theme: theme,
-                              spacing: spacing,
-                              appColors: appColors,
-                            ).animate(
-                              delay: (entry.key.clamp(0, 8) * 50).ms,
-                            )
-                              .fadeIn(duration: 350.ms)
-                              .slideY(
-                                begin: 0.08,
-                                end: 0,
-                                curve: Curves.easeOutCubic,
-                              ),
+                            child:
+                                _SubCard(
+                                      subscription: entry.value,
+                                      statusColor: _statusColor(
+                                        entry.value.status,
+                                        appColors,
+                                      ),
+                                      theme: theme,
+                                      spacing: spacing,
+                                      appColors: appColors,
+                                    )
+                                    .animate(
+                                      delay: (entry.key.clamp(0, 8) * 50).ms,
+                                    )
+                                    .fadeIn(duration: 350.ms)
+                                    .slideY(
+                                      begin: 0.08,
+                                      end: 0,
+                                      curve: Curves.easeOutCubic,
+                                    ),
                           );
                         }),
                         if (_viewModel.isLoadingMore)
@@ -124,8 +136,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                             context.push('/plans');
                           },
                           icon: const Icon(Symbols.add, size: 20),
-                          label: const Text('BUY NEW SUBSCRIPTION',
-                            style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+                          label: const Text(
+                            'BUY NEW SUBSCRIPTION',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.colorScheme.primary,
@@ -158,8 +174,9 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
               child: Container(
                 padding: EdgeInsets.all(spacing.lg),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Column(
@@ -168,8 +185,16 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        AppShimmer.block(width: 72, height: 22, borderRadius: 8),
-                        AppShimmer.block(width: 40, height: 40, borderRadius: 8),
+                        AppShimmer.block(
+                          width: 72,
+                          height: 22,
+                          borderRadius: 8,
+                        ),
+                        AppShimmer.block(
+                          width: 40,
+                          height: 40,
+                          borderRadius: 8,
+                        ),
                       ],
                     ),
                     SizedBox(height: spacing.md),
@@ -188,40 +213,47 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: spacing.xxl),
-      child: Column(
-        children: [
-          Container(
-            width: 112,
-            height: 112,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: theme.colorScheme.primary.withValues(alpha: 0.08),
-              border: Border.all(
-                color: theme.colorScheme.primary.withValues(alpha: 0.15),
+          padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+          child: Column(
+            children: [
+              Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                  ),
+                ),
+                child: Icon(
+                  Symbols.workspace_premium,
+                  size: 56,
+                  color: theme.colorScheme.primary,
+                ),
               ),
-            ),
-            child: Icon(
-              Symbols.workspace_premium,
-              size: 56,
-              color: theme.colorScheme.primary,
-            ),
+              SizedBox(height: spacing.xl),
+              Text(
+                'No subscriptions',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              SizedBox(height: spacing.sm),
+              Text(
+                'Buy a subscription to get started.',
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: spacing.xl),
-          Text('No subscriptions',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-          SizedBox(height: spacing.sm),
-          Text('Buy a subscription to get started.',
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-        ],
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideY(
-          begin: 0.08,
-          end: 0,
-          curve: Curves.easeOutQuad,
-        );
+        )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -233,8 +265,11 @@ class _SubCard extends StatelessWidget {
   final AppColors appColors;
 
   const _SubCard({
-    required this.subscription, required this.statusColor, required this.theme,
-    required this.spacing, required this.appColors,
+    required this.subscription,
+    required this.statusColor,
+    required this.theme,
+    required this.spacing,
+    required this.appColors,
   });
 
   @override
@@ -254,7 +289,10 @@ class _SubCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xxs),
+                padding: EdgeInsets.symmetric(
+                  horizontal: spacing.sm,
+                  vertical: spacing.xxs,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
@@ -262,13 +300,16 @@ class _SubCard extends StatelessWidget {
                 child: Text(
                   subscription.status.toUpperCase(),
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color: statusColor, fontWeight: FontWeight.w900, letterSpacing: 1.0,
+                    color: statusColor,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.0,
                   ),
                 ),
               ),
               if (subscription.plan?.service?.imageUrl != null)
                 Semantics(
-                  label: subscription.plan?.service?.name ??
+                  label:
+                      subscription.plan?.service?.name ??
                       subscription.plan?.name ??
                       '',
                   image: true,
@@ -276,7 +317,9 @@ class _SubCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     child: Image.network(
                       subscription.plan!.service!.imageUrl!,
-                      width: 40, height: 40, fit: BoxFit.cover,
+                      width: 40,
+                      height: 40,
+                      fit: BoxFit.cover,
                     ),
                   ),
                 ),
@@ -285,34 +328,57 @@ class _SubCard extends StatelessWidget {
           SizedBox(height: spacing.md),
           Text(
             subscription.plan?.name.toUpperCase() ?? '',
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w900,
+            ),
           ),
-          if (subscription.plan?.description != null && subscription.plan!.description!.isNotEmpty)
+          if (subscription.plan?.description != null &&
+              subscription.plan!.description!.isNotEmpty)
             Padding(
               padding: EdgeInsets.only(top: spacing.xs),
-              child: Text(subscription.plan!.description!,
-                style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+              child: Text(
+                subscription.plan!.description!,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ),
           SizedBox(height: spacing.md),
           Row(
             children: [
-              Icon(Symbols.schedule, size: 14, color: theme.colorScheme.onSurfaceVariant),
+              Icon(
+                Symbols.schedule,
+                size: 14,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               SizedBox(width: spacing.xxs),
-              Text('${subscription.daysRemaining ?? 0} days remaining',
+              Text(
+                '${subscription.daysRemaining ?? 0} days remaining',
                 style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w700, color: theme.colorScheme.onSurfaceVariant)),
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
           SizedBox(height: spacing.sm),
           Row(
             children: [
               Expanded(
-                child: Text('Start: ${subscription.startsAt ?? '—'}',
-                  style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                child: Text(
+                  'Start: ${subscription.startsAt ?? '—'}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
               Expanded(
-                child: Text('End: ${subscription.endsAt ?? '—'}',
-                  style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                child: Text(
+                  'End: ${subscription.endsAt ?? '—'}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ],
           ),

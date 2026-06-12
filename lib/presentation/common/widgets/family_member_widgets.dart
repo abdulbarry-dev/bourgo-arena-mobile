@@ -46,106 +46,112 @@ class FamilyMemberCard extends StatelessWidget {
     }
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOutCubic,
-      width: 130,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.outlineVariant, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          children: [
-            // Subtle glow background
-            Positioned(
-              top: -20,
-              right: -20,
-              child: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: genderColor.withValues(alpha: 0.05),
-                ),
-              ),
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          width: 130,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainer,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant,
+              width: 1.5,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 20,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              children: [
+                // Subtle glow background
+                Positioned(
+                  top: -20,
+                  right: -20,
+                  child: Container(
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(
-                      color: genderColor.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
-                      border: Border.all(
-                        color: genderColor.withValues(alpha: 0.2),
-                        width: 1,
+                      color: genderColor.withValues(alpha: 0.05),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 20,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: genderColor.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: genderColor.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(genderIcon, color: genderColor, size: 28),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        AppHaptics.light();
+                        onRemove();
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.error.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Symbols.close,
+                          size: 14,
+                          color: theme.colorScheme.error,
+                        ),
                       ),
                     ),
-                    child: Icon(genderIcon, color: genderColor, size: 28),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    AppHaptics.light();
-                    onRemove();
-                  },
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.error.withValues(alpha: 0.1),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Symbols.close,
-                      size: 14,
-                      color: theme.colorScheme.error,
-                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms).scale(
-      duration: 300.ms,
-      curve: Curves.easeOutCubic,
-      begin: const Offset(0.95, 0.95),
-      end: const Offset(1, 1),
-    );
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .scale(
+          duration: 300.ms,
+          curve: Curves.easeOutCubic,
+          begin: const Offset(0.95, 0.95),
+          end: const Offset(1, 1),
+        );
   }
 }
 
@@ -289,126 +295,125 @@ class FamilyMemberForm extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(32),
-        boxShadow: [
-          BoxShadow(
-            color: theme.shadowColor.withValues(alpha: 0.08),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: AuthTextField(
-                  label: l10n.authFirstNameLabel,
-                  hint: l10n.authFirstNameHint,
-                  leadingIcon: Symbols.person,
-                  controller: firstNameController,
-                  errorText: firstNameError,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: AuthTextField(
-                  label: l10n.authLastNameLabel,
-                  hint: l10n.authLastNameHint,
-                  leadingIcon: Symbols.person,
-                  controller: lastNameController,
-                  errorText: lastNameError,
-                ),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(32),
+            boxShadow: [
+              BoxShadow(
+                color: theme.shadowColor.withValues(alpha: 0.08),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          AuthTextField(
-            label: l10n.authBirthDateLabel,
-            hint: l10n.authBirthDateHint,
-            leadingIcon: Symbols.calendar_today,
-            controller: birthDateController,
-            readOnly: true,
-            onTap: onSelectBirthDate,
-            errorText: birthDateError,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                l10n.authGenderLabel.toUpperCase(),
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: genderError != null
-                      ? theme.colorScheme.error
-                      : theme.colorScheme.primary,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.5,
-                ),
-              ),
-              if (genderError != null)
-                Text(
-                  genderError!,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.error,
+              Row(
+                children: [
+                  Expanded(
+                    child: AuthTextField(
+                      label: l10n.authFirstNameLabel,
+                      hint: l10n.authFirstNameHint,
+                      leadingIcon: Symbols.person,
+                      controller: firstNameController,
+                      errorText: firstNameError,
+                    ),
                   ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: AuthTextField(
+                      label: l10n.authLastNameLabel,
+                      hint: l10n.authLastNameHint,
+                      leadingIcon: Symbols.person,
+                      controller: lastNameController,
+                      errorText: lastNameError,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              AuthTextField(
+                label: l10n.authBirthDateLabel,
+                hint: l10n.authBirthDateHint,
+                leadingIcon: Symbols.calendar_today,
+                controller: birthDateController,
+                readOnly: true,
+                onTap: onSelectBirthDate,
+                errorText: birthDateError,
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.authGenderLabel.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: genderError != null
+                          ? theme.colorScheme.error
+                          : theme.colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  if (genderError != null)
+                    Text(
+                      genderError!,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  _GenderButton(
+                    icon: Symbols.male,
+                    label: l10n.commonGenderMale,
+                    isSelected: selectedGender == 'male',
+                    onTap: () {
+                      AppHaptics.selection();
+                      onGenderChanged('male');
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  _GenderButton(
+                    icon: Symbols.female,
+                    label: l10n.commonGenderFemale,
+                    isSelected: selectedGender == 'female',
+                    onTap: () {
+                      AppHaptics.selection();
+                      onGenderChanged('female');
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              FilledButton.icon(
+                onPressed: () {
+                  AppHaptics.light();
+                  onAdd();
+                },
+                icon: const Icon(Symbols.add, size: 20),
+                label: Text(addButtonLabel ?? l10n.authAddMember),
+                style: FilledButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  backgroundColor: theme.colorScheme.primaryContainer,
+                  foregroundColor: theme.colorScheme.onPrimaryContainer,
+                  elevation: 0,
                 ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              _GenderButton(
-                icon: Symbols.male,
-                label: l10n.commonGenderMale,
-                isSelected: selectedGender == 'male',
-                onTap: () {
-                  AppHaptics.selection();
-                  onGenderChanged('male');
-                },
-              ),
-              const SizedBox(width: 12),
-              _GenderButton(
-                icon: Symbols.female,
-                label: l10n.commonGenderFemale,
-                isSelected: selectedGender == 'female',
-                onTap: () {
-                  AppHaptics.selection();
-                  onGenderChanged('female');
-                },
               ),
             ],
           ),
-          const SizedBox(height: 32),
-          FilledButton.icon(
-            onPressed: () {
-              AppHaptics.light();
-              onAdd();
-            },
-            icon: const Icon(Symbols.add, size: 20),
-            label: Text(addButtonLabel ?? l10n.authAddMember),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              backgroundColor: theme.colorScheme.primaryContainer,
-              foregroundColor: theme.colorScheme.onPrimaryContainer,
-              elevation: 0,
-            ),
-          ),
-        ],
-      ),
-    ).animate().fadeIn(duration: 350.ms).slideY(
-      begin: 0.06,
-      end: 0,
-      curve: Curves.easeOutCubic,
-    );
+        )
+        .animate()
+        .fadeIn(duration: 350.ms)
+        .slideY(begin: 0.06, end: 0, curve: Curves.easeOutCubic);
   }
 }
 

@@ -7,11 +7,13 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/bracket.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/event_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 
 class ApiEventRepository implements EventRepository {
   final ApiClient _apiClient;
+  final UserRepository _userRepository;
 
-  ApiEventRepository(this._apiClient);
+  ApiEventRepository(this._apiClient, this._userRepository);
 
   @override
   Future<Result<List<Event>, Failure>> getEvents({
@@ -52,9 +54,7 @@ class ApiEventRepository implements EventRepository {
   }
 
   @override
-  Future<Result<List<BracketRound>, Failure>> getEventBracket(
-    String eventId,
-  ) {
+  Future<Result<List<BracketRound>, Failure>> getEventBracket(String eventId) {
     return executeApiCall(() async {
       final response = await _apiClient.get('/events/$eventId/bracket');
       if (response is List) return Result.success([]);
@@ -62,10 +62,8 @@ class ApiEventRepository implements EventRepository {
       final data = responseMap['data'] as Map<String, dynamic>? ?? responseMap;
       final rounds = <BracketRound>[];
       for (final entry in data.entries) {
-        final roundNumber = int.tryParse(
-              entry.key.replaceAll('round_', ''),
-            ) ??
-            0;
+        final roundNumber =
+            int.tryParse(entry.key.replaceAll('round_', '')) ?? 0;
         final matches = (entry.value as List)
             .map(
               (m) => EventMapper.toMatch(
@@ -97,16 +95,26 @@ class ApiEventRepository implements EventRepository {
       final response = await _apiClient.get('/user/events');
       final List<dynamic> data = response is List
           ? response
-          : ((response as Map<String, dynamic>)['data']
-                  as List<dynamic>? ??
-              []);
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
+      final userResult = await _userRepository.getUserProfile();
+      final currentUserId = userResult.fold(
+        onSuccess: (user) => user.id,
+        onFailure: (_) => null,
+      );
+
       final entities = data
           .map(
             (json) => EventMapper.toParticipantEntity(
               EventParticipantModel.fromJson(json as Map<String, dynamic>),
             ),
           )
+          .where((p) {
+            if (currentUserId == null) return false;
+            return p.user?.id.toString() == currentUserId.toString();
+          })
           .toList();
+
       return Result.success(entities);
     });
   }

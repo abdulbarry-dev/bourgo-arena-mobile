@@ -171,8 +171,7 @@ class _EventsScreenState extends State<EventsScreen> {
       child: ListView.builder(
         controller: _scrollController,
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-        itemCount:
-            _viewModel.events.length + (_viewModel.hasMore ? 1 : 0),
+        itemCount: _viewModel.events.length + (_viewModel.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= _viewModel.events.length) {
             return const Padding(

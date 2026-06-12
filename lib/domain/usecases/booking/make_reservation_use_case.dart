@@ -17,6 +17,9 @@ class MakeReservationUseCase {
     Reservation reservation, {
     String? paymentMethod,
   }) async {
-    return _repository.makeReservation(reservation, paymentMethod: paymentMethod);
+    return _repository.makeReservation(
+      reservation,
+      paymentMethod: paymentMethod,
+    );
   }
 }

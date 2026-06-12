@@ -15,6 +15,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/settings/set_locale_use_case
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
+import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
@@ -45,9 +46,12 @@ class SettingsViewModel extends BaseViewModel {
   bool _coursesNotificationsEnabled = true;
   bool _loyaltyNotificationsEnabled = true;
   bool _familyNotificationsEnabled = true;
+  bool _showFamilyManagement = false;
+  bool _familyFeaturesEnabled = false;
   bool _languageSelected = false;
   bool _themeSelected = false;
   String _appVersion = '';
+  User? _currentUser;
 
   SettingsViewModel(
     this._getThemeModeUseCase,
@@ -123,6 +127,12 @@ class SettingsViewModel extends BaseViewModel {
   /// Whether family notifications are enabled.
   bool get familyNotificationsEnabled => _familyNotificationsEnabled;
 
+  /// Whether family management features should be visible.
+  bool get showFamilyManagement => _showFamilyManagement;
+
+  /// Whether the family features are explicitly enabled by the user.
+  bool get familyFeaturesEnabled => _familyFeaturesEnabled;
+
   /// Loads all persisted settings from storage.
   ///
   /// Must be called once after construction (e.g. during DI setup).
@@ -195,6 +205,19 @@ class SettingsViewModel extends BaseViewModel {
         ? (familyResult as Success<bool, Failure>).data
         : true;
     _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+
+    final userResult = await _userRepository.getUserProfile();
+    if (userResult.isSuccess) {
+      final user = (userResult as Success<User, Failure>).data;
+      _currentUser = user;
+      final prefs = user.preferences ?? {};
+      _familyFeaturesEnabled = prefs['app']?['family_enabled'] as bool? ?? false;
+      _showFamilyManagement = _familyFeaturesEnabled || user.isParentAccount || user.children.isNotEmpty;
+    } else {
+      _showFamilyManagement = false;
+      _familyFeaturesEnabled = false;
+      _currentUser = null;
+    }
 
     notifyListeners();
   }
@@ -330,9 +353,28 @@ class SettingsViewModel extends BaseViewModel {
     await _syncPreferences();
   }
 
+  /// Toggles family features explicit visibility.
+  Future<void> toggleFamilyFeatures(bool value) async {
+    if (value == _familyFeaturesEnabled) return;
+    _familyFeaturesEnabled = value;
+    
+    if (_currentUser != null) {
+      _showFamilyManagement = _familyFeaturesEnabled || _currentUser!.isParentAccount || _currentUser!.children.isNotEmpty;
+    } else {
+      _showFamilyManagement = _familyFeaturesEnabled;
+    }
+    
+    notifyListeners();
+    await _syncPreferences();
+  }
+
   Future<void> _syncPreferences() async {
     final preferences = {
-      'app': {'theme': _themeMode.name, 'language': _locale.languageCode},
+      'app': {
+        'theme': _themeMode.name, 
+        'language': _locale.languageCode,
+        'family_enabled': _familyFeaturesEnabled,
+      },
       'notifications': {
         'push_enabled': _notificationsEnabled,
         'promotions': _promoNotificationsEnabled,

@@ -67,27 +67,29 @@ class ApiFamilyRepository implements FamilyRepository {
       final birthDateStr = birthDate.toIso8601String().split('T').first;
       final Map<String, dynamic> response;
       if (avatarFilePath != null) {
-        response = await _apiClient.uploadMultipart(
-              '/family/children',
-              fileFieldName: 'avatar',
-              filePath: avatarFilePath,
-              extraFields: {
-                'first_name': firstName,
-                'last_name': lastName,
-                'birth_date': birthDateStr,
-                'gender': gender,
-              },
-            )
-            as Map<String, dynamic>;
+        response =
+            await _apiClient.uploadMultipart(
+                  '/family/children',
+                  fileFieldName: 'avatar',
+                  filePath: avatarFilePath,
+                  extraFields: {
+                    'first_name': firstName,
+                    'last_name': lastName,
+                    'birth_date': birthDateStr,
+                    'gender': gender,
+                  },
+                )
+                as Map<String, dynamic>;
       } else {
-        response = await _apiClient.post('/family/children', {
-              'first_name': firstName,
-              'last_name': lastName,
-              'birth_date': birthDateStr,
-              'gender': gender,
-              'avatar_url': avatarUrl,
-            })
-            as Map<String, dynamic>;
+        response =
+            await _apiClient.post('/family/children', {
+                  'first_name': firstName,
+                  'last_name': lastName,
+                  'birth_date': birthDateStr,
+                  'gender': gender,
+                  'avatar_url': avatarUrl,
+                })
+                as Map<String, dynamic>;
       }
 
       return Result.success(
@@ -110,28 +112,30 @@ class ApiFamilyRepository implements FamilyRepository {
       final birthDateStr = birthDate.toIso8601String().split('T').first;
       final Map<String, dynamic> response;
       if (avatarFilePath != null) {
-        response = await _apiClient.uploadMultipart(
-              '/family/children/$id',
-              fileFieldName: 'avatar',
-              filePath: avatarFilePath,
-              extraFields: {
-                'first_name': firstName,
-                'last_name': lastName,
-                'birth_date': birthDateStr,
-                'gender': gender,
-                '_method': 'PUT',
-              },
-            )
-            as Map<String, dynamic>;
+        response =
+            await _apiClient.uploadMultipart(
+                  '/family/children/$id',
+                  fileFieldName: 'avatar',
+                  filePath: avatarFilePath,
+                  extraFields: {
+                    'first_name': firstName,
+                    'last_name': lastName,
+                    'birth_date': birthDateStr,
+                    'gender': gender,
+                    '_method': 'PUT',
+                  },
+                )
+                as Map<String, dynamic>;
       } else {
-        response = await _apiClient.put('/family/children/$id', {
-              'first_name': firstName,
-              'last_name': lastName,
-              'birth_date': birthDateStr,
-              'gender': gender,
-              'avatar_url': avatarUrl,
-            })
-            as Map<String, dynamic>;
+        response =
+            await _apiClient.put('/family/children/$id', {
+                  'first_name': firstName,
+                  'last_name': lastName,
+                  'birth_date': birthDateStr,
+                  'gender': gender,
+                  'avatar_url': avatarUrl,
+                })
+                as Map<String, dynamic>;
       }
 
       return Result.success(
@@ -210,10 +214,7 @@ class ApiFamilyRepository implements FamilyRepository {
       final body = <String, dynamic>{'plan_id': planId};
       if (startsAt != null) body['starts_at'] = startsAt;
       final response =
-          await _apiClient.post(
-                '/family/children/$childId/subscriptions',
-                body,
-              )
+          await _apiClient.post('/family/children/$childId/subscriptions', body)
               as Map<String, dynamic>;
       return Result.success(
         SubscriptionMapper.toEntity(SubscriptionModel.fromJson(response)),
@@ -285,7 +286,7 @@ class ApiFamilyRepository implements FamilyRepository {
 
   @override
   Future<Result<PaginatedResult<CourseSession>, Failure>>
-      getChildAvailableSessions({
+  getChildAvailableSessions({
     required String childId,
     int page = 1,
     int perPage = 15,
@@ -414,7 +415,8 @@ class ApiFamilyRepository implements FamilyRepository {
   }
 
   @override
-  Future<Result<PaginatedResult<CompletedItem>, Failure>> getChildCompletedItems({
+  Future<Result<PaginatedResult<CompletedItem>, Failure>>
+  getChildCompletedItems({
     required String childId,
     int page = 1,
     int perPage = 15,
@@ -443,16 +445,14 @@ class ApiFamilyRepository implements FamilyRepository {
     });
   }
 
-  PaginatedResult<T> _toPaginated<T>(
-    List<T> items,
-    Map<String, dynamic> meta,
-  ) {
+  PaginatedResult<T> _toPaginated<T>(List<T> items, Map<String, dynamic> meta) {
     return PaginatedResult(
       data: items,
       currentPage: meta['current_page'] as int? ?? 1,
       lastPage: meta['last_page'] as int? ?? 1,
       total: meta['total'] as int? ?? items.length,
-      hasMore: (meta['current_page'] as int? ?? 1) <
+      hasMore:
+          (meta['current_page'] as int? ?? 1) <
           (meta['last_page'] as int? ?? 1),
     );
   }

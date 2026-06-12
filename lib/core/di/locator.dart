@@ -223,7 +223,7 @@ Future<void> initLocator() async {
     () => ApiServiceRepository(locator<ApiClient>()),
   );
   locator.registerLazySingleton<EventRepository>(
-    () => ApiEventRepository(locator<ApiClient>()),
+    () => ApiEventRepository(locator<ApiClient>(), locator<UserRepository>()),
   );
   locator.registerLazySingleton<LoyaltyRepository>(
     () => ApiLoyaltyRepository(locator<ApiClient>()),
@@ -284,7 +284,9 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => BuyChildSubscriptionUseCase(locator()));
   locator.registerLazySingleton(() => GetChildSubscriptionsUseCase(locator()));
   locator.registerLazySingleton(() => GetChildBookingsUseCase(locator()));
-  locator.registerLazySingleton(() => GetChildAvailableSessionsUseCase(locator()));
+  locator.registerLazySingleton(
+    () => GetChildAvailableSessionsUseCase(locator()),
+  );
   locator.registerLazySingleton(() => BookChildSessionUseCase(locator()));
   locator.registerLazySingleton(() => GetChildReservationsUseCase(locator()));
   locator.registerLazySingleton(() => GetChildScheduleUseCase(locator()));

@@ -119,7 +119,8 @@ class ApiAuthRepository implements AuthRepository {
           }
         },
         onFailure: (failure) {
-          final shouldWipe = _currentSession == null ||
+          final shouldWipe =
+              _currentSession == null ||
               _currentSession!.state != AuthState.authenticated;
           if (shouldWipe) {
             _apiClient.setToken(null);
@@ -611,9 +612,15 @@ class ApiAuthRepository implements AuthRepository {
     if (deviceId == null) return;
     try {
       await _deviceRegistrationRepo.link(deviceId);
-      developer.log('Device successfully linked to member.', name: 'ApiAuthRepository');
+      developer.log(
+        'Device successfully linked to member.',
+        name: 'ApiAuthRepository',
+      );
     } catch (e) {
-      developer.log('Failed to link device after auth: $e', name: 'ApiAuthRepository');
+      developer.log(
+        'Failed to link device after auth: $e',
+        name: 'ApiAuthRepository',
+      );
     }
   }
 
@@ -1015,10 +1022,7 @@ class ApiAuthRepository implements AuthRepository {
     }
     return executeApiCall(() async {
       final response =
-          await _apiClient.get(
-                '/user/verification-status',
-                skipAuthError: true,
-              )
+          await _apiClient.get('/user/verification-status', skipAuthError: true)
               as Map<String, dynamic>;
       final model = VerificationStatusModel.fromJson(response);
       final status = VerificationMapper.toEntity(model);

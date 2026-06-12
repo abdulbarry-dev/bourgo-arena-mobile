@@ -89,7 +89,10 @@ void main() {
                 ),
               ),
             ),
-            GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+            GoRoute(
+              path: '/home',
+              builder: (context, state) => const SizedBox(),
+            ),
           ],
         ),
       ),
@@ -142,11 +145,16 @@ void main() {
                 builder: (context, state) => Scaffold(
                   body: Form(
                     key: viewModel.formKey,
-                    child: TextFormField(controller: viewModel.identifierController),
+                    child: TextFormField(
+                      controller: viewModel.identifierController,
+                    ),
                   ),
                 ),
               ),
-              GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const SizedBox(),
+              ),
             ],
           ),
         ),
@@ -187,11 +195,16 @@ void main() {
                 builder: (context, state) => Scaffold(
                   body: Form(
                     key: viewModel.formKey,
-                    child: TextFormField(controller: viewModel.identifierController),
+                    child: TextFormField(
+                      controller: viewModel.identifierController,
+                    ),
                   ),
                 ),
               ),
-              GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const SizedBox(),
+              ),
             ],
           ),
         ),
@@ -305,11 +318,16 @@ void main() {
                 builder: (context, state) => Scaffold(
                   body: Form(
                     key: viewModel.formKey,
-                    child: TextFormField(controller: viewModel.identifierController),
+                    child: TextFormField(
+                      controller: viewModel.identifierController,
+                    ),
                   ),
                 ),
               ),
-              GoRoute(path: '/home', builder: (context, state) => const SizedBox()),
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const SizedBox(),
+              ),
             ],
           ),
         ),

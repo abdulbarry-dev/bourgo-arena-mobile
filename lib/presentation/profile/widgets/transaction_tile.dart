@@ -7,9 +7,8 @@ import 'package:material_symbols_icons/symbols.dart';
 
 class TransactionTile extends StatelessWidget {
   final Payment payment;
-  final VoidCallback? onTapReceipt;
 
-  const TransactionTile({super.key, required this.payment, this.onTapReceipt});
+  const TransactionTile({super.key, required this.payment});
 
   IconData _iconForType(String type) {
     switch (type) {
@@ -166,29 +165,6 @@ class TransactionTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
-                    ),
-                  ],
-                  if (payment.receiptUrl != null) ...[
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: onTapReceipt,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Symbols.receipt_long,
-                            size: 16,
-                            color: theme.colorScheme.primary,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'View receipt',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
                   ],
                 ],

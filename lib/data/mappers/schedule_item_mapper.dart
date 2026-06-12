@@ -22,12 +22,16 @@ class ScheduleItemMapper {
 
   static ScheduleItemModel fromEntity(ScheduleItem entity) {
     return ScheduleItemModel(
-      type: entity.type == ScheduleItemType.reservation ? 'reservation' : 'booking',
+      type: entity.type == ScheduleItemType.reservation
+          ? 'reservation'
+          : 'booking',
       typeLabel: entity.typeLabel,
       id: entity.id,
       date: entity.date,
       courseName: entity.type == ScheduleItemType.booking ? entity.name : null,
-      activityTitle: entity.type == ScheduleItemType.reservation ? entity.name : null,
+      activityTitle: entity.type == ScheduleItemType.reservation
+          ? entity.name
+          : null,
       startTime: entity.startTime,
       endTime: entity.endTime,
       durationMinutes: entity.durationMinutes,

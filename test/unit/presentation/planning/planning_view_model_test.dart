@@ -75,12 +75,12 @@ void main() {
         const ServerFailure(AppErrorCode.serverError, 'error'),
       ),
     );
-    when(() => mockGetServices.call()).thenAnswer(
-      (_) async => Result.success(<Service>[]),
-    );
-    when(() => mockGetActiveSubs.execute()).thenAnswer(
-      (_) async => Result.success(<Subscription>[]),
-    );
+    when(
+      () => mockGetServices.call(),
+    ).thenAnswer((_) async => Result.success(<Service>[]));
+    when(
+      () => mockGetActiveSubs.execute(),
+    ).thenAnswer((_) async => Result.success(<Subscription>[]));
 
     viewModel = PlanningViewModel(
       getCoursesUseCase: mockGetCourses,

@@ -176,35 +176,40 @@ void main() {
 
       expect(viewModel.errorMessage, 'Rate limit exceeded');
     });
-    test('requestFamilyOtp sends OTP via family endpoint if method is verified', () async {
-      when(() => mockGetVerificationStatusUseCase()).thenAnswer(
-        (_) async => const Success(
-          VerificationStatus(
-            emailVerified: true,
-            phoneVerified: true,
-            onboardingCompleted: true,
-            isFullyVerified: true,
-            email: 'test@example.com',
-            phone: '+1234567890',
+    test(
+      'requestFamilyOtp sends OTP via family endpoint if method is verified',
+      () async {
+        when(() => mockGetVerificationStatusUseCase()).thenAnswer(
+          (_) async => const Success(
+            VerificationStatus(
+              emailVerified: true,
+              phoneVerified: true,
+              onboardingCompleted: true,
+              isFullyVerified: true,
+              email: 'test@example.com',
+              phone: '+1234567890',
+            ),
           ),
-        ),
-      );
-      when(
-        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
-      ).thenAnswer((_) async => const Success('OTP sent'));
+        );
+        when(
+          () =>
+              mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+        ).thenAnswer((_) async => const Success('OTP sent'));
 
-      bool successCalled = false;
-      await viewModel.requestFamilyOtp(
-        isEmail: true,
-        onSuccess: () => successCalled = true,
-        onError: (_) {},
-      );
+        bool successCalled = false;
+        await viewModel.requestFamilyOtp(
+          isEmail: true,
+          onSuccess: () => successCalled = true,
+          onError: (_) {},
+        );
 
-      verify(
-        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
-      ).called(1);
-      expect(successCalled, isTrue);
-    });
+        verify(
+          () =>
+              mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+        ).called(1);
+        expect(successCalled, isTrue);
+      },
+    );
 
     test(
       'requestFamilyOtp reports error if email is not yet verified',
@@ -232,7 +237,8 @@ void main() {
         expect(error, 'Your email address is not verified yet.');
         verifyNever(() => mockSendOtpUseCase(any()));
         verifyNever(
-          () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+          () =>
+              mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
         );
       },
     );

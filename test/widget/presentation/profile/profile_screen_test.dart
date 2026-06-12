@@ -81,9 +81,7 @@ void main() {
     locator.registerFactory<GetFullPaymentHistoryUseCase>(
       () => mockGetFullPaymentHistoryUseCase,
     );
-    locator.registerFactory<GetMyEventsUseCase>(
-      () => mockGetMyEventsUseCase,
-    );
+    locator.registerFactory<GetMyEventsUseCase>(() => mockGetMyEventsUseCase);
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
 
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(false);
@@ -104,9 +102,8 @@ void main() {
       () => mockGetMyEventsUseCase(),
     ).thenAnswer((_) async => Result.success([]));
     when(() => mockAuthRepository.getMemberTier()).thenAnswer(
-      (_) async => Result.success(
-        const AuthSession(state: AuthState.unauthenticated),
-      ),
+      (_) async =>
+          Result.success(const AuthSession(state: AuthState.unauthenticated)),
     );
   });
 

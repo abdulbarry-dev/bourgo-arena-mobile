@@ -29,7 +29,8 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
   void initState() {
     super.initState();
     _viewModel = ChildSessionsViewModel(
-      getChildAvailableSessionsUseCase: locator<GetChildAvailableSessionsUseCase>(),
+      getChildAvailableSessionsUseCase:
+          locator<GetChildAvailableSessionsUseCase>(),
       bookChildSessionUseCase: locator<BookChildSessionUseCase>(),
     );
     _viewModel.load(widget.childId);
@@ -70,14 +71,22 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(session.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    session.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   Text('Day: $dayName'),
                   Text('Time: ${session.startTime} - ${session.endTime}'),
                   Text('Spots: ${session.remainingSpots}/${session.capacity}'),
                   if (session.isFull) ...[
                     const SizedBox(height: 8),
-                    Text('Session is full', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                    Text(
+                      'Session is full',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
                   ],
                   const SizedBox(height: 16),
                   if (!session.isFull)
@@ -87,7 +96,9 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                           context: context,
                           initialDate: selectedDate,
                           firstDate: DateTime.now(),
-                          lastDate: DateTime.now().add(const Duration(days: 30)),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 30),
+                          ),
                         );
                         if (date != null) {
                           setDialogState(() => selectedDate = date);
@@ -135,7 +146,8 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                               content: Text(
                                 booking != null
                                     ? 'Successfully booked!'
-                                    : _viewModel.errorMessage ?? 'Failed to book',
+                                    : _viewModel.errorMessage ??
+                                          'Failed to book',
                               ),
                               backgroundColor: booking != null
                                   ? appColors.statusSuccess
@@ -179,12 +191,16 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                           controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(spacing.lg),
-                          itemCount: _viewModel.sessions.length + (_viewModel.isLoadingMore ? 1 : 0),
+                          itemCount:
+                              _viewModel.sessions.length +
+                              (_viewModel.isLoadingMore ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index == _viewModel.sessions.length) {
                               return const Padding(
                                 padding: EdgeInsets.all(16),
-                                child: Center(child: CircularProgressIndicator()),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               );
                             }
                             final session = _viewModel.sessions[index];
@@ -196,7 +212,9 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                                 theme: theme,
                                 spacing: spacing,
                                 appColors: appColors,
-                                onBook: session.isBooked ? null : () => _bookSession(session),
+                                onBook: session.isBooked
+                                    ? null
+                                    : () => _bookSession(session),
                               ),
                             );
                           },
@@ -220,8 +238,9 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
               child: Container(
                 padding: EdgeInsets.all(spacing.lg),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.3),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.3,
+                  ),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -250,39 +269,42 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: spacing.xxl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 112,
-              height: 112,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 112,
+                  height: 112,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Icon(
+                    Symbols.sports_kabaddi,
+                    size: 56,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-              ),
-              child: Icon(
-                Symbols.sports_kabaddi,
-                size: 56,
-                color: theme.colorScheme.primary,
-              ),
+                SizedBox(height: spacing.xl),
+                Text(
+                  'No sessions available',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: spacing.xl),
-            Text('No sessions available',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideY(
-          begin: 0.08,
-          end: 0,
-          curve: Curves.easeOutQuad,
-        );
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -295,8 +317,12 @@ class _SessionCard extends StatelessWidget {
   final VoidCallback? onBook;
 
   const _SessionCard({
-    required this.session, required this.index, required this.theme,
-    required this.spacing, required this.appColors, this.onBook,
+    required this.session,
+    required this.index,
+    required this.theme,
+    required this.spacing,
+    required this.appColors,
+    this.onBook,
   });
 
   @override
@@ -321,14 +347,21 @@ class _SessionCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(session.title,
-                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                    Text(
+                      session.title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                     if (session.isBooked) ...[
                       SizedBox(width: spacing.sm),
                       Semantics(
                         label: 'Booked',
-                        child: Icon(Symbols.check_circle,
-                            size: 16, color: appColors.statusSuccess),
+                        child: Icon(
+                          Symbols.check_circle,
+                          size: 16,
+                          color: appColors.statusSuccess,
+                        ),
                       ),
                     ],
                   ],
@@ -336,38 +369,72 @@ class _SessionCard extends StatelessWidget {
                 SizedBox(height: spacing.xs),
                 Row(
                   children: [
-                    Icon(Symbols.calendar_today, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(
+                      Symbols.calendar_today,
+                      size: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     SizedBox(width: spacing.xxs),
-                    Text(dayName,
-                      style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                    Text(
+                      dayName,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                     SizedBox(width: spacing.md),
-                    Icon(Symbols.schedule, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(
+                      Symbols.schedule,
+                      size: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     SizedBox(width: spacing.xxs),
-                    Text('${session.startTime} - ${session.endTime}',
-                      style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                    Text(
+                      '${session.startTime} - ${session.endTime}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   ],
                 ),
                 SizedBox(height: spacing.xs),
                 Row(
                   children: [
-                    Icon(Symbols.group, size: 12, color: theme.colorScheme.onSurfaceVariant),
+                    Icon(
+                      Symbols.group,
+                      size: 12,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                     SizedBox(width: spacing.xxs),
-                    Text('${session.enrolled}/${session.capacity}',
+                    Text(
+                      '${session.enrolled}/${session.capacity}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: session.isFull ? appColors.statusError : theme.colorScheme.onSurfaceVariant,
-                        fontWeight: session.isFull ? FontWeight.w700 : FontWeight.normal,
-                      )),
+                        color: session.isFull
+                            ? appColors.statusError
+                            : theme.colorScheme.onSurfaceVariant,
+                        fontWeight: session.isFull
+                            ? FontWeight.w700
+                            : FontWeight.normal,
+                      ),
+                    ),
                     if (session.isFull) ...[
                       SizedBox(width: spacing.sm),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 2),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: spacing.xs,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: appColors.statusError.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text('FULL', style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w900, color: appColors.statusError, fontSize: 9,
-                        )),
+                        child: Text(
+                          'FULL',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: appColors.statusError,
+                            fontSize: 9,
+                          ),
+                        ),
                       ),
                     ],
                   ],

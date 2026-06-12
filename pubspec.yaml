@@ -39,8 +39,6 @@ dependencies:
   google_fonts: ^8.0.2
   material_symbols_icons: ^4.2928.1
   intl: ^0.20.2
-  build_runner: ^2.14.0
-  mocktail: ^1.0.5
   flutter_localizations:
     sdk: flutter
   shared_preferences: ^2.5.5
@@ -85,6 +83,8 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
   network_image_mock: ^2.1.1
   freezed: ^3.2.6-dev.1
+  build_runner: ^2.14.0
+  mocktail: ^1.0.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

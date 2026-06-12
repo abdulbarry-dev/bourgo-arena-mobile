@@ -61,10 +61,11 @@ class ApiClient {
             // 1. Explicit authToken override
             // 2. Sanctum token (_token) if provided and we want to use it
             // 3. Device token (_deviceToken) as the primary/fallback for persistence
-            
+
             final String? overrideToken = options.extra['authToken'] as String?;
-            final bool useSanctumOnly = options.extra['useSanctumOnly'] ?? false;
-            
+            final bool useSanctumOnly =
+                options.extra['useSanctumOnly'] ?? false;
+
             String? authToken;
             if (overrideToken != null) {
               authToken = overrideToken;
@@ -83,7 +84,7 @@ class ApiClient {
           _attachDeviceIdHeader(options);
 
           developer.log('API Request: [${options.method}] ${options.uri}');
-          
+
           // Log Headers (masking Authorization)
           final loggedHeaders = Map<String, dynamic>.from(options.headers);
           if (loggedHeaders.containsKey('Authorization')) {
@@ -213,11 +214,13 @@ class ApiClient {
       final response = await _dio.get(
         normalizedPath,
         queryParameters: queryParameters,
-        options: Options(extra: {
-          'includeAuth': includeAuth,
-          'useSanctumOnly': useSanctumOnly,
-          'authToken': authToken,
-        }),
+        options: Options(
+          extra: {
+            'includeAuth': includeAuth,
+            'useSanctumOnly': useSanctumOnly,
+            'authToken': authToken,
+          },
+        ),
       );
       return _handleResponse(response, fullResponse: fullResponse);
     } on DioException catch (e) {
@@ -240,11 +243,13 @@ class ApiClient {
       final response = await _dio.post(
         normalizedPath,
         data: body,
-        options: Options(extra: {
-          'includeAuth': includeAuth,
-          'useSanctumOnly': useSanctumOnly,
-          'authToken': authToken,
-        }),
+        options: Options(
+          extra: {
+            'includeAuth': includeAuth,
+            'useSanctumOnly': useSanctumOnly,
+            'authToken': authToken,
+          },
+        ),
       );
       return _handleResponse(response, fullResponse: fullResponse);
     } on DioException catch (e) {
@@ -267,11 +272,13 @@ class ApiClient {
       final response = await _dio.put(
         normalizedPath,
         data: body,
-        options: Options(extra: {
-          'includeAuth': includeAuth,
-          'useSanctumOnly': useSanctumOnly,
-          'authToken': authToken,
-        }),
+        options: Options(
+          extra: {
+            'includeAuth': includeAuth,
+            'useSanctumOnly': useSanctumOnly,
+            'authToken': authToken,
+          },
+        ),
       );
       return _handleResponse(response, fullResponse: fullResponse);
     } on DioException catch (e) {
@@ -292,11 +299,13 @@ class ApiClient {
       final normalizedPath = path.startsWith('/') ? path : '/$path';
       final response = await _dio.delete(
         normalizedPath,
-        options: Options(extra: {
-          'includeAuth': includeAuth,
-          'useSanctumOnly': useSanctumOnly,
-          'authToken': authToken,
-        }),
+        options: Options(
+          extra: {
+            'includeAuth': includeAuth,
+            'useSanctumOnly': useSanctumOnly,
+            'authToken': authToken,
+          },
+        ),
       );
       return _handleResponse(response, fullResponse: fullResponse);
     } on DioException catch (e) {
@@ -325,11 +334,13 @@ class ApiClient {
       final response = await _dio.post(
         normalizedPath,
         data: formData,
-        options: Options(extra: {
-          'includeAuth': includeAuth,
-          'useSanctumOnly': useSanctumOnly,
-          'authToken': authToken,
-        }),
+        options: Options(
+          extra: {
+            'includeAuth': includeAuth,
+            'useSanctumOnly': useSanctumOnly,
+            'authToken': authToken,
+          },
+        ),
       );
       return _handleResponse(response, fullResponse: fullResponse);
     } on DioException catch (e) {

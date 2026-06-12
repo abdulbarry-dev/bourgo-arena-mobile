@@ -91,22 +91,18 @@ class AppColors extends ThemeExtension<AppColors> {
       bgBorder: Color.lerp(bgBorder, other.bgBorder, t) ?? bgBorder,
       statusSuccess:
           Color.lerp(statusSuccess, other.statusSuccess, t) ?? statusSuccess,
-      statusError:
-          Color.lerp(statusError, other.statusError, t) ?? statusError,
+      statusError: Color.lerp(statusError, other.statusError, t) ?? statusError,
       statusWarning:
           Color.lerp(statusWarning, other.statusWarning, t) ?? statusWarning,
-      iconDefault:
-          Color.lerp(iconDefault, other.iconDefault, t) ?? iconDefault,
+      iconDefault: Color.lerp(iconDefault, other.iconDefault, t) ?? iconDefault,
       accentActivity:
           Color.lerp(accentActivity, other.accentActivity, t) ?? accentActivity,
-      accentEvent:
-          Color.lerp(accentEvent, other.accentEvent, t) ?? accentEvent,
+      accentEvent: Color.lerp(accentEvent, other.accentEvent, t) ?? accentEvent,
       accentCourse:
           Color.lerp(accentCourse, other.accentCourse, t) ?? accentCourse,
       accentService:
           Color.lerp(accentService, other.accentService, t) ?? accentService,
-      genderMale:
-          Color.lerp(genderMale, other.genderMale, t) ?? genderMale,
+      genderMale: Color.lerp(genderMale, other.genderMale, t) ?? genderMale,
       genderFemale:
           Color.lerp(genderFemale, other.genderFemale, t) ?? genderFemale,
     );

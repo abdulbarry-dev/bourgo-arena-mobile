@@ -20,8 +20,8 @@ class ChildSessionsViewModel extends BaseViewModel {
   ChildSessionsViewModel({
     required GetChildAvailableSessionsUseCase getChildAvailableSessionsUseCase,
     required BookChildSessionUseCase bookChildSessionUseCase,
-  })  : _getChildAvailableSessionsUseCase = getChildAvailableSessionsUseCase,
-        _bookChildSessionUseCase = bookChildSessionUseCase;
+  }) : _getChildAvailableSessionsUseCase = getChildAvailableSessionsUseCase,
+       _bookChildSessionUseCase = bookChildSessionUseCase;
 
   List<CourseSession> get sessions => _sessions;
   bool get isLoading => _isLoading;

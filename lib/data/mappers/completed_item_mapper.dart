@@ -18,12 +18,16 @@ class CompletedItemMapper {
 
   static CompletedItemModel fromEntity(CompletedItem entity) {
     return CompletedItemModel(
-      type: entity.type == CompletedItemType.reservation ? 'reservation' : 'booking',
+      type: entity.type == CompletedItemType.reservation
+          ? 'reservation'
+          : 'booking',
       typeLabel: entity.typeLabel,
       id: entity.id,
       date: entity.date,
       courseName: entity.type == CompletedItemType.booking ? entity.name : null,
-      activityTitle: entity.type == CompletedItemType.reservation ? entity.name : null,
+      activityTitle: entity.type == CompletedItemType.reservation
+          ? entity.name
+          : null,
       status: entity.status,
       completedAt: entity.completedAt,
     );

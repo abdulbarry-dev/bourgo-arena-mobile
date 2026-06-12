@@ -25,10 +25,7 @@ class ChildReservationsViewModel extends BaseViewModel {
   String get filter => _filter;
   bool get hasMore => _pagination?.hasMore ?? false;
 
-  Future<void> load({
-    required String childId,
-    String filter = 'all',
-  }) async {
+  Future<void> load({required String childId, String filter = 'all'}) async {
     _childId = childId;
     _filter = filter;
     _isLoading = true;
@@ -50,7 +47,9 @@ class ChildReservationsViewModel extends BaseViewModel {
         },
         failure: (failure) {
           setErrorMessage(failure.message);
-          developer.log('Failed to load child reservations: ${failure.message}');
+          developer.log(
+            'Failed to load child reservations: ${failure.message}',
+          );
         },
       );
     } catch (e) {

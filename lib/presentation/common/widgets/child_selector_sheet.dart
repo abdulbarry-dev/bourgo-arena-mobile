@@ -59,7 +59,11 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
 
     return Container(
       padding: EdgeInsets.fromLTRB(
-          spacing.lg, spacing.lg, spacing.lg, spacing.lg + bottomInset),
+        spacing.lg,
+        spacing.lg,
+        spacing.lg,
+        spacing.lg + bottomInset,
+      ),
       decoration: BoxDecoration(
         color: theme.scaffoldBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -81,8 +85,9 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
           SizedBox(height: spacing.lg),
           Text(
             'WHO IS THIS FOR?',
-            style: theme.textTheme.titleLarge
-                ?.copyWith(fontWeight: FontWeight.w900),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w900,
+            ),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: spacing.xl),
@@ -91,7 +96,7 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
               padding: EdgeInsets.all(32),
               child: Center(child: CircularProgressIndicator()),
             )
- else ...[
+          else ...[
             _OptionTile(
               icon: Symbols.person,
               title: l10n.commonMe,
@@ -100,9 +105,11 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
             ),
             if (_children != null) ...[
               if (_children!.isEmpty)
-                _AddChildTile(
-                  message: 'No children added yet. Add one to get started.',
-                  onTap: () => Navigator.pop(context, kAddChildSentinel),
+                _OptionTile(
+                  icon: Symbols.person,
+                  title: 'No children found',
+                  subtitle: 'You currently have no children added.',
+                  onTap: () {},
                 )
               else ...[
                 ..._children!.map(
@@ -116,13 +123,6 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
                       subtitle: null,
                       onTap: () => Navigator.pop(context, child.id),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: spacing.sm),
-                  child: _AddChildTile(
-                    message: 'Add another child',
-                    onTap: () => Navigator.pop(context, kAddChildSentinel),
                   ),
                 ),
               ],
@@ -168,7 +168,9 @@ class _OptionTile extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                backgroundColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.1,
+                ),
                 child: Icon(icon, size: 20, color: theme.colorScheme.primary),
               ),
               const SizedBox(width: 12),
@@ -199,80 +201,6 @@ class _OptionTile extends StatelessWidget {
               Icon(
                 Symbols.chevron_right,
                 color: theme.colorScheme.onSurfaceVariant,
-                size: 20,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _AddChildTile extends StatelessWidget {
-  final String message;
-  final VoidCallback onTap;
-
-  const _AddChildTile({required this.message, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: appColors.bgElevated,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-              strokeAlign: BorderSide.strokeAlignInside,
-            ),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                child: Icon(
-                  Symbols.person_add,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Add a Child',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      message,
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Icon(
-                Symbols.add_circle,
-                color: theme.colorScheme.primary,
                 size: 20,
               ),
             ],

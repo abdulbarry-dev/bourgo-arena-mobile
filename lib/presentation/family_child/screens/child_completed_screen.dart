@@ -71,12 +71,16 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
                           controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(spacing.lg),
-                          itemCount: _viewModel.items.length + (_viewModel.isLoadingMore ? 1 : 0),
+                          itemCount:
+                              _viewModel.items.length +
+                              (_viewModel.isLoadingMore ? 1 : 0),
                           itemBuilder: (context, index) {
                             if (index == _viewModel.items.length) {
                               return const Padding(
                                 padding: EdgeInsets.all(16),
-                                child: Center(child: CircularProgressIndicator()),
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               );
                             }
                             final item = _viewModel.items[index];
@@ -132,41 +136,53 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: spacing.xxl, horizontal: spacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              width: 112,
-              height: 112,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: spacing.xxl,
+              horizontal: spacing.xl,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 112,
+                  height: 112,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Icon(
+                    Symbols.check_circle,
+                    size: 56,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-              ),
-              child: Icon(Symbols.check_circle, size: 56, color: theme.colorScheme.primary),
+                SizedBox(height: spacing.xl),
+                Text(
+                  'No completed items',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: spacing.md),
+                Text(
+                  'Completed bookings and activities will appear here.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: spacing.xl),
-            Text(
-              'No completed items',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-            ),
-            SizedBox(height: spacing.md),
-            Text(
-              'Completed bookings and activities will appear here.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -177,84 +193,116 @@ class _CompletedCard extends StatelessWidget {
   final AppSpacing spacing;
 
   const _CompletedCard({
-    required this.item, required this.index, required this.theme, required this.spacing,
+    required this.item,
+    required this.index,
+    required this.theme,
+    required this.spacing,
   });
 
   @override
   Widget build(BuildContext context) {
     final appColors = theme.extension<AppColors>()!;
     final isActivity = item.type == CompletedItemType.activity;
-    final color = isActivity ? const Color(0xFF8B5CF6) : theme.colorScheme.primary;
+    final color = isActivity
+        ? const Color(0xFF8B5CF6)
+        : theme.colorScheme.primary;
 
     return PressableCard(
-      borderRadius: BorderRadius.circular(16),
-      onTap: () {},
-      child: Container(
-        padding: EdgeInsets.all(spacing.lg),
-        decoration: BoxDecoration(
-          color: appColors.bgElevated,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: appColors.bgBorder),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48, height: 48,
-              decoration: BoxDecoration(
-                color: appColors.statusSuccess.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Center(
-                child: Semantics(
-                  label: 'Completed',
-                  child: Icon(Symbols.check_circle, color: appColors.statusSuccess, size: 24),
-                ),
-              ),
+          onTap: () {},
+          child: Container(
+            padding: EdgeInsets.all(spacing.lg),
+            decoration: BoxDecoration(
+              color: appColors.bgElevated,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: appColors.bgBorder),
             ),
-            SizedBox(width: spacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(item.typeLabel.toUpperCase(),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w900, color: color, fontSize: 9,
-                          )),
+            child: Row(
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: appColors.statusSuccess.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Semantics(
+                      label: 'Completed',
+                      child: Icon(
+                        Symbols.check_circle,
+                        color: appColors.statusSuccess,
+                        size: 24,
                       ),
-                      const Spacer(),
-                      Text(item.date,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant)),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: spacing.xs),
-                  Text(item.name,
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-                  SizedBox(height: spacing.xxs),
-                  Row(
+                ),
+                SizedBox(width: spacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Symbols.check_circle, size: 12, color: appColors.statusSuccess),
-                      SizedBox(width: spacing.xxs),
-                      Text('Completed: ${item.completedAt}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant)),
+                      Row(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: spacing.xs,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              item.typeLabel.toUpperCase(),
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: color,
+                                fontSize: 9,
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            item.date,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: spacing.xs),
+                      Text(
+                        item.name,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(height: spacing.xxs),
+                      Row(
+                        children: [
+                          Icon(
+                            Symbols.check_circle,
+                            size: 12,
+                            color: appColors.statusSuccess,
+                          ),
+                          SizedBox(width: spacing.xxs),
+                          Text(
+                            'Completed: ${item.completedAt}',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ).animate(delay: (index.clamp(0, 8) * 50).ms)
+          ),
+        )
+        .animate(delay: (index.clamp(0, 8) * 50).ms)
         .fadeIn(duration: 350.ms)
         .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic);
   }

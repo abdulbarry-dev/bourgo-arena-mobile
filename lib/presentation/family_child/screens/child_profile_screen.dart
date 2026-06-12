@@ -60,7 +60,13 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
                     padding: EdgeInsets.all(spacing.lg),
                     child: profile == null
                         ? _buildErrorState(theme, spacing)
-                        : _buildContent(context, profile, theme, spacing, appColors),
+                        : _buildContent(
+                            context,
+                            profile,
+                            theme,
+                            spacing,
+                            appColors,
+                          ),
                   ),
                 ),
         );
@@ -98,55 +104,61 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
     AppColors appColors,
   ) {
     return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(spacing.xl),
-      decoration: BoxDecoration(
-        color: appColors.bgElevated,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: appColors.bgBorder),
-      ),
-      child: Column(
-        children: [
-          ChildAvatar(
-            gender: profile.gender,
-            size: 96,
-            heroTag: 'child-avatar-${widget.childId}',
+          width: double.infinity,
+          padding: EdgeInsets.all(spacing.xl),
+          decoration: BoxDecoration(
+            color: appColors.bgElevated,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: appColors.bgBorder),
           ),
-          SizedBox(height: spacing.md),
-          Text(
-            profile.name,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          SizedBox(height: spacing.xxs),
-          Text(
-            '${profile.firstName} ${profile.lastName}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          SizedBox(height: spacing.sm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
             children: [
-              _InfoChip(
-                icon: Symbols.cake,
-                label: '${profile.birthDate.day}/${profile.birthDate.month}/${profile.birthDate.year}',
-                theme: theme,
+              ChildAvatar(
+                gender: profile.gender,
+                size: 96,
+                heroTag: 'child-avatar-${widget.childId}',
               ),
-              SizedBox(width: spacing.sm),
-              if (profile.gender != null)
-                _InfoChip(
-                  icon: profile.gender == 'female' ? Symbols.female : Symbols.male,
-                  label: profile.gender!.toUpperCase(),
-                  theme: theme,
+              SizedBox(height: spacing.md),
+              Text(
+                profile.name,
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
                 ),
+              ),
+              SizedBox(height: spacing.xxs),
+              Text(
+                '${profile.firstName} ${profile.lastName}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              SizedBox(height: spacing.sm),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _InfoChip(
+                    icon: Symbols.cake,
+                    label:
+                        '${profile.birthDate.day}/${profile.birthDate.month}/${profile.birthDate.year}',
+                    theme: theme,
+                  ),
+                  SizedBox(width: spacing.sm),
+                  if (profile.gender != null)
+                    _InfoChip(
+                      icon: profile.gender == 'female'
+                          ? Symbols.female
+                          : Symbols.male,
+                      label: profile.gender!.toUpperCase(),
+                      theme: theme,
+                    ),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
-    ).animate().fade(duration: 400.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
+        )
+        .animate()
+        .fade(duration: 400.ms)
+        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 
   Widget _buildActiveSubscriptionCard(
@@ -176,7 +188,11 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         children: [
           Row(
             children: [
-              Icon(Symbols.workspace_premium, color: theme.colorScheme.primary, size: 20),
+              Icon(
+                Symbols.workspace_premium,
+                color: theme.colorScheme.primary,
+                size: 20,
+              ),
               SizedBox(width: spacing.sm),
               Text(
                 'ABONNEMENT ACTIF',
@@ -191,7 +207,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
           SizedBox(height: spacing.md),
           Text(
             sub.plan?.name?.toUpperCase() ?? '',
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w900,
+            ),
           ),
           SizedBox(height: spacing.xs),
           if (sub.daysRemaining != null)
@@ -205,10 +223,18 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
           Row(
             children: [
               Expanded(
-                child: _DateLabel(label: 'DÉBUT', date: sub.startsAt, theme: theme),
+                child: _DateLabel(
+                  label: 'DÉBUT',
+                  date: sub.startsAt,
+                  theme: theme,
+                ),
               ),
               SizedBox(width: spacing.xs),
-              Icon(Symbols.arrow_forward, size: 14, color: theme.colorScheme.onSurfaceVariant),
+              Icon(
+                Symbols.arrow_forward,
+                size: 14,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
               SizedBox(width: spacing.xs),
               Expanded(
                 child: _DateLabel(label: 'FIN', date: sub.endsAt, theme: theme),
@@ -240,49 +266,64 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         ).animate().fade(duration: 300.ms).slideY(begin: 0.05, end: 0),
         SizedBox(height: spacing.md),
         _ActionButton(
-          icon: Symbols.workspace_premium,
-          label: 'SUBSCRIPTIONS',
-          onTap: () => context.push('/child/$childId/subscriptions'),
-          theme: theme,
-          spacing: spacing,
-          appColors: appColors,
-        ).animate(delay: 50.ms).fade(duration: 300.ms).slideY(begin: 0.05, end: 0),
+              icon: Symbols.workspace_premium,
+              label: 'SUBSCRIPTIONS',
+              onTap: () => context.push('/child/$childId/subscriptions'),
+              theme: theme,
+              spacing: spacing,
+              appColors: appColors,
+            )
+            .animate(delay: 50.ms)
+            .fade(duration: 300.ms)
+            .slideY(begin: 0.05, end: 0),
         SizedBox(height: spacing.md),
         _ActionButton(
-          icon: Symbols.event_note,
-          label: 'BOOKINGS',
-          onTap: () => context.push('/child/$childId/bookings'),
-          theme: theme,
-          spacing: spacing,
-          appColors: appColors,
-        ).animate(delay: 100.ms).fade(duration: 300.ms).slideY(begin: 0.05, end: 0),
+              icon: Symbols.event_note,
+              label: 'BOOKINGS',
+              onTap: () => context.push('/child/$childId/bookings'),
+              theme: theme,
+              spacing: spacing,
+              appColors: appColors,
+            )
+            .animate(delay: 100.ms)
+            .fade(duration: 300.ms)
+            .slideY(begin: 0.05, end: 0),
         SizedBox(height: spacing.md),
         _ActionButton(
-          icon: Symbols.sports,
-          label: 'SESSIONS',
-          onTap: () => context.push('/child/$childId/sessions'),
-          theme: theme,
-          spacing: spacing,
-          appColors: appColors,
-        ).animate(delay: 150.ms).fade(duration: 300.ms).slideY(begin: 0.05, end: 0),
+              icon: Symbols.sports,
+              label: 'SESSIONS',
+              onTap: () => context.push('/child/$childId/sessions'),
+              theme: theme,
+              spacing: spacing,
+              appColors: appColors,
+            )
+            .animate(delay: 150.ms)
+            .fade(duration: 300.ms)
+            .slideY(begin: 0.05, end: 0),
         SizedBox(height: spacing.md),
         _ActionButton(
-          icon: Symbols.list_alt,
-          label: 'RESERVATIONS',
-          onTap: () => context.push('/child/$childId/reservations'),
-          theme: theme,
-          spacing: spacing,
-          appColors: appColors,
-        ).animate(delay: 200.ms).fade(duration: 300.ms).slideY(begin: 0.05, end: 0),
+              icon: Symbols.list_alt,
+              label: 'RESERVATIONS',
+              onTap: () => context.push('/child/$childId/reservations'),
+              theme: theme,
+              spacing: spacing,
+              appColors: appColors,
+            )
+            .animate(delay: 200.ms)
+            .fade(duration: 300.ms)
+            .slideY(begin: 0.05, end: 0),
         SizedBox(height: spacing.md),
         _ActionButton(
-          icon: Symbols.check_circle,
-          label: 'COMPLETED',
-          onTap: () => context.push('/child/$childId/completed'),
-          theme: theme,
-          spacing: spacing,
-          appColors: appColors,
-        ).animate(delay: 250.ms).fade(duration: 300.ms).slideY(begin: 0.05, end: 0),
+              icon: Symbols.check_circle,
+              label: 'COMPLETED',
+              onTap: () => context.push('/child/$childId/completed'),
+              theme: theme,
+              spacing: spacing,
+              appColors: appColors,
+            )
+            .animate(delay: 250.ms)
+            .fade(duration: 300.ms)
+            .slideY(begin: 0.05, end: 0),
       ],
     );
   }
@@ -318,13 +359,20 @@ class _InfoChip extends StatelessWidget {
   final String label;
   final ThemeData theme;
 
-  const _InfoChip({required this.icon, required this.label, required this.theme});
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    required this.theme,
+  });
 
   @override
   Widget build(BuildContext context) {
     final spacing = context.spacing;
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: spacing.sm, vertical: spacing.xxs),
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.sm,
+        vertical: spacing.xxs,
+      ),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
@@ -334,7 +382,12 @@ class _InfoChip extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: theme.colorScheme.onSurfaceVariant),
           SizedBox(width: spacing.xxs),
-          Text(label, style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -346,7 +399,11 @@ class _DateLabel extends StatelessWidget {
   final String? date;
   final ThemeData theme;
 
-  const _DateLabel({required this.label, required this.date, required this.theme});
+  const _DateLabel({
+    required this.label,
+    required this.date,
+    required this.theme,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -360,11 +417,21 @@ class _DateLabel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: theme.textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w900, color: theme.colorScheme.onSurfaceVariant, letterSpacing: 1.0,
-          )),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.onSurfaceVariant,
+              letterSpacing: 1.0,
+            ),
+          ),
           SizedBox(height: spacing.xxs),
-          Text(date ?? '—', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            date ?? '—',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ],
       ),
     );
@@ -412,11 +479,18 @@ class _ActionButton extends StatelessWidget {
             ),
             SizedBox(width: spacing.md),
             Expanded(
-              child: Text(label, style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800, letterSpacing: 1.0,
-              )),
+              child: Text(
+                label,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.0,
+                ),
+              ),
             ),
-            Icon(Symbols.chevron_right, color: theme.colorScheme.onSurfaceVariant),
+            Icon(
+              Symbols.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ],
         ),
       ),

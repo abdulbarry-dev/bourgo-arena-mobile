@@ -1,19 +1,407 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/payment/payment_webview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+/// States for the Konnect payment sub-flow within [PaymentStep].
+enum _KonnectPaymentState {
+  /// Showing the summary and payment method selector.
+  idle,
+
+  /// Calling makeReservation on the server.
+  processingReservation,
+
+  /// WebView is open — payment in progress.
+  openingGateway,
+
+  /// Verifying payment status with the server.
+  verifying,
+
+  /// Payment confirmed — show success.
+  success,
+
+  /// Payment failed or could not be verified.
+  failed,
+}
+
 /// Step 3: Payment and Confirmation Summary.
-class PaymentStep extends StatelessWidget {
+class PaymentStep extends StatefulWidget {
+  /// The view model driving the booking flow.
   final BookingViewModel viewModel;
 
+  /// Creates a [PaymentStep].
   const PaymentStep({super.key, required this.viewModel});
 
   @override
+  State<PaymentStep> createState() => _PaymentStepState();
+}
+
+class _PaymentStepState extends State<PaymentStep> {
+  _KonnectPaymentState _konnectState = _KonnectPaymentState.idle;
+  String? _errorMessage;
+  String? _pendingReservationId;
+  int? _pendingDepositPaymentId;
+
+  Future<void> _handlePayment() async {
+    setState(() {
+      _konnectState = _KonnectPaymentState.processingReservation;
+      _errorMessage = null;
+    });
+
+    final success = await widget.viewModel.makeReservation();
+    if (!mounted) return;
+
+    if (!success) {
+      setState(() {
+        _konnectState = _KonnectPaymentState.failed;
+        _errorMessage = widget.viewModel.errorMessage ?? 'Reservation failed.';
+      });
+      return;
+    }
+
+    final reservationId = widget.viewModel.createdReservationId;
+    final isLoyalty =
+        widget.viewModel.paymentMethod == AppConstants.paymentMethodWalletId;
+
+    if (isLoyalty) {
+      await _handleLoyaltyPayment(reservationId);
+    } else {
+      await _openKonnectGateway(
+        reservationId: reservationId,
+        depositUrl: widget.viewModel.depositUrl,
+        depositPaymentId: widget.viewModel.depositPaymentId,
+      );
+    }
+  }
+
+  /// Pays using loyalty points — no WebView needed.
+  Future<void> _handleLoyaltyPayment(String? reservationId) async {
+    if (reservationId == null) {
+      setState(() {
+        _konnectState = _KonnectPaymentState.failed;
+        _errorMessage = 'Missing reservation ID for loyalty payment.';
+      });
+      return;
+    }
+
+    final parsedId = int.tryParse(reservationId);
+    if (parsedId == null) {
+      setState(() {
+        _konnectState = _KonnectPaymentState.failed;
+        _errorMessage = 'Invalid reservation ID format.';
+      });
+      return;
+    }
+
+    setState(() => _konnectState = _KonnectPaymentState.verifying);
+
+    final useCase = locator<PayWithLoyaltyUseCase>();
+    final result = await useCase(type: 'reservation', id: parsedId);
+
+    if (!mounted) return;
+
+    result.fold(
+      onSuccess: (_) {
+        setState(() => _konnectState = _KonnectPaymentState.success);
+      },
+      onFailure: (failure) {
+        setState(() {
+          _konnectState = _KonnectPaymentState.failed;
+          _errorMessage = failure.message;
+        });
+      },
+    );
+  }
+
+  /// Opens the Konnect gateway in a full-screen in-app WebView.
+  Future<void> _openKonnectGateway({
+    required String? reservationId,
+    required String? depositUrl,
+    required int? depositPaymentId,
+  }) async {
+    if (depositUrl == null || reservationId == null) {
+      setState(() {
+        _konnectState = _KonnectPaymentState.failed;
+        _errorMessage =
+            'No payment URL received from server. Please retry.';
+      });
+      return;
+    }
+
+    _pendingReservationId = reservationId;
+    _pendingDepositPaymentId = depositPaymentId;
+
+    setState(() => _konnectState = _KonnectPaymentState.openingGateway);
+
+    final result = await Navigator.of(context).push<PaymentWebViewResult>(
+      MaterialPageRoute(
+        builder: (_) => PaymentWebViewScreen(paymentUrl: depositUrl),
+      ),
+    );
+
+    if (!mounted) return;
+
+    switch (result) {
+      case PaymentWebViewResult.success:
+        // Gateway confirmed payment via redirect — verify with server.
+        await _verifyPayment();
+      case PaymentWebViewResult.failure:
+        // Gateway explicitly signalled failure.
+        setState(() {
+          _konnectState = _KonnectPaymentState.failed;
+          _errorMessage =
+              'Payment failed. Please try again or choose another method.';
+        });
+      case PaymentWebViewResult.dismissed:
+      case null:
+        // User closed the WebView without completing payment — go back
+        // to the summary so they can retry. No verification needed.
+        setState(() {
+          _konnectState = _KonnectPaymentState.idle;
+          _errorMessage = null;
+        });
+    }
+  }
+
+
+  /// Calls the server to confirm the payment status.
+  Future<void> _verifyPayment() async {
+    setState(() => _konnectState = _KonnectPaymentState.verifying);
+
+    final repository = locator<ReservationRepository>();
+    final verifyResult = await repository.verifyPayment(
+      _pendingReservationId!,
+      _pendingDepositPaymentId?.toString() ?? '',
+    );
+
+    if (!mounted) return;
+
+    verifyResult.fold(
+      onSuccess: (status) {
+        if (status == 'paid' || status == 'completed') {
+          setState(() => _konnectState = _KonnectPaymentState.success);
+        } else {
+          setState(() {
+            _konnectState = _KonnectPaymentState.idle;
+            _errorMessage =
+                'Payment not yet confirmed (status: $status). '
+                'You can check your bookings.';
+          });
+        }
+      },
+      onFailure: (failure) {
+        setState(() {
+          _konnectState = _KonnectPaymentState.failed;
+          _errorMessage = failure.message;
+        });
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    switch (_konnectState) {
+      case _KonnectPaymentState.processingReservation:
+        return _LoadingView(message: 'Creating reservation...');
+      case _KonnectPaymentState.openingGateway:
+        return _LoadingView(message: 'Opening payment gateway...');
+      case _KonnectPaymentState.verifying:
+        return _LoadingView(message: 'Verifying payment...');
+      case _KonnectPaymentState.success:
+        return _SuccessView(
+          onContinue: () => context.push(
+            '/booking-success',
+            extra: widget.viewModel.selectedActivity,
+          ),
+        );
+      case _KonnectPaymentState.failed:
+        return _FailedView(
+          message: _errorMessage ?? 'An error occurred.',
+          onRetry: () => setState(() {
+            _konnectState = _KonnectPaymentState.idle;
+            _errorMessage = null;
+          }),
+        );
+      case _KonnectPaymentState.idle:
+        return _IdleView(
+          viewModel: widget.viewModel,
+          onPay: _handlePayment,
+          errorMessage: _errorMessage,
+        );
+    }
+  }
+}
+
+/// Full-screen loading state — shown during server calls and WebView open.
+class _LoadingView extends StatelessWidget {
+  final String message;
+
+  const _LoadingView({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const CircularProgressIndicator(),
+          const SizedBox(height: 24),
+          Text(
+            message,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Full-screen success state — mirrors the plan payment success screen.
+class _SuccessView extends StatelessWidget {
+  final VoidCallback onContinue;
+
+  const _SuccessView({required this.onContinue});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Icon(
+            Symbols.check_circle,
+            size: 100,
+            color: theme.colorScheme.primary,
+          ),
+          const SizedBox(height: 32),
+          Text(
+            'PAYMENT SUCCESSFUL',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontFamily: AppConstants.displayFontFamily,
+              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Your booking deposit has been confirmed.',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 48),
+          ElevatedButton(
+            onPressed: onContinue,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              minimumSize: const Size(double.infinity, 56),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: const Text(
+              'VIEW MY BOOKING',
+              style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Full-screen failure state — shows error message with a retry button.
+class _FailedView extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _FailedView({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Icon(Symbols.error, size: 100, color: theme.colorScheme.error),
+          const SizedBox(height: 32),
+          Text(
+            'PAYMENT FAILED',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontFamily: AppConstants.displayFontFamily,
+              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.error,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 48),
+          ElevatedButton(
+            onPressed: onRetry,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.surface,
+              foregroundColor: theme.colorScheme.onSurface,
+              minimumSize: const Size(double.infinity, 56),
+              side: BorderSide(color: theme.colorScheme.outlineVariant),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+            ),
+            child: const Text(
+              'TRY AGAIN',
+              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The default idle view — summary card + payment method selector + pay button.
+class _IdleView extends StatelessWidget {
+  final BookingViewModel viewModel;
+  final VoidCallback onPay;
+  final String? errorMessage;
+
+  const _IdleView({
+    required this.viewModel,
+    required this.onPay,
+    required this.errorMessage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Expanded(
@@ -22,36 +410,61 @@ class PaymentStep extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SectionTitle(
-                  title: AppLocalizations.of(context)!.bookingSummaryTitle,
-                ),
+                _SectionTitle(title: l10n.bookingSummaryTitle),
                 _SummaryCard(viewModel: viewModel),
                 const SizedBox(height: 32),
-                _SectionTitle(
-                  title: AppLocalizations.of(context)!.bookingPaymentTitle,
-                ),
+                _SectionTitle(title: l10n.bookingPaymentTitle),
                 _PaymentMethodSelector(viewModel: viewModel),
+                if (errorMessage != null) ...[
+                  const SizedBox(height: 16),
+                  _ErrorBanner(message: errorMessage!),
+                ],
               ],
             ),
           ),
         ),
         _BottomPayButton(
-          onPressed: () async {
-            final success = await viewModel.makeReservation();
-            if (!success || !context.mounted) return;
-
-            if (viewModel.requiresDeposit) {
-              context.push('/payment/${viewModel.createdReservationId}');
-            } else {
-              context.push(
-                '/booking-success',
-                extra: viewModel.selectedActivity,
-              );
-            }
-          },
-          price: viewModel.priceToPay,
+          onPressed: onPay,
+          price: viewModel.depositAmount,
+          isLoading: false,
         ),
       ],
+    );
+  }
+}
+
+class _ErrorBanner extends StatelessWidget {
+  final String message;
+
+  const _ErrorBanner({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Symbols.error,
+            size: 18,
+            color: theme.colorScheme.onErrorContainer,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onErrorContainer,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -182,6 +595,13 @@ class _SummaryCard extends StatelessWidget {
             value:
                 '${viewModel.projectedPoints} ${AppLocalizations.of(context)!.commonPointsShort}',
           ),
+          const SizedBox(height: 12),
+          _SummaryRow(
+            icon: Symbols.payments,
+            label: '10% Deposit Required',
+            value:
+                '${viewModel.depositAmount.toStringAsFixed(2)} ${activity?.currency ?? ''}',
+          ),
         ],
       ),
     );
@@ -257,6 +677,7 @@ class _PaymentMethodSelector extends StatelessWidget {
         _PaymentOption(
           icon: Symbols.credit_card,
           label: AppLocalizations.of(context)!.bookingMethodCard,
+          subtitle: 'Bank Cards, E-Dinar, Wallets',
           isSelected:
               viewModel.paymentMethod == AppConstants.paymentMethodCardId,
           onTap: () =>
@@ -264,8 +685,9 @@ class _PaymentMethodSelector extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _PaymentOption(
-          icon: Symbols.account_balance_wallet,
+          icon: Symbols.stars,
           label: AppLocalizations.of(context)!.bookingMethodWallet,
+          subtitle: 'Use your accumulated loyalty points',
           isSelected:
               viewModel.paymentMethod == AppConstants.paymentMethodWalletId,
           onTap: () =>
@@ -279,12 +701,14 @@ class _PaymentMethodSelector extends StatelessWidget {
 class _PaymentOption extends StatelessWidget {
   final IconData icon;
   final String label;
+  final String subtitle;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _PaymentOption({
     required this.icon,
     required this.label,
+    required this.subtitle,
     required this.isSelected,
     required this.onTap,
   });
@@ -295,41 +719,78 @@ class _PaymentOption extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
+          color: isSelected
+              ? theme.colorScheme.primary.withValues(alpha: 0.06)
+              : theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected
                 ? theme.colorScheme.primary
                 : theme.colorScheme.outline.withValues(alpha: 0.12),
+            width: isSelected ? 2 : 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
-            ),
-            const SizedBox(width: 16),
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
                 color: isSelected
-                    ? theme.colorScheme.onSurface
+                    ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                    : theme.colorScheme.surfaceContainerHighest,
+              ),
+              child: Icon(
+                icon,
+                size: 22,
+                color: isSelected
+                    ? theme.colorScheme.primary
                     : theme.colorScheme.onSurfaceVariant,
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isSelected
+                          ? theme.colorScheme.onSurface
+                          : theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
             if (isSelected)
               Icon(
                 Symbols.check_circle,
                 color: theme.colorScheme.primary,
-                size: 20,
+                size: 22,
+              )
+            else
+              Icon(
+                Icons.radio_button_unchecked,
+                color: theme.colorScheme.outline.withValues(alpha: 0.4),
+                size: 22,
               ),
           ],
         ),
@@ -339,10 +800,15 @@ class _PaymentOption extends StatelessWidget {
 }
 
 class _BottomPayButton extends StatelessWidget {
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double price;
+  final bool isLoading;
 
-  const _BottomPayButton({required this.onPressed, required this.price});
+  const _BottomPayButton({
+    required this.onPressed,
+    required this.price,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -364,10 +830,31 @@ class _BottomPayButton extends StatelessWidget {
           onPressed: onPressed,
           style: ElevatedButton.styleFrom(
             minimumSize: const Size(double.infinity, 56),
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: theme.colorScheme.onPrimary,
+            disabledBackgroundColor: theme.colorScheme.primary.withValues(
+              alpha: 0.5,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
           ),
-          child: Text(
-            '${AppLocalizations.of(context)!.bookingPay} — $price ${AppLocalizations.of(context)!.bookingCurrency}',
-          ),
+          child: isLoading
+              ? const SizedBox(
+                  height: 22,
+                  width: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  '${AppLocalizations.of(context)!.bookingPay} 10% Deposit — ${price.toStringAsFixed(2)} ${AppLocalizations.of(context)!.bookingCurrency}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.8,
+                  ),
+                ),
         ),
       ),
     );

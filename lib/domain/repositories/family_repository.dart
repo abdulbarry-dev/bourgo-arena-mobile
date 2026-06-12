@@ -68,7 +68,8 @@ abstract interface class FamilyRepository {
   });
 
   /// GET /family/children/{member}/sessions
-  Future<Result<PaginatedResult<CourseSession>, Failure>> getChildAvailableSessions({
+  Future<Result<PaginatedResult<CourseSession>, Failure>>
+  getChildAvailableSessions({
     required String childId,
     int page = 1,
     int perPage = 15,
@@ -103,7 +104,8 @@ abstract interface class FamilyRepository {
   });
 
   /// GET /family/children/{member}/completed
-  Future<Result<PaginatedResult<CompletedItem>, Failure>> getChildCompletedItems({
+  Future<Result<PaginatedResult<CompletedItem>, Failure>>
+  getChildCompletedItems({
     required String childId,
     int page = 1,
     int perPage = 15,

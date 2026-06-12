@@ -317,11 +317,7 @@ class _MembersList extends StatelessWidget {
                   )
                   .animate(delay: (index.clamp(0, 8) * 50).ms)
                   .fadeIn(duration: 350.ms)
-                  .slideY(
-                    begin: 0.08,
-                    end: 0,
-                    curve: Curves.easeOutCubic,
-                  );
+                  .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic);
             },
           ),
         ),

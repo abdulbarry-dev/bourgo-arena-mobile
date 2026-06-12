@@ -547,16 +547,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       _isActionLoading,
       _isCheckedIn,
       _isRegistered,
-      _event!
+      _event!,
     )) {
       (true, _, _, _) => ('', null),
       (_, true, _, _) => ('CHECKED IN', null),
-      (_, _, true, final e)
-          when e.requiresCheckIn && _isEventDay() =>
-        ('CHECK IN', _checkIn),
+      (_, _, true, final e) when e.requiresCheckIn && _isEventDay() => (
+        'CHECK IN',
+        _checkIn,
+      ),
       (_, _, true, final e) when e.status == 'open' => ('WITHDRAW', _withdraw),
-      (_, _, false, final e) when e.isRegistrationOpen =>
-        ('REGISTER FOR EVENT', _register),
+      (_, _, false, final e) when e.isRegistrationOpen => (
+        'REGISTER FOR EVENT',
+        _register,
+      ),
       _ => ('REGISTRATION CLOSED', null),
     };
 

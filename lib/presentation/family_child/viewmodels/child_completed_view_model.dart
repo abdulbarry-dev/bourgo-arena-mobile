@@ -70,7 +70,9 @@ class ChildCompletedViewModel extends BaseViewModel {
           _currentPage = paginated.currentPage;
         },
         failure: (failure) {
-          developer.log('Failed to load more completed items: ${failure.message}');
+          developer.log(
+            'Failed to load more completed items: ${failure.message}',
+          );
         },
       );
     } catch (e) {

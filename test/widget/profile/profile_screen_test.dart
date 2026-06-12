@@ -225,18 +225,18 @@ void main() {
         AuthSession(user: testUser, state: AuthState.authenticated),
       ),
     );
-    when(() => mockGetUserProfileUseCase()).thenAnswer(
-      (_) async => Result.success(testUser),
-    );
-    when(() => mockGetOngoingReservationsUseCase()).thenAnswer(
-      (_) async => const Success([]),
-    );
-    when(() => mockGetFullPaymentHistoryUseCase.execute()).thenAnswer(
-      (_) async => const Success([]),
-    );
-    when(() => mockGetMyEventsUseCase()).thenAnswer(
-      (_) async => const Success([]),
-    );
+    when(
+      () => mockGetUserProfileUseCase(),
+    ).thenAnswer((_) async => Result.success(testUser));
+    when(
+      () => mockGetOngoingReservationsUseCase(),
+    ).thenAnswer((_) async => const Success([]));
+    when(
+      () => mockGetFullPaymentHistoryUseCase.execute(),
+    ).thenAnswer((_) async => const Success([]));
+    when(
+      () => mockGetMyEventsUseCase(),
+    ).thenAnswer((_) async => const Success([]));
   });
 
   tearDown(() {

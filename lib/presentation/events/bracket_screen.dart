@@ -232,9 +232,7 @@ class _MatchCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: appColors.bgElevated,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: appColors.bgBorder.withValues(alpha: 0.5),
-        ),
+        border: Border.all(color: appColors.bgBorder.withValues(alpha: 0.5)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -249,7 +247,10 @@ class _MatchCard extends StatelessWidget {
               appColors: appColors,
             ),
             const SizedBox(height: 8),
-            Container(height: 1, color: appColors.bgBorder.withValues(alpha: 0.3)),
+            Container(
+              height: 1,
+              color: appColors.bgBorder.withValues(alpha: 0.3),
+            ),
             const SizedBox(height: 8),
             _ParticipantRow(
               name: p2?.name ?? 'TBD',
@@ -318,7 +319,9 @@ class _ParticipantRow extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: isWinner ? appColors.statusSuccess : theme.colorScheme.onSurfaceVariant,
+                color: isWinner
+                    ? appColors.statusSuccess
+                    : theme.colorScheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -351,10 +354,7 @@ class _MatchStatusChip extends StatelessWidget {
   final String label;
   final Color color;
 
-  const _MatchStatusChip({
-    required this.label,
-    required this.color,
-  });
+  const _MatchStatusChip({required this.label, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -365,10 +365,7 @@ class _MatchStatusChip extends StatelessWidget {
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(4),
       ),
-      child: Text(
-        label,
-        style: typography.overline?.copyWith(color: color),
-      ),
+      child: Text(label, style: typography.overline?.copyWith(color: color)),
     );
   }
 }

@@ -80,25 +80,29 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       return;
     }
 
-    final result = await Navigator.of(context).push<bool>(
+    final result = await Navigator.of(context).push<PaymentWebViewResult>(
       MaterialPageRoute(
         builder: (context) => PaymentWebViewScreen(paymentUrl: url),
       ),
     );
 
-    if (result == true) {
-      _viewModel.verifyPayment();
-    } else {
+    // Explicit gateway failure — no need to verify.
+    if (result == PaymentWebViewResult.failure) {
       _viewModel.reset();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Payment cancelled or failed.'),
+            content: const Text('Payment failed. Please try again.'),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
+      return;
     }
+
+    // For success redirects and manual dismissal, always verify —
+    // the payment may have gone through before the user closed the screen.
+    _viewModel.verifyPayment();
   }
 
   @override

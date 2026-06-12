@@ -48,7 +48,8 @@ class ChildProfile {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       status: status ?? this.status,
       isArchived: isArchived ?? this.isArchived,
-      hasActiveSubscription: hasActiveSubscription ?? this.hasActiveSubscription,
+      hasActiveSubscription:
+          hasActiveSubscription ?? this.hasActiveSubscription,
       activeSubscription: activeSubscription ?? this.activeSubscription,
       createdAt: createdAt ?? this.createdAt,
     );

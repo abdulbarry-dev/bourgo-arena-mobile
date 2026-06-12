@@ -19,8 +19,8 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
   ChildSubscriptionsViewModel({
     required GetChildSubscriptionsUseCase getChildSubscriptionsUseCase,
     required BuyChildSubscriptionUseCase buyChildSubscriptionUseCase,
-  })  : _getChildSubscriptionsUseCase = getChildSubscriptionsUseCase,
-        _buyChildSubscriptionUseCase = buyChildSubscriptionUseCase;
+  }) : _getChildSubscriptionsUseCase = getChildSubscriptionsUseCase,
+       _buyChildSubscriptionUseCase = buyChildSubscriptionUseCase;
 
   List<Subscription> get subscriptions => _subscriptions;
   bool get isLoading => _isLoading;
@@ -35,9 +35,7 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
     notifyListeners();
 
     try {
-      final result = await _getChildSubscriptionsUseCase(
-        childId: childId,
-      );
+      final result = await _getChildSubscriptionsUseCase(childId: childId);
       result.when(
         success: (paginated) {
           _subscriptions = paginated.data;
@@ -47,7 +45,9 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
         },
         failure: (failure) {
           setErrorMessage(failure.message);
-          developer.log('Failed to load child subscriptions: ${failure.message}');
+          developer.log(
+            'Failed to load child subscriptions: ${failure.message}',
+          );
         },
       );
     } catch (e) {
@@ -76,7 +76,9 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
           _currentPage = paginated.currentPage;
         },
         failure: (failure) {
-          developer.log('Failed to load more subscriptions: ${failure.message}');
+          developer.log(
+            'Failed to load more subscriptions: ${failure.message}',
+          );
         },
       );
     } catch (e) {

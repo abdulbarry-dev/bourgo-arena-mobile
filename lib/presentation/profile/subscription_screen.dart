@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -93,8 +92,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                                 ),
                             SizedBox(height: spacing.xl),
                             _ServiceSection(
-                              subscription: subscriptions[i].subscription,
-                            )
+                                  subscription: subscriptions[i].subscription,
+                                )
                                 .animate(delay: 200.ms)
                                 .fade(duration: 400.ms)
                                 .slideY(
@@ -175,7 +174,6 @@ class _SubscriptionCard extends StatelessWidget {
     required this.subscription,
     required this.appColors,
   });
-
 
   String _statusLabel(String status) {
     switch (status.toLowerCase()) {
@@ -638,45 +636,6 @@ class _PaymentSection extends StatelessWidget {
                       ),
                   ],
                 ),
-              if (subscription.receiptUrl != null) ...[
-                SizedBox(height: spacing.sm),
-                const Divider(),
-                SizedBox(height: spacing.sm),
-                GestureDetector(
-                  onTap: () async {
-                    final uri = Uri.tryParse(subscription.receiptUrl!);
-                    if (uri != null && await canLaunchUrl(uri)) {
-                      await launchUrl(
-                        uri,
-                        mode: LaunchMode.externalApplication,
-                      );
-                    }
-                  },
-                  child: Row(
-                    children: [
-                      Icon(
-                        Symbols.receipt_long,
-                        size: 18,
-                        color: theme.colorScheme.primary,
-                      ),
-                      SizedBox(width: spacing.xs),
-                      Text(
-                        'Voir le reçu',
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          color: theme.colorScheme.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const Spacer(),
-                      Icon(
-                        Symbols.open_in_new,
-                        size: 16,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ],
           ),
         ),
@@ -699,11 +658,7 @@ class _PaymentMethodBadge extends StatelessWidget {
   (IconData, Color, String) _paymentMethodInfo() {
     switch (method.toLowerCase()) {
       case 'loyalty_points':
-        return (
-          Symbols.stars,
-          const Color(0xFFF59E0B),
-          'Fidelity',
-        );
+        return (Symbols.stars, const Color(0xFFF59E0B), 'Fidelity');
       case 'konnect':
         return (
           Symbols.account_balance_wallet,
@@ -711,11 +666,7 @@ class _PaymentMethodBadge extends StatelessWidget {
           'Konnect',
         );
       case 'flouci':
-        return (
-          Symbols.credit_card_gear,
-          const Color(0xFF10B981),
-          'Flouci',
-        );
+        return (Symbols.credit_card_gear, const Color(0xFF10B981), 'Flouci');
       case 'manual_admin':
         return (
           Symbols.admin_panel_settings,

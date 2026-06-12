@@ -89,10 +89,7 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
     if (_isLoading) {
       return AppShimmer(
         child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 24,
-            vertical: 16,
-          ),
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: List.generate(5, (_) {
               return Padding(

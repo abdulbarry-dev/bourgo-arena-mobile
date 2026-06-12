@@ -3,6 +3,9 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activities_view_model.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/skeleton_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
@@ -18,33 +21,17 @@ class ActivitiesListScreen extends StatefulWidget {
 }
 
 class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
-  List<Activity> _activities = [];
-  bool _isLoading = true;
-  String? _error;
+  late final ActivitiesViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _load();
-  }
-
-  Future<void> _load() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-    final result = await locator<GetActivitiesUseCase>()();
-    if (!mounted) return;
-    result.when(
-      success: (data) => setState(() {
-        _activities = data;
-        _isLoading = false;
-      }),
-      failure: (f) => setState(() {
-        _error = f.message;
-        _isLoading = false;
-      }),
+    _viewModel = ActivitiesViewModel(
+      getActivitiesUseCase: locator<GetActivitiesUseCase>(),
+      getUserBookingsUseCase: locator<GetUserBookingsUseCase>(),
+      authStateNotifier: locator<AuthStateNotifier>(),
     );
+    _viewModel.loadData();
   }
 
   @override
@@ -72,12 +59,15 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
           ),
         ),
       ),
-      body: _buildBody(),
+      body: ListenableBuilder(
+        listenable: _viewModel,
+        builder: (context, _) => _buildBody(),
+      ),
     );
   }
 
   Widget _buildBody() {
-    if (_isLoading) {
+    if (_viewModel.isLoading) {
       return ListView(
         padding: const EdgeInsets.all(24),
         children: List.generate(
@@ -87,37 +77,40 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
       );
     }
 
-    if (_error != null) {
+    if (_viewModel.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              _error!,
+              _viewModel.errorMessage!,
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _load, child: const Text('RETRY')),
+            ElevatedButton(
+              onPressed: _viewModel.loadData,
+              child: const Text('RETRY'),
+            ),
           ],
         ),
       );
     }
 
-    if (_activities.isEmpty) {
+    if (_viewModel.activities.isEmpty) {
       return RefreshIndicator(
-        onRefresh: _load,
+        onRefresh: _viewModel.loadData,
         child: ListView(children: const []),
       );
     }
 
     return RefreshIndicator(
-      onRefresh: _load,
+      onRefresh: _viewModel.loadData,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        itemCount: _activities.length,
+        itemCount: _viewModel.activities.length,
         itemBuilder: (context, index) {
-          final activity = _activities[index];
+          final activity = _viewModel.activities[index];
           return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: PressableCard(

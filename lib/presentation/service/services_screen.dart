@@ -123,7 +123,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 )
               : null,
           filled: true,
-          fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+          fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.4,
+          ),
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
@@ -202,7 +204,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
               ),
               child: const Text(
                 'RETRY',
-                style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+                style: TextStyle(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
               ),
             ),
           ],
@@ -224,7 +229,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _viewModel.searchQuery.isNotEmpty || _viewModel.filterType != ServiceFilterType.all
+              _viewModel.searchQuery.isNotEmpty ||
+                      _viewModel.filterType != ServiceFilterType.all
                   ? 'No matching services'
                   : 'No services available',
               style: theme.textTheme.titleMedium?.copyWith(
@@ -235,11 +241,14 @@ class _ServicesScreenState extends State<ServicesScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _viewModel.searchQuery.isNotEmpty || _viewModel.filterType != ServiceFilterType.all
+              _viewModel.searchQuery.isNotEmpty ||
+                      _viewModel.filterType != ServiceFilterType.all
                   ? 'Try adjusting your search or filters.'
                   : 'Check back soon for new services.',
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.7,
+                ),
               ),
             ),
           ],
@@ -264,11 +273,15 @@ class _ServicesScreenState extends State<ServicesScreen> {
           }
           final service = services[index];
           return Padding(
-            padding: const EdgeInsets.only(bottom: 16),
-            child: _ServiceCard(service: service, onTap: () {
-              context.push('/services/${service.id}', extra: service);
-            }),
-          ).animate(delay: (index * 50).ms)
+                padding: const EdgeInsets.only(bottom: 16),
+                child: _ServiceCard(
+                  service: service,
+                  onTap: () {
+                    context.push('/services/${service.id}', extra: service);
+                  },
+                ),
+              )
+              .animate(delay: (index * 50).ms)
               .fade(duration: 400.ms)
               .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
         },
@@ -276,7 +289,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 
-  bool _allServicesLoaded() => !_viewModel.isLoading && _viewModel.state == ServicesLoadState.loaded;
+  bool _allServicesLoaded() =>
+      !_viewModel.isLoading && _viewModel.state == ServicesLoadState.loaded;
 
   Widget _buildSkeletonLoading(ThemeData theme) {
     return ListView(
@@ -352,10 +366,14 @@ class _ServiceCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.3,
+          ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            color: theme.colorScheme.surfaceContainerHighest.withValues(
+              alpha: 0.5,
+            ),
           ),
         ),
         clipBehavior: Clip.antiAlias,
@@ -378,7 +396,9 @@ class _ServiceCard extends StatelessWidget {
                       child: Icon(
                         Symbols.grid_view,
                         size: 48,
-                        color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.25,
+                        ),
                       ),
                     ),
                   Positioned.fill(
@@ -419,7 +439,8 @@ class _ServiceCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (service.description != null && service.description!.isNotEmpty)
+                  if (service.description != null &&
+                      service.description!.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: Text(
@@ -436,21 +457,30 @@ class _ServiceCard extends StatelessWidget {
                     Wrap(
                       spacing: 6,
                       runSpacing: 4,
-                      children: stats.map((stat) => Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          stat,
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.primary,
-                          ),
-                        ),
-                      )).toList(),
+                      children: stats
+                          .map(
+                            (stat) => Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.1,
+                                ),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                stat,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: theme.colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
                 ],
               ),
@@ -476,7 +506,9 @@ class _SkeletonServiceCard extends StatelessWidget {
         highlightColor: theme.colorScheme.onSurface.withValues(alpha: 0.1),
         child: Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            color: theme.colorScheme.surfaceContainerHighest.withValues(
+              alpha: 0.3,
+            ),
             borderRadius: BorderRadius.circular(20),
           ),
           clipBehavior: Clip.antiAlias,
@@ -511,17 +543,20 @@ class _SkeletonServiceCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     Row(
-                      children: List.generate(3, (_) => Padding(
-                        padding: const EdgeInsets.only(right: 8),
-                        child: Container(
-                          width: 60,
-                          height: 22,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(6),
+                      children: List.generate(
+                        3,
+                        (_) => Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Container(
+                            width: 60,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
                           ),
                         ),
-                      )),
+                      ),
                     ),
                   ],
                 ),

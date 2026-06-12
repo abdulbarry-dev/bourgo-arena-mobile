@@ -80,23 +80,12 @@ class _VerifyAdditionalMethodScreenState
 
       result.when(
         success: (status) {
-          // If onboarding is incomplete, hand off to the normal onboarding
-          // verification flow instead of staying on the additional verification
-          // screen used for regular login sessions.
-          if (!status.onboardingCompleted) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (!mounted) return;
-              context.push(
-                '/verification-method',
-                extra: _buildOnboardingData(),
-              );
-            });
-            return;
-          }
-
+          // Only update the local contact fields and unverified method.
+          // Routing decisions (including onboarding redirects) are the
+          // router's responsibility — never push from here.
           setState(() {
-            _email = status.email;
-            _phone = status.phone;
+            _email = status.email ?? _email;
+            _phone = status.phone ?? _phone;
             if (!status.emailVerified) {
               _unverifiedMethod = 'email';
             } else if (!status.phoneVerified) {
@@ -117,21 +106,6 @@ class _VerifyAdditionalMethodScreenState
     setState(() {
       _isLoading = value;
     });
-  }
-
-  Map<String, dynamic> _buildOnboardingData() {
-    final user = widget.authStateNotifier.session.user;
-
-    return {
-      'firstName': user?.firstName ?? '',
-      'lastName': user?.lastName ?? '',
-      'email': _email ?? user?.email ?? '',
-      'phone': _phone ?? user?.phone ?? '',
-      'gender': user?.gender,
-      'birthDate': user?.birthDate,
-      'isParentAccount': user?.isParentAccount ?? false,
-      'familyMembers': user?.children ?? const [],
-    };
   }
 
   void _verifyNow() async {

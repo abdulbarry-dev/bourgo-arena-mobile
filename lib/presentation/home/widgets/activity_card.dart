@@ -43,15 +43,23 @@ class ActivityCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildImageSection(theme, appColors),
-            _buildContentSection(theme, appColors),
+            _ImageSection(activity: activity),
+            _ContentSection(activity: activity),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildImageSection(ThemeData theme, AppColors appColors) {
+class _ImageSection extends StatelessWidget {
+  final Activity activity;
+
+  const _ImageSection({required this.activity});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SizedBox(
       height: 180,
       child: Stack(
@@ -92,8 +100,17 @@ class ActivityCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildContentSection(ThemeData theme, AppColors appColors) {
+class _ContentSection extends StatelessWidget {
+  final Activity activity;
+
+  const _ContentSection({required this.activity});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(

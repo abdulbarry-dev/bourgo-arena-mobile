@@ -108,7 +108,11 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
     );
   }
 
-  Widget _buildDateRangePicker(ThemeData theme, AppSpacing spacing, AppColors appColors) {
+  Widget _buildDateRangePicker(
+    ThemeData theme,
+    AppSpacing spacing,
+    AppColors appColors,
+  ) {
     return Container(
       padding: EdgeInsets.all(spacing.md),
       decoration: BoxDecoration(
@@ -124,12 +128,21 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                 AppHaptics.selection();
                 _pickDate(true);
               },
-              child: _DateChip(label: 'FROM', date: _toIsoDate(_from), theme: theme, spacing: spacing),
+              child: _DateChip(
+                label: 'FROM',
+                date: _toIsoDate(_from),
+                theme: theme,
+                spacing: spacing,
+              ),
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: spacing.sm),
-            child: Icon(Symbols.arrow_forward, size: 16, color: theme.colorScheme.onSurfaceVariant),
+            child: Icon(
+              Symbols.arrow_forward,
+              size: 16,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
           Expanded(
             child: GestureDetector(
@@ -137,7 +150,12 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                 AppHaptics.selection();
                 _pickDate(false);
               },
-              child: _DateChip(label: 'TO', date: _toIsoDate(_to), theme: theme, spacing: spacing),
+              child: _DateChip(
+                label: 'TO',
+                date: _toIsoDate(_to),
+                theme: theme,
+                spacing: spacing,
+              ),
             ),
           ),
         ],
@@ -176,8 +194,9 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
             Container(
               height: 64,
               decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest
-                    .withValues(alpha: 0.3),
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
@@ -189,8 +208,9 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                 child: Container(
                   padding: EdgeInsets.all(spacing.lg),
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.surfaceContainerHighest
-                        .withValues(alpha: 0.3),
+                    color: theme.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.3,
+                    ),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -222,42 +242,49 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: spacing.xxl),
-        child: Column(
-          children: [
-            Container(
-              width: 112,
-              height: 112,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.15),
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+            child: Column(
+              children: [
+                Container(
+                  width: 112,
+                  height: 112,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Icon(
+                    Symbols.schedule,
+                    size: 56,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
-              ),
-              child: Icon(
-                Symbols.schedule,
-                size: 56,
-                color: theme.colorScheme.primary,
-              ),
+                SizedBox(height: spacing.xl),
+                Text(
+                  'No events scheduled',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                SizedBox(height: spacing.sm),
+                Text(
+                  'No courses or activities in this date range.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: spacing.xl),
-            Text('No events scheduled',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-            SizedBox(height: spacing.sm),
-            Text('No courses or activities in this date range.',
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideY(
-          begin: 0.08,
-          end: 0,
-          curve: Curves.easeOutQuad,
-        );
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 300.ms)
+        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -267,7 +294,12 @@ class _DateChip extends StatelessWidget {
   final ThemeData theme;
   final AppSpacing spacing;
 
-  const _DateChip({required this.label, required this.date, required this.theme, required this.spacing});
+  const _DateChip({
+    required this.label,
+    required this.date,
+    required this.theme,
+    required this.spacing,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -279,16 +311,28 @@ class _DateChip extends StatelessWidget {
         curve: Curves.easeOutCubic,
         padding: EdgeInsets.all(spacing.sm),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(
+            alpha: 0.5,
+          ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           children: [
-            Text(label, style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.w900, letterSpacing: 1.0, color: theme.colorScheme.onSurfaceVariant,
-            )),
+            Text(
+              label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.0,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
             SizedBox(height: spacing.xxs),
-            Text(date, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(
+              date,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ],
         ),
       ),
@@ -314,85 +358,108 @@ class _ScheduleItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isReservation = item.type == ScheduleItemType.reservation;
-    final color = isReservation ? appColors.accentActivity : theme.colorScheme.primary;
+    final color = isReservation
+        ? appColors.accentActivity
+        : theme.colorScheme.primary;
 
     return Container(
-      padding: EdgeInsets.all(spacing.lg),
-      decoration: BoxDecoration(
-        color: appColors.bgElevated,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: appColors.bgBorder),
-        gradient: LinearGradient(
-          colors: [color.withValues(alpha: 0.05), Colors.transparent],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 4,
-            height: 56,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(2),
+          padding: EdgeInsets.all(spacing.lg),
+          decoration: BoxDecoration(
+            color: appColors.bgElevated,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: appColors.bgBorder),
+            gradient: LinearGradient(
+              colors: [color.withValues(alpha: 0.05), Colors.transparent],
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
             ),
           ),
-          SizedBox(width: spacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          child: Row(
+            children: [
+              Container(
+                width: 4,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              SizedBox(width: spacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(item.typeLabel.toUpperCase(),
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w900, color: color, fontSize: 9,
-                        )),
+                    Row(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: spacing.xs,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            item.typeLabel.toUpperCase(),
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: color,
+                              fontSize: 9,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: spacing.sm),
+                        if (item.isCompleted)
+                          Semantics(
+                            label: 'Completed',
+                            child: Icon(
+                              Symbols.check_circle,
+                              size: 14,
+                              color: appColors.statusSuccess,
+                            ),
+                          ),
+                        const Spacer(),
+                        Text(
+                          item.date,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: spacing.sm),
-                    if (item.isCompleted)
-                      Semantics(
-                        label: 'Completed',
-                        child: Icon(Symbols.check_circle,
-                            size: 14, color: appColors.statusSuccess),
-                      ),
-                    const Spacer(),
-                    Text(item.date, style: theme.textTheme.labelSmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    )),
-                  ],
-                ),
-                SizedBox(height: spacing.xs),
-                Text(item.name, style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                )),
-                SizedBox(height: spacing.xxs),
-                Row(
-                  children: [
-                    Icon(Symbols.schedule, size: 14, color: theme.colorScheme.onSurfaceVariant),
-                    SizedBox(width: spacing.xxs),
+                    SizedBox(height: spacing.xs),
                     Text(
-                      item.endTime != null
-                          ? '${item.startTime} - ${item.endTime}'
-                          : '${item.startTime} · ${item.durationMinutes} min',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      )),
+                      item.name,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: spacing.xxs),
+                    Row(
+                      children: [
+                        Icon(
+                          Symbols.schedule,
+                          size: 14,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        SizedBox(width: spacing.xxs),
+                        Text(
+                          item.endTime != null
+                              ? '${item.startTime} - ${item.endTime}'
+                              : '${item.startTime} · ${item.durationMinutes} min',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
-    )
+        )
         .animate(delay: (index.clamp(0, 8) * 50).ms)
         .fadeIn(duration: 350.ms)
         .slideY(begin: 0.08, end: 0, curve: Curves.easeOutCubic);

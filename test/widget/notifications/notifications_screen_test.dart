@@ -19,6 +19,8 @@ void main() {
     mockViewModel = MockNotificationsViewModel();
     when(() => mockViewModel.isLoading).thenReturn(true);
     when(() => mockViewModel.notifications).thenReturn([]);
+    when(() => mockViewModel.hasMore).thenReturn(false);
+    when(() => mockViewModel.isLoadingMore).thenReturn(false);
     when(() => mockViewModel.addListener(any())).thenReturn(null);
     when(() => mockViewModel.removeListener(any())).thenReturn(null);
   });

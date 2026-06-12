@@ -20,7 +20,11 @@ class SubscriptionManagementScreen extends StatefulWidget {
   final Subscription? currentSubscription;
   final String? childId;
 
-  const SubscriptionManagementScreen({super.key, this.currentSubscription, this.childId});
+  const SubscriptionManagementScreen({
+    super.key,
+    this.currentSubscription,
+    this.childId,
+  });
 
   @override
   State<SubscriptionManagementScreen> createState() =>
@@ -237,8 +241,13 @@ class _SubscriptionManagementScreenState
                       theme: theme,
                       appColors: appColors,
                       onTap: () {
-                        final childParam = widget.childId != null ? '?childId=${widget.childId}' : '';
-                        context.push('/plans/${plan.id}$childParam', extra: plan);
+                        final childParam = widget.childId != null
+                            ? '?childId=${widget.childId}'
+                            : '';
+                        context.push(
+                          '/plans/${plan.id}$childParam',
+                          extra: plan,
+                        );
                       },
                     )
                     .animate(delay: (index * 50).ms)

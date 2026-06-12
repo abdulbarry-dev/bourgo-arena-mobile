@@ -27,7 +27,8 @@ class ChildProfileModel {
   static SubscriptionModel? _activeSubFromJson(Map<String, dynamic>? json) {
     if (json == null) return null;
     final planId = (json['plan_id'] ?? json['plan']?['id'] ?? '').toString();
-    final planName = (json['plan_name'] ?? json['plan']?['name'] ?? '') as String;
+    final planName =
+        (json['plan_name'] ?? json['plan']?['name'] ?? '') as String;
     final planPrice = (json['plan']?['price'] as num?)?.toDouble() ?? 0.0;
 
     return SubscriptionModel(
@@ -42,7 +43,8 @@ class ChildProfileModel {
         hasAllCourses: json['plan']?['has_all_courses'] as bool?,
         service: json['plan']?['service'] != null
             ? PlanServiceModel.fromJson(
-                json['plan']!['service'] as Map<String, dynamic>)
+                json['plan']!['service'] as Map<String, dynamic>,
+              )
             : null,
       ),
       service: json['service'] != null

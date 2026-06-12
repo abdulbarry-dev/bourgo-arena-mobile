@@ -31,11 +31,7 @@ class AppSectionHeader extends StatelessWidget {
     return Row(
       children: [
         if (icon != null) ...[
-          Icon(
-            icon,
-            size: 18,
-            color: accentColor ?? theme.colorScheme.primary,
-          ),
+          Icon(icon, size: 18, color: accentColor ?? theme.colorScheme.primary),
           SizedBox(width: spacing.xs),
         ],
         Expanded(

@@ -547,7 +547,9 @@ class _CourseCard extends StatelessWidget {
               flex: 3,
               child: Container(
                 decoration: BoxDecoration(
-                  color: hasImage ? null : theme.colorScheme.surfaceContainerHighest,
+                  color: hasImage
+                      ? null
+                      : theme.colorScheme.surfaceContainerHighest,
                 ),
                 child: hasImage
                     ? PremiumNetworkImage(
@@ -558,7 +560,9 @@ class _CourseCard extends StatelessWidget {
                         child: Icon(
                           Symbols.school,
                           size: 32,
-                          color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.3,
+                          ),
                         ),
                       ),
               ),

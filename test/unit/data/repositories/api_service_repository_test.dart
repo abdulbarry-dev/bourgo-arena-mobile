@@ -87,13 +87,19 @@ void main() {
       check(service.id).equals(1);
       check(service.name).equals('Service A');
 
-      verify(() => mockApiClient.get('/services/1', fullResponse: true)).called(1);
+      verify(
+        () => mockApiClient.get('/services/1', fullResponse: true),
+      ).called(1);
     });
 
     test('getServices returns failure on exception', () async {
       // Arrange
       when(
-        () => mockApiClient.get('/services', fullResponse: true, queryParameters: any(named: 'queryParameters')),
+        () => mockApiClient.get(
+          '/services',
+          fullResponse: true,
+          queryParameters: any(named: 'queryParameters'),
+        ),
       ).thenThrow(const ServerException('Server error'));
 
       // Act

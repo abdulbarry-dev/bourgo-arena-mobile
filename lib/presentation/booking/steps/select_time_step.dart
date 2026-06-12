@@ -89,6 +89,7 @@ class SelectTimeStep extends StatelessWidget {
                   dayLabel: _dayNames[entry.key],
                   slots: entry.value,
                   selectedSlotId: viewModel.selectedSlot?.id,
+                  reservedSlotIds: viewModel.reservedSlotIds,
                   onSelectSlot: viewModel.selectSlot,
                 ),
             ],
@@ -206,12 +207,14 @@ class _DaySection extends StatelessWidget {
   final String dayLabel;
   final List<TimeSlot> slots;
   final String? selectedSlotId;
+  final Set<String> reservedSlotIds;
   final void Function(TimeSlot) onSelectSlot;
 
   const _DaySection({
     required this.dayLabel,
     required this.slots,
     required this.selectedSlotId,
+    required this.reservedSlotIds,
     required this.onSelectSlot,
   });
 
@@ -240,6 +243,8 @@ class _DaySection extends StatelessWidget {
             key: ValueKey(slot.id ?? slot.time),
             slot: slot,
             isSelected: selectedSlotId == slot.id,
+            isReservedByUser:
+                slot.id != null && reservedSlotIds.contains(slot.id),
             onTap: () => onSelectSlot(slot),
           ),
         ),
@@ -252,12 +257,16 @@ class _DaySection extends StatelessWidget {
 class _SlotTile extends StatelessWidget {
   final TimeSlot slot;
   final bool isSelected;
+
+  /// True when this slot is already reserved by the current user.
+  final bool isReservedByUser;
   final VoidCallback onTap;
 
   const _SlotTile({
     super.key,
     required this.slot,
     required this.isSelected,
+    required this.isReservedByUser,
     required this.onTap,
   });
 
@@ -272,12 +281,21 @@ class _SlotTile extends StatelessWidget {
     final appColors = theme.extension<AppColors>()!;
     final startFormatted = _formatTime(slot.startTime);
     final endFormatted = _formatTime(slot.endTime);
-    final isFullyBooked = slot.isFullyBooked || !slot.available;
+    // A slot reserved by the current user is always treated as
+    // unavailable for selection (even if capacity allows more bookings).
+    final isFullyBooked =
+        !isReservedByUser && (slot.isFullyBooked || !slot.available);
+    final isDisabled = isReservedByUser || isFullyBooked;
+
+    // Amber tint for "reserved by you", muted grey for fully booked.
+    final reservedByUserColor = theme.brightness == Brightness.dark
+        ? const Color(0xFFFFF8E1)
+        : const Color(0xFFFFF3E0);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: GestureDetector(
-        onTap: isFullyBooked ? null : onTap,
+        onTap: isDisabled ? null : onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
@@ -285,6 +303,8 @@ class _SlotTile extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected
                 ? theme.colorScheme.primary.withValues(alpha: 0.12)
+                : isReservedByUser
+                ? reservedByUserColor.withValues(alpha: 0.45)
                 : isFullyBooked
                 ? theme.colorScheme.surfaceContainerHighest.withValues(
                     alpha: 0.4,
@@ -294,6 +314,8 @@ class _SlotTile extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? theme.colorScheme.primary
+                  : isReservedByUser
+                  ? const Color(0xFFFFB300).withValues(alpha: 0.5)
                   : isFullyBooked
                   ? appColors.bgBorder.withValues(alpha: 0.5)
                   : appColors.bgBorder,
@@ -308,6 +330,8 @@ class _SlotTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? theme.colorScheme.primary
+                      : isReservedByUser
+                      ? const Color(0xFFFFB300).withValues(alpha: 0.18)
                       : isFullyBooked
                       ? theme.colorScheme.surfaceContainerHighest
                       : theme.colorScheme.primaryContainer.withValues(
@@ -318,12 +342,16 @@ class _SlotTile extends StatelessWidget {
                 child: Icon(
                   isSelected
                       ? Symbols.check_circle
+                      : isReservedByUser
+                      ? Symbols.lock
                       : isFullyBooked
                       ? Symbols.event_busy
                       : Symbols.schedule,
                   size: 20,
                   color: isSelected
                       ? theme.colorScheme.onPrimary
+                      : isReservedByUser
+                      ? const Color(0xFFFFB300)
                       : isFullyBooked
                       ? theme.colorScheme.onSurfaceVariant.withValues(
                           alpha: 0.4,
@@ -340,7 +368,11 @@ class _SlotTile extends StatelessWidget {
                       '$startFormatted - $endFormatted',
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: isFullyBooked
+                        color: isReservedByUser
+                            ? theme.colorScheme.onSurfaceVariant.withValues(
+                                alpha: 0.6,
+                              )
+                            : isFullyBooked
                             ? theme.colorScheme.onSurfaceVariant.withValues(
                                 alpha: 0.5,
                               )
@@ -352,7 +384,7 @@ class _SlotTile extends StatelessWidget {
                       Text(
                         '${slot.durationMinutes} min',
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: isFullyBooked
+                          color: isDisabled
                               ? theme.colorScheme.onSurfaceVariant.withValues(
                                   alpha: 0.35,
                                 )
@@ -365,7 +397,26 @@ class _SlotTile extends StatelessWidget {
                   ],
                 ),
               ),
-              if (slot.capacity != null && slot.bookedCount != null)
+              if (isReservedByUser)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFB300).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'RÉSERVÉ',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFFFFB300),
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                )
+              else if (slot.capacity != null && slot.bookedCount != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 10,

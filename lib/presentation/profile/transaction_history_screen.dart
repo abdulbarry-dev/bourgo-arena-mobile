@@ -4,7 +4,6 @@ import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/transaction_
 import 'package:bourgo_arena_mobile/presentation/profile/widgets/transaction_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class PaymentHistoryScreen extends StatefulWidget {
   final PaymentHistoryViewModel viewModel;
@@ -236,20 +235,8 @@ class _PaymentList extends StatelessWidget {
       itemCount: payments.length,
       itemBuilder: (context, index) {
         final payment = payments[index];
-        return TransactionTile(
-          payment: payment,
-          onTapReceipt: payment.receiptUrl != null
-              ? () => _openReceipt(context, payment.receiptUrl!)
-              : null,
-        );
+        return TransactionTile(payment: payment);
       },
     );
-  }
-
-  Future<void> _openReceipt(BuildContext context, String url) async {
-    final uri = Uri.tryParse(url);
-    if (uri != null && await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
   }
 }

@@ -65,7 +65,8 @@ class PremiumNetworkImage extends StatelessWidget {
               : null,
         ),
         child: Center(
-          child: errorIcon ??
+          child:
+              errorIcon ??
               Icon(
                 Symbols.imagesmode,
                 size: 24,

@@ -20,8 +20,8 @@ class ChildBookingsViewModel extends BaseViewModel {
   ChildBookingsViewModel({
     required GetChildBookingsUseCase getChildBookingsUseCase,
     required CompleteChildBookingUseCase completeChildBookingUseCase,
-  })  : _getChildBookingsUseCase = getChildBookingsUseCase,
-        _completeChildBookingUseCase = completeChildBookingUseCase;
+  }) : _getChildBookingsUseCase = getChildBookingsUseCase,
+       _completeChildBookingUseCase = completeChildBookingUseCase;
 
   List<ChildBooking> get bookings => _bookings;
   bool get isLoading => _isLoading;
@@ -29,10 +29,7 @@ class ChildBookingsViewModel extends BaseViewModel {
   String get filter => _filter;
   bool get hasMore => _pagination?.hasMore ?? false;
 
-  Future<void> load({
-    required String childId,
-    String filter = 'all',
-  }) async {
+  Future<void> load({required String childId, String filter = 'all'}) async {
     _childId = childId;
     _filter = filter;
     _isLoading = true;
