@@ -299,10 +299,8 @@ class FamilyManagementViewModel extends BaseViewModel {
 
         final enableResult = await _enableFamilyFeatureUseCase();
         final finalSuccess = enableResult.fold(
-          onSuccess: (_) {
-            // Justification: _user is checked non-null at the start of
-            // verifyFamilyAccountOtp.
-            _user = _user!.copyWith(isParentAccount: true);
+          onSuccess: (isParentAccount) {
+            _user = _user!.copyWith(isParentAccount: isParentAccount);
             _isOtpSent = false;
             _selectedOtpMethod = null;
             _selectedOtpIdentifier = null;

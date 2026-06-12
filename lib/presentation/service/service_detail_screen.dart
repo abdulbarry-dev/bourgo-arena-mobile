@@ -292,7 +292,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1,
-                  color: Colors.black,
+                  color: theme.colorScheme.onPrimary,
                 ),
               ),
             ),
@@ -499,7 +499,7 @@ class _PlanCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.amber.withValues(alpha: 0.15),
+                  color: appColors.accentCourse.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -507,7 +507,7 @@ class _PlanCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
-                    color: Colors.amber.shade700,
+                    color: appColors.accentCourse,
                     letterSpacing: 0.5,
                   ),
                 ),

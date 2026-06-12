@@ -6,8 +6,10 @@ import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/add_edit_child_view_model.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -39,6 +41,19 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
   void dispose() {
     _viewModel.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAvatar() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+      maxWidth: 512,
+      maxHeight: 512,
+    );
+    if (picked != null) {
+      _viewModel.setAvatarFilePath(picked.path);
+    }
   }
 
   Future<void> _selectBirthDate() async {
@@ -92,6 +107,10 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Avatar Picker
+                _buildAvatarPicker(theme),
+                SizedBox(height: spacing.lg),
+
                 // First Name Field
                 AuthTextField(
                   label: l10n.profileFirstName,
@@ -263,6 +282,55 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildAvatarPicker(ThemeData theme) {
+    final hasAvatar = _viewModel.avatarFilePath != null || _viewModel.isEditing;
+    return GestureDetector(
+      onTap: _pickAvatar,
+      child: Center(
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withValues(alpha: 0.08),
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+              width: 2,
+            ),
+          ),
+          child: ClipOval(
+            child: _viewModel.avatarFilePath != null
+                ? Image.file(
+                    File(_viewModel.avatarFilePath!),
+                    fit: BoxFit.cover,
+                    width: 100,
+                    height: 100,
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Symbols.add_a_photo,
+                        size: 28,
+                        color: theme.colorScheme.primary,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'PHOTO',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.primary,
+                          fontSize: 9,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
       ),
     );
   }

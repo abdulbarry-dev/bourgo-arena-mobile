@@ -12,6 +12,9 @@ class ChildSessionsViewModel extends BaseViewModel {
 
   List<CourseSession> _sessions = [];
   bool _isLoading = false;
+  bool _isLoadingMore = false;
+  int _currentPage = 1;
+  String _childId = '';
   PaginatedResult<CourseSession>? _pagination;
 
   ChildSessionsViewModel({
@@ -22,10 +25,14 @@ class ChildSessionsViewModel extends BaseViewModel {
 
   List<CourseSession> get sessions => _sessions;
   bool get isLoading => _isLoading;
+  bool get isLoadingMore => _isLoadingMore;
   bool get hasMore => _pagination?.hasMore ?? false;
 
   Future<void> load(String childId) async {
+    _childId = childId;
     _isLoading = true;
+    _currentPage = 1;
+    _sessions = [];
     notifyListeners();
 
     try {
@@ -34,6 +41,7 @@ class ChildSessionsViewModel extends BaseViewModel {
         success: (paginated) {
           _sessions = paginated.data;
           _pagination = paginated;
+          _currentPage = paginated.currentPage;
           clearError();
         },
         failure: (failure) {
@@ -46,6 +54,34 @@ class ChildSessionsViewModel extends BaseViewModel {
       developer.log('Error loading child sessions: $e');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !hasMore) return;
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      final result = await _getChildAvailableSessionsUseCase(
+        childId: _childId,
+        page: _currentPage + 1,
+      );
+      result.when(
+        success: (paginated) {
+          _sessions.addAll(paginated.data);
+          _pagination = paginated;
+          _currentPage = paginated.currentPage;
+        },
+        failure: (failure) {
+          developer.log('Failed to load more sessions: ${failure.message}');
+        },
+      );
+    } catch (e) {
+      developer.log('Error loading more sessions: $e');
+    } finally {
+      _isLoadingMore = false;
       notifyListeners();
     }
   }

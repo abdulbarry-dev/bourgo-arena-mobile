@@ -1,5 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
+import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
@@ -10,11 +12,13 @@ class OtpViewModel extends BaseViewModel {
   final VerifyOtpUseCase _verifyOtpUseCase;
   final SendOtpUseCase _sendOtpUseCase;
   final GetVerificationStatusUseCase _getVerificationStatusUseCase;
+  final RequestFamilyAccountOtpUseCase _requestFamilyAccountOtpUseCase;
 
   OtpViewModel(
     this._verifyOtpUseCase,
     this._sendOtpUseCase,
     this._getVerificationStatusUseCase,
+    this._requestFamilyAccountOtpUseCase,
   );
 
   bool _isLoading = false;
@@ -110,7 +114,7 @@ class OtpViewModel extends BaseViewModel {
   }
 
   /// Requests an OTP for enabling family account mode.
-  /// Checks verification status first to ensure the method is not already verified.
+  /// Checks verification status first to ensure the contact method IS verified.
   Future<void> requestFamilyOtp({
     required bool isEmail,
     required VoidCallback onSuccess,
@@ -124,20 +128,20 @@ class OtpViewModel extends BaseViewModel {
 
     await statusResult.fold<Future<void>>(
       onSuccess: (status) async {
-        // 2. Conditional UI Logic
-        if (isEmail && status.emailVerified) {
-          onError('This email address is already verified.');
+        // 2. Ensure the chosen contact method IS verified
+        if (isEmail && !status.emailVerified) {
+          onError('Your email address is not verified yet.');
           setLoading(false);
           return;
-        } else if (!isEmail && status.phoneVerified) {
-          onError('This phone number is already verified.');
+        } else if (!isEmail && !status.phoneVerified) {
+          onError('Your phone number is not verified yet.');
           setLoading(false);
           return;
         }
 
-        // 3. API Call
-        final result = await _sendOtpUseCase(
-          isEmail ? status.email! : status.phone!,
+        // 3. API Call using family-specific endpoint
+        final result = await _requestFamilyAccountOtpUseCase(
+          method: isEmail ? OtpDeliveryMethod.email : OtpDeliveryMethod.phone,
         );
 
         setLoading(false);

@@ -20,6 +20,7 @@ class ChildSessionsScreen extends StatefulWidget {
 
 class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
   late final ChildSessionsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -29,12 +30,23 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
       bookChildSessionUseCase: locator<BookChildSessionUseCase>(),
     );
     _viewModel.load(widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   void _bookSession(CourseSession session) {
@@ -62,7 +74,7 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                   Text('Spots: ${session.remainingSpots}/${session.capacity}'),
                   if (session.isFull) ...[
                     const SizedBox(height: 8),
-                    const Text('Session is full', style: TextStyle(color: Colors.red)),
+                    Text('Session is full', style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ],
                   const SizedBox(height: 16),
                   if (!session.isFull)
@@ -144,10 +156,17 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                   child: _viewModel.sessions.isEmpty
                       ? _buildEmptyState(theme, spacing)
                       : ListView.builder(
+                          controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(spacing.lg),
-                          itemCount: _viewModel.sessions.length,
+                          itemCount: _viewModel.sessions.length + (_viewModel.isLoadingMore ? 1 : 0),
                           itemBuilder: (context, index) {
+                            if (index == _viewModel.sessions.length) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
                             final session = _viewModel.sessions[index];
                             return Padding(
                               padding: EdgeInsets.only(bottom: spacing.md),
@@ -226,7 +245,7 @@ class _SessionCard extends StatelessWidget {
                       style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                     if (session.isBooked) ...[
                       SizedBox(width: spacing.sm),
-                      Icon(Symbols.check_circle, size: 16, color: const Color(0xFF22C55E)),
+                      Icon(Symbols.check_circle, size: 16, color: appColors.statusSuccess),
                     ],
                   ],
                 ),
@@ -251,19 +270,19 @@ class _SessionCard extends StatelessWidget {
                     SizedBox(width: spacing.xxs),
                     Text('${session.enrolled}/${session.capacity}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: session.isFull ? Colors.red : theme.colorScheme.onSurfaceVariant,
+                        color: session.isFull ? theme.colorScheme.error : theme.colorScheme.onSurfaceVariant,
                         fontWeight: session.isFull ? FontWeight.w700 : FontWeight.normal,
                       )),
                     if (session.isFull) ...[
                       SizedBox(width: spacing.sm),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text('FULL', style: theme.textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.w900, color: Colors.red, fontSize: 9,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text('FULL', style: theme.textTheme.labelSmall?.copyWith(
+                            fontWeight: FontWeight.w900, color: theme.colorScheme.error, fontSize: 9,
                         )),
                       ),
                     ],

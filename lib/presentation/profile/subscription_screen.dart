@@ -1,5 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/subscription_view_model.dart';
@@ -26,6 +28,8 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     super.initState();
     _viewModel = SubscriptionViewModel(
       getActiveSubscriptionsUseCase: locator<GetActiveSubscriptionsUseCase>(),
+      getChildrenUseCase: locator<GetChildrenUseCase>(),
+      getChildSubscriptionsUseCase: locator<GetChildSubscriptionsUseCase>(),
     );
   }
 
@@ -37,12 +41,28 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
-        final subscription = _viewModel.subscription;
+        final memberSubs = _viewModel.memberSubscriptions;
+        final subscriptions = memberSubs.map((m) => m.subscription).toList();
+
+        // Group: null childId → own subscriptions
+        final grouped = <String?, List<MemberSubscription>>{};
+        for (final ms in memberSubs) {
+          grouped.putIfAbsent(ms.childId, () => []).add(ms);
+        }
+        // Sort: own group first (null key), then alphabetical by childName
+        final groupKeys = grouped.keys.toList()
+          ..sort((a, b) {
+            if (a == null) return -1;
+            if (b == null) return 1;
+            final aName = grouped[a]!.first.childName ?? '';
+            final bName = grouped[b]!.first.childName ?? '';
+            return aName.compareTo(bName);
+          });
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: SubScreenAppBar(title: 'MON ABONNEMENT'),
-          body: _viewModel.isLoading && subscription == null
+          body: _viewModel.isLoading && subscriptions.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : RefreshIndicator(
                   onRefresh: _viewModel.loadSubscription,
@@ -53,51 +73,72 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        if (subscription != null) ...[
-                          _SubscriptionCard(
-                                subscription: subscription,
-                                appColors: theme.extension<AppColors>()!,
-                              )
-                              .animate()
-                              .fade(duration: 400.ms)
-                              .slideY(
-                                begin: 0.1,
-                                end: 0,
-                                curve: Curves.easeOutQuad,
-                              ),
-                          SizedBox(height: spacing.xl),
-                          _PlanDetailsSection(
-                                subscription: subscription,
-                                appColors: theme.extension<AppColors>()!,
-                              )
-                              .animate(delay: 100.ms)
-                              .fade(duration: 400.ms)
-                              .slideY(
-                                begin: 0.1,
-                                end: 0,
-                                curve: Curves.easeOutQuad,
-                              ),
-                          SizedBox(height: spacing.xl),
-                          _ServiceSection(subscription: subscription)
-                              .animate(delay: 200.ms)
-                              .fade(duration: 400.ms)
-                              .slideY(
-                                begin: 0.1,
-                                end: 0,
-                                curve: Curves.easeOutQuad,
-                              ),
-                          SizedBox(height: spacing.xl),
-                          _PaymentSection(
-                                subscription: subscription,
-                                appColors: theme.extension<AppColors>()!,
-                              )
-                              .animate(delay: 300.ms)
-                              .fade(duration: 400.ms)
-                              .slideY(
-                                begin: 0.1,
-                                end: 0,
-                                curve: Curves.easeOutQuad,
-                              ),
+                        if (subscriptions.isNotEmpty) ...[
+                          for (int g = 0; g < groupKeys.length; g++) ...[
+                            if (g > 0) SizedBox(height: spacing.xxl),
+                            _OwnerSectionHeader(
+                              childName: grouped[groupKeys[g]]!.first.childName,
+                              isOwn: groupKeys[g] == null,
+                            ),
+                            SizedBox(height: spacing.md),
+                            for (final ms in grouped[groupKeys[g]]!) ...[
+                              if (grouped[groupKeys[g]]!.indexOf(ms) > 0) ...[
+                                SizedBox(height: spacing.xl),
+                                Container(
+                                  height: 1,
+                                  color: theme
+                                      .extension<AppColors>()!
+                                      .bgBorder
+                                      .withValues(alpha: 0.3),
+                                ),
+                                SizedBox(height: spacing.xl),
+                              ],
+                              _SubscriptionCard(
+                                    subscription: ms.subscription,
+                                    appColors: theme.extension<AppColors>()!,
+                                  )
+                                  .animate()
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                              SizedBox(height: spacing.xl),
+                              _PlanDetailsSection(
+                                    subscription: ms.subscription,
+                                    appColors: theme.extension<AppColors>()!,
+                                  )
+                                  .animate(delay: 100.ms)
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                              SizedBox(height: spacing.xl),
+                              _ServiceSection(subscription: ms.subscription)
+                                  .animate(delay: 200.ms)
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                              SizedBox(height: spacing.xl),
+                              _PaymentSection(
+                                    subscription: ms.subscription,
+                                    appColors: theme.extension<AppColors>()!,
+                                  )
+                                  .animate(delay: 300.ms)
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                            ],
+                          ],
                         ] else if (_viewModel.errorMessage != null) ...[
                           _ErrorState(
                             message: _viewModel.errorMessage!,
@@ -150,6 +191,48 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 }
 
+class _OwnerSectionHeader extends StatelessWidget {
+  final String? childName;
+  final bool isOwn;
+
+  const _OwnerSectionHeader({
+    this.childName,
+    required this.isOwn,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = context.spacing;
+
+    return Row(
+      children: [
+        Container(
+          padding: EdgeInsets.all(spacing.sm),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            isOwn ? Symbols.person : Symbols.child_care,
+            size: 18,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        SizedBox(width: spacing.sm),
+        Text(
+          isOwn ? 'POUR MOI' : 'POUR ${childName?.toUpperCase()}',
+          style: theme.textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.2,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _SubscriptionCard extends StatelessWidget {
   final Subscription subscription;
   final AppColors appColors;
@@ -159,20 +242,6 @@ class _SubscriptionCard extends StatelessWidget {
     required this.appColors,
   });
 
-  Color _statusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return const Color(0xFF22C55E);
-      case 'expired':
-        return const Color(0xFF9CA3AF);
-      case 'cancelled':
-        return const Color(0xFFEF4444);
-      case 'pending':
-        return const Color(0xFFF59E0B);
-      default:
-        return const Color(0xFF9CA3AF);
-    }
-  }
 
   String _statusLabel(String status) {
     switch (status.toLowerCase()) {
@@ -193,7 +262,12 @@ class _SubscriptionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final spacing = context.spacing;
-    final statusColor = _statusColor(subscription.status);
+    final statusColor = switch (subscription.status.toLowerCase()) {
+      'active' => appColors.statusSuccess,
+      'cancelled' => theme.colorScheme.error,
+      'pending' => appColors.statusWarning,
+      _ => theme.colorScheme.onSurfaceVariant,
+    };
     final plan = subscription.plan;
 
     return Container(
@@ -210,23 +284,48 @@ class _SubscriptionCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing.sm,
-                  vertical: spacing.xxs,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  _statusLabel(subscription.status),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
+              Row(
+                children: [
+                  if (subscription.service?.name != null) ...[
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.sm,
+                        vertical: spacing.xxs,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        subscription.service!.name!.toUpperCase(),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: spacing.xs),
+                  ],
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: spacing.sm,
+                      vertical: spacing.xxs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _statusLabel(subscription.status),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: statusColor,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               Container(
                 padding: EdgeInsets.all(spacing.sm),
@@ -598,22 +697,10 @@ class _PaymentSection extends StatelessWidget {
                     ],
                     const Spacer(),
                     if (subscription.paymentMethod != null)
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: spacing.sm,
-                          vertical: spacing.xxs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: appColors.bgBorder.withValues(alpha: 0.5),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          subscription.paymentMethod!.toUpperCase(),
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
+                      _PaymentMethodBadge(
+                        method: subscription.paymentMethod!,
+                        appColors: appColors,
+                        theme: theme,
                       ),
                   ],
                 ),
@@ -660,6 +747,81 @@ class _PaymentSection extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _PaymentMethodBadge extends StatelessWidget {
+  final String method;
+  final AppColors appColors;
+  final ThemeData theme;
+
+  const _PaymentMethodBadge({
+    required this.method,
+    required this.appColors,
+    required this.theme,
+  });
+
+  (IconData, Color, String) _paymentMethodInfo() {
+    switch (method.toLowerCase()) {
+      case 'loyalty_points':
+        return (
+          Symbols.stars,
+          const Color(0xFFF59E0B),
+          'Fidelity',
+        );
+      case 'konnect':
+        return (
+          Symbols.account_balance_wallet,
+          const Color(0xFF6366F1),
+          'Konnect',
+        );
+      case 'flouci':
+        return (
+          Symbols.credit_card_gear,
+          const Color(0xFF10B981),
+          'Flouci',
+        );
+      case 'manual_admin':
+        return (
+          Symbols.admin_panel_settings,
+          appColors.statusWarning,
+          'Manual',
+        );
+      default:
+        return (
+          Symbols.payments,
+          theme.colorScheme.onSurfaceVariant,
+          method.toUpperCase(),
+        );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final (icon, color, label) = _paymentMethodInfo();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: color,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

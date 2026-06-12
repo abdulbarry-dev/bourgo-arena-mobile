@@ -10,9 +10,13 @@ class GetChildScheduleUseCase {
 
   Future<Result<List<ScheduleItem>, Failure>> call({
     required String childId,
-    required String from,
-    required String to,
+    String? from,
+    String? to,
   }) {
-    return _repository.getChildSchedule(childId: childId, from: from, to: to);
+    return _repository.getChildSchedule(
+      childId: childId,
+      from: from,
+      to: to,
+    );
   }
 }

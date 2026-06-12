@@ -19,6 +19,7 @@ abstract interface class FamilyRepository {
     required DateTime birthDate,
     required String gender,
     String? avatarUrl,
+    String? avatarFilePath,
   });
 
   Future<Result<ChildProfile, Failure>> updateChild({
@@ -28,30 +29,16 @@ abstract interface class FamilyRepository {
     required DateTime birthDate,
     required String gender,
     String? avatarUrl,
+    String? avatarFilePath,
   });
 
   Future<Result<void, Failure>> removeChild(String id);
 
   Future<Result<List<FamilyMemberProfile>, Failure>> getFamilyMembers();
 
-  Future<Result<FamilyMemberProfile, Failure>> addFamilyMember({
-    required String name,
-    required String relation,
-    required DateTime birthDate,
-  });
-
-  Future<Result<FamilyMemberProfile, Failure>> updateFamilyMember({
-    required String id,
-    required String name,
-    required String relation,
-    required DateTime birthDate,
-  });
-
-  Future<Result<void, Failure>> removeFamilyMember(String id);
-
   Future<Result<void, Failure>> disableFamilyFeature();
 
-  Future<Result<void, Failure>> enableFamilyFeature();
+  Future<Result<bool, Failure>> enableFamilyFeature();
 
   // --- Child Family Management Endpoints ---
 
@@ -68,6 +55,7 @@ abstract interface class FamilyRepository {
   /// GET /family/children/{member}/subscriptions
   Future<Result<PaginatedResult<Subscription>, Failure>> getChildSubscriptions({
     required String childId,
+    int page = 1,
     int perPage = 15,
   });
 
@@ -75,12 +63,14 @@ abstract interface class FamilyRepository {
   Future<Result<PaginatedResult<ChildBooking>, Failure>> getChildBookings({
     required String childId,
     String filter = 'all',
+    int page = 1,
     int perPage = 15,
   });
 
   /// GET /family/children/{member}/sessions
   Future<Result<PaginatedResult<CourseSession>, Failure>> getChildAvailableSessions({
     required String childId,
+    int page = 1,
     int perPage = 15,
   });
 
@@ -95,14 +85,15 @@ abstract interface class FamilyRepository {
   Future<Result<PaginatedResult<Reservation>, Failure>> getChildReservations({
     required String childId,
     String filter = 'all',
+    int page = 1,
     int perPage = 10,
   });
 
   /// GET /family/children/{member}/schedule
   Future<Result<List<ScheduleItem>, Failure>> getChildSchedule({
     required String childId,
-    required String from,
-    required String to,
+    String? from,
+    String? to,
   });
 
   /// POST /family/children/{member}/bookings/{booking}/complete
@@ -114,6 +105,7 @@ abstract interface class FamilyRepository {
   /// GET /family/children/{member}/completed
   Future<Result<PaginatedResult<CompletedItem>, Failure>> getChildCompletedItems({
     required String childId,
+    int page = 1,
     int perPage = 15,
   });
 }

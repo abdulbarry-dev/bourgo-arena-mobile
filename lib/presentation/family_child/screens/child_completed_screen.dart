@@ -19,6 +19,7 @@ class ChildCompletedScreen extends StatefulWidget {
 
 class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
   late final ChildCompletedViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -27,12 +28,23 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
       getChildCompletedItemsUseCase: locator<GetChildCompletedItemsUseCase>(),
     );
     _viewModel.load(widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   @override
@@ -54,10 +66,17 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
                   child: _viewModel.items.isEmpty
                       ? _buildEmptyState(theme, spacing)
                       : ListView.builder(
+                          controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(spacing.lg),
-                          itemCount: _viewModel.items.length,
+                          itemCount: _viewModel.items.length + (_viewModel.isLoadingMore ? 1 : 0),
                           itemBuilder: (context, index) {
+                            if (index == _viewModel.items.length) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
                             final item = _viewModel.items[index];
                             return Padding(
                               padding: EdgeInsets.only(bottom: spacing.md),
@@ -107,26 +126,27 @@ class _CompletedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isActivity = item.type == CompletedItemType.activity;
-    final color = isActivity ? const Color(0xFF8B5CF6) : theme.colorScheme.primary;
+    final appColors = theme.extension<AppColors>()!;
+    final isReservation = item.type == CompletedItemType.reservation;
+    final color = isReservation ? appColors.accentActivity : theme.colorScheme.primary;
 
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
-        color: theme.extension<AppColors>()!.bgElevated,
+        color: appColors.bgElevated,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.extension<AppColors>()!.bgBorder),
+        border: Border.all(color: appColors.bgBorder),
       ),
       child: Row(
         children: [
           Container(
             width: 48, height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF22C55E).withValues(alpha: 0.1),
+              color: appColors.statusSuccess.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
-              child: Icon(Symbols.check_circle, color: const Color(0xFF22C55E), size: 24),
+              child: Icon(Symbols.check_circle, color: appColors.statusSuccess, size: 24),
             ),
           ),
           SizedBox(width: spacing.md),
@@ -159,7 +179,7 @@ class _CompletedCard extends StatelessWidget {
                 SizedBox(height: spacing.xxs),
                 Row(
                   children: [
-                    Icon(Symbols.check_circle, size: 12, color: const Color(0xFF22C55E)),
+                    Icon(Symbols.check_circle, size: 12, color: appColors.statusSuccess),
                     SizedBox(width: spacing.xxs),
                     Text('Completed: ${item.completedAt}',
                       style: theme.textTheme.labelSmall?.copyWith(

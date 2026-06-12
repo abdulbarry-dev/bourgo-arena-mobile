@@ -74,7 +74,7 @@ Map<String, dynamic> _$MatchModelToJson(MatchModel instance) =>
     };
 
 EventModel _$EventModelFromJson(Map<String, dynamic> json) => EventModel(
-  id: json['id'] as String,
+  id: EventModel._idToString(json['id']),
   name: json['name'] as String?,
   description: json['description'] as String?,
   sportType: json['sport_type'] as String?,
@@ -114,7 +114,7 @@ EventParticipantModel _$EventParticipantModelFromJson(
   Map<String, dynamic> json,
 ) => EventParticipantModel(
   id: (json['id'] as num).toInt(),
-  eventId: json['event_id'] as String,
+  eventId: EventParticipantModel._idToString(json['event_id']),
   user: json['user'] == null
       ? null
       : ParticipantUserModel.fromJson(json['user'] as Map<String, dynamic>),

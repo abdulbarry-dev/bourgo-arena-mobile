@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_view_model.dart';
 import 'dart:async';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -24,6 +25,7 @@ class OtpScreen extends StatefulWidget {
   final VerifyOtpUseCase verifyOtpUseCase;
   final SendOtpUseCase sendOtpUseCase;
   final GetVerificationStatusUseCase getVerificationStatusUseCase;
+  final RequestFamilyAccountOtpUseCase requestFamilyAccountOtpUseCase;
 
   const OtpScreen({
     super.key,
@@ -34,6 +36,7 @@ class OtpScreen extends StatefulWidget {
     required this.verifyOtpUseCase,
     required this.sendOtpUseCase,
     required this.getVerificationStatusUseCase,
+    required this.requestFamilyAccountOtpUseCase,
   });
 
   @override
@@ -58,6 +61,7 @@ class _OtpScreenState extends State<OtpScreen> {
       widget.verifyOtpUseCase,
       widget.sendOtpUseCase,
       widget.getVerificationStatusUseCase,
+      widget.requestFamilyAccountOtpUseCase,
     );
     _resolvedDestination = _resolveDestination();
     _viewModel.addListener(_onViewModelChanged);

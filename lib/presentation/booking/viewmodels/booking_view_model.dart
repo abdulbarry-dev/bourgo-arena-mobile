@@ -370,7 +370,7 @@ class BookingViewModel extends BaseViewModel {
       final userResult = await _getUserProfileUseCase();
       userResult.when(
         success: (user) {
-          _isFamilyAccount = user.isParentAccount;
+          _isFamilyAccount = true;
           _memberTier = _getMemberTierUseCase(
             subscriptionLevel: user.subscriptionLevel,
           );
@@ -378,16 +378,21 @@ class BookingViewModel extends BaseViewModel {
         failure: (_) => _isFamilyAccount = false,
       );
 
-      if (_isFamilyAccount) {
-        final membersResult = await _getFamilyMembersUseCase();
-        membersResult.when(
-          success: (members) {
-            _familyMembers = members;
+      final membersResult = await _getFamilyMembersUseCase();
+      membersResult.when(
+        success: (members) {
+          _familyMembers = members;
+          if (_familyMembers.isEmpty) {
+            _isFamilyAccount = false;
+          } else {
             _selectedMember ??= members.isNotEmpty ? members.first : null;
-          },
-          failure: (_) => _familyMembers = [],
-        );
-      }
+          }
+        },
+        failure: (_) {
+          _familyMembers = [];
+          _isFamilyAccount = false;
+        },
+      );
 
       if (_selectedActivity != null) {
         _currentStep = _isFamilyAccount ? 2 : 1;

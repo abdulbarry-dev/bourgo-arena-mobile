@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:material_symbols_icons/symbols.dart';
+
+import '../../../core/theme/app_colors.dart';
 
 enum AppToastType { success, error, info, warning }
 
@@ -60,21 +61,24 @@ class AppToast {
   }
 
   static _ToastColors _resolveColors(ThemeData theme, AppToastType type) {
-    const successColor = Color(0xFF2E7D32);
-    const warningColor = Color(0xFFF57F17);
+    final appColors = theme.extension<AppColors>();
 
     return switch (type) {
-      AppToastType.success => const _ToastColors(successColor, Colors.white),
+      AppToastType.success => _ToastColors(
+        appColors?.statusSuccess ?? const Color(0xFF2E7D32),
+        Colors.white,
+      ),
       AppToastType.error => _ToastColors(
         theme.colorScheme.error,
         theme.colorScheme.onError,
       ),
-      AppToastType.warning => const _ToastColors(warningColor, Colors.white),
+      AppToastType.warning => _ToastColors(
+        appColors?.statusWarning ?? const Color(0xFFF57F17),
+        Colors.black,
+      ),
       AppToastType.info => _ToastColors(
-        theme.brightness == Brightness.dark
-            ? const Color(0xFF424242)
-            : const Color(0xFF616161),
-        Colors.white,
+        theme.colorScheme.surfaceContainerHighest,
+        theme.colorScheme.onSurface,
       ),
     };
   }

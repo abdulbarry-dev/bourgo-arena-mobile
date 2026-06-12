@@ -515,12 +515,12 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         ),
       ),
       child: _isActionLoading
-          ? const SizedBox(
+          ? SizedBox(
               height: 22,
               width: 22,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.black,
+                color: theme.colorScheme.onPrimary,
               ),
             )
           : Text(

@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_r
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class ChildReservationsScreen extends StatefulWidget {
   final String childId;
@@ -19,6 +20,7 @@ class ChildReservationsScreen extends StatefulWidget {
 
 class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
   late final ChildReservationsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -27,12 +29,23 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
       getChildReservationsUseCase: locator<GetChildReservationsUseCase>(),
     );
     _viewModel.load(childId: widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   @override
@@ -53,6 +66,7 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                   onRefresh: () => _viewModel.load(childId: widget.childId, filter: _viewModel.filter),
                   color: theme.colorScheme.primary,
                   child: CustomScrollView(
+                    controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
                       SliverToBoxAdapter(
@@ -60,7 +74,7 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                       ),
                       if (_viewModel.reservations.isEmpty)
                         SliverFillRemaining(child: _buildEmptyState(theme, spacing))
-                      else
+                      else ...[
                         SliverPadding(
                           padding: EdgeInsets.all(spacing.lg),
                           sliver: SliverList(
@@ -82,6 +96,14 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                             ),
                           ),
                         ),
+                        if (_viewModel.isLoadingMore)
+                          const SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                          ),
+                      ],
                     ],
                   ),
                 ),
@@ -170,11 +192,11 @@ class _ReservationCard extends StatelessWidget {
           Container(
             width: 48, height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
+              color: appColors.accentActivity.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
-              child: Icon(Symbols.sports, color: const Color(0xFF8B5CF6), size: 24),
+              child: Icon(Symbols.sports, color: appColors.accentActivity, size: 24),
             ),
           ),
           SizedBox(width: spacing.md),
@@ -209,15 +231,15 @@ class _ReservationCard extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: spacing.xs, vertical: 2),
                       decoration: BoxDecoration(
                         color: reservation.paymentStatus == 'paid'
-                            ? const Color(0xFF22C55E).withValues(alpha: 0.1)
-                            : const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                            ? appColors.statusSuccess.withValues(alpha: 0.1)
+                            : appColors.statusWarning.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(reservation.paymentStatus.toUpperCase(),
                         style: theme.textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.w900, fontSize: 9,
                           color: reservation.paymentStatus == 'paid'
-                              ? const Color(0xFF22C55E) : const Color(0xFFF59E0B),
+                              ? appColors.statusSuccess : appColors.statusWarning,
                         )),
                     ),
                   ],
@@ -227,12 +249,65 @@ class _ReservationCard extends StatelessWidget {
           ),
           if (reservation.qrCode != null)
             IconButton(
-              onPressed: () {}, // QR display
+              onPressed: () => _showQrCodeDialog(context, reservation, theme),
               icon: Icon(Symbols.qr_code, color: theme.colorScheme.primary),
               tooltip: 'Show QR code',
             ),
         ],
       ),
     ).animate(delay: (index * 50).ms).fade(duration: 300.ms).slideX(begin: -0.02, end: 0);
+  }
+
+  static void _showQrCodeDialog(BuildContext context, Reservation reservation, ThemeData theme) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                reservation.activityTitle.toUpperCase(),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${reservation.date} · ${reservation.time}',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 24),
+              QrImageView(
+                data: reservation.qrCode!,
+                version: QrVersions.auto,
+                size: 200,
+                backgroundColor: Colors.white,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                reservation.qrCode!,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('CLOSE'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

@@ -139,7 +139,7 @@ class BourgoTheme {
       brightness: Brightness.light,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
-      textTheme: _getTextTheme(),
+      textTheme: _getTextTheme(Brightness.light),
       extensions: [
         AppColors(
           brandPrimaryGhost: const Color(0xFF558800).withValues(alpha: 0.08),
@@ -151,6 +151,12 @@ class BourgoTheme {
           statusError: const Color(0xFFD32F2F),
           statusWarning: const Color(0xFFF9A825),
           iconDefault: const Color(0xFF1A1A1A).withValues(alpha: 0.4),
+          accentActivity: const Color(0xFF7C3AED),
+          accentEvent: const Color(0xFFC026D3),
+          accentCourse: const Color(0xFFEA580C),
+          accentService: const Color(0xFF0D9488),
+          genderMale: const Color(0xFF0284C7),
+          genderFemale: const Color(0xFFDB2777),
         ),
         AppSpacing.standard,
         AppAnimation.standard,
@@ -220,7 +226,7 @@ class BourgoTheme {
       brightness: Brightness.dark,
       scaffoldBackgroundColor: bgBase,
       colorScheme: colorScheme,
-      textTheme: _getTextTheme(),
+      textTheme: _getTextTheme(Brightness.dark),
       extensions: [
         AppColors(
           brandPrimaryGhost: primaryNeon.withValues(alpha: 0.08),
@@ -232,6 +238,12 @@ class BourgoTheme {
           statusError: const Color(0xFFEF5350),
           statusWarning: const Color(0xFFFFD54F),
           iconDefault: Colors.white.withValues(alpha: 0.4),
+          accentActivity: const Color(0xFFA78BFA),
+          accentEvent: const Color(0xFFE879F9),
+          accentCourse: const Color(0xFFFB923C),
+          accentService: const Color(0xFF2DD4BF),
+          genderMale: const Color(0xFF38BDF8),
+          genderFemale: const Color(0xFFF472B6),
         ),
         AppSpacing.standard,
         AppAnimation.standard,
@@ -287,8 +299,10 @@ class BourgoTheme {
     );
   }
 
-  static TextTheme _getTextTheme() {
+  static TextTheme _getTextTheme(Brightness brightness) {
     final baseTextTheme = GoogleFonts.dmSansTextTheme();
+    final isDark = brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A1A);
 
     return baseTextTheme.copyWith(
       displayLarge: GoogleFonts.blackHanSans(
@@ -315,6 +329,9 @@ class BourgoTheme {
           letterSpacing: -0.3,
         ),
       ),
+    ).apply(
+      displayColor: textColor,
+      bodyColor: textColor,
     );
   }
 }

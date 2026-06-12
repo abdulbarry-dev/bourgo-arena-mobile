@@ -20,6 +20,7 @@ class ChildBookingsScreen extends StatefulWidget {
 
 class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
   late final ChildBookingsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -29,12 +30,23 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
       completeChildBookingUseCase: locator<CompleteChildBookingUseCase>(),
     );
     _viewModel.load(childId: widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   @override
@@ -55,6 +67,7 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                   onRefresh: () => _viewModel.load(childId: widget.childId, filter: _viewModel.filter),
                   color: theme.colorScheme.primary,
                   child: CustomScrollView(
+                    controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
                       SliverToBoxAdapter(
@@ -62,7 +75,7 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                       ),
                       if (_viewModel.bookings.isEmpty)
                         SliverFillRemaining(child: _buildEmptyState(theme, spacing, appColors))
-                      else
+                      else ...[
                         SliverPadding(
                           padding: EdgeInsets.all(spacing.lg),
                           sliver: SliverList(
@@ -87,6 +100,14 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                             ),
                           ),
                         ),
+                        if (_viewModel.isLoadingMore)
+                          const SliverToBoxAdapter(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: CircularProgressIndicator()),
+                            ),
+                          ),
+                      ],
                     ],
                   ),
                 ),
@@ -197,7 +218,7 @@ class _BookingCard extends StatelessWidget {
             ),
             child: Center(
               child: booking.isCompleted
-                  ? Icon(Symbols.check_circle, color: const Color(0xFF22C55E), size: 24)
+                  ? Icon(Symbols.check_circle, color: appColors.statusSuccess, size: 24)
                   : Icon(Symbols.event, color: theme.colorScheme.primary, size: 24),
             ),
           ),

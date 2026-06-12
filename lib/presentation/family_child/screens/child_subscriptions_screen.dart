@@ -21,6 +21,7 @@ class ChildSubscriptionsScreen extends StatefulWidget {
 
 class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
   late final ChildSubscriptionsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -30,21 +31,22 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
       buyChildSubscriptionUseCase: locator<BuyChildSubscriptionUseCase>(),
     );
     _viewModel.load(widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
   }
 
-  Color _statusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'active': return const Color(0xFF22C55E);
-      case 'expired': return const Color(0xFF9CA3AF);
-      case 'cancelled': return const Color(0xFFEF4444);
-      case 'pending': return const Color(0xFFF59E0B);
-      default: return const Color(0xFF9CA3AF);
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
     }
   }
 
@@ -66,18 +68,24 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                   onRefresh: () => _viewModel.load(widget.childId),
                   color: theme.colorScheme.primary,
                   child: ListView(
+                    controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.all(spacing.lg),
                     children: [
                       if (_viewModel.subscriptions.isEmpty)
                         _buildEmptyState(theme, spacing)
-                      else
+                      else ...[
                         ..._viewModel.subscriptions.asMap().entries.map((entry) {
                           return Padding(
                             padding: EdgeInsets.only(bottom: spacing.md),
                             child: _SubCard(
                               subscription: entry.value,
-                              statusColor: _statusColor(entry.value.status),
+                              statusColor: switch (entry.value.status.toLowerCase()) {
+                                'active' => appColors.statusSuccess,
+                                'cancelled' => theme.colorScheme.error,
+                                'pending' => appColors.statusWarning,
+                                _ => theme.colorScheme.onSurfaceVariant,
+                              },
                               theme: theme,
                               spacing: spacing,
                               appColors: appColors,
@@ -86,13 +94,19 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                               .slideY(begin: 0.05, end: 0),
                           );
                         }),
+                        if (_viewModel.isLoadingMore)
+                          const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                      ],
                       SizedBox(height: spacing.lg),
                       SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            context.push('/plans');
+                            context.push('/plans?childId=${widget.childId}');
                           },
                           icon: const Icon(Symbols.add, size: 20),
                           label: const Text('BUY NEW SUBSCRIPTION',

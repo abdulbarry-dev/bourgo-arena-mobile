@@ -1,4 +1,4 @@
-enum ScheduleItemType { course, activity }
+enum ScheduleItemType { booking, reservation }
 
 class ScheduleItem {
   final ScheduleItemType type;
@@ -7,6 +7,7 @@ class ScheduleItem {
   final String date;
   final String name;
   final String startTime;
+  final String? endTime;
   final int durationMinutes;
   final String status;
   final String statusLabel;
@@ -19,6 +20,7 @@ class ScheduleItem {
     required this.date,
     required this.name,
     required this.startTime,
+    this.endTime,
     required this.durationMinutes,
     required this.status,
     required this.statusLabel,

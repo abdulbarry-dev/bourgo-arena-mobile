@@ -17,6 +17,7 @@ class AddEditChildViewModel extends BaseViewModel {
 
   String? _selectedGender;
   DateTime? _selectedBirthDate;
+  String? _avatarFilePath;
   bool _isSubmitting = false;
 
   bool _hasFirstNameError = false;
@@ -39,12 +40,18 @@ class AddEditChildViewModel extends BaseViewModel {
   // Getters
   String? get selectedGender => _selectedGender;
   DateTime? get selectedBirthDate => _selectedBirthDate;
+  String? get avatarFilePath => _avatarFilePath;
   bool get isSubmitting => _isSubmitting;
   bool get isEditing => _existingChild != null;
   bool get hasFirstNameError => _hasFirstNameError;
   bool get hasLastNameError => _hasLastNameError;
   bool get hasGenderError => _hasGenderError;
   bool get hasBirthDateError => _hasBirthDateError;
+
+  void setAvatarFilePath(String? path) {
+    _avatarFilePath = path;
+    notifyListeners();
+  }
 
   void _initializeFromChild(ChildProfile child) {
     firstNameController.text = child.firstName;
@@ -99,12 +106,14 @@ class AddEditChildViewModel extends BaseViewModel {
               lastName: lastName,
               gender: _selectedGender!,
               birthDate: _selectedBirthDate!,
+              avatarFilePath: _avatarFilePath,
             )
           : await _addChildUseCase.execute(
               firstName: firstName,
               lastName: lastName,
               gender: _selectedGender!,
               birthDate: _selectedBirthDate!,
+              avatarFilePath: _avatarFilePath,
             );
 
       bool success = false;

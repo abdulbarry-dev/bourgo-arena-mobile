@@ -12,11 +12,13 @@ class GetChildReservationsUseCase {
   Future<Result<PaginatedResult<Reservation>, Failure>> call({
     required String childId,
     String filter = 'all',
+    int page = 1,
     int perPage = 10,
   }) {
     return _repository.getChildReservations(
       childId: childId,
       filter: filter,
+      page: page,
       perPage: perPage,
     );
   }

@@ -11,10 +11,12 @@ class GetChildAvailableSessionsUseCase {
 
   Future<Result<PaginatedResult<CourseSession>, Failure>> call({
     required String childId,
+    int page = 1,
     int perPage = 15,
   }) {
     return _repository.getChildAvailableSessions(
       childId: childId,
+      page: page,
       perPage: perPage,
     );
   }

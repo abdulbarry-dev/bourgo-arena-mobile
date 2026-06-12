@@ -61,17 +61,34 @@ class ApiFamilyRepository implements FamilyRepository {
     required DateTime birthDate,
     required String gender,
     String? avatarUrl,
+    String? avatarFilePath,
   }) {
     return executeApiCall(() async {
-      final response =
-          await _apiClient.post('/family/children', {
+      final birthDateStr = birthDate.toIso8601String().split('T').first;
+      final Map<String, dynamic> response;
+      if (avatarFilePath != null) {
+        response = await _apiClient.uploadMultipart(
+              '/family/children',
+              fileFieldName: 'avatar',
+              filePath: avatarFilePath,
+              extraFields: {
                 'first_name': firstName,
                 'last_name': lastName,
-                'birth_date': birthDate.toIso8601String().split('T').first,
+                'birth_date': birthDateStr,
                 'gender': gender,
-                'avatar_url': avatarUrl,
-              })
-              as Map<String, dynamic>;
+              },
+            )
+            as Map<String, dynamic>;
+      } else {
+        response = await _apiClient.post('/family/children', {
+              'first_name': firstName,
+              'last_name': lastName,
+              'birth_date': birthDateStr,
+              'gender': gender,
+              'avatar_url': avatarUrl,
+            })
+            as Map<String, dynamic>;
+      }
 
       return Result.success(
         ChildMapper.toEntity(ChildProfileModel.fromJson(response)),
@@ -87,17 +104,35 @@ class ApiFamilyRepository implements FamilyRepository {
     required DateTime birthDate,
     required String gender,
     String? avatarUrl,
+    String? avatarFilePath,
   }) {
     return executeApiCall(() async {
-      final response =
-          await _apiClient.put('/family/children/$id', {
+      final birthDateStr = birthDate.toIso8601String().split('T').first;
+      final Map<String, dynamic> response;
+      if (avatarFilePath != null) {
+        response = await _apiClient.uploadMultipart(
+              '/family/children/$id',
+              fileFieldName: 'avatar',
+              filePath: avatarFilePath,
+              extraFields: {
                 'first_name': firstName,
                 'last_name': lastName,
-                'birth_date': birthDate.toIso8601String().split('T').first,
+                'birth_date': birthDateStr,
                 'gender': gender,
-                'avatar_url': avatarUrl,
-              })
-              as Map<String, dynamic>;
+                '_method': 'PUT',
+              },
+            )
+            as Map<String, dynamic>;
+      } else {
+        response = await _apiClient.put('/family/children/$id', {
+              'first_name': firstName,
+              'last_name': lastName,
+              'birth_date': birthDateStr,
+              'gender': gender,
+              'avatar_url': avatarUrl,
+            })
+            as Map<String, dynamic>;
+      }
 
       return Result.success(
         ChildMapper.toEntity(ChildProfileModel.fromJson(response)),
@@ -135,55 +170,6 @@ class ApiFamilyRepository implements FamilyRepository {
   }
 
   @override
-  Future<Result<FamilyMemberProfile, Failure>> addFamilyMember({
-    required String name,
-    required String relation,
-    required DateTime birthDate,
-  }) {
-    return executeApiCall(() async {
-      final response =
-          await _apiClient.post('/family/members', {
-                'name': name,
-                'relation': relation,
-                'birth_date': birthDate.toIso8601String().split('T').first,
-              })
-              as Map<String, dynamic>;
-
-      final data = response['data'] as Map<String, dynamic>? ?? response;
-      return Result.success(FamilyMemberProfileModel.fromJson(data).toEntity());
-    });
-  }
-
-  @override
-  Future<Result<FamilyMemberProfile, Failure>> updateFamilyMember({
-    required String id,
-    required String name,
-    required String relation,
-    required DateTime birthDate,
-  }) {
-    return executeApiCall(() async {
-      final response =
-          await _apiClient.put('/family/members/$id', {
-                'name': name,
-                'relation': relation,
-                'birth_date': birthDate.toIso8601String().split('T').first,
-              })
-              as Map<String, dynamic>;
-
-      final data = response['data'] as Map<String, dynamic>? ?? response;
-      return Result.success(FamilyMemberProfileModel.fromJson(data).toEntity());
-    });
-  }
-
-  @override
-  Future<Result<void, Failure>> removeFamilyMember(String id) {
-    return executeApiCall(() async {
-      await _apiClient.delete('/family/members/$id');
-      return Result.success(null);
-    });
-  }
-
-  @override
   Future<Result<void, Failure>> disableFamilyFeature() {
     return executeApiCall(() async {
       await _apiClient.post('/family/disable-feature', {});
@@ -192,10 +178,13 @@ class ApiFamilyRepository implements FamilyRepository {
   }
 
   @override
-  Future<Result<void, Failure>> enableFamilyFeature() {
+  Future<Result<bool, Failure>> enableFamilyFeature() {
     return executeApiCall(() async {
-      await _apiClient.post('/family/enable-feature', {});
-      return Result.success(null);
+      final response =
+          await _apiClient.post('/family/enable-feature', {})
+              as Map<String, dynamic>;
+      final data = response['data'] as Map<String, dynamic>?;
+      return Result.success(data?['is_parent_account'] == true);
     });
   }
 
@@ -235,6 +224,7 @@ class ApiFamilyRepository implements FamilyRepository {
   @override
   Future<Result<PaginatedResult<Subscription>, Failure>> getChildSubscriptions({
     required String childId,
+    int page = 1,
     int perPage = 15,
   }) {
     return executeApiCall(() async {
@@ -242,7 +232,10 @@ class ApiFamilyRepository implements FamilyRepository {
           await _apiClient.get(
                 '/family/children/$childId/subscriptions',
                 fullResponse: true,
-                queryParameters: {'per_page': perPage.toString()},
+                queryParameters: {
+                  'page': page.toString(),
+                  'per_page': perPage.toString(),
+                },
               )
               as Map<String, dynamic>;
       final data = response['data'] as List<dynamic>? ?? [];
@@ -262,6 +255,7 @@ class ApiFamilyRepository implements FamilyRepository {
   Future<Result<PaginatedResult<ChildBooking>, Failure>> getChildBookings({
     required String childId,
     String filter = 'all',
+    int page = 1,
     int perPage = 15,
   }) {
     return executeApiCall(() async {
@@ -271,6 +265,7 @@ class ApiFamilyRepository implements FamilyRepository {
                 fullResponse: true,
                 queryParameters: {
                   'filter': filter,
+                  'page': page.toString(),
                   'per_page': perPage.toString(),
                 },
               )
@@ -292,6 +287,7 @@ class ApiFamilyRepository implements FamilyRepository {
   Future<Result<PaginatedResult<CourseSession>, Failure>>
       getChildAvailableSessions({
     required String childId,
+    int page = 1,
     int perPage = 15,
   }) {
     return executeApiCall(() async {
@@ -299,7 +295,10 @@ class ApiFamilyRepository implements FamilyRepository {
           await _apiClient.get(
                 '/family/children/$childId/sessions',
                 fullResponse: true,
-                queryParameters: {'per_page': perPage.toString()},
+                queryParameters: {
+                  'page': page.toString(),
+                  'per_page': perPage.toString(),
+                },
               )
               as Map<String, dynamic>;
       final data = response['data'] as List<dynamic>? ?? [];
@@ -338,6 +337,7 @@ class ApiFamilyRepository implements FamilyRepository {
   Future<Result<PaginatedResult<Reservation>, Failure>> getChildReservations({
     required String childId,
     String filter = 'all',
+    int page = 1,
     int perPage = 10,
   }) {
     return executeApiCall(() async {
@@ -347,6 +347,7 @@ class ApiFamilyRepository implements FamilyRepository {
                 fullResponse: true,
                 queryParameters: {
                   'filter': filter,
+                  'page': page.toString(),
                   'per_page': perPage.toString(),
                 },
               )
@@ -367,15 +368,18 @@ class ApiFamilyRepository implements FamilyRepository {
   @override
   Future<Result<List<ScheduleItem>, Failure>> getChildSchedule({
     required String childId,
-    required String from,
-    required String to,
+    String? from,
+    String? to,
   }) {
     return executeApiCall(() async {
+      final queryParams = <String, dynamic>{};
+      if (from != null) queryParams['from'] = from;
+      if (to != null) queryParams['to'] = to;
       final response =
           await _apiClient.get(
                 '/family/children/$childId/schedule',
                 fullResponse: true,
-                queryParameters: {'from': from, 'to': to},
+                queryParameters: queryParams.isEmpty ? null : queryParams,
               )
               as Map<String, dynamic>;
       final responseData = response['data'] as Map<String, dynamic>? ?? {};
@@ -412,6 +416,7 @@ class ApiFamilyRepository implements FamilyRepository {
   @override
   Future<Result<PaginatedResult<CompletedItem>, Failure>> getChildCompletedItems({
     required String childId,
+    int page = 1,
     int perPage = 15,
   }) {
     return executeApiCall(() async {
@@ -419,7 +424,10 @@ class ApiFamilyRepository implements FamilyRepository {
           await _apiClient.get(
                 '/family/children/$childId/completed',
                 fullResponse: true,
-                queryParameters: {'per_page': perPage.toString()},
+                queryParameters: {
+                  'page': page.toString(),
+                  'per_page': perPage.toString(),
+                },
               )
               as Map<String, dynamic>;
       final data = response['data'] as List<dynamic>? ?? [];

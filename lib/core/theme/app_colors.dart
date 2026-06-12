@@ -14,6 +14,13 @@ class AppColors extends ThemeExtension<AppColors> {
 
   final Color iconDefault;
 
+  final Color accentActivity;
+  final Color accentEvent;
+  final Color accentCourse;
+  final Color accentService;
+  final Color genderMale;
+  final Color genderFemale;
+
   const AppColors({
     required this.brandPrimaryGhost,
     required this.brandPrimaryGlow,
@@ -24,6 +31,12 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.statusError,
     required this.statusWarning,
     required this.iconDefault,
+    required this.accentActivity,
+    required this.accentEvent,
+    required this.accentCourse,
+    required this.accentService,
+    required this.genderMale,
+    required this.genderFemale,
   });
 
   @override
@@ -37,6 +50,12 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? statusError,
     Color? statusWarning,
     Color? iconDefault,
+    Color? accentActivity,
+    Color? accentEvent,
+    Color? accentCourse,
+    Color? accentService,
+    Color? genderMale,
+    Color? genderFemale,
   }) {
     return AppColors(
       brandPrimaryGhost: brandPrimaryGhost ?? this.brandPrimaryGhost,
@@ -48,6 +67,12 @@ class AppColors extends ThemeExtension<AppColors> {
       statusError: statusError ?? this.statusError,
       statusWarning: statusWarning ?? this.statusWarning,
       iconDefault: iconDefault ?? this.iconDefault,
+      accentActivity: accentActivity ?? this.accentActivity,
+      accentEvent: accentEvent ?? this.accentEvent,
+      accentCourse: accentCourse ?? this.accentCourse,
+      accentService: accentService ?? this.accentService,
+      genderMale: genderMale ?? this.genderMale,
+      genderFemale: genderFemale ?? this.genderFemale,
     );
   }
 
@@ -72,6 +97,18 @@ class AppColors extends ThemeExtension<AppColors> {
           Color.lerp(statusWarning, other.statusWarning, t) ?? statusWarning,
       iconDefault:
           Color.lerp(iconDefault, other.iconDefault, t) ?? iconDefault,
+      accentActivity:
+          Color.lerp(accentActivity, other.accentActivity, t) ?? accentActivity,
+      accentEvent:
+          Color.lerp(accentEvent, other.accentEvent, t) ?? accentEvent,
+      accentCourse:
+          Color.lerp(accentCourse, other.accentCourse, t) ?? accentCourse,
+      accentService:
+          Color.lerp(accentService, other.accentService, t) ?? accentService,
+      genderMale:
+          Color.lerp(genderMale, other.genderMale, t) ?? genderMale,
+      genderFemale:
+          Color.lerp(genderFemale, other.genderFemale, t) ?? genderFemale,
     );
   }
 }
