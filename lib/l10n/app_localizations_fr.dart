@@ -440,9 +440,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get bookingReturnHome => 'RETOUR À L\'ACCUEIL';
 
   @override
-  String get bookingViewTicket => 'VOIR LE TICKET';
-
-  @override
   String get bookingNoSlots => 'Aucun créneau disponible pour cette date.';
 
   @override

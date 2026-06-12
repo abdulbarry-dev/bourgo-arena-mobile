@@ -914,12 +914,6 @@ abstract class AppLocalizations {
   /// **'RETOUR À L\'ACCUEIL'**
   String get bookingReturnHome;
 
-  /// No description provided for @bookingViewTicket.
-  ///
-  /// In fr, this message translates to:
-  /// **'VOIR LE TICKET'**
-  String get bookingViewTicket;
-
   /// No description provided for @bookingNoSlots.
   ///
   /// In fr, this message translates to:

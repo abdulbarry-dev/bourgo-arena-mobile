@@ -89,6 +89,8 @@ class FamilyManagementViewModel extends BaseViewModel {
   bool get hasChildGenderError => _hasChildGenderError;
   bool get hasChildBirthDateError => _hasChildBirthDateError;
 
+  Future<void> reloadProfile() => _loadProfile();
+
   void setChildGender(String? gender) {
     _selectedChildGender = gender;
     _hasChildGenderError = false;

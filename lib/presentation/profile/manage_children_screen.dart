@@ -135,45 +135,52 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
         listenable: _viewModel,
         builder: (context, _) {
           if (_viewModel.isLoading) {
-            return _buildLoadingState(theme, spacing);
+            return RefreshIndicator(
+              onRefresh: _viewModel.reloadChildren,
+              child: _buildLoadingState(theme, spacing),
+            );
           }
 
           final children = _viewModel.children;
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(spacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                if (children.isEmpty)
-                  _buildEmptyState(context, theme, spacing, l10n)
-                else
-                  _buildChildrenList(context, children, theme, spacing),
-                SizedBox(height: spacing.xl),
-                FilledButton.icon(
-                  onPressed: () async {
-                    AppHaptics.light();
-                    final childAdded = await context.push<bool>('/add-child');
-                    if (childAdded == true) {
-                      await _viewModel.reloadChildren();
-                    }
-                  },
-                  icon: const Icon(Symbols.add),
-                  label: Text(
-                    l10n.profileAddChild.toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.2,
+          return RefreshIndicator(
+            onRefresh: _viewModel.reloadChildren,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.all(spacing.xl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (children.isEmpty)
+                    _buildEmptyState(context, theme, spacing, l10n)
+                  else
+                    _buildChildrenList(context, children, theme, spacing),
+                  SizedBox(height: spacing.xl),
+                  FilledButton.icon(
+                    onPressed: () async {
+                      AppHaptics.light();
+                      final childAdded = await context.push<bool>('/add-child');
+                      if (childAdded == true) {
+                        await _viewModel.reloadChildren();
+                      }
+                    },
+                    icon: const Icon(Symbols.add),
+                    label: Text(
+                      l10n.profileAddChild.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    style: FilledButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: spacing.lg),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                   ),
-                  style: FilledButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: spacing.lg),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           );
         },
@@ -183,30 +190,28 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
 
   Widget _buildLoadingState(ThemeData theme, AppSpacing spacing) {
     return AppShimmer(
-      child: Padding(
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.all(spacing.xl),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: List.generate(
-            4,
-            (_) => Padding(
-              padding: EdgeInsets.only(bottom: spacing.lg),
-              child: Row(
-                children: [
-                  AppShimmer.block(width: 64, height: 64, borderRadius: 32),
-                  SizedBox(width: spacing.lg),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppShimmer.block(width: 140, height: 16),
-                        SizedBox(height: spacing.sm),
-                        AppShimmer.block(width: 80, height: 12),
-                      ],
-                    ),
+        children: List.generate(
+          4,
+          (_) => Padding(
+            padding: EdgeInsets.only(bottom: spacing.lg),
+            child: Row(
+              children: [
+                AppShimmer.block(width: 64, height: 64, borderRadius: 32),
+                SizedBox(width: spacing.lg),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppShimmer.block(width: 140, height: 16),
+                      SizedBox(height: spacing.sm),
+                      AppShimmer.block(width: 80, height: 12),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

@@ -241,11 +241,12 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
         listenable: _viewModel,
         builder: (context, _) {
           if (_viewModel.isLoading) {
-            return AppShimmer(
-              child: Padding(
-                padding: EdgeInsets.all(spacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+            return RefreshIndicator(
+              onRefresh: _viewModel.reloadProfile,
+              child: AppShimmer(
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.all(spacing.xl),
                   children: [
                     AppShimmer.block(height: 88, borderRadius: 24),
                     SizedBox(height: spacing.xl),
@@ -260,97 +261,116 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
 
           final user = _viewModel.user;
           if (user == null) {
-            return Center(child: Text(l10n.commonErrorOccurred));
+            return RefreshIndicator(
+              onRefresh: _viewModel.reloadProfile,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(
+                        height: constraints.maxHeight,
+                        child: Center(child: Text(l10n.commonErrorOccurred)),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
           }
 
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(spacing.xl),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Family Account Status Section
-                Container(
-                  padding: EdgeInsets.all(spacing.lg),
-                  decoration: BoxDecoration(
-                    color: appColors.bgElevated,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: appColors.bgBorder),
+          return RefreshIndicator(
+            onRefresh: _viewModel.reloadProfile,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.all(spacing.xl),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Family Account Status Section
+                  Container(
+                    padding: EdgeInsets.all(spacing.lg),
+                    decoration: BoxDecoration(
+                      color: appColors.bgElevated,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: appColors.bgBorder),
+                    ),
+                    child: FamilyAccountToggle(
+                      value: user.isParentAccount,
+                      onChanged: _toggleFamilyAccount,
+                    ),
                   ),
-                  child: FamilyAccountToggle(
-                    value: user.isParentAccount,
-                    onChanged: _toggleFamilyAccount,
-                  ),
-                ),
-                SizedBox(height: spacing.xl),
+                  SizedBox(height: spacing.xl),
 
-                // Manage Children Section (if family account is enabled)
-                if (user.isParentAccount) ...[
-                  Text(
-                    l10n.profileManageChildren,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  SizedBox(height: spacing.lg),
-                  FilledButton.icon(
-                    onPressed: () {
-                      AppHaptics.light();
-                      context.push('/manage-children');
-                    },
-                    icon: const Icon(Symbols.groups),
-                    label: Text(
-                      l10n.profileManageChildren.toUpperCase(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 1.2,
-                        fontSize: 14,
+                  // Manage Children Section (if family account is enabled)
+                  if (user.isParentAccount) ...[
+                    Text(
+                      l10n.profileManageChildren,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    style: FilledButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: spacing.lg),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                    SizedBox(height: spacing.lg),
+                    FilledButton.icon(
+                      onPressed: () {
+                        AppHaptics.light();
+                        context.push('/manage-children');
+                      },
+                      icon: const Icon(Symbols.groups),
+                      label: Text(
+                        l10n.profileManageChildren.toUpperCase(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.2,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: spacing.lg),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
-                  ),
-                ] else ...[
-                  SizedBox(height: spacing.xxl),
-                  Center(
-                    child: Column(
-                      children: [
-                        Container(
-                          width: 112,
-                          height: 112,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: theme.colorScheme.primary.withValues(
-                              alpha: 0.08,
-                            ),
-                            border: Border.all(
+                  ] else ...[
+                    SizedBox(height: spacing.xxl),
+                    Center(
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 112,
+                            height: 112,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
                               color: theme.colorScheme.primary.withValues(
-                                alpha: 0.15,
+                                alpha: 0.08,
+                              ),
+                              border: Border.all(
+                                color: theme.colorScheme.primary.withValues(
+                                  alpha: 0.15,
+                                ),
                               ),
                             ),
+                            child: Icon(
+                              Symbols.family_restroom,
+                              size: 56,
+                              color: theme.colorScheme.primary,
+                            ),
                           ),
-                          child: Icon(
-                            Symbols.family_restroom,
-                            size: 56,
-                            color: theme.colorScheme.primary,
+                          SizedBox(height: spacing.xl),
+                          Text(
+                            l10n.profileFamilyNotEnabled,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: spacing.xl),
-                        Text(
-                          l10n.profileFamilyNotEnabled,
-                          textAlign: TextAlign.center,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ],
-              ],
+              ),
             ),
           );
         },

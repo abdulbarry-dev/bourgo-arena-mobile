@@ -435,9 +435,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookingReturnHome => 'RETURN TO HOME';
 
   @override
-  String get bookingViewTicket => 'VIEW TICKET';
-
-  @override
   String get bookingNoSlots => 'No slots available for this date.';
 
   @override

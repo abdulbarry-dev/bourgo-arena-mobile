@@ -88,10 +88,12 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
 
   Widget _buildBody(ThemeData theme) {
     if (_isLoading) {
-      return AppShimmer(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Column(
+      return RefreshIndicator(
+        onRefresh: _load,
+        child: AppShimmer(
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             children: List.generate(5, (_) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
@@ -104,49 +106,75 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
     }
 
     if (_error != null) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Symbols.error,
-                size: 48,
-                color: theme.colorScheme.error.withValues(alpha: 0.5),
-              ),
-              const SizedBox(height: 16),
-              Text(_error!, style: theme.textTheme.bodyMedium),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: _load,
-                icon: const Icon(Symbols.refresh, size: 18),
-                label: Text(
-                  AppLocalizations.of(context)!.myEventsScreenRetryButton,
+      return RefreshIndicator(
+        onRefresh: _load,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(32),
+              children: [
+                SizedBox(
+                  height: constraints.maxHeight - 64,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Symbols.error,
+                        size: 48,
+                        color: theme.colorScheme.error.withValues(alpha: 0.5),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(_error!, style: theme.textTheme.bodyMedium),
+                      const SizedBox(height: 16),
+                      FilledButton.icon(
+                        onPressed: _load,
+                        icon: const Icon(Symbols.refresh, size: 18),
+                        label: Text(
+                          AppLocalizations.of(
+                            context,
+                          )!.myEventsScreenRetryButton,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          },
         ),
       );
     }
 
     if (_participants.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Symbols.emoji_events,
-              size: 64,
-              color: theme.colorScheme.primary.withValues(alpha: 0.3),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              AppLocalizations.of(context)!.myEventsScreenNoEvents,
-              style: theme.textTheme.titleMedium,
-            ),
-          ],
+      return RefreshIndicator(
+        onRefresh: _load,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: constraints.maxHeight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Symbols.emoji_events,
+                        size: 64,
+                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context)!.myEventsScreenNoEvents,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       );
     }
@@ -154,6 +182,7 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         itemCount: _participants.length,
         itemBuilder: (context, index) {

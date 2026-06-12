@@ -175,47 +175,68 @@ class _ServicesScreenState extends State<ServicesScreen> {
   Widget _buildBody(ThemeData theme) {
     final l10n = AppLocalizations.of(context)!;
     if (_viewModel.isLoading) {
-      return _buildSkeletonLoading(theme);
+      return RefreshIndicator(
+        onRefresh: _viewModel.loadServices,
+        displacement: 20,
+        color: theme.colorScheme.primary,
+        child: _buildSkeletonLoading(theme),
+      );
     }
 
     if (_viewModel.errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Symbols.error,
-              size: 48,
-              color: theme.colorScheme.error.withValues(alpha: 0.6),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _viewModel.errorMessage!,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _viewModel.loadServices,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                minimumSize: const Size(180, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
+      return RefreshIndicator(
+        onRefresh: _viewModel.loadServices,
+        displacement: 20,
+        color: theme.colorScheme.primary,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              children: [
+                SizedBox(
+                  height: constraints.maxHeight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Symbols.error,
+                        size: 48,
+                        color: theme.colorScheme.error.withValues(alpha: 0.6),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _viewModel.errorMessage!,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton(
+                        onPressed: _viewModel.loadServices,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: theme.colorScheme.primary,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          minimumSize: const Size(180, 48),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          l10n.serviceDetailRetry.toUpperCase(),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              child: Text(
-                l10n.serviceDetailRetry.toUpperCase(),
-                style: const TextStyle(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       );
     }
@@ -223,40 +244,57 @@ class _ServicesScreenState extends State<ServicesScreen> {
     final services = _viewModel.services;
 
     if (services.isEmpty && _allServicesLoaded()) {
-      return Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Symbols.grid_view,
-              size: 64,
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              _viewModel.searchQuery.isNotEmpty ||
-                      _viewModel.filterType != ServiceFilterType.all
-                  ? l10n.servicesNoMatching
-                  : l10n.servicesNoAvailable,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontFamily: AppConstants.displayFontFamily,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              _viewModel.searchQuery.isNotEmpty ||
-                      _viewModel.filterType != ServiceFilterType.all
-                  ? l10n.servicesAdjustSearch
-                  : l10n.servicesCheckBack,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(
-                  alpha: 0.7,
+      return RefreshIndicator(
+        onRefresh: _viewModel.loadServices,
+        displacement: 20,
+        color: theme.colorScheme.primary,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(
+                  height: constraints.maxHeight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Symbols.grid_view,
+                        size: 64,
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.4,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _viewModel.searchQuery.isNotEmpty ||
+                                _viewModel.filterType != ServiceFilterType.all
+                            ? l10n.servicesNoMatching
+                            : l10n.servicesNoAvailable,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                          fontFamily: AppConstants.displayFontFamily,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _viewModel.searchQuery.isNotEmpty ||
+                                _viewModel.filterType != ServiceFilterType.all
+                            ? l10n.servicesAdjustSearch
+                            : l10n.servicesCheckBack,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant.withValues(
+                            alpha: 0.7,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       );
     }
@@ -267,6 +305,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
       color: theme.colorScheme.primary,
       child: ListView.builder(
         controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
         itemCount: services.length + (_viewModel.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
@@ -299,7 +338,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
   Widget _buildSkeletonLoading(ThemeData theme) {
     return ListView(
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
       children: List.generate(4, (_) => _SkeletonServiceCard(theme: theme)),
     );

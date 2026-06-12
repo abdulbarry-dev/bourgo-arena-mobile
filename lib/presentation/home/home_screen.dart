@@ -122,8 +122,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   onServiceTap: (service) =>
                       context.push('/services/${service.id}', extra: service),
                 ),
-                if (_viewModel.services.isNotEmpty &&
-                    !_viewModel.servicesLoading)
+                if (_viewModel.servicesLoading)
+                  _RotatingServiceHeroSkeleton()
+                else if (_viewModel.services.isNotEmpty)
                   _RotatingServiceHero(
                     services: _viewModel.services,
                     onServiceTap: (service) =>
@@ -839,6 +840,9 @@ class _SkeletonRow extends StatelessWidget {
   }
 }
 
+/// Skeleton for the small service chip row.
+/// Mirrors the real service tile: 100 px wide, square-ish image area,
+/// then a centred single-line name bone at the bottom.
 class _ServicesSkeletonRow extends StatelessWidget {
   const _ServicesSkeletonRow();
 
@@ -848,66 +852,205 @@ class _ServicesSkeletonRow extends StatelessWidget {
     final baseColor = theme.colorScheme.onSurface.withValues(alpha: 0.06);
     final highlightColor = theme.colorScheme.onSurface.withValues(alpha: 0.13);
 
-    return SizedBox(
+    return Container(
       height: 180,
-      child: Shimmer.fromColors(
-        baseColor: baseColor,
-        highlightColor: highlightColor,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          itemCount: 3,
-          itemBuilder: (context, index) => Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Container(
-              width: 140,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Expanded(
-                    flex: 5,
-                    child: ColoredBox(color: Colors.white),
+      margin: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row skeleton — title bone + SEE ALL bone
+          Shimmer.fromColors(
+            baseColor: baseColor,
+            highlightColor: highlightColor,
+            child: Row(
+              children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 12,
-                            width: 90,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          Container(
-                            height: 10,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                        ],
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 110,
+                  height: 14,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  width: 56,
+                  height: 12,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Service chip tiles
+          Expanded(
+            child: Shimmer.fromColors(
+              baseColor: baseColor,
+              highlightColor: highlightColor,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: 5,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, index) => Container(
+                  width: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Image area
+                      const Expanded(
+                        flex: 7,
+                        child: ColoredBox(color: Colors.white),
                       ),
-                    ),
+                      // Name label area
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 8,
+                        ),
+                        child: Center(
+                          child: Container(
+                            height: 10,
+                            width: 64,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Skeleton for the rotating service hero card.
+/// Mirrors the 220 px container: full-bleed shimmer image, gradient overlay
+/// bone, service name bone, stat-badge bones, and explore button bone.
+class _RotatingServiceHeroSkeleton extends SliverToBoxAdapter {
+  _RotatingServiceHeroSkeleton()
+    : super(child: const _RotatingServiceHeroSkeletonContent());
+}
+
+class _RotatingServiceHeroSkeletonContent extends StatelessWidget {
+  const _RotatingServiceHeroSkeletonContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final baseColor = theme.colorScheme.onSurface.withValues(alpha: 0.06);
+    final highlightColor = theme.colorScheme.onSurface.withValues(alpha: 0.13);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+      child: Shimmer.fromColors(
+        baseColor: baseColor,
+        highlightColor: highlightColor,
+        child: Container(
+          height: 220,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Full bleed image bone
+              const ColoredBox(color: Colors.white),
+              // Gradient-overlay area (bottom ~40%)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  height: 110,
+                  decoration: BoxDecoration(
+                    // Slightly lighter so the bone lines below are visible
+                    color: Colors.white.withValues(alpha: 0.6),
+                  ),
+                ),
+              ),
+              // Content bones at bottom-left
+              const Positioned(
+                left: 20,
+                right: 20,
+                bottom: 20,
+                child: _HeroBones(),
+              ),
+            ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+class _HeroBones extends StatelessWidget {
+  const _HeroBones();
+
+  Widget _bone({required double width, required double height}) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Service name bone
+        _bone(width: 180, height: 22),
+        const SizedBox(height: 8),
+        // Stat badge bones
+        Row(
+          children: [
+            _bone(width: 60, height: 18),
+            const SizedBox(width: 8),
+            _bone(width: 72, height: 18),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Explore button bone
+        Container(
+          width: 120,
+          height: 36,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ],
     );
   }
 }

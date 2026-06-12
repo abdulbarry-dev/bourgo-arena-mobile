@@ -120,20 +120,37 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
     }
 
     if (_viewModel.errorMessage != null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              _viewModel.errorMessage!,
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _viewModel.loadData,
-              child: Text(AppLocalizations.of(context)!.actionRetry),
-            ),
-          ],
+      return RefreshIndicator(
+        onRefresh: _viewModel.loadData,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              children: [
+                SizedBox(
+                  height: constraints.maxHeight,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        _viewModel.errorMessage!,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _viewModel.loadData,
+                        child: Text(AppLocalizations.of(context)!.actionRetry),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       );
     }
@@ -148,7 +165,10 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
     if (filteredActivities.isEmpty) {
       return RefreshIndicator(
         onRefresh: _viewModel.loadData,
-        child: ListView(children: const []),
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: const [],
+        ),
       );
     }
 
