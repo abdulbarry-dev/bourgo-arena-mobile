@@ -10,6 +10,9 @@ abstract class SubscriptionRepository {
   /// Retrieves the history of all subscriptions for the member.
   Future<Result<List<Subscription>, Failure>> getSubscriptionHistory();
 
-  Future<Result<Subscription, Failure>> subscribeToPlan(String planId);
+  Future<Result<Subscription, Failure>> subscribeToPlan(
+    String planId, {
+    String? childId,
+  });
   Future<Result<void, Failure>> cancelSubscription(String subscriptionId);
 }

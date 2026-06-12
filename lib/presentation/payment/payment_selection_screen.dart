@@ -80,6 +80,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       amount: widget.plan.price,
       provider: provider,
       description: 'Subscription to ${widget.plan.name}',
+      childId: widget.childId,
     );
 
     if (_viewModel.state == PaymentSelectionState.loyaltySuccess) {

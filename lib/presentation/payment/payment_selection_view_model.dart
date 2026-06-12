@@ -54,6 +54,7 @@ class PaymentSelectionViewModel extends ChangeNotifier {
     required double amount,
     required String provider,
     String? description,
+    String? childId,
   }) async {
     if (_isProcessing) return;
     _isProcessing = true;
@@ -62,7 +63,7 @@ class PaymentSelectionViewModel extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
 
-    final subResult = await _subscribeToPlanUseCase(planId);
+    final subResult = await _subscribeToPlanUseCase(planId, childId: childId);
 
     final subscription = subResult.fold<Subscription?>(
       onSuccess: (sub) => sub,

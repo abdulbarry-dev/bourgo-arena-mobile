@@ -8,7 +8,10 @@ class SubscribeToPlanUseCase {
 
   SubscribeToPlanUseCase(this._repository);
 
-  Future<Result<Subscription, Failure>> call(String planId) async {
-    return _repository.subscribeToPlan(planId);
+  Future<Result<Subscription, Failure>> call(
+    String planId, {
+    String? childId,
+  }) async {
+    return _repository.subscribeToPlan(planId, childId: childId);
   }
 }
