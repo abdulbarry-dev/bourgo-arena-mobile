@@ -67,8 +67,9 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
         context: context,
         icon: Symbols.stars,
         title: AppLocalizations.of(context)!.paymentPayWithPointsTitle,
-        message: AppLocalizations.of(context)!.paymentPayWithPointsWarning
-            .replaceAll('{price}', widget.plan.price.toStringAsFixed(2)),
+        message: AppLocalizations.of(
+          context,
+        )!.paymentPayWithPointsWarning(widget.plan.price.toStringAsFixed(2)),
         confirmLabel: AppLocalizations.of(context)!.paymentPayNow,
       );
       if (confirmed != true) return;
@@ -226,12 +227,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           const SizedBox(height: 16),
           Text(
             widget.childId != null
-                ? AppLocalizations.of(context)!.paymentSuccessChildDesc
-                      .replaceAll('{planName}', widget.plan.name)
-                : AppLocalizations.of(context)!.paymentSuccessDesc.replaceAll(
-                    '{planName}',
-                    widget.plan.name,
-                  ),
+                ? AppLocalizations.of(
+                    context,
+                  )!.paymentSuccessChildDesc(widget.plan.name)
+                : AppLocalizations.of(context)!.paymentSuccessDesc,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -362,9 +361,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               .fade(duration: 400.ms)
               .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           Text(
-                AppLocalizations.of(
-                  context,
-                )!.paymentForPlan.replaceAll('{planName}', widget.plan.name),
+                AppLocalizations.of(context)!.paymentForPlan(widget.plan.name),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -537,7 +534,7 @@ class _PaymentMethodCard extends StatelessWidget {
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
-                        if (bottomContent != null) bottomContent!,
+                        ?bottomContent,
                       ],
                     ),
                   ),

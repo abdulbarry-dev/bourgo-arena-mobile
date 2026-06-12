@@ -141,22 +141,22 @@ class _PaymentStatus extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(24),
       child: switch (viewModel.state) {
-        PaymentState.initiating => const Center(
+        PaymentState.initiating => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
               Text(AppLocalizations.of(context)!.paymentPreparing),
             ],
           ),
         ),
-        PaymentState.awaitingVerification => const Center(
+        PaymentState.awaitingVerification => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
               Text(AppLocalizations.of(context)!.paymentVerifying),
             ],
           ),

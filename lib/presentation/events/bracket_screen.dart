@@ -176,14 +176,18 @@ class _BracketRoundCard extends StatelessWidget {
   const _BracketRoundCard({required this.round, required this.isLast});
 
   String _roundLabel(BuildContext context, int roundNumber, int totalRounds) {
-    if (totalRounds == 1)
+    if (totalRounds == 1) {
       return AppLocalizations.of(context)!.eventsBracketFinal;
-    if (roundNumber == totalRounds)
+    }
+    if (roundNumber == totalRounds) {
       return AppLocalizations.of(context)!.eventsBracketFinal;
-    if (roundNumber == totalRounds - 1)
+    }
+    if (roundNumber == totalRounds - 1) {
       return AppLocalizations.of(context)!.eventsBracketSemiFinals;
-    if (roundNumber == totalRounds - 2)
+    }
+    if (roundNumber == totalRounds - 2) {
       return AppLocalizations.of(context)!.eventsBracketQuarterFinals;
+    }
     return '${AppLocalizations.of(context)!.eventsBracketRound} $roundNumber';
   }
 

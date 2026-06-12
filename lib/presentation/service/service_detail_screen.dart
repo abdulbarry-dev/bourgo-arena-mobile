@@ -168,6 +168,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   }
 
   Widget _buildError(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
@@ -266,6 +267,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
     ThemeData theme,
     Service service,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),

@@ -26,7 +26,7 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
                   'device_id': deviceId,
                   'platform': platform,
                   'app_version': appVersion,
-                  if (fingerprint != null) 'device_fingerprint': fingerprint,
+                  'device_fingerprint': ?fingerprint,
                   if (integrityToken != null && integrityToken.isNotEmpty)
                     'integrity_token': integrityToken,
                 },

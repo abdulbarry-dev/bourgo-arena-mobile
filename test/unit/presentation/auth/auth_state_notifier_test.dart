@@ -9,8 +9,6 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:checks/checks.dart';
-import 'package:bourgo_arena_mobile/domain/core/failure.dart';
-import 'package:bourgo_arena_mobile/domain/core/app_error_code.dart';
 import '../../../test_utils.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}

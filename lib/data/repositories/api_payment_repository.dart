@@ -85,10 +85,12 @@ class ApiPaymentRepository implements PaymentRepository {
   }) {
     return executeApiCall(() async {
       final body = <String, dynamic>{};
-      if (paymentReference != null)
+      if (paymentReference != null) {
         body['payment_reference'] = paymentReference;
-      if (gatewayTransactionId != null)
+      }
+      if (gatewayTransactionId != null) {
         body['gateway_transaction_id'] = gatewayTransactionId;
+      }
 
       final response =
           await _apiClient.post('/payments/verify', body)

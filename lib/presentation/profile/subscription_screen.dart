@@ -423,8 +423,9 @@ class _PlanDetailsSection extends StatelessWidget {
     final spacing = context.spacing;
     final description = subscription.plan?.description;
 
-    if (description == null || description.isEmpty)
+    if (description == null || description.isEmpty) {
       return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

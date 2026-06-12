@@ -2257,6 +2257,2196 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Personnalisez l\'apparence de l\'application selon vos préférences.'**
   String get themeSelectionSubtitle;
+
+  /// No description provided for @activitiesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'ACTIVITÉS'**
+  String get activitiesTitle;
+
+  /// No description provided for @coursesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'COURS'**
+  String get coursesTitle;
+
+  /// No description provided for @coursesSubscriptionRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Certains cours nécessitent un abonnement pour réserver des séances.'**
+  String get coursesSubscriptionRequired;
+
+  /// No description provided for @coursesViewOffers.
+  ///
+  /// In fr, this message translates to:
+  /// **'VOIR LES OFFRES'**
+  String get coursesViewOffers;
+
+  /// No description provided for @childSelectorTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'POUR QUI EST-CE ?'**
+  String get childSelectorTitle;
+
+  /// No description provided for @childSelectorSelfDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'inscrire pour soi-même'**
+  String get childSelectorSelfDesc;
+
+  /// No description provided for @childSelectorNoChildrenTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun enfant trouvé'**
+  String get childSelectorNoChildrenTitle;
+
+  /// No description provided for @childSelectorNoChildrenDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'avez actuellement aucun enfant ajouté.'**
+  String get childSelectorNoChildrenDesc;
+
+  /// No description provided for @otpVerifyTitlePrefix.
+  ///
+  /// In fr, this message translates to:
+  /// **'VÉRIFIER'**
+  String get otpVerifyTitlePrefix;
+
+  /// No description provided for @otpSentToText.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous avons envoyé un code au\n'**
+  String get otpSentToText;
+
+  /// No description provided for @otpPasteClipboard.
+  ///
+  /// In fr, this message translates to:
+  /// **'COLLER DEPUIS LE PRESSE-PAPIERS'**
+  String get otpPasteClipboard;
+
+  /// No description provided for @otpErrorIncomplete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir les 6 chiffres'**
+  String get otpErrorIncomplete;
+
+  /// No description provided for @otpErrorFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'La vérification a échoué'**
+  String get otpErrorFailed;
+
+  /// No description provided for @paymentErrorLaunch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir la page de paiement.'**
+  String get paymentErrorLaunch;
+
+  /// No description provided for @paymentTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement'**
+  String get paymentTitle;
+
+  /// No description provided for @paymentPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préparation du paiement...'**
+  String get paymentPreparing;
+
+  /// No description provided for @paymentVerifying.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification du paiement...'**
+  String get paymentVerifying;
+
+  /// No description provided for @paymentSuccessTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement réussi !'**
+  String get paymentSuccessTitle;
+
+  /// No description provided for @paymentSuccessDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre réservation est confirmée.'**
+  String get paymentSuccessDesc;
+
+  /// No description provided for @paymentBackHome.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour à l\'accueil'**
+  String get paymentBackHome;
+
+  /// No description provided for @paymentFailedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec du paiement'**
+  String get paymentFailedTitle;
+
+  /// No description provided for @paymentTryAgain.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get paymentTryAgain;
+
+  /// No description provided for @reservationsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'MES RÉSERVATIONS'**
+  String get reservationsTitle;
+
+  /// No description provided for @reservationsUpcomingTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'À VENIR'**
+  String get reservationsUpcomingTab;
+
+  /// No description provided for @reservationsHistoryTab.
+  ///
+  /// In fr, this message translates to:
+  /// **'HISTORIQUE'**
+  String get reservationsHistoryTab;
+
+  /// No description provided for @reservationsEmptyUpcomingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'AUCUNE RÉSERVATION À VENIR'**
+  String get reservationsEmptyUpcomingTitle;
+
+  /// No description provided for @reservationsEmptyUpcomingDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'avez pas encore de réservations à venir.'**
+  String get reservationsEmptyUpcomingDesc;
+
+  /// No description provided for @reservationsEmptyHistoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'HISTORIQUE VIDE'**
+  String get reservationsEmptyHistoryTitle;
+
+  /// No description provided for @reservationsEmptyHistoryDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'avez pas encore de réservations passées.'**
+  String get reservationsEmptyHistoryDesc;
+
+  /// No description provided for @errorLoadingFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chargement échoué'**
+  String get errorLoadingFailed;
+
+  /// No description provided for @actionRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get actionRetry;
+
+  /// No description provided for @actionCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'ANNULER'**
+  String get actionCancel;
+
+  /// No description provided for @actionVerify.
+  ///
+  /// In fr, this message translates to:
+  /// **'VÉRIFIER'**
+  String get actionVerify;
+
+  /// No description provided for @actionPayNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAYER MAINTENANT'**
+  String get actionPayNow;
+
+  /// No description provided for @paymentErrorGeneric.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur est survenue.'**
+  String get paymentErrorGeneric;
+
+  /// No description provided for @paymentPointsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAYER AVEC DES POINTS'**
+  String get paymentPointsTitle;
+
+  /// No description provided for @paymentPointsDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous êtes sur le point de payer votre réservation avec vos points de fidélité. Cette action ne peut pas être annulée.'**
+  String get paymentPointsDesc;
+
+  /// No description provided for @paymentErrorMissingId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant de réservation manquant pour le paiement par fidélité.'**
+  String get paymentErrorMissingId;
+
+  /// No description provided for @paymentErrorInvalidId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format de l\'identifiant de réservation invalide.'**
+  String get paymentErrorInvalidId;
+
+  /// No description provided for @paymentErrorNoUrl.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune URL de paiement reçue du serveur. Veuillez réessayer.'**
+  String get paymentErrorNoUrl;
+
+  /// No description provided for @paymentErrorUnconfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement non encore confirmé. Vous pouvez vérifier vos réservations.'**
+  String get paymentErrorUnconfirmed;
+
+  /// No description provided for @paymentCreatingReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Création de la réservation...'**
+  String get paymentCreatingReservation;
+
+  /// No description provided for @paymentOpeningGateway.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouverture de la passerelle de paiement...'**
+  String get paymentOpeningGateway;
+
+  /// No description provided for @paymentViewBooking.
+  ///
+  /// In fr, this message translates to:
+  /// **'VOIR MA RÉSERVATION'**
+  String get paymentViewBooking;
+
+  /// No description provided for @paymentDepositRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Acompte de 10% requis'**
+  String get paymentDepositRequired;
+
+  /// No description provided for @paymentMethodCardDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cartes bancaires, E-Dinar, Portefeuilles'**
+  String get paymentMethodCardDesc;
+
+  /// No description provided for @paymentMethodPointsDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisez vos points de fidélité accumulés'**
+  String get paymentMethodPointsDesc;
+
+  /// No description provided for @serviceDetailPlans.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnements'**
+  String get serviceDetailPlans;
+
+  /// No description provided for @serviceDetailCourses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cours'**
+  String get serviceDetailCourses;
+
+  /// No description provided for @serviceDetailEvents.
+  ///
+  /// In fr, this message translates to:
+  /// **'Événements'**
+  String get serviceDetailEvents;
+
+  /// No description provided for @serviceDetailActivities.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activités'**
+  String get serviceDetailActivities;
+
+  /// No description provided for @serviceDetailErrorMsg.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur est survenue'**
+  String get serviceDetailErrorMsg;
+
+  /// No description provided for @serviceDetailRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get serviceDetailRetry;
+
+  /// No description provided for @serviceDetailActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actif'**
+  String get serviceDetailActive;
+
+  /// No description provided for @serviceDetailAnnual.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuel'**
+  String get serviceDetailAnnual;
+
+  /// No description provided for @serviceDetailYears.
+  ///
+  /// In fr, this message translates to:
+  /// **'Années'**
+  String get serviceDetailYears;
+
+  /// No description provided for @serviceDetailMonthly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mensuel'**
+  String get serviceDetailMonthly;
+
+  /// No description provided for @serviceDetailMonths.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mois'**
+  String get serviceDetailMonths;
+
+  /// No description provided for @serviceDetailDays.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jours'**
+  String get serviceDetailDays;
+
+  /// No description provided for @serviceDetailAllCourses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous les cours'**
+  String get serviceDetailAllCourses;
+
+  /// No description provided for @serviceDetailEventLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Événement'**
+  String get serviceDetailEventLabel;
+
+  /// No description provided for @servicesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Services'**
+  String get servicesTitle;
+
+  /// No description provided for @servicesSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher des services...'**
+  String get servicesSearchHint;
+
+  /// No description provided for @servicesFilterAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous'**
+  String get servicesFilterAll;
+
+  /// No description provided for @servicesFilterPlans.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnements'**
+  String get servicesFilterPlans;
+
+  /// No description provided for @servicesFilterCourses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cours'**
+  String get servicesFilterCourses;
+
+  /// No description provided for @servicesFilterEvents.
+  ///
+  /// In fr, this message translates to:
+  /// **'Événements'**
+  String get servicesFilterEvents;
+
+  /// No description provided for @servicesNoMatching.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun service correspondant'**
+  String get servicesNoMatching;
+
+  /// No description provided for @servicesNoAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun service disponible'**
+  String get servicesNoAvailable;
+
+  /// No description provided for @servicesAdjustSearch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Essayez d\'ajuster votre recherche ou vos filtres.'**
+  String get servicesAdjustSearch;
+
+  /// No description provided for @servicesCheckBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenez bientôt pour de nouveaux services.'**
+  String get servicesCheckBack;
+
+  /// No description provided for @notifGlobalTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications Globales'**
+  String get notifGlobalTitle;
+
+  /// No description provided for @notifEnablePush.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activer les notifications push'**
+  String get notifEnablePush;
+
+  /// No description provided for @notifEnablePushSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bouton principal pour toutes les notifications'**
+  String get notifEnablePushSub;
+
+  /// No description provided for @notifPlanningTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Planning et Cours'**
+  String get notifPlanningTitle;
+
+  /// No description provided for @notifReservations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations et Planning'**
+  String get notifReservations;
+
+  /// No description provided for @notifReservationsSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmations de réservation, rappels et annulations'**
+  String get notifReservationsSub;
+
+  /// No description provided for @notifCourses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cours'**
+  String get notifCourses;
+
+  /// No description provided for @notifCoursesSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mises à jour de vos cours et instructeurs'**
+  String get notifCoursesSub;
+
+  /// No description provided for @notifAccountTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte et Paiements'**
+  String get notifAccountTitle;
+
+  /// No description provided for @notifSubscriptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnements'**
+  String get notifSubscriptions;
+
+  /// No description provided for @notifSubscriptionsSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avis de renouvellement et problèmes de paiement'**
+  String get notifSubscriptionsSub;
+
+  /// No description provided for @notifSecurity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avertissements et Mises à jour de sécurité'**
+  String get notifSecurity;
+
+  /// No description provided for @notifSecuritySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mises à jour cruciales sur la sécurité du compte'**
+  String get notifSecuritySub;
+
+  /// No description provided for @notifCommunityTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Communauté et Offres'**
+  String get notifCommunityTitle;
+
+  /// No description provided for @notifFamily.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activité Familiale'**
+  String get notifFamily;
+
+  /// No description provided for @notifFamilySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Activités et approbations des comptes enfants'**
+  String get notifFamilySub;
+
+  /// No description provided for @notifLoyalty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fidélité et Points'**
+  String get notifLoyalty;
+
+  /// No description provided for @notifLoyaltySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récompenses gagnées et niveaux supérieurs'**
+  String get notifLoyaltySub;
+
+  /// No description provided for @notifPromo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Promotions et Offres'**
+  String get notifPromo;
+
+  /// No description provided for @notifPromoSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recevez des mises à jour sur les nouvelles offres'**
+  String get notifPromoSub;
+
+  /// No description provided for @paymentPayWithPointsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAYER AVEC DES POINTS'**
+  String get paymentPayWithPointsTitle;
+
+  /// No description provided for @paymentPayWithPointsWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous êtes sur le point de payer {price} TND avec vos points de fidélité. Cette action est irréversible.'**
+  String paymentPayWithPointsWarning(String price);
+
+  /// No description provided for @paymentPayNow.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAYER MAINTENANT'**
+  String get paymentPayNow;
+
+  /// No description provided for @paymentErrorCannotOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir la page de paiement.'**
+  String get paymentErrorCannotOpen;
+
+  /// No description provided for @paymentFailedRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le paiement a échoué. Veuillez réessayer.'**
+  String get paymentFailedRetry;
+
+  /// No description provided for @paymentMethodTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'MÉTHODE DE PAIEMENT'**
+  String get paymentMethodTitle;
+
+  /// No description provided for @paymentLoadingCreatingSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Création de l\'abonnement...'**
+  String get paymentLoadingCreatingSub;
+
+  /// No description provided for @paymentLoadingPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préparation du paiement...'**
+  String get paymentLoadingPreparing;
+
+  /// No description provided for @paymentLoadingLoyalty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Traitement du paiement de fidélité...'**
+  String get paymentLoadingLoyalty;
+
+  /// No description provided for @paymentLoadingVerifying.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification du paiement...'**
+  String get paymentLoadingVerifying;
+
+  /// No description provided for @paymentSuccessChildDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'abonnement à {planName} est maintenant actif pour votre enfant.'**
+  String paymentSuccessChildDesc(String planName);
+
+  /// No description provided for @paymentBackToHome.
+  ///
+  /// In fr, this message translates to:
+  /// **'RETOUR À L\'ACCUEIL'**
+  String get paymentBackToHome;
+
+  /// No description provided for @paymentUnknownError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur inconnue s\'est produite.'**
+  String get paymentUnknownError;
+
+  /// No description provided for @paymentTotalAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'MONTANT TOTAL'**
+  String get paymentTotalAmount;
+
+  /// No description provided for @paymentForPlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour {planName}'**
+  String paymentForPlan(String planName);
+
+  /// No description provided for @paymentSelectMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'SÉLECTIONNER LA MÉTHODE DE PAIEMENT'**
+  String get paymentSelectMethod;
+
+  /// No description provided for @paymentMethodKonnectTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Payer avec Konnect'**
+  String get paymentMethodKonnectTitle;
+
+  /// No description provided for @paymentMethodKonnectSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cartes Bancaires, E-Dinar, Portefeuilles'**
+  String get paymentMethodKonnectSubtitle;
+
+  /// No description provided for @paymentOr.
+  ///
+  /// In fr, this message translates to:
+  /// **'OU'**
+  String get paymentOr;
+
+  /// No description provided for @paymentMethodLoyaltyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Payer avec le Solde de Fidélité'**
+  String get paymentMethodLoyaltyTitle;
+
+  /// No description provided for @paymentMethodLoyaltySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisez vos points accumulés'**
+  String get paymentMethodLoyaltySubtitle;
+
+  /// No description provided for @paymentSecurePaymentTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PAIEMENT SÉCURISÉ'**
+  String get paymentSecurePaymentTitle;
+
+  /// No description provided for @courseDetailBookedSession.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservé {title} le {date} à {time}'**
+  String courseDetailBookedSession(String title, String date, String time);
+
+  /// No description provided for @subscriptionRequiredTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'ABONNEMENT REQUIS'**
+  String get subscriptionRequiredTitle;
+
+  /// No description provided for @subscriptionRequiredBookMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez besoin d\'un abonnement actif pour réserver des sessions. Abonnez-vous à un plan et réessayez.'**
+  String get subscriptionRequiredBookMessage;
+
+  /// No description provided for @subscriptionRequiredSignInMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connectez-vous et abonnez-vous à un plan pour réserver des sessions.'**
+  String get subscriptionRequiredSignInMessage;
+
+  /// No description provided for @closeButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'FERMER'**
+  String get closeButton;
+
+  /// No description provided for @viewPlansButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'VOIR LES PLANS'**
+  String get viewPlansButton;
+
+  /// No description provided for @signInButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'SE CONNECTER'**
+  String get signInButton;
+
+  /// No description provided for @monthJanuary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Janvier'**
+  String get monthJanuary;
+
+  /// No description provided for @monthFebruary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Février'**
+  String get monthFebruary;
+
+  /// No description provided for @monthMarch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mars'**
+  String get monthMarch;
+
+  /// No description provided for @monthApril.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avril'**
+  String get monthApril;
+
+  /// No description provided for @monthMay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mai'**
+  String get monthMay;
+
+  /// No description provided for @monthJune.
+  ///
+  /// In fr, this message translates to:
+  /// **'Juin'**
+  String get monthJune;
+
+  /// No description provided for @monthJuly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Juillet'**
+  String get monthJuly;
+
+  /// No description provided for @monthAugust.
+  ///
+  /// In fr, this message translates to:
+  /// **'Août'**
+  String get monthAugust;
+
+  /// No description provided for @monthSeptember.
+  ///
+  /// In fr, this message translates to:
+  /// **'Septembre'**
+  String get monthSeptember;
+
+  /// No description provided for @monthOctober.
+  ///
+  /// In fr, this message translates to:
+  /// **'Octobre'**
+  String get monthOctober;
+
+  /// No description provided for @monthNovember.
+  ///
+  /// In fr, this message translates to:
+  /// **'Novembre'**
+  String get monthNovember;
+
+  /// No description provided for @monthDecember.
+  ///
+  /// In fr, this message translates to:
+  /// **'Décembre'**
+  String get monthDecember;
+
+  /// No description provided for @reserveAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉSERVER'**
+  String get reserveAction;
+
+  /// No description provided for @daySunday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dimanche'**
+  String get daySunday;
+
+  /// No description provided for @dayMonday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lundi'**
+  String get dayMonday;
+
+  /// No description provided for @dayTuesday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mardi'**
+  String get dayTuesday;
+
+  /// No description provided for @dayWednesday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mercredi'**
+  String get dayWednesday;
+
+  /// No description provided for @dayThursday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jeudi'**
+  String get dayThursday;
+
+  /// No description provided for @dayFriday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vendredi'**
+  String get dayFriday;
+
+  /// No description provided for @daySaturday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Samedi'**
+  String get daySaturday;
+
+  /// No description provided for @courseDefaultTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'COURS'**
+  String get courseDefaultTitle;
+
+  /// No description provided for @upcomingSessionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'SESSIONS À VENIR'**
+  String get upcomingSessionsTitle;
+
+  /// No description provided for @noUpcomingSessionsMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune session à venir cette semaine'**
+  String get noUpcomingSessionsMessage;
+
+  /// No description provided for @subscriptionRequiredViewBookMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous avez besoin d\'un abonnement actif pour voir et réserver des sessions pour ce cours.'**
+  String get subscriptionRequiredViewBookMessage;
+
+  /// No description provided for @subscriptionRequiredSignInViewBookMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connectez-vous et abonnez-vous à un plan pour voir et réserver des sessions.'**
+  String get subscriptionRequiredSignInViewBookMessage;
+
+  /// No description provided for @statusBooked.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉSERVÉ'**
+  String get statusBooked;
+
+  /// No description provided for @statusFull.
+  ///
+  /// In fr, this message translates to:
+  /// **'COMPLET'**
+  String get statusFull;
+
+  /// No description provided for @remainingPlaces.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} PLACES'**
+  String remainingPlaces(String count);
+
+  /// No description provided for @viewDetailsLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'VOIR LES DÉTAILS'**
+  String get viewDetailsLabel;
+
+  /// No description provided for @signInRequiredTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion requise'**
+  String get signInRequiredTitle;
+
+  /// No description provided for @signInRequiredMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous devez être connecté pour voir et réserver des cours. Rejoignez-nous pour commencer votre parcours de fitness !'**
+  String get signInRequiredMessage;
+
+  /// No description provided for @signInRegisterButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se connecter / S\'inscrire'**
+  String get signInRegisterButton;
+
+  /// No description provided for @unlockPlanningTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Débloquer le planning'**
+  String get unlockPlanningTitle;
+
+  /// No description provided for @unlockPlanningMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un abonnement actif est requis pour voir les horaires des cours et réserver des classes. Rejoignez-nous et élevez votre parcours de fitness !'**
+  String get unlockPlanningMessage;
+
+  /// No description provided for @viewPlansLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les plans'**
+  String get viewPlansLabel;
+
+  /// No description provided for @planningErrorTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'ERREUR DE PLANNING'**
+  String get planningErrorTitle;
+
+  /// No description provided for @planningErrorMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de récupérer le programme des cours. Veuillez vérifier votre connexion.'**
+  String get planningErrorMessage;
+
+  /// No description provided for @retryAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get retryAction;
+
+  /// No description provided for @planningSignInTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONNECTEZ-VOUS'**
+  String get planningSignInTitle;
+
+  /// No description provided for @planningSignInMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connectez-vous pour accéder à votre planning de cours et réserver vos séances.'**
+  String get planningSignInMessage;
+
+  /// No description provided for @planningNoSessionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'AUCUNE SÉANCE'**
+  String get planningNoSessionsTitle;
+
+  /// No description provided for @planningNoSessionsSubscriptionMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune séance disponible avec votre abonnement actuel. Passez à un abonnement supérieur pour accéder à plus de cours.'**
+  String get planningNoSessionsSubscriptionMessage;
+
+  /// No description provided for @planningNoSessionsWeekMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune séance à venir cette semaine. Revenez plus tard pour découvrir le programme.'**
+  String get planningNoSessionsWeekMessage;
+
+  /// No description provided for @meLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moi'**
+  String get meLabel;
+
+  /// No description provided for @meMemberName.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} (Moi)'**
+  String meMemberName(String name);
+
+  /// No description provided for @browseTabCourses.
+  ///
+  /// In fr, this message translates to:
+  /// **'COURS'**
+  String get browseTabCourses;
+
+  /// No description provided for @browseTabActivities.
+  ///
+  /// In fr, this message translates to:
+  /// **'ACTIVITÉS'**
+  String get browseTabActivities;
+
+  /// No description provided for @browseTabEvents.
+  ///
+  /// In fr, this message translates to:
+  /// **'ÉVÉNEMENTS'**
+  String get browseTabEvents;
+
+  /// No description provided for @browseErrorTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'ERREUR'**
+  String get browseErrorTitle;
+
+  /// No description provided for @browseErrorRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉESSAYER'**
+  String get browseErrorRetry;
+
+  /// No description provided for @browseEventFallback.
+  ///
+  /// In fr, this message translates to:
+  /// **'ÉVÉNEMENT'**
+  String get browseEventFallback;
+
+  /// No description provided for @browseUnknownStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inconnu'**
+  String get browseUnknownStatus;
+
+  /// No description provided for @profileSubscriptionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer votre forfait et accès premium'**
+  String get profileSubscriptionSubtitle;
+
+  /// No description provided for @profileNotificationsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer vos alertes et rappels de cours'**
+  String get profileNotificationsSubtitle;
+
+  /// No description provided for @profileSettingsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations personnelles et sécurité'**
+  String get profileSettingsSubtitle;
+
+  /// No description provided for @editProfilePhotoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'PHOTO DE PROFIL'**
+  String get editProfilePhotoTitle;
+
+  /// No description provided for @editProfileTakePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'PRENDRE UNE PHOTO'**
+  String get editProfileTakePhoto;
+
+  /// No description provided for @editProfileChoosePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'CHOISIR UNE PHOTO'**
+  String get editProfileChoosePhoto;
+
+  /// No description provided for @editProfileDeletePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'SUPPRIMER LA PHOTO'**
+  String get editProfileDeletePhoto;
+
+  /// No description provided for @editProfilePhotoUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo de profil mise à jour'**
+  String get editProfilePhotoUpdated;
+
+  /// No description provided for @editProfilePhotoFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec du téléchargement'**
+  String get editProfilePhotoFailed;
+
+  /// No description provided for @editProfileDeletePhotoConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous vraiment supprimer votre photo de profil ?'**
+  String get editProfileDeletePhotoConfirm;
+
+  /// No description provided for @commonDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'SUPPRIMER'**
+  String get commonDelete;
+
+  /// No description provided for @editProfilePhotoDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo de profil supprimée'**
+  String get editProfilePhotoDeleted;
+
+  /// No description provided for @editProfilePhotoDeleteFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de la suppression'**
+  String get editProfilePhotoDeleteFailed;
+
+  /// No description provided for @editProfileOtpSendFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de l\'envoi du code à'**
+  String get editProfileOtpSendFailed;
+
+  /// No description provided for @editProfileVerifiedUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'vérifié et mis à jour avec succès !'**
+  String get editProfileVerifiedUpdated;
+
+  /// No description provided for @editProfileUpdateFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de la mise à jour de'**
+  String get editProfileUpdateFailed;
+
+  /// No description provided for @editProfileTabPersonal.
+  ///
+  /// In fr, this message translates to:
+  /// **'PERSONNEL'**
+  String get editProfileTabPersonal;
+
+  /// No description provided for @editProfileTabSecurity.
+  ///
+  /// In fr, this message translates to:
+  /// **'SÉCURITÉ'**
+  String get editProfileTabSecurity;
+
+  /// No description provided for @editProfileGender.
+  ///
+  /// In fr, this message translates to:
+  /// **'GENRE'**
+  String get editProfileGender;
+
+  /// No description provided for @editProfileGenderHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionner le genre'**
+  String get editProfileGenderHint;
+
+  /// No description provided for @editProfileGenderMale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Homme'**
+  String get editProfileGenderMale;
+
+  /// No description provided for @editProfileGenderFemale.
+  ///
+  /// In fr, this message translates to:
+  /// **'Femme'**
+  String get editProfileGenderFemale;
+
+  /// No description provided for @commonVerify.
+  ///
+  /// In fr, this message translates to:
+  /// **'VÉRIFIER'**
+  String get commonVerify;
+
+  /// No description provided for @editProfileSecurityNotice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les modifications de votre e-mail ou numéro nécessitent une vérification par code OTP. Saisissez la nouvelle valeur et cliquez sur VÉRIFIER.'**
+  String get editProfileSecurityNotice;
+
+  /// No description provided for @editProfileEmailHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez votre e-mail'**
+  String get editProfileEmailHint;
+
+  /// No description provided for @editProfilePhoneHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrez votre numéro de téléphone'**
+  String get editProfilePhoneHint;
+
+  /// No description provided for @planDetailChildOnlyPlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Forfait Enfant Uniquement'**
+  String get planDetailChildOnlyPlan;
+
+  /// No description provided for @planDetailChildOnlyDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce forfait est conçu pour les enfants uniquement. Sélectionnez un enfant pour lui acheter ce forfait.'**
+  String get planDetailChildOnlyDesc;
+
+  /// No description provided for @planDetailSelectChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'SÉLECTIONNER UN ENFANT'**
+  String get planDetailSelectChild;
+
+  /// No description provided for @planDetailChildAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enfant ajouté. Veuillez le sélectionner pour continuer.'**
+  String get planDetailChildAdded;
+
+  /// No description provided for @planDetailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉTAILS DU FORFAIT'**
+  String get planDetailTitle;
+
+  /// No description provided for @planDetailIncludes.
+  ///
+  /// In fr, this message translates to:
+  /// **'INCLUS'**
+  String get planDetailIncludes;
+
+  /// No description provided for @planDetailAccessAllCourses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès à TOUS les cours'**
+  String get planDetailAccessAllCourses;
+
+  /// No description provided for @planDetailSubscribeFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'ABONNER POUR'**
+  String get planDetailSubscribeFor;
+
+  /// No description provided for @planDetailMyself.
+  ///
+  /// In fr, this message translates to:
+  /// **'Moi-même'**
+  String get planDetailMyself;
+
+  /// No description provided for @planDetailChild.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enfant'**
+  String get planDetailChild;
+
+  /// No description provided for @planDetailActivePlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'FORFAIT ACTIF'**
+  String get planDetailActivePlan;
+
+  /// No description provided for @planDetailSubscribeBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'ABONNER'**
+  String get planDetailSubscribeBtn;
+
+  /// No description provided for @planDetailErrorSomethingWentWrong.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur s\'est produite'**
+  String get planDetailErrorSomethingWentWrong;
+
+  /// No description provided for @planDetailRetryBtn.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉESSAYER'**
+  String get planDetailRetryBtn;
+
+  /// No description provided for @planDetailNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Forfait introuvable'**
+  String get planDetailNotFound;
+
+  /// No description provided for @planDetailArchived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce forfait a peut-être été archivé ou retiré.'**
+  String get planDetailArchived;
+
+  /// No description provided for @commonGoBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'RETOUR'**
+  String get commonGoBack;
+
+  /// No description provided for @eventsBracketRound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tour'**
+  String get eventsBracketRound;
+
+  /// No description provided for @eventsBracketSemiFinals.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demi-finales'**
+  String get eventsBracketSemiFinals;
+
+  /// No description provided for @eventsBracketTBD.
+  ///
+  /// In fr, this message translates to:
+  /// **'À déterminer'**
+  String get eventsBracketTBD;
+
+  /// No description provided for @eventsBracketTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arbre du tournoi'**
+  String get eventsBracketTitle;
+
+  /// No description provided for @eventsBracketWalkover.
+  ///
+  /// In fr, this message translates to:
+  /// **'Forfait'**
+  String get eventsBracketWalkover;
+
+  /// No description provided for @eventsDetailCheckedInStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistré'**
+  String get eventsDetailCheckedInStatus;
+
+  /// No description provided for @eventsDetailCheckInAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'enregistrer'**
+  String get eventsDetailCheckInAction;
+
+  /// No description provided for @eventsDetailCheckInRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrement requis'**
+  String get eventsDetailCheckInRequired;
+
+  /// No description provided for @eventsDetailCheckInSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrement réussi'**
+  String get eventsDetailCheckInSuccess;
+
+  /// No description provided for @eventsDetailDateTBD.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date à déterminer'**
+  String get eventsDetailDateTBD;
+
+  /// No description provided for @eventsDetailErrorTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur'**
+  String get eventsDetailErrorTitle;
+
+  /// No description provided for @eventsDetailEventFallback.
+  ///
+  /// In fr, this message translates to:
+  /// **'Événement'**
+  String get eventsDetailEventFallback;
+
+  /// No description provided for @eventsDetailFormat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format'**
+  String get eventsDetailFormat;
+
+  /// No description provided for @eventsDetailNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Événement introuvable'**
+  String get eventsDetailNotFound;
+
+  /// No description provided for @eventsDetailParticipantsText.
+  ///
+  /// In fr, this message translates to:
+  /// **'Participants'**
+  String get eventsDetailParticipantsText;
+
+  /// No description provided for @eventsDetailRegisterAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'inscrire'**
+  String get eventsDetailRegisterAction;
+
+  /// No description provided for @eventsDetailRegisterBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'inscrire avant le'**
+  String get eventsDetailRegisterBy;
+
+  /// No description provided for @eventsDetailRegisteredStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inscrit'**
+  String get eventsDetailRegisteredStatus;
+
+  /// No description provided for @eventsDetailRegisterSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inscription réussie'**
+  String get eventsDetailRegisterSuccess;
+
+  /// No description provided for @eventsDetailRegisterTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'inscrire à l\'événement'**
+  String get eventsDetailRegisterTitle;
+
+  /// No description provided for @eventsDetailRegistrationClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inscriptions fermées'**
+  String get eventsDetailRegistrationClosed;
+
+  /// No description provided for @eventsDetailRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get eventsDetailRetryButton;
+
+  /// No description provided for @eventsDetailTBD.
+  ///
+  /// In fr, this message translates to:
+  /// **'À déterminer'**
+  String get eventsDetailTBD;
+
+  /// No description provided for @eventsDetailThisEvent.
+  ///
+  /// In fr, this message translates to:
+  /// **'cet événement'**
+  String get eventsDetailThisEvent;
+
+  /// No description provided for @eventsDetailViewBracketButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir l\'arbre'**
+  String get eventsDetailViewBracketButton;
+
+  /// No description provided for @eventsDetailWaitlistSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouté à la liste d\'attente'**
+  String get eventsDetailWaitlistSuccess;
+
+  /// No description provided for @eventsDetailWithdrawPromptPrefix.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous vraiment vous désinscrire de'**
+  String get eventsDetailWithdrawPromptPrefix;
+
+  /// No description provided for @eventsDetailWithdrawSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désinscription réussie'**
+  String get eventsDetailWithdrawSuccess;
+
+  /// No description provided for @eventsDetailWithdrawTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se désinscrire'**
+  String get eventsDetailWithdrawTitle;
+
+  /// No description provided for @eventsScreenCheckBackSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenez bientôt pour les prochains tournois'**
+  String get eventsScreenCheckBackSoon;
+
+  /// No description provided for @eventsScreenEventFallback.
+  ///
+  /// In fr, this message translates to:
+  /// **'Événement'**
+  String get eventsScreenEventFallback;
+
+  /// No description provided for @eventsScreenNoTournaments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun tournoi disponible'**
+  String get eventsScreenNoTournaments;
+
+  /// No description provided for @eventsScreenRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get eventsScreenRetryButton;
+
+  /// No description provided for @eventsScreenTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tournois'**
+  String get eventsScreenTitle;
+
+  /// No description provided for @myEventsScreenNoEvents.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun événement trouvé'**
+  String get myEventsScreenNoEvents;
+
+  /// No description provided for @myEventsScreenRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get myEventsScreenRetryButton;
+
+  /// No description provided for @myEventsScreenTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes événements'**
+  String get myEventsScreenTitle;
+
+  /// No description provided for @familyChildBookingsEmptyMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune réservation trouvée.'**
+  String get familyChildBookingsEmptyMessage;
+
+  /// No description provided for @familyChildBookingsEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune réservation'**
+  String get familyChildBookingsEmptyTitle;
+
+  /// No description provided for @familyChildBookingsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get familyChildBookingsTitle;
+
+  /// No description provided for @familyChildCompletedAtPrefix.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé à :'**
+  String get familyChildCompletedAtPrefix;
+
+  /// No description provided for @familyChildCompletedEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune activité terminée'**
+  String get familyChildCompletedEmptyTitle;
+
+  /// No description provided for @familyChildCompletedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get familyChildCompletedTitle;
+
+  /// No description provided for @familyChildProfileDaysRemainingText.
+  ///
+  /// In fr, this message translates to:
+  /// **'jours restants'**
+  String get familyChildProfileDaysRemainingText;
+
+  /// No description provided for @familyChildProfileEnd.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fin :'**
+  String get familyChildProfileEnd;
+
+  /// No description provided for @familyChildProfileErrorFallback.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur s\'est produite'**
+  String get familyChildProfileErrorFallback;
+
+  /// No description provided for @familyChildProfileRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get familyChildProfileRetryButton;
+
+  /// No description provided for @familyChildProfileScheduleButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Calendrier'**
+  String get familyChildProfileScheduleButton;
+
+  /// No description provided for @familyChildProfileStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Début :'**
+  String get familyChildProfileStart;
+
+  /// No description provided for @familyChildReservationsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get familyChildReservationsTitle;
+
+  /// No description provided for @familyChildScheduleEmptyMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun cours ou activité dans cette plage de dates.'**
+  String get familyChildScheduleEmptyMessage;
+
+  /// No description provided for @familyChildScheduleEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun événement prévu'**
+  String get familyChildScheduleEmptyTitle;
+
+  /// No description provided for @familyChildScheduleFrom.
+  ///
+  /// In fr, this message translates to:
+  /// **'DU'**
+  String get familyChildScheduleFrom;
+
+  /// No description provided for @familyChildScheduleTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'CALENDRIER'**
+  String get familyChildScheduleTitle;
+
+  /// No description provided for @familyChildScheduleTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'AU'**
+  String get familyChildScheduleTo;
+
+  /// No description provided for @familyChildScheduleCompletedStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get familyChildScheduleCompletedStatus;
+
+  /// No description provided for @familyChildSessionsBookCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get familyChildSessionsBookCancel;
+
+  /// No description provided for @familyChildSessionsBookDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date :'**
+  String get familyChildSessionsBookDate;
+
+  /// No description provided for @familyChildSessionsBookDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jour :'**
+  String get familyChildSessionsBookDay;
+
+  /// No description provided for @familyChildSessionsBookFull.
+  ///
+  /// In fr, this message translates to:
+  /// **'La session est complète'**
+  String get familyChildSessionsBookFull;
+
+  /// No description provided for @familyChildSessionsBookSpots.
+  ///
+  /// In fr, this message translates to:
+  /// **'Places :'**
+  String get familyChildSessionsBookSpots;
+
+  /// No description provided for @familyChildSessionsBookTime.
+  ///
+  /// In fr, this message translates to:
+  /// **'Heure :'**
+  String get familyChildSessionsBookTime;
+
+  /// No description provided for @familyChildSessionsBookTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réserver une session'**
+  String get familyChildSessionsBookTitle;
+
+  /// No description provided for @familyChildSessionsEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune session disponible'**
+  String get familyChildSessionsEmptyTitle;
+
+  /// No description provided for @familyChildSessionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'SESSIONS DISPONIBLES'**
+  String get familyChildSessionsTitle;
+
+  /// No description provided for @familyChildSessionsBookSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation réussie !'**
+  String get familyChildSessionsBookSuccess;
+
+  /// No description provided for @familyChildSessionsBookFailure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de la réservation'**
+  String get familyChildSessionsBookFailure;
+
+  /// No description provided for @familyChildSessionsBookConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer la réservation'**
+  String get familyChildSessionsBookConfirm;
+
+  /// No description provided for @familyChildSessionsStatusBooked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservé'**
+  String get familyChildSessionsStatusBooked;
+
+  /// No description provided for @familyChildSessionsStatusFull.
+  ///
+  /// In fr, this message translates to:
+  /// **'COMPLET'**
+  String get familyChildSessionsStatusFull;
+
+  /// No description provided for @familyChildSessionsBookTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réserver la session'**
+  String get familyChildSessionsBookTooltip;
+
+  /// No description provided for @familyChildSubscriptionsDaysRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'jours restants'**
+  String get familyChildSubscriptionsDaysRemaining;
+
+  /// No description provided for @familyChildSubscriptionsEnd.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fin :'**
+  String get familyChildSubscriptionsEnd;
+
+  /// No description provided for @familyChildSubscriptionsStart.
+  ///
+  /// In fr, this message translates to:
+  /// **'Début :'**
+  String get familyChildSubscriptionsStart;
+
+  /// No description provided for @familyChildSubscriptionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'ABONNEMENTS'**
+  String get familyChildSubscriptionsTitle;
+
+  /// No description provided for @familyChildSubscriptionsBuyNew.
+  ///
+  /// In fr, this message translates to:
+  /// **'ACHETER UN NOUVEL ABONNEMENT'**
+  String get familyChildSubscriptionsBuyNew;
+
+  /// No description provided for @familyChildSubscriptionsEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun abonnement'**
+  String get familyChildSubscriptionsEmptyTitle;
+
+  /// No description provided for @familyChildSubscriptionsEmptyMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Achetez un abonnement pour commencer.'**
+  String get familyChildSubscriptionsEmptyMessage;
+
+  /// No description provided for @homeAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'disponible(s)'**
+  String get homeAvailable;
+
+  /// No description provided for @homeCoursesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'COURS'**
+  String get homeCoursesTitle;
+
+  /// No description provided for @homeEventsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'TOURNOIS ET ÉVÉNEMENTS'**
+  String get homeEventsTitle;
+
+  /// No description provided for @homeExploreButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'EXPLORER'**
+  String get homeExploreButton;
+
+  /// No description provided for @homeGlobalSearchTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche globale'**
+  String get homeGlobalSearchTooltip;
+
+  /// No description provided for @homeNo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun'**
+  String get homeNo;
+
+  /// No description provided for @homeRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉESSAYER'**
+  String get homeRetryButton;
+
+  /// No description provided for @homeSeeAllButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'VOIR TOUT'**
+  String get homeSeeAllButton;
+
+  /// No description provided for @homeServiceCourses.
+  ///
+  /// In fr, this message translates to:
+  /// **'cours'**
+  String get homeServiceCourses;
+
+  /// No description provided for @homeServiceEvents.
+  ///
+  /// In fr, this message translates to:
+  /// **'événements'**
+  String get homeServiceEvents;
+
+  /// No description provided for @homeServicePlans.
+  ///
+  /// In fr, this message translates to:
+  /// **'plans'**
+  String get homeServicePlans;
+
+  /// No description provided for @homeServicesEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun service disponible'**
+  String get homeServicesEmpty;
+
+  /// No description provided for @homeServicesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'NOS SERVICES'**
+  String get homeServicesTitle;
+
+  /// No description provided for @homeActivityExploreButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'EXPLORER'**
+  String get homeActivityExploreButton;
+
+  /// No description provided for @loyaltyLoadFailedMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger vos points.'**
+  String get loyaltyLoadFailedMessage;
+
+  /// No description provided for @loyaltyLoadFailedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chargement échoué'**
+  String get loyaltyLoadFailedTitle;
+
+  /// No description provided for @loyaltyMaxTierReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'Niveau maximum atteint'**
+  String get loyaltyMaxTierReached;
+
+  /// No description provided for @loyaltyMyPointsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'MES POINTS'**
+  String get loyaltyMyPointsTitle;
+
+  /// No description provided for @loyaltyNextTier.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prochain palier'**
+  String get loyaltyNextTier;
+
+  /// No description provided for @loyaltyNoTransactionMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos transactions de points apparaîtront ici.'**
+  String get loyaltyNoTransactionMessage;
+
+  /// No description provided for @loyaltyNoTransactionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune transaction'**
+  String get loyaltyNoTransactionTitle;
+
+  /// No description provided for @loyaltyPointsBalance.
+  ///
+  /// In fr, this message translates to:
+  /// **'SOLDE DE POINTS'**
+  String get loyaltyPointsBalance;
+
+  /// No description provided for @loyaltyPointsHistoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'HISTORIQUE DES POINTS'**
+  String get loyaltyPointsHistoryTitle;
+
+  /// No description provided for @loyaltyPts.
+  ///
+  /// In fr, this message translates to:
+  /// **'pts'**
+  String get loyaltyPts;
+
+  /// No description provided for @loyaltyRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉESSAYER'**
+  String get loyaltyRetryButton;
+
+  /// No description provided for @loyaltySourceDailyCheckin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Check-in quotidien'**
+  String get loyaltySourceDailyCheckin;
+
+  /// No description provided for @loyaltySourceReferral.
+  ///
+  /// In fr, this message translates to:
+  /// **'Parrainage'**
+  String get loyaltySourceReferral;
+
+  /// No description provided for @loyaltySourceSubscriptionRenewal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Renouvellement d\'abonnement'**
+  String get loyaltySourceSubscriptionRenewal;
+
+  /// No description provided for @loyaltySourceReservationCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation complétée'**
+  String get loyaltySourceReservationCompleted;
+
+  /// No description provided for @loyaltySourceWelcomeBonus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bonus de bienvenue'**
+  String get loyaltySourceWelcomeBonus;
+
+  /// No description provided for @loyaltySourceTransaction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Transaction'**
+  String get loyaltySourceTransaction;
+
+  /// No description provided for @notificationFilterAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'TOUT'**
+  String get notificationFilterAll;
+
+  /// No description provided for @notificationFilterUnread.
+  ///
+  /// In fr, this message translates to:
+  /// **'NON LUS'**
+  String get notificationFilterUnread;
+
+  /// No description provided for @notificationFilterReservations.
+  ///
+  /// In fr, this message translates to:
+  /// **'RÉSERVATIONS'**
+  String get notificationFilterReservations;
+
+  /// No description provided for @notificationFilterSubscriptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'ABONNEMENTS'**
+  String get notificationFilterSubscriptions;
+
+  /// No description provided for @notificationFilterLoyalty.
+  ///
+  /// In fr, this message translates to:
+  /// **'LOYALITÉ'**
+  String get notificationFilterLoyalty;
+
+  /// No description provided for @notificationFilterOffers.
+  ///
+  /// In fr, this message translates to:
+  /// **'OFFRES'**
+  String get notificationFilterOffers;
+
+  /// No description provided for @notificationFilterFamily.
+  ///
+  /// In fr, this message translates to:
+  /// **'FAMILLE'**
+  String get notificationFilterFamily;
+
+  /// No description provided for @notificationCaughtUpMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'VOUS ÊTES À JOUR'**
+  String get notificationCaughtUpMessage;
+
+  /// No description provided for @notificationEmptyFilterMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune notification ne correspond à ce filtre.'**
+  String get notificationEmptyFilterMessage;
+
+  /// No description provided for @notificationEmptyFilterTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun résultat'**
+  String get notificationEmptyFilterTitle;
+
+  /// No description provided for @notificationEmptyMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'avez aucune notification pour le moment.'**
+  String get notificationEmptyMessage;
+
+  /// No description provided for @notificationEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune notification'**
+  String get notificationEmptyTitle;
+
+  /// No description provided for @notificationLoadFailedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chargement échoué'**
+  String get notificationLoadFailedTitle;
+
+  /// No description provided for @notificationMarkAllReadTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout marquer comme lu'**
+  String get notificationMarkAllReadTooltip;
+
+  /// No description provided for @notificationRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get notificationRetryButton;
+
+  /// No description provided for @notificationScreenTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'NOTIFICATIONS'**
+  String get notificationScreenTitle;
+
+  /// No description provided for @familyChildProfileActiveSubscription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnement actif'**
+  String get familyChildProfileActiveSubscription;
+
+  /// No description provided for @familyChildProfileSubscriptionsButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Abonnements'**
+  String get familyChildProfileSubscriptionsButton;
+
+  /// No description provided for @familyChildProfileBookingsButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get familyChildProfileBookingsButton;
+
+  /// No description provided for @familyChildProfileSessionsButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sessions'**
+  String get familyChildProfileSessionsButton;
+
+  /// No description provided for @familyChildProfileReservationsButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get familyChildProfileReservationsButton;
+
+  /// No description provided for @familyChildProfileCompletedButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminées'**
+  String get familyChildProfileCompletedButton;
+
+  /// No description provided for @familyChildBookingCompletedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marqué comme terminé'**
+  String get familyChildBookingCompletedSuccess;
+
+  /// No description provided for @familyChildBookingCompletedFailure.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de l\'achèvement'**
+  String get familyChildBookingCompletedFailure;
+
+  /// No description provided for @familyChildBookingsCompletedStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get familyChildBookingsCompletedStatus;
+
+  /// No description provided for @familyChildBookingsMarkCompletedTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer comme terminé'**
+  String get familyChildBookingsMarkCompletedTooltip;
+
+  /// No description provided for @familyChildReservationsEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune réservation'**
+  String get familyChildReservationsEmptyTitle;
+
+  /// No description provided for @familyChildReservationsEmptyMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'avez aucune réservation.'**
+  String get familyChildReservationsEmptyMessage;
+
+  /// No description provided for @familyChildReservationsShowQrTooltip.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher le QR code'**
+  String get familyChildReservationsShowQrTooltip;
+
+  /// No description provided for @familyChildReservationsCloseButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermer'**
+  String get familyChildReservationsCloseButton;
+
+  /// No description provided for @familyChildCompletedEmptyMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun élément terminé.'**
+  String get familyChildCompletedEmptyMessage;
+
+  /// No description provided for @familyChildCompletedStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get familyChildCompletedStatus;
+
+  /// No description provided for @eventsScreenWaitlistSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouté à la liste d\'attente'**
+  String get eventsScreenWaitlistSuccess;
+
+  /// No description provided for @eventsScreenRegisterSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Inscription réussie'**
+  String get eventsScreenRegisterSuccess;
+
+  /// No description provided for @eventsScreenViewDetailsButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les détails'**
+  String get eventsScreenViewDetailsButton;
+
+  /// No description provided for @eventsScreenRegisterButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'inscrire'**
+  String get eventsScreenRegisterButton;
+
+  /// No description provided for @eventsBracketRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get eventsBracketRetryButton;
+
+  /// No description provided for @eventsBracketNotAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arbre non disponible'**
+  String get eventsBracketNotAvailable;
+
+  /// No description provided for @eventsBracketFinal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Finale'**
+  String get eventsBracketFinal;
+
+  /// No description provided for @eventsBracketQuarterFinals.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quarts de finale'**
+  String get eventsBracketQuarterFinals;
+
+  /// No description provided for @eventsBracketCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Terminé'**
+  String get eventsBracketCompleted;
 }
 
 class _AppLocalizationsDelegate

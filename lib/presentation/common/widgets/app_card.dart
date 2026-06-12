@@ -58,11 +58,11 @@ class AppCard extends StatelessWidget {
   }) {
     return AppCard(
       key: key,
-      child: child,
       gradient: gradient,
       hasBorder: false,
       padding: padding,
       onTap: onTap,
+      child: child,
     );
   }
 
@@ -76,11 +76,11 @@ class AppCard extends StatelessWidget {
   }) {
     return AppCard(
       key: key,
-      child: child,
       radius: AppCardRadius.compact,
       padding: padding,
       margin: margin,
       onTap: onTap,
+      child: child,
     );
   }
 

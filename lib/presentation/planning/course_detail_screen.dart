@@ -52,11 +52,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     final result = await _courseRepository.getCourseSessions(widget.courseId);
     result.when(
       success: (sessions) {
-        if (mounted)
+        if (mounted) {
           setState(() {
             _sessions = sessions;
             _isLoading = false;
           });
+        }
       },
       failure: (failure) {
         if (mounted) {
@@ -453,7 +454,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           itemBuilder: (_, i) => CachedNetworkImage(
             imageUrl: images[i],
             fit: BoxFit.cover,
-            errorWidget: (_, __, ___) =>
+            errorWidget: (_, _, _) =>
                 Container(color: theme.colorScheme.surfaceContainerHighest),
           ),
         ),
@@ -637,7 +638,7 @@ class _SessionTile extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildImage(theme),
-            Expanded(child: _buildContent(theme)),
+            Expanded(child: _buildContent(context, theme)),
           ],
         ),
       ),
@@ -662,7 +663,7 @@ class _SessionTile extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(ThemeData theme) {
+  Widget _buildContent(BuildContext context, ThemeData theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
@@ -693,9 +694,9 @@ class _SessionTile extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(child: _buildCapacityBar(theme)),
+              Expanded(child: _buildCapacityBar(context, theme)),
               const SizedBox(width: 12),
-              _buildActionButton(theme),
+              _buildActionButton(context, theme),
             ],
           ),
         ],
@@ -703,7 +704,7 @@ class _SessionTile extends StatelessWidget {
     );
   }
 
-  Widget _buildCapacityBar(ThemeData theme) {
+  Widget _buildCapacityBar(BuildContext context, ThemeData theme) {
     final ratio = session.capacity > 0
         ? session.enrolled / session.capacity
         : 0.0;
@@ -740,7 +741,9 @@ class _SessionTile extends StatelessWidget {
               ? AppLocalizations.of(context)!.statusBooked
               : session.isFull
               ? AppLocalizations.of(context)!.statusFull
-              : AppLocalizations.of(context)!.remainingPlaces(remaining),
+              : AppLocalizations.of(
+                  context,
+                )!.remainingPlaces(remaining.toString()),
           style: theme.textTheme.labelSmall?.copyWith(
             color: session.isBooked
                 ? theme.colorScheme.primary
@@ -756,7 +759,7 @@ class _SessionTile extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(ThemeData theme) {
+  Widget _buildActionButton(BuildContext context, ThemeData theme) {
     if (session.isBooked) {
       return SizedBox(
         height: 32,

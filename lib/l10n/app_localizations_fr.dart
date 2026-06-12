@@ -1170,4 +1170,1158 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get themeSelectionSubtitle =>
       'Personnalisez l\'apparence de l\'application selon vos préférences.';
+
+  @override
+  String get activitiesTitle => 'ACTIVITÉS';
+
+  @override
+  String get coursesTitle => 'COURS';
+
+  @override
+  String get coursesSubscriptionRequired =>
+      'Certains cours nécessitent un abonnement pour réserver des séances.';
+
+  @override
+  String get coursesViewOffers => 'VOIR LES OFFRES';
+
+  @override
+  String get childSelectorTitle => 'POUR QUI EST-CE ?';
+
+  @override
+  String get childSelectorSelfDesc => 'S\'inscrire pour soi-même';
+
+  @override
+  String get childSelectorNoChildrenTitle => 'Aucun enfant trouvé';
+
+  @override
+  String get childSelectorNoChildrenDesc =>
+      'Vous n\'avez actuellement aucun enfant ajouté.';
+
+  @override
+  String get otpVerifyTitlePrefix => 'VÉRIFIER';
+
+  @override
+  String get otpSentToText => 'Nous avons envoyé un code au\n';
+
+  @override
+  String get otpPasteClipboard => 'COLLER DEPUIS LE PRESSE-PAPIERS';
+
+  @override
+  String get otpErrorIncomplete => 'Veuillez saisir les 6 chiffres';
+
+  @override
+  String get otpErrorFailed => 'La vérification a échoué';
+
+  @override
+  String get paymentErrorLaunch => 'Impossible d\'ouvrir la page de paiement.';
+
+  @override
+  String get paymentTitle => 'Paiement';
+
+  @override
+  String get paymentPreparing => 'Préparation du paiement...';
+
+  @override
+  String get paymentVerifying => 'Vérification du paiement...';
+
+  @override
+  String get paymentSuccessTitle => 'Paiement réussi !';
+
+  @override
+  String get paymentSuccessDesc => 'Votre réservation est confirmée.';
+
+  @override
+  String get paymentBackHome => 'Retour à l\'accueil';
+
+  @override
+  String get paymentFailedTitle => 'Échec du paiement';
+
+  @override
+  String get paymentTryAgain => 'Réessayer';
+
+  @override
+  String get reservationsTitle => 'MES RÉSERVATIONS';
+
+  @override
+  String get reservationsUpcomingTab => 'À VENIR';
+
+  @override
+  String get reservationsHistoryTab => 'HISTORIQUE';
+
+  @override
+  String get reservationsEmptyUpcomingTitle => 'AUCUNE RÉSERVATION À VENIR';
+
+  @override
+  String get reservationsEmptyUpcomingDesc =>
+      'Vous n\'avez pas encore de réservations à venir.';
+
+  @override
+  String get reservationsEmptyHistoryTitle => 'HISTORIQUE VIDE';
+
+  @override
+  String get reservationsEmptyHistoryDesc =>
+      'Vous n\'avez pas encore de réservations passées.';
+
+  @override
+  String get errorLoadingFailed => 'Chargement échoué';
+
+  @override
+  String get actionRetry => 'Réessayer';
+
+  @override
+  String get actionCancel => 'ANNULER';
+
+  @override
+  String get actionVerify => 'VÉRIFIER';
+
+  @override
+  String get actionPayNow => 'PAYER MAINTENANT';
+
+  @override
+  String get paymentErrorGeneric => 'Une erreur est survenue.';
+
+  @override
+  String get paymentPointsTitle => 'PAYER AVEC DES POINTS';
+
+  @override
+  String get paymentPointsDesc =>
+      'Vous êtes sur le point de payer votre réservation avec vos points de fidélité. Cette action ne peut pas être annulée.';
+
+  @override
+  String get paymentErrorMissingId =>
+      'Identifiant de réservation manquant pour le paiement par fidélité.';
+
+  @override
+  String get paymentErrorInvalidId =>
+      'Format de l\'identifiant de réservation invalide.';
+
+  @override
+  String get paymentErrorNoUrl =>
+      'Aucune URL de paiement reçue du serveur. Veuillez réessayer.';
+
+  @override
+  String get paymentErrorUnconfirmed =>
+      'Paiement non encore confirmé. Vous pouvez vérifier vos réservations.';
+
+  @override
+  String get paymentCreatingReservation => 'Création de la réservation...';
+
+  @override
+  String get paymentOpeningGateway =>
+      'Ouverture de la passerelle de paiement...';
+
+  @override
+  String get paymentViewBooking => 'VOIR MA RÉSERVATION';
+
+  @override
+  String get paymentDepositRequired => 'Acompte de 10% requis';
+
+  @override
+  String get paymentMethodCardDesc =>
+      'Cartes bancaires, E-Dinar, Portefeuilles';
+
+  @override
+  String get paymentMethodPointsDesc =>
+      'Utilisez vos points de fidélité accumulés';
+
+  @override
+  String get serviceDetailPlans => 'Abonnements';
+
+  @override
+  String get serviceDetailCourses => 'Cours';
+
+  @override
+  String get serviceDetailEvents => 'Événements';
+
+  @override
+  String get serviceDetailActivities => 'Activités';
+
+  @override
+  String get serviceDetailErrorMsg => 'Une erreur est survenue';
+
+  @override
+  String get serviceDetailRetry => 'Réessayer';
+
+  @override
+  String get serviceDetailActive => 'Actif';
+
+  @override
+  String get serviceDetailAnnual => 'Annuel';
+
+  @override
+  String get serviceDetailYears => 'Années';
+
+  @override
+  String get serviceDetailMonthly => 'Mensuel';
+
+  @override
+  String get serviceDetailMonths => 'Mois';
+
+  @override
+  String get serviceDetailDays => 'Jours';
+
+  @override
+  String get serviceDetailAllCourses => 'Tous les cours';
+
+  @override
+  String get serviceDetailEventLabel => 'Événement';
+
+  @override
+  String get servicesTitle => 'Services';
+
+  @override
+  String get servicesSearchHint => 'Rechercher des services...';
+
+  @override
+  String get servicesFilterAll => 'Tous';
+
+  @override
+  String get servicesFilterPlans => 'Abonnements';
+
+  @override
+  String get servicesFilterCourses => 'Cours';
+
+  @override
+  String get servicesFilterEvents => 'Événements';
+
+  @override
+  String get servicesNoMatching => 'Aucun service correspondant';
+
+  @override
+  String get servicesNoAvailable => 'Aucun service disponible';
+
+  @override
+  String get servicesAdjustSearch =>
+      'Essayez d\'ajuster votre recherche ou vos filtres.';
+
+  @override
+  String get servicesCheckBack => 'Revenez bientôt pour de nouveaux services.';
+
+  @override
+  String get notifGlobalTitle => 'Notifications Globales';
+
+  @override
+  String get notifEnablePush => 'Activer les notifications push';
+
+  @override
+  String get notifEnablePushSub =>
+      'Bouton principal pour toutes les notifications';
+
+  @override
+  String get notifPlanningTitle => 'Planning et Cours';
+
+  @override
+  String get notifReservations => 'Réservations et Planning';
+
+  @override
+  String get notifReservationsSub =>
+      'Confirmations de réservation, rappels et annulations';
+
+  @override
+  String get notifCourses => 'Cours';
+
+  @override
+  String get notifCoursesSub => 'Mises à jour de vos cours et instructeurs';
+
+  @override
+  String get notifAccountTitle => 'Compte et Paiements';
+
+  @override
+  String get notifSubscriptions => 'Abonnements';
+
+  @override
+  String get notifSubscriptionsSub =>
+      'Avis de renouvellement et problèmes de paiement';
+
+  @override
+  String get notifSecurity => 'Avertissements et Mises à jour de sécurité';
+
+  @override
+  String get notifSecuritySub =>
+      'Mises à jour cruciales sur la sécurité du compte';
+
+  @override
+  String get notifCommunityTitle => 'Communauté et Offres';
+
+  @override
+  String get notifFamily => 'Activité Familiale';
+
+  @override
+  String get notifFamilySub => 'Activités et approbations des comptes enfants';
+
+  @override
+  String get notifLoyalty => 'Fidélité et Points';
+
+  @override
+  String get notifLoyaltySub => 'Récompenses gagnées et niveaux supérieurs';
+
+  @override
+  String get notifPromo => 'Promotions et Offres';
+
+  @override
+  String get notifPromoSub =>
+      'Recevez des mises à jour sur les nouvelles offres';
+
+  @override
+  String get paymentPayWithPointsTitle => 'PAYER AVEC DES POINTS';
+
+  @override
+  String paymentPayWithPointsWarning(String price) {
+    return 'Vous êtes sur le point de payer $price TND avec vos points de fidélité. Cette action est irréversible.';
+  }
+
+  @override
+  String get paymentPayNow => 'PAYER MAINTENANT';
+
+  @override
+  String get paymentErrorCannotOpen =>
+      'Impossible d\'ouvrir la page de paiement.';
+
+  @override
+  String get paymentFailedRetry => 'Le paiement a échoué. Veuillez réessayer.';
+
+  @override
+  String get paymentMethodTitle => 'MÉTHODE DE PAIEMENT';
+
+  @override
+  String get paymentLoadingCreatingSub => 'Création de l\'abonnement...';
+
+  @override
+  String get paymentLoadingPreparing => 'Préparation du paiement...';
+
+  @override
+  String get paymentLoadingLoyalty => 'Traitement du paiement de fidélité...';
+
+  @override
+  String get paymentLoadingVerifying => 'Vérification du paiement...';
+
+  @override
+  String paymentSuccessChildDesc(String planName) {
+    return 'L\'abonnement à $planName est maintenant actif pour votre enfant.';
+  }
+
+  @override
+  String get paymentBackToHome => 'RETOUR À L\'ACCUEIL';
+
+  @override
+  String get paymentUnknownError => 'Une erreur inconnue s\'est produite.';
+
+  @override
+  String get paymentTotalAmount => 'MONTANT TOTAL';
+
+  @override
+  String paymentForPlan(String planName) {
+    return 'Pour $planName';
+  }
+
+  @override
+  String get paymentSelectMethod => 'SÉLECTIONNER LA MÉTHODE DE PAIEMENT';
+
+  @override
+  String get paymentMethodKonnectTitle => 'Payer avec Konnect';
+
+  @override
+  String get paymentMethodKonnectSubtitle =>
+      'Cartes Bancaires, E-Dinar, Portefeuilles';
+
+  @override
+  String get paymentOr => 'OU';
+
+  @override
+  String get paymentMethodLoyaltyTitle => 'Payer avec le Solde de Fidélité';
+
+  @override
+  String get paymentMethodLoyaltySubtitle => 'Utilisez vos points accumulés';
+
+  @override
+  String get paymentSecurePaymentTitle => 'PAIEMENT SÉCURISÉ';
+
+  @override
+  String courseDetailBookedSession(String title, String date, String time) {
+    return 'Réservé $title le $date à $time';
+  }
+
+  @override
+  String get subscriptionRequiredTitle => 'ABONNEMENT REQUIS';
+
+  @override
+  String get subscriptionRequiredBookMessage =>
+      'Vous avez besoin d\'un abonnement actif pour réserver des sessions. Abonnez-vous à un plan et réessayez.';
+
+  @override
+  String get subscriptionRequiredSignInMessage =>
+      'Connectez-vous et abonnez-vous à un plan pour réserver des sessions.';
+
+  @override
+  String get closeButton => 'FERMER';
+
+  @override
+  String get viewPlansButton => 'VOIR LES PLANS';
+
+  @override
+  String get signInButton => 'SE CONNECTER';
+
+  @override
+  String get monthJanuary => 'Janvier';
+
+  @override
+  String get monthFebruary => 'Février';
+
+  @override
+  String get monthMarch => 'Mars';
+
+  @override
+  String get monthApril => 'Avril';
+
+  @override
+  String get monthMay => 'Mai';
+
+  @override
+  String get monthJune => 'Juin';
+
+  @override
+  String get monthJuly => 'Juillet';
+
+  @override
+  String get monthAugust => 'Août';
+
+  @override
+  String get monthSeptember => 'Septembre';
+
+  @override
+  String get monthOctober => 'Octobre';
+
+  @override
+  String get monthNovember => 'Novembre';
+
+  @override
+  String get monthDecember => 'Décembre';
+
+  @override
+  String get reserveAction => 'RÉSERVER';
+
+  @override
+  String get daySunday => 'Dimanche';
+
+  @override
+  String get dayMonday => 'Lundi';
+
+  @override
+  String get dayTuesday => 'Mardi';
+
+  @override
+  String get dayWednesday => 'Mercredi';
+
+  @override
+  String get dayThursday => 'Jeudi';
+
+  @override
+  String get dayFriday => 'Vendredi';
+
+  @override
+  String get daySaturday => 'Samedi';
+
+  @override
+  String get courseDefaultTitle => 'COURS';
+
+  @override
+  String get upcomingSessionsTitle => 'SESSIONS À VENIR';
+
+  @override
+  String get noUpcomingSessionsMessage =>
+      'Aucune session à venir cette semaine';
+
+  @override
+  String get subscriptionRequiredViewBookMessage =>
+      'Vous avez besoin d\'un abonnement actif pour voir et réserver des sessions pour ce cours.';
+
+  @override
+  String get subscriptionRequiredSignInViewBookMessage =>
+      'Connectez-vous et abonnez-vous à un plan pour voir et réserver des sessions.';
+
+  @override
+  String get statusBooked => 'RÉSERVÉ';
+
+  @override
+  String get statusFull => 'COMPLET';
+
+  @override
+  String remainingPlaces(String count) {
+    return '$count PLACES';
+  }
+
+  @override
+  String get viewDetailsLabel => 'VOIR LES DÉTAILS';
+
+  @override
+  String get signInRequiredTitle => 'Connexion requise';
+
+  @override
+  String get signInRequiredMessage =>
+      'Vous devez être connecté pour voir et réserver des cours. Rejoignez-nous pour commencer votre parcours de fitness !';
+
+  @override
+  String get signInRegisterButton => 'Se connecter / S\'inscrire';
+
+  @override
+  String get unlockPlanningTitle => 'Débloquer le planning';
+
+  @override
+  String get unlockPlanningMessage =>
+      'Un abonnement actif est requis pour voir les horaires des cours et réserver des classes. Rejoignez-nous et élevez votre parcours de fitness !';
+
+  @override
+  String get viewPlansLabel => 'Voir les plans';
+
+  @override
+  String get planningErrorTitle => 'ERREUR DE PLANNING';
+
+  @override
+  String get planningErrorMessage =>
+      'Impossible de récupérer le programme des cours. Veuillez vérifier votre connexion.';
+
+  @override
+  String get retryAction => 'Réessayer';
+
+  @override
+  String get planningSignInTitle => 'CONNECTEZ-VOUS';
+
+  @override
+  String get planningSignInMessage =>
+      'Connectez-vous pour accéder à votre planning de cours et réserver vos séances.';
+
+  @override
+  String get planningNoSessionsTitle => 'AUCUNE SÉANCE';
+
+  @override
+  String get planningNoSessionsSubscriptionMessage =>
+      'Aucune séance disponible avec votre abonnement actuel. Passez à un abonnement supérieur pour accéder à plus de cours.';
+
+  @override
+  String get planningNoSessionsWeekMessage =>
+      'Aucune séance à venir cette semaine. Revenez plus tard pour découvrir le programme.';
+
+  @override
+  String get meLabel => 'Moi';
+
+  @override
+  String meMemberName(String name) {
+    return '$name (Moi)';
+  }
+
+  @override
+  String get browseTabCourses => 'COURS';
+
+  @override
+  String get browseTabActivities => 'ACTIVITÉS';
+
+  @override
+  String get browseTabEvents => 'ÉVÉNEMENTS';
+
+  @override
+  String get browseErrorTitle => 'ERREUR';
+
+  @override
+  String get browseErrorRetry => 'RÉESSAYER';
+
+  @override
+  String get browseEventFallback => 'ÉVÉNEMENT';
+
+  @override
+  String get browseUnknownStatus => 'Inconnu';
+
+  @override
+  String get profileSubscriptionSubtitle =>
+      'Gérer votre forfait et accès premium';
+
+  @override
+  String get profileNotificationsSubtitle =>
+      'Gérer vos alertes et rappels de cours';
+
+  @override
+  String get profileSettingsSubtitle => 'Informations personnelles et sécurité';
+
+  @override
+  String get editProfilePhotoTitle => 'PHOTO DE PROFIL';
+
+  @override
+  String get editProfileTakePhoto => 'PRENDRE UNE PHOTO';
+
+  @override
+  String get editProfileChoosePhoto => 'CHOISIR UNE PHOTO';
+
+  @override
+  String get editProfileDeletePhoto => 'SUPPRIMER LA PHOTO';
+
+  @override
+  String get editProfilePhotoUpdated => 'Photo de profil mise à jour';
+
+  @override
+  String get editProfilePhotoFailed => 'Échec du téléchargement';
+
+  @override
+  String get editProfileDeletePhotoConfirm =>
+      'Voulez-vous vraiment supprimer votre photo de profil ?';
+
+  @override
+  String get commonDelete => 'SUPPRIMER';
+
+  @override
+  String get editProfilePhotoDeleted => 'Photo de profil supprimée';
+
+  @override
+  String get editProfilePhotoDeleteFailed => 'Échec de la suppression';
+
+  @override
+  String get editProfileOtpSendFailed => 'Échec de l\'envoi du code à';
+
+  @override
+  String get editProfileVerifiedUpdated =>
+      'vérifié et mis à jour avec succès !';
+
+  @override
+  String get editProfileUpdateFailed => 'Échec de la mise à jour de';
+
+  @override
+  String get editProfileTabPersonal => 'PERSONNEL';
+
+  @override
+  String get editProfileTabSecurity => 'SÉCURITÉ';
+
+  @override
+  String get editProfileGender => 'GENRE';
+
+  @override
+  String get editProfileGenderHint => 'Sélectionner le genre';
+
+  @override
+  String get editProfileGenderMale => 'Homme';
+
+  @override
+  String get editProfileGenderFemale => 'Femme';
+
+  @override
+  String get commonVerify => 'VÉRIFIER';
+
+  @override
+  String get editProfileSecurityNotice =>
+      'Les modifications de votre e-mail ou numéro nécessitent une vérification par code OTP. Saisissez la nouvelle valeur et cliquez sur VÉRIFIER.';
+
+  @override
+  String get editProfileEmailHint => 'Entrez votre e-mail';
+
+  @override
+  String get editProfilePhoneHint => 'Entrez votre numéro de téléphone';
+
+  @override
+  String get planDetailChildOnlyPlan => 'Forfait Enfant Uniquement';
+
+  @override
+  String get planDetailChildOnlyDesc =>
+      'Ce forfait est conçu pour les enfants uniquement. Sélectionnez un enfant pour lui acheter ce forfait.';
+
+  @override
+  String get planDetailSelectChild => 'SÉLECTIONNER UN ENFANT';
+
+  @override
+  String get planDetailChildAdded =>
+      'Enfant ajouté. Veuillez le sélectionner pour continuer.';
+
+  @override
+  String get planDetailTitle => 'DÉTAILS DU FORFAIT';
+
+  @override
+  String get planDetailIncludes => 'INCLUS';
+
+  @override
+  String get planDetailAccessAllCourses => 'Accès à TOUS les cours';
+
+  @override
+  String get planDetailSubscribeFor => 'S\'ABONNER POUR';
+
+  @override
+  String get planDetailMyself => 'Moi-même';
+
+  @override
+  String get planDetailChild => 'Enfant';
+
+  @override
+  String get planDetailActivePlan => 'FORFAIT ACTIF';
+
+  @override
+  String get planDetailSubscribeBtn => 'S\'ABONNER';
+
+  @override
+  String get planDetailErrorSomethingWentWrong => 'Une erreur s\'est produite';
+
+  @override
+  String get planDetailRetryBtn => 'RÉESSAYER';
+
+  @override
+  String get planDetailNotFound => 'Forfait introuvable';
+
+  @override
+  String get planDetailArchived =>
+      'Ce forfait a peut-être été archivé ou retiré.';
+
+  @override
+  String get commonGoBack => 'RETOUR';
+
+  @override
+  String get eventsBracketRound => 'Tour';
+
+  @override
+  String get eventsBracketSemiFinals => 'Demi-finales';
+
+  @override
+  String get eventsBracketTBD => 'À déterminer';
+
+  @override
+  String get eventsBracketTitle => 'Arbre du tournoi';
+
+  @override
+  String get eventsBracketWalkover => 'Forfait';
+
+  @override
+  String get eventsDetailCheckedInStatus => 'Enregistré';
+
+  @override
+  String get eventsDetailCheckInAction => 'S\'enregistrer';
+
+  @override
+  String get eventsDetailCheckInRequired => 'Enregistrement requis';
+
+  @override
+  String get eventsDetailCheckInSuccess => 'Enregistrement réussi';
+
+  @override
+  String get eventsDetailDateTBD => 'Date à déterminer';
+
+  @override
+  String get eventsDetailErrorTitle => 'Erreur';
+
+  @override
+  String get eventsDetailEventFallback => 'Événement';
+
+  @override
+  String get eventsDetailFormat => 'Format';
+
+  @override
+  String get eventsDetailNotFound => 'Événement introuvable';
+
+  @override
+  String get eventsDetailParticipantsText => 'Participants';
+
+  @override
+  String get eventsDetailRegisterAction => 'S\'inscrire';
+
+  @override
+  String get eventsDetailRegisterBy => 'S\'inscrire avant le';
+
+  @override
+  String get eventsDetailRegisteredStatus => 'Inscrit';
+
+  @override
+  String get eventsDetailRegisterSuccess => 'Inscription réussie';
+
+  @override
+  String get eventsDetailRegisterTitle => 'S\'inscrire à l\'événement';
+
+  @override
+  String get eventsDetailRegistrationClosed => 'Inscriptions fermées';
+
+  @override
+  String get eventsDetailRetryButton => 'Réessayer';
+
+  @override
+  String get eventsDetailTBD => 'À déterminer';
+
+  @override
+  String get eventsDetailThisEvent => 'cet événement';
+
+  @override
+  String get eventsDetailViewBracketButton => 'Voir l\'arbre';
+
+  @override
+  String get eventsDetailWaitlistSuccess => 'Ajouté à la liste d\'attente';
+
+  @override
+  String get eventsDetailWithdrawPromptPrefix =>
+      'Voulez-vous vraiment vous désinscrire de';
+
+  @override
+  String get eventsDetailWithdrawSuccess => 'Désinscription réussie';
+
+  @override
+  String get eventsDetailWithdrawTitle => 'Se désinscrire';
+
+  @override
+  String get eventsScreenCheckBackSoon =>
+      'Revenez bientôt pour les prochains tournois';
+
+  @override
+  String get eventsScreenEventFallback => 'Événement';
+
+  @override
+  String get eventsScreenNoTournaments => 'Aucun tournoi disponible';
+
+  @override
+  String get eventsScreenRetryButton => 'Réessayer';
+
+  @override
+  String get eventsScreenTitle => 'Tournois';
+
+  @override
+  String get myEventsScreenNoEvents => 'Aucun événement trouvé';
+
+  @override
+  String get myEventsScreenRetryButton => 'Réessayer';
+
+  @override
+  String get myEventsScreenTitle => 'Mes événements';
+
+  @override
+  String get familyChildBookingsEmptyMessage => 'Aucune réservation trouvée.';
+
+  @override
+  String get familyChildBookingsEmptyTitle => 'Aucune réservation';
+
+  @override
+  String get familyChildBookingsTitle => 'Réservations';
+
+  @override
+  String get familyChildCompletedAtPrefix => 'Terminé à :';
+
+  @override
+  String get familyChildCompletedEmptyTitle => 'Aucune activité terminée';
+
+  @override
+  String get familyChildCompletedTitle => 'Terminé';
+
+  @override
+  String get familyChildProfileDaysRemainingText => 'jours restants';
+
+  @override
+  String get familyChildProfileEnd => 'Fin :';
+
+  @override
+  String get familyChildProfileErrorFallback => 'Une erreur s\'est produite';
+
+  @override
+  String get familyChildProfileRetryButton => 'Réessayer';
+
+  @override
+  String get familyChildProfileScheduleButton => 'Calendrier';
+
+  @override
+  String get familyChildProfileStart => 'Début :';
+
+  @override
+  String get familyChildReservationsTitle => 'Réservations';
+
+  @override
+  String get familyChildScheduleEmptyMessage =>
+      'Aucun cours ou activité dans cette plage de dates.';
+
+  @override
+  String get familyChildScheduleEmptyTitle => 'Aucun événement prévu';
+
+  @override
+  String get familyChildScheduleFrom => 'DU';
+
+  @override
+  String get familyChildScheduleTitle => 'CALENDRIER';
+
+  @override
+  String get familyChildScheduleTo => 'AU';
+
+  @override
+  String get familyChildScheduleCompletedStatus => 'Terminé';
+
+  @override
+  String get familyChildSessionsBookCancel => 'Annuler';
+
+  @override
+  String get familyChildSessionsBookDate => 'Date :';
+
+  @override
+  String get familyChildSessionsBookDay => 'Jour :';
+
+  @override
+  String get familyChildSessionsBookFull => 'La session est complète';
+
+  @override
+  String get familyChildSessionsBookSpots => 'Places :';
+
+  @override
+  String get familyChildSessionsBookTime => 'Heure :';
+
+  @override
+  String get familyChildSessionsBookTitle => 'Réserver une session';
+
+  @override
+  String get familyChildSessionsEmptyTitle => 'Aucune session disponible';
+
+  @override
+  String get familyChildSessionsTitle => 'SESSIONS DISPONIBLES';
+
+  @override
+  String get familyChildSessionsBookSuccess => 'Réservation réussie !';
+
+  @override
+  String get familyChildSessionsBookFailure => 'Échec de la réservation';
+
+  @override
+  String get familyChildSessionsBookConfirm => 'Confirmer la réservation';
+
+  @override
+  String get familyChildSessionsStatusBooked => 'Réservé';
+
+  @override
+  String get familyChildSessionsStatusFull => 'COMPLET';
+
+  @override
+  String get familyChildSessionsBookTooltip => 'Réserver la session';
+
+  @override
+  String get familyChildSubscriptionsDaysRemaining => 'jours restants';
+
+  @override
+  String get familyChildSubscriptionsEnd => 'Fin :';
+
+  @override
+  String get familyChildSubscriptionsStart => 'Début :';
+
+  @override
+  String get familyChildSubscriptionsTitle => 'ABONNEMENTS';
+
+  @override
+  String get familyChildSubscriptionsBuyNew => 'ACHETER UN NOUVEL ABONNEMENT';
+
+  @override
+  String get familyChildSubscriptionsEmptyTitle => 'Aucun abonnement';
+
+  @override
+  String get familyChildSubscriptionsEmptyMessage =>
+      'Achetez un abonnement pour commencer.';
+
+  @override
+  String get homeAvailable => 'disponible(s)';
+
+  @override
+  String get homeCoursesTitle => 'COURS';
+
+  @override
+  String get homeEventsTitle => 'TOURNOIS ET ÉVÉNEMENTS';
+
+  @override
+  String get homeExploreButton => 'EXPLORER';
+
+  @override
+  String get homeGlobalSearchTooltip => 'Recherche globale';
+
+  @override
+  String get homeNo => 'Aucun';
+
+  @override
+  String get homeRetryButton => 'RÉESSAYER';
+
+  @override
+  String get homeSeeAllButton => 'VOIR TOUT';
+
+  @override
+  String get homeServiceCourses => 'cours';
+
+  @override
+  String get homeServiceEvents => 'événements';
+
+  @override
+  String get homeServicePlans => 'plans';
+
+  @override
+  String get homeServicesEmpty => 'Aucun service disponible';
+
+  @override
+  String get homeServicesTitle => 'NOS SERVICES';
+
+  @override
+  String get homeActivityExploreButton => 'EXPLORER';
+
+  @override
+  String get loyaltyLoadFailedMessage => 'Impossible de charger vos points.';
+
+  @override
+  String get loyaltyLoadFailedTitle => 'Chargement échoué';
+
+  @override
+  String get loyaltyMaxTierReached => 'Niveau maximum atteint';
+
+  @override
+  String get loyaltyMyPointsTitle => 'MES POINTS';
+
+  @override
+  String get loyaltyNextTier => 'Prochain palier';
+
+  @override
+  String get loyaltyNoTransactionMessage =>
+      'Vos transactions de points apparaîtront ici.';
+
+  @override
+  String get loyaltyNoTransactionTitle => 'Aucune transaction';
+
+  @override
+  String get loyaltyPointsBalance => 'SOLDE DE POINTS';
+
+  @override
+  String get loyaltyPointsHistoryTitle => 'HISTORIQUE DES POINTS';
+
+  @override
+  String get loyaltyPts => 'pts';
+
+  @override
+  String get loyaltyRetryButton => 'RÉESSAYER';
+
+  @override
+  String get loyaltySourceDailyCheckin => 'Check-in quotidien';
+
+  @override
+  String get loyaltySourceReferral => 'Parrainage';
+
+  @override
+  String get loyaltySourceSubscriptionRenewal => 'Renouvellement d\'abonnement';
+
+  @override
+  String get loyaltySourceReservationCompleted => 'Réservation complétée';
+
+  @override
+  String get loyaltySourceWelcomeBonus => 'Bonus de bienvenue';
+
+  @override
+  String get loyaltySourceTransaction => 'Transaction';
+
+  @override
+  String get notificationFilterAll => 'TOUT';
+
+  @override
+  String get notificationFilterUnread => 'NON LUS';
+
+  @override
+  String get notificationFilterReservations => 'RÉSERVATIONS';
+
+  @override
+  String get notificationFilterSubscriptions => 'ABONNEMENTS';
+
+  @override
+  String get notificationFilterLoyalty => 'LOYALITÉ';
+
+  @override
+  String get notificationFilterOffers => 'OFFRES';
+
+  @override
+  String get notificationFilterFamily => 'FAMILLE';
+
+  @override
+  String get notificationCaughtUpMessage => 'VOUS ÊTES À JOUR';
+
+  @override
+  String get notificationEmptyFilterMessage =>
+      'Aucune notification ne correspond à ce filtre.';
+
+  @override
+  String get notificationEmptyFilterTitle => 'Aucun résultat';
+
+  @override
+  String get notificationEmptyMessage =>
+      'Vous n\'avez aucune notification pour le moment.';
+
+  @override
+  String get notificationEmptyTitle => 'Aucune notification';
+
+  @override
+  String get notificationLoadFailedTitle => 'Chargement échoué';
+
+  @override
+  String get notificationMarkAllReadTooltip => 'Tout marquer comme lu';
+
+  @override
+  String get notificationRetryButton => 'Réessayer';
+
+  @override
+  String get notificationScreenTitle => 'NOTIFICATIONS';
+
+  @override
+  String get familyChildProfileActiveSubscription => 'Abonnement actif';
+
+  @override
+  String get familyChildProfileSubscriptionsButton => 'Abonnements';
+
+  @override
+  String get familyChildProfileBookingsButton => 'Réservations';
+
+  @override
+  String get familyChildProfileSessionsButton => 'Sessions';
+
+  @override
+  String get familyChildProfileReservationsButton => 'Réservations';
+
+  @override
+  String get familyChildProfileCompletedButton => 'Terminées';
+
+  @override
+  String get familyChildBookingCompletedSuccess => 'Marqué comme terminé';
+
+  @override
+  String get familyChildBookingCompletedFailure => 'Échec de l\'achèvement';
+
+  @override
+  String get familyChildBookingsCompletedStatus => 'Terminé';
+
+  @override
+  String get familyChildBookingsMarkCompletedTooltip => 'Marquer comme terminé';
+
+  @override
+  String get familyChildReservationsEmptyTitle => 'Aucune réservation';
+
+  @override
+  String get familyChildReservationsEmptyMessage =>
+      'Vous n\'avez aucune réservation.';
+
+  @override
+  String get familyChildReservationsShowQrTooltip => 'Afficher le QR code';
+
+  @override
+  String get familyChildReservationsCloseButton => 'Fermer';
+
+  @override
+  String get familyChildCompletedEmptyMessage => 'Aucun élément terminé.';
+
+  @override
+  String get familyChildCompletedStatus => 'Terminé';
+
+  @override
+  String get eventsScreenWaitlistSuccess => 'Ajouté à la liste d\'attente';
+
+  @override
+  String get eventsScreenRegisterSuccess => 'Inscription réussie';
+
+  @override
+  String get eventsScreenViewDetailsButton => 'Voir les détails';
+
+  @override
+  String get eventsScreenRegisterButton => 'S\'inscrire';
+
+  @override
+  String get eventsBracketRetryButton => 'Réessayer';
+
+  @override
+  String get eventsBracketNotAvailable => 'Arbre non disponible';
+
+  @override
+  String get eventsBracketFinal => 'Finale';
+
+  @override
+  String get eventsBracketQuarterFinals => 'Quarts de finale';
+
+  @override
+  String get eventsBracketCompleted => 'Terminé';
 }

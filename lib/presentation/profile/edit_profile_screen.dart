@@ -303,11 +303,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: const Text(
+        title: Text(
           AppLocalizations.of(context)!.editProfileDeletePhoto,
-          style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
+          style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
         ),
-        content: const Text(
+        content: Text(
           AppLocalizations.of(context)!.editProfileDeletePhotoConfirm,
         ),
         actions: [
@@ -498,7 +498,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
-          tabs: const [
+          tabs: [
             Tab(text: AppLocalizations.of(context)!.editProfileTabPersonal),
             Tab(text: AppLocalizations.of(context)!.editProfileTabSecurity),
           ],
@@ -655,7 +655,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             ),
           ),
           hint: Text(AppLocalizations.of(context)!.editProfileGenderHint),
-          items: const [
+          items: [
             DropdownMenuItem(
               value: 'male',
               child: Text(AppLocalizations.of(context)!.editProfileGenderMale),
@@ -692,9 +692,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           padding: const EdgeInsets.symmetric(horizontal: 16),
           minimumSize: const Size(0, 36),
         ),
-        child: const Text(
+        child: Text(
           AppLocalizations.of(context)!.commonVerify,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,
             letterSpacing: 1.0,

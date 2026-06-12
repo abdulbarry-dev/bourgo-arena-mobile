@@ -329,7 +329,7 @@ class ApiClient {
       final normalizedPath = path.startsWith('/') ? path : '/$path';
       final formData = FormData.fromMap({
         fileFieldName: await MultipartFile.fromFile(filePath),
-        if (extraFields != null) ...extraFields,
+        ...?extraFields,
       });
       final response = await _dio.post(
         normalizedPath,

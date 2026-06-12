@@ -1163,4 +1163,1146 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get themeSelectionSubtitle =>
       'Select a display mode for your application';
+
+  @override
+  String get activitiesTitle => 'ACTIVITIES';
+
+  @override
+  String get coursesTitle => 'COURSES';
+
+  @override
+  String get coursesSubscriptionRequired =>
+      'Certain courses require a subscription to book sessions.';
+
+  @override
+  String get coursesViewOffers => 'VIEW OFFERS';
+
+  @override
+  String get childSelectorTitle => 'WHO IS THIS FOR?';
+
+  @override
+  String get childSelectorSelfDesc => 'Subscribe for yourself';
+
+  @override
+  String get childSelectorNoChildrenTitle => 'No children found';
+
+  @override
+  String get childSelectorNoChildrenDesc =>
+      'You currently have no children added.';
+
+  @override
+  String get otpVerifyTitlePrefix => 'VERIFY';
+
+  @override
+  String get otpSentToText => 'We\'ve sent a code to\n';
+
+  @override
+  String get otpPasteClipboard => 'PASTE FROM CLIPBOARD';
+
+  @override
+  String get otpErrorIncomplete => 'Please enter all 6 digits';
+
+  @override
+  String get otpErrorFailed => 'Verification failed';
+
+  @override
+  String get paymentErrorLaunch => 'Could not open payment page.';
+
+  @override
+  String get paymentTitle => 'Payment';
+
+  @override
+  String get paymentPreparing => 'Preparing payment...';
+
+  @override
+  String get paymentVerifying => 'Verifying payment...';
+
+  @override
+  String get paymentSuccessTitle => 'Payment Successful!';
+
+  @override
+  String get paymentSuccessDesc => 'Your booking is confirmed.';
+
+  @override
+  String get paymentBackHome => 'Back to Home';
+
+  @override
+  String get paymentFailedTitle => 'Payment Failed';
+
+  @override
+  String get paymentTryAgain => 'Try Again';
+
+  @override
+  String get reservationsTitle => 'MY RESERVATIONS';
+
+  @override
+  String get reservationsUpcomingTab => 'UPCOMING';
+
+  @override
+  String get reservationsHistoryTab => 'HISTORY';
+
+  @override
+  String get reservationsEmptyUpcomingTitle => 'NO UPCOMING RESERVATIONS';
+
+  @override
+  String get reservationsEmptyUpcomingDesc =>
+      'You don\'t have any upcoming reservations yet.';
+
+  @override
+  String get reservationsEmptyHistoryTitle => 'EMPTY HISTORY';
+
+  @override
+  String get reservationsEmptyHistoryDesc =>
+      'You don\'t have any past reservations yet.';
+
+  @override
+  String get errorLoadingFailed => 'Loading failed';
+
+  @override
+  String get actionRetry => 'Retry';
+
+  @override
+  String get actionCancel => 'CANCEL';
+
+  @override
+  String get actionVerify => 'VERIFY';
+
+  @override
+  String get actionPayNow => 'PAY NOW';
+
+  @override
+  String get paymentErrorGeneric => 'An error occurred.';
+
+  @override
+  String get paymentPointsTitle => 'PAY WITH POINTS';
+
+  @override
+  String get paymentPointsDesc =>
+      'You are about to pay for your booking using your loyalty points. This action cannot be undone.';
+
+  @override
+  String get paymentErrorMissingId =>
+      'Missing reservation ID for loyalty payment.';
+
+  @override
+  String get paymentErrorInvalidId => 'Invalid reservation ID format.';
+
+  @override
+  String get paymentErrorNoUrl =>
+      'No payment URL received from server. Please retry.';
+
+  @override
+  String get paymentErrorUnconfirmed =>
+      'Payment not yet confirmed. You can check your bookings.';
+
+  @override
+  String get paymentCreatingReservation => 'Creating reservation...';
+
+  @override
+  String get paymentOpeningGateway => 'Opening payment gateway...';
+
+  @override
+  String get paymentViewBooking => 'VIEW MY BOOKING';
+
+  @override
+  String get paymentDepositRequired => '10% Deposit Required';
+
+  @override
+  String get paymentMethodCardDesc => 'Bank Cards, E-Dinar, Wallets';
+
+  @override
+  String get paymentMethodPointsDesc => 'Use your accumulated loyalty points';
+
+  @override
+  String get serviceDetailPlans => 'Plans';
+
+  @override
+  String get serviceDetailCourses => 'Courses';
+
+  @override
+  String get serviceDetailEvents => 'Events';
+
+  @override
+  String get serviceDetailActivities => 'Activities';
+
+  @override
+  String get serviceDetailErrorMsg => 'Something went wrong';
+
+  @override
+  String get serviceDetailRetry => 'Retry';
+
+  @override
+  String get serviceDetailActive => 'Active';
+
+  @override
+  String get serviceDetailAnnual => 'Annual';
+
+  @override
+  String get serviceDetailYears => 'Years';
+
+  @override
+  String get serviceDetailMonthly => 'Monthly';
+
+  @override
+  String get serviceDetailMonths => 'Months';
+
+  @override
+  String get serviceDetailDays => 'Days';
+
+  @override
+  String get serviceDetailAllCourses => 'All Courses';
+
+  @override
+  String get serviceDetailEventLabel => 'Event';
+
+  @override
+  String get servicesTitle => 'Services';
+
+  @override
+  String get servicesSearchHint => 'Search services...';
+
+  @override
+  String get servicesFilterAll => 'All';
+
+  @override
+  String get servicesFilterPlans => 'Plans';
+
+  @override
+  String get servicesFilterCourses => 'Courses';
+
+  @override
+  String get servicesFilterEvents => 'Events';
+
+  @override
+  String get servicesNoMatching => 'No matching services';
+
+  @override
+  String get servicesNoAvailable => 'No services available';
+
+  @override
+  String get servicesAdjustSearch => 'Try adjusting your search or filters.';
+
+  @override
+  String get servicesCheckBack => 'Check back soon for new services.';
+
+  @override
+  String get notifGlobalTitle => 'Global Notifications';
+
+  @override
+  String get notifEnablePush => 'Enable Push Notifications';
+
+  @override
+  String get notifEnablePushSub => 'Master toggle for all push notifications';
+
+  @override
+  String get notifPlanningTitle => 'Planning & Courses';
+
+  @override
+  String get notifReservations => 'Reservations & Planning';
+
+  @override
+  String get notifReservationsSub =>
+      'Booking confirmations, reminders, and cancellations';
+
+  @override
+  String get notifCourses => 'Courses';
+
+  @override
+  String get notifCoursesSub =>
+      'Updates from your enrolled courses and instructors';
+
+  @override
+  String get notifAccountTitle => 'Account & Payments';
+
+  @override
+  String get notifSubscriptions => 'Subscriptions';
+
+  @override
+  String get notifSubscriptionsSub => 'Renewal notices and payment issues';
+
+  @override
+  String get notifSecurity => 'Security Warnings & Updates';
+
+  @override
+  String get notifSecuritySub =>
+      'Crucial account security and activity updates';
+
+  @override
+  String get notifCommunityTitle => 'Community & Offers';
+
+  @override
+  String get notifFamily => 'Family Activity';
+
+  @override
+  String get notifFamilySub => 'Child account activities and approvals';
+
+  @override
+  String get notifLoyalty => 'Loyalty & Points';
+
+  @override
+  String get notifLoyaltySub => 'Rewards earned and tier upgrades';
+
+  @override
+  String get notifPromo => 'Promotions & Offers';
+
+  @override
+  String get notifPromoSub => 'Receive updates on new deals and events';
+
+  @override
+  String get paymentPayWithPointsTitle => 'PAY WITH POINTS';
+
+  @override
+  String paymentPayWithPointsWarning(String price) {
+    return 'You are about to pay $price TND using your loyalty points. This action cannot be undone.';
+  }
+
+  @override
+  String get paymentPayNow => 'PAY NOW';
+
+  @override
+  String get paymentErrorCannotOpen => 'Could not open payment page.';
+
+  @override
+  String get paymentFailedRetry => 'Payment failed. Please try again.';
+
+  @override
+  String get paymentMethodTitle => 'PAYMENT METHOD';
+
+  @override
+  String get paymentLoadingCreatingSub => 'Creating subscription...';
+
+  @override
+  String get paymentLoadingPreparing => 'Preparing payment...';
+
+  @override
+  String get paymentLoadingLoyalty => 'Processing loyalty payment...';
+
+  @override
+  String get paymentLoadingVerifying => 'Verifying payment...';
+
+  @override
+  String paymentSuccessChildDesc(String planName) {
+    return 'Subscription to $planName is now active for your child.';
+  }
+
+  @override
+  String get paymentBackToHome => 'BACK TO HOME';
+
+  @override
+  String get paymentUnknownError => 'An unknown error occurred.';
+
+  @override
+  String get paymentTotalAmount => 'TOTAL AMOUNT';
+
+  @override
+  String paymentForPlan(String planName) {
+    return 'For $planName';
+  }
+
+  @override
+  String get paymentSelectMethod => 'SELECT PAYMENT METHOD';
+
+  @override
+  String get paymentMethodKonnectTitle => 'Pay with Konnect';
+
+  @override
+  String get paymentMethodKonnectSubtitle => 'Bank Cards, E-Dinar, Wallets';
+
+  @override
+  String get paymentOr => 'OR';
+
+  @override
+  String get paymentMethodLoyaltyTitle => 'Pay with Loyalty Balance';
+
+  @override
+  String get paymentMethodLoyaltySubtitle => 'Use your accumulated points';
+
+  @override
+  String get paymentSecurePaymentTitle => 'SECURE PAYMENT';
+
+  @override
+  String courseDetailBookedSession(String title, String date, String time) {
+    return 'Reserved $title on $date at $time';
+  }
+
+  @override
+  String get subscriptionRequiredTitle => 'SUBSCRIPTION REQUIRED';
+
+  @override
+  String get subscriptionRequiredBookMessage =>
+      'You need an active subscription to book sessions. Subscribe to a plan and try again.';
+
+  @override
+  String get subscriptionRequiredSignInMessage =>
+      'Sign in and subscribe to a plan to book sessions.';
+
+  @override
+  String get closeButton => 'CLOSE';
+
+  @override
+  String get viewPlansButton => 'VIEW PLANS';
+
+  @override
+  String get signInButton => 'SIGN IN';
+
+  @override
+  String get monthJanuary => 'January';
+
+  @override
+  String get monthFebruary => 'February';
+
+  @override
+  String get monthMarch => 'March';
+
+  @override
+  String get monthApril => 'April';
+
+  @override
+  String get monthMay => 'May';
+
+  @override
+  String get monthJune => 'June';
+
+  @override
+  String get monthJuly => 'July';
+
+  @override
+  String get monthAugust => 'August';
+
+  @override
+  String get monthSeptember => 'September';
+
+  @override
+  String get monthOctober => 'October';
+
+  @override
+  String get monthNovember => 'November';
+
+  @override
+  String get monthDecember => 'December';
+
+  @override
+  String get reserveAction => 'RESERVE';
+
+  @override
+  String get daySunday => 'Sunday';
+
+  @override
+  String get dayMonday => 'Monday';
+
+  @override
+  String get dayTuesday => 'Tuesday';
+
+  @override
+  String get dayWednesday => 'Wednesday';
+
+  @override
+  String get dayThursday => 'Thursday';
+
+  @override
+  String get dayFriday => 'Friday';
+
+  @override
+  String get daySaturday => 'Saturday';
+
+  @override
+  String get courseDefaultTitle => 'COURSE';
+
+  @override
+  String get upcomingSessionsTitle => 'UPCOMING SESSIONS';
+
+  @override
+  String get noUpcomingSessionsMessage => 'No upcoming sessions this week';
+
+  @override
+  String get subscriptionRequiredViewBookMessage =>
+      'You need an active subscription to view and book sessions for this course.';
+
+  @override
+  String get subscriptionRequiredSignInViewBookMessage =>
+      'Sign in and subscribe to a plan to view and book sessions.';
+
+  @override
+  String get statusBooked => 'BOOKED';
+
+  @override
+  String get statusFull => 'FULL';
+
+  @override
+  String remainingPlaces(String count) {
+    return '$count PLACES';
+  }
+
+  @override
+  String get viewDetailsLabel => 'VIEW DETAILS';
+
+  @override
+  String get signInRequiredTitle => 'Sign In Required';
+
+  @override
+  String get signInRequiredMessage =>
+      'You need to be logged in to view and book courses. Join us to start your fitness journey!';
+
+  @override
+  String get signInRegisterButton => 'Sign In / Register';
+
+  @override
+  String get unlockPlanningTitle => 'Unlock Planning';
+
+  @override
+  String get unlockPlanningMessage =>
+      'An active subscription is required to view course schedules and book classes. Join us and elevate your fitness journey!';
+
+  @override
+  String get viewPlansLabel => 'View Plans';
+
+  @override
+  String get planningErrorTitle => 'PLANNING ERROR';
+
+  @override
+  String get planningErrorMessage =>
+      'Unable to fetch the course schedule. Please check your connection.';
+
+  @override
+  String get retryAction => 'Retry';
+
+  @override
+  String get planningSignInTitle => 'SIGN IN';
+
+  @override
+  String get planningSignInMessage =>
+      'Sign in to access your course schedule and book sessions.';
+
+  @override
+  String get planningNoSessionsTitle => 'NO SESSIONS';
+
+  @override
+  String get planningNoSessionsSubscriptionMessage =>
+      'No sessions available with your current subscription. Upgrade to a higher subscription to access more courses.';
+
+  @override
+  String get planningNoSessionsWeekMessage =>
+      'No upcoming sessions this week. Check back later to see the schedule.';
+
+  @override
+  String get meLabel => 'Me';
+
+  @override
+  String meMemberName(String name) {
+    return '$name (Me)';
+  }
+
+  @override
+  String get browseTabCourses => 'COURSES';
+
+  @override
+  String get browseTabActivities => 'ACTIVITIES';
+
+  @override
+  String get browseTabEvents => 'EVENTS';
+
+  @override
+  String get browseErrorTitle => 'ERROR';
+
+  @override
+  String get browseErrorRetry => 'RETRY';
+
+  @override
+  String get browseEventFallback => 'EVENT';
+
+  @override
+  String get browseUnknownStatus => 'Unknown';
+
+  @override
+  String get profileSubscriptionSubtitle =>
+      'Manage your plan and premium access';
+
+  @override
+  String get profileNotificationsSubtitle =>
+      'Manage your alerts and class reminders';
+
+  @override
+  String get profileSettingsSubtitle => 'Personal information and security';
+
+  @override
+  String get editProfilePhotoTitle => 'PROFILE PHOTO';
+
+  @override
+  String get editProfileTakePhoto => 'TAKE A PHOTO';
+
+  @override
+  String get editProfileChoosePhoto => 'CHOOSE A PHOTO';
+
+  @override
+  String get editProfileDeletePhoto => 'DELETE PHOTO';
+
+  @override
+  String get editProfilePhotoUpdated => 'Profile photo updated';
+
+  @override
+  String get editProfilePhotoFailed => 'Upload failed';
+
+  @override
+  String get editProfileDeletePhotoConfirm =>
+      'Are you sure you want to delete your profile photo?';
+
+  @override
+  String get commonDelete => 'DELETE';
+
+  @override
+  String get editProfilePhotoDeleted => 'Profile photo deleted';
+
+  @override
+  String get editProfilePhotoDeleteFailed => 'Failed to delete';
+
+  @override
+  String get editProfileOtpSendFailed => 'Failed to send OTP to';
+
+  @override
+  String get editProfileVerifiedUpdated => 'verified and updated successfully!';
+
+  @override
+  String get editProfileUpdateFailed => 'Failed to update';
+
+  @override
+  String get editProfileTabPersonal => 'PERSONAL';
+
+  @override
+  String get editProfileTabSecurity => 'SECURITY';
+
+  @override
+  String get editProfileGender => 'GENDER';
+
+  @override
+  String get editProfileGenderHint => 'Select Gender';
+
+  @override
+  String get editProfileGenderMale => 'Male';
+
+  @override
+  String get editProfileGenderFemale => 'Female';
+
+  @override
+  String get commonVerify => 'VERIFY';
+
+  @override
+  String get editProfileSecurityNotice =>
+      'Changes to your email or phone number require OTP verification. Enter a new value and click VERIFY.';
+
+  @override
+  String get editProfileEmailHint => 'Enter your email';
+
+  @override
+  String get editProfilePhoneHint => 'Enter your phone number';
+
+  @override
+  String get planDetailChildOnlyPlan => 'Child-Only Plan';
+
+  @override
+  String get planDetailChildOnlyDesc =>
+      'This plan is designed for children only. Select a child to purchase this plan for them.';
+
+  @override
+  String get planDetailSelectChild => 'SELECT A CHILD';
+
+  @override
+  String get planDetailChildAdded =>
+      'Child added. Please select them to continue.';
+
+  @override
+  String get planDetailTitle => 'PLAN DETAILS';
+
+  @override
+  String get planDetailIncludes => 'INCLUDES';
+
+  @override
+  String get planDetailAccessAllCourses => 'Access to ALL courses';
+
+  @override
+  String get planDetailSubscribeFor => 'SUBSCRIBE FOR';
+
+  @override
+  String get planDetailMyself => 'Myself';
+
+  @override
+  String get planDetailChild => 'Child';
+
+  @override
+  String get planDetailActivePlan => 'ACTIVE PLAN';
+
+  @override
+  String get planDetailSubscribeBtn => 'SUBSCRIBE';
+
+  @override
+  String get planDetailErrorSomethingWentWrong => 'Something went wrong';
+
+  @override
+  String get planDetailRetryBtn => 'RETRY';
+
+  @override
+  String get planDetailNotFound => 'Plan not found';
+
+  @override
+  String get planDetailArchived =>
+      'This plan may have been archived or removed.';
+
+  @override
+  String get commonGoBack => 'GO BACK';
+
+  @override
+  String get eventsBracketRound => 'Round';
+
+  @override
+  String get eventsBracketSemiFinals => 'Semi-Finals';
+
+  @override
+  String get eventsBracketTBD => 'TBD';
+
+  @override
+  String get eventsBracketTitle => 'Tournament Bracket';
+
+  @override
+  String get eventsBracketWalkover => 'Walkover';
+
+  @override
+  String get eventsDetailCheckedInStatus => 'Checked In';
+
+  @override
+  String get eventsDetailCheckInAction => 'Check In';
+
+  @override
+  String get eventsDetailCheckInRequired => 'Check-in required';
+
+  @override
+  String get eventsDetailCheckInSuccess => 'Successfully checked in';
+
+  @override
+  String get eventsDetailDateTBD => 'Date TBD';
+
+  @override
+  String get eventsDetailErrorTitle => 'Error';
+
+  @override
+  String get eventsDetailEventFallback => 'Event';
+
+  @override
+  String get eventsDetailFormat => 'Format';
+
+  @override
+  String get eventsDetailNotFound => 'Event not found';
+
+  @override
+  String get eventsDetailParticipantsText => 'Participants';
+
+  @override
+  String get eventsDetailRegisterAction => 'Register';
+
+  @override
+  String get eventsDetailRegisterBy => 'Register by';
+
+  @override
+  String get eventsDetailRegisteredStatus => 'Registered';
+
+  @override
+  String get eventsDetailRegisterSuccess => 'Successfully registered';
+
+  @override
+  String get eventsDetailRegisterTitle => 'Register for Event';
+
+  @override
+  String get eventsDetailRegistrationClosed => 'Registration Closed';
+
+  @override
+  String get eventsDetailRetryButton => 'Retry';
+
+  @override
+  String get eventsDetailTBD => 'TBD';
+
+  @override
+  String get eventsDetailThisEvent => 'this event';
+
+  @override
+  String get eventsDetailViewBracketButton => 'View Bracket';
+
+  @override
+  String get eventsDetailWaitlistSuccess => 'Added to waitlist';
+
+  @override
+  String get eventsDetailWithdrawPromptPrefix =>
+      'Are you sure you want to withdraw from';
+
+  @override
+  String get eventsDetailWithdrawSuccess => 'Successfully withdrawn';
+
+  @override
+  String get eventsDetailWithdrawTitle => 'Withdraw';
+
+  @override
+  String get eventsScreenCheckBackSoon =>
+      'Check back soon for upcoming tournaments';
+
+  @override
+  String get eventsScreenEventFallback => 'Event';
+
+  @override
+  String get eventsScreenNoTournaments => 'No Tournaments Available';
+
+  @override
+  String get eventsScreenRetryButton => 'Retry';
+
+  @override
+  String get eventsScreenTitle => 'Tournaments';
+
+  @override
+  String get myEventsScreenNoEvents => 'No Events Found';
+
+  @override
+  String get myEventsScreenRetryButton => 'Retry';
+
+  @override
+  String get myEventsScreenTitle => 'My Events';
+
+  @override
+  String get familyChildBookingsEmptyMessage => 'No bookings found.';
+
+  @override
+  String get familyChildBookingsEmptyTitle => 'No Bookings';
+
+  @override
+  String get familyChildBookingsTitle => 'Bookings';
+
+  @override
+  String get familyChildCompletedAtPrefix => 'Completed at:';
+
+  @override
+  String get familyChildCompletedEmptyTitle => 'No Completed Activities';
+
+  @override
+  String get familyChildCompletedTitle => 'Completed';
+
+  @override
+  String get familyChildProfileDaysRemainingText => 'days remaining';
+
+  @override
+  String get familyChildProfileEnd => 'End:';
+
+  @override
+  String get familyChildProfileErrorFallback => 'An error occurred';
+
+  @override
+  String get familyChildProfileRetryButton => 'Retry';
+
+  @override
+  String get familyChildProfileScheduleButton => 'Schedule';
+
+  @override
+  String get familyChildProfileStart => 'Start:';
+
+  @override
+  String get familyChildReservationsTitle => 'Reservations';
+
+  @override
+  String get familyChildScheduleEmptyMessage =>
+      'No courses or activities in this date range.';
+
+  @override
+  String get familyChildScheduleEmptyTitle => 'No events scheduled';
+
+  @override
+  String get familyChildScheduleFrom => 'FROM';
+
+  @override
+  String get familyChildScheduleTitle => 'SCHEDULE';
+
+  @override
+  String get familyChildScheduleTo => 'TO';
+
+  @override
+  String get familyChildScheduleCompletedStatus => 'Completed';
+
+  @override
+  String get familyChildSessionsBookCancel => 'Cancel';
+
+  @override
+  String get familyChildSessionsBookDate => 'Date:';
+
+  @override
+  String get familyChildSessionsBookDay => 'Day:';
+
+  @override
+  String get familyChildSessionsBookFull => 'Session is full';
+
+  @override
+  String get familyChildSessionsBookSpots => 'Spots:';
+
+  @override
+  String get familyChildSessionsBookTime => 'Time:';
+
+  @override
+  String get familyChildSessionsBookTitle => 'Book Session';
+
+  @override
+  String get familyChildSessionsEmptyTitle => 'No sessions available';
+
+  @override
+  String get familyChildSessionsTitle => 'AVAILABLE SESSIONS';
+
+  @override
+  String get familyChildSessionsBookSuccess => 'Successfully booked!';
+
+  @override
+  String get familyChildSessionsBookFailure => 'Failed to book';
+
+  @override
+  String get familyChildSessionsBookConfirm => 'Confirm Booking';
+
+  @override
+  String get familyChildSessionsStatusBooked => 'Booked';
+
+  @override
+  String get familyChildSessionsStatusFull => 'FULL';
+
+  @override
+  String get familyChildSessionsBookTooltip => 'Book session';
+
+  @override
+  String get familyChildSubscriptionsDaysRemaining => 'days remaining';
+
+  @override
+  String get familyChildSubscriptionsEnd => 'End:';
+
+  @override
+  String get familyChildSubscriptionsStart => 'Start:';
+
+  @override
+  String get familyChildSubscriptionsTitle => 'SUBSCRIPTIONS';
+
+  @override
+  String get familyChildSubscriptionsBuyNew => 'BUY NEW SUBSCRIPTION';
+
+  @override
+  String get familyChildSubscriptionsEmptyTitle => 'No subscriptions';
+
+  @override
+  String get familyChildSubscriptionsEmptyMessage =>
+      'Buy a subscription to get started.';
+
+  @override
+  String get homeAvailable => 'available';
+
+  @override
+  String get homeCoursesTitle => 'COURSES';
+
+  @override
+  String get homeEventsTitle => 'TOURNAMENTS & EVENTS';
+
+  @override
+  String get homeExploreButton => 'EXPLORE';
+
+  @override
+  String get homeGlobalSearchTooltip => 'Global Search';
+
+  @override
+  String get homeNo => 'No';
+
+  @override
+  String get homeRetryButton => 'RETRY';
+
+  @override
+  String get homeSeeAllButton => 'SEE ALL';
+
+  @override
+  String get homeServiceCourses => 'courses';
+
+  @override
+  String get homeServiceEvents => 'events';
+
+  @override
+  String get homeServicePlans => 'plans';
+
+  @override
+  String get homeServicesEmpty => 'No services available';
+
+  @override
+  String get homeServicesTitle => 'OUR SERVICES';
+
+  @override
+  String get homeActivityExploreButton => 'EXPLORE';
+
+  @override
+  String get loyaltyLoadFailedMessage => 'Unable to load your points.';
+
+  @override
+  String get loyaltyLoadFailedTitle => 'Load failed';
+
+  @override
+  String get loyaltyMaxTierReached => 'Maximum level reached';
+
+  @override
+  String get loyaltyMyPointsTitle => 'MY POINTS';
+
+  @override
+  String get loyaltyNextTier => 'Next tier';
+
+  @override
+  String get loyaltyNoTransactionMessage =>
+      'Your points transactions will appear here.';
+
+  @override
+  String get loyaltyNoTransactionTitle => 'No transaction';
+
+  @override
+  String get loyaltyPointsBalance => 'POINTS BALANCE';
+
+  @override
+  String get loyaltyPointsHistoryTitle => 'POINTS HISTORY';
+
+  @override
+  String get loyaltyPts => 'pts';
+
+  @override
+  String get loyaltyRetryButton => 'RETRY';
+
+  @override
+  String get loyaltySourceDailyCheckin => 'Daily Check-in';
+
+  @override
+  String get loyaltySourceReferral => 'Referral';
+
+  @override
+  String get loyaltySourceSubscriptionRenewal => 'Subscription Renewal';
+
+  @override
+  String get loyaltySourceReservationCompleted => 'Reservation Completed';
+
+  @override
+  String get loyaltySourceWelcomeBonus => 'Welcome Bonus';
+
+  @override
+  String get loyaltySourceTransaction => 'Transaction';
+
+  @override
+  String get notificationFilterAll => 'ALL';
+
+  @override
+  String get notificationFilterUnread => 'UNREAD';
+
+  @override
+  String get notificationFilterReservations => 'RESERVATIONS';
+
+  @override
+  String get notificationFilterSubscriptions => 'SUBSCRIPTIONS';
+
+  @override
+  String get notificationFilterLoyalty => 'LOYALTY';
+
+  @override
+  String get notificationFilterOffers => 'OFFERS';
+
+  @override
+  String get notificationFilterFamily => 'FAMILY';
+
+  @override
+  String get notificationCaughtUpMessage => 'YOU ARE CAUGHT UP';
+
+  @override
+  String get notificationEmptyFilterMessage =>
+      'No notifications match this filter.';
+
+  @override
+  String get notificationEmptyFilterTitle => 'No results';
+
+  @override
+  String get notificationEmptyMessage =>
+      'You have no notifications at the moment.';
+
+  @override
+  String get notificationEmptyTitle => 'No notifications';
+
+  @override
+  String get notificationLoadFailedTitle => 'Load failed';
+
+  @override
+  String get notificationMarkAllReadTooltip => 'Mark all as read';
+
+  @override
+  String get notificationRetryButton => 'Retry';
+
+  @override
+  String get notificationScreenTitle => 'NOTIFICATIONS';
+
+  @override
+  String get familyChildProfileActiveSubscription => 'Active Subscription';
+
+  @override
+  String get familyChildProfileSubscriptionsButton => 'Subscriptions';
+
+  @override
+  String get familyChildProfileBookingsButton => 'Bookings';
+
+  @override
+  String get familyChildProfileSessionsButton => 'Sessions';
+
+  @override
+  String get familyChildProfileReservationsButton => 'Reservations';
+
+  @override
+  String get familyChildProfileCompletedButton => 'Completed';
+
+  @override
+  String get familyChildBookingCompletedSuccess => 'Marked as completed';
+
+  @override
+  String get familyChildBookingCompletedFailure => 'Failed to complete';
+
+  @override
+  String get familyChildBookingsCompletedStatus => 'Completed';
+
+  @override
+  String get familyChildBookingsMarkCompletedTooltip => 'Mark as completed';
+
+  @override
+  String get familyChildReservationsEmptyTitle => 'No reservations';
+
+  @override
+  String get familyChildReservationsEmptyMessage => 'You have no reservations.';
+
+  @override
+  String get familyChildReservationsShowQrTooltip => 'Show QR code';
+
+  @override
+  String get familyChildReservationsCloseButton => 'Close';
+
+  @override
+  String get familyChildCompletedEmptyMessage => 'No completed items.';
+
+  @override
+  String get familyChildCompletedStatus => 'Completed';
+
+  @override
+  String get eventsScreenWaitlistSuccess => 'Added to waitlist';
+
+  @override
+  String get eventsScreenRegisterSuccess => 'Successfully registered';
+
+  @override
+  String get eventsScreenViewDetailsButton => 'View details';
+
+  @override
+  String get eventsScreenRegisterButton => 'Register';
+
+  @override
+  String get eventsBracketRetryButton => 'Retry';
+
+  @override
+  String get eventsBracketNotAvailable => 'Bracket not available';
+
+  @override
+  String get eventsBracketFinal => 'Final';
+
+  @override
+  String get eventsBracketQuarterFinals => 'Quarter-Finals';
+
+  @override
+  String get eventsBracketCompleted => 'Completed';
 }

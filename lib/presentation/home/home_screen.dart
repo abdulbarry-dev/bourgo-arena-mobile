@@ -261,8 +261,8 @@ class _ServicesHeroContent extends StatelessWidget {
       );
     }
     if (services.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 24),
+      return Padding(
+        padding: const EdgeInsets.only(top: 24),
         child: _EmptyRow(
           message: AppLocalizations.of(context)!.homeServicesEmpty,
           accentColor: Colors.blueGrey,
@@ -732,11 +732,13 @@ class _DashboardSection extends SliverToBoxAdapter {
                  onRetry: onRetry,
                )
              else if (isEmpty)
-               _EmptyRow(
-                 message:
-                     '${AppLocalizations.of(context)!.homeNo} $title ${AppLocalizations.of(context)!.homeAvailable}',
-                 accentColor: accentColor,
-                 icon: icon,
+               Builder(
+                 builder: (context) => _EmptyRow(
+                   message:
+                       '${AppLocalizations.of(context)!.homeNo} $title ${AppLocalizations.of(context)!.homeAvailable}',
+                   accentColor: accentColor,
+                   icon: icon,
+                 ),
                )
              else
                SizedBox(

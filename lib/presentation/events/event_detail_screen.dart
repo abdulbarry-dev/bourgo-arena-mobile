@@ -87,7 +87,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
-            _infoRow(theme, Symbols.calendar_month, _formatDateRange()),
+            _infoRow(theme, Symbols.calendar_month, _formatDateRange(context)),
             const SizedBox(height: 8),
             _infoRow(
               theme,
@@ -208,12 +208,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
 
-    if (_isLoading)
+    if (_isLoading) {
       return Scaffold(
         backgroundColor: theme.colorScheme.surface,
         body: const Center(child: CircularProgressIndicator()),
       );
-    if (_errorMessage != null)
+    }
+    if (_errorMessage != null) {
       return Scaffold(
         appBar: AppBar(),
         body: PremiumErrorState(
@@ -229,13 +230,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           },
         ),
       );
-    if (_event == null)
+    }
+    if (_event == null) {
       return Scaffold(
         appBar: AppBar(),
         body: Center(
           child: Text(AppLocalizations.of(context)!.eventsDetailNotFound),
         ),
       );
+    }
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -306,7 +309,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           itemBuilder: (_, i) => Image.network(
             images[i],
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
+            errorBuilder: (_, _, _) =>
                 Container(color: theme.colorScheme.surfaceContainerHighest),
           ),
         ),
@@ -498,8 +501,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   String _formatDateRange(BuildContext context) {
     final start = _event!.startDate;
     final end = _event!.endDate;
-    if (start == null && end == null)
+    if (start == null && end == null) {
       return AppLocalizations.of(context)!.eventsDetailDateTBD;
+    }
     final s = start != null
         ? _formatDate(start)
         : AppLocalizations.of(context)!.eventsDetailTBD;

@@ -47,7 +47,7 @@ class SessionScheduleCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _buildImage(theme),
-              Expanded(child: _buildContent(theme, appColors)),
+              Expanded(child: _buildContent(context, theme, appColors)),
             ],
           ),
         ),
@@ -73,7 +73,11 @@ class SessionScheduleCard extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(ThemeData theme, AppColors appColors) {
+  Widget _buildContent(
+    BuildContext context,
+    ThemeData theme,
+    AppColors appColors,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Column(
@@ -104,9 +108,9 @@ class SessionScheduleCard extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              Expanded(child: _buildCapacityBar(theme)),
+              Expanded(child: _buildCapacityBar(context, theme)),
               const SizedBox(width: 12),
-              _buildActionButton(theme),
+              _buildActionButton(context, theme),
             ],
           ),
         ],
@@ -114,7 +118,7 @@ class SessionScheduleCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCapacityBar(ThemeData theme) {
+  Widget _buildCapacityBar(BuildContext context, ThemeData theme) {
     final ratio = entry.capacity > 0 ? entry.enrolled / entry.capacity : 0.0;
     final remaining = entry.capacity - entry.enrolled;
 
@@ -149,7 +153,9 @@ class SessionScheduleCard extends StatelessWidget {
               ? AppLocalizations.of(context)!.statusBooked
               : entry.isFull
               ? AppLocalizations.of(context)!.statusFull
-              : AppLocalizations.of(context)!.remainingPlaces(remaining),
+              : AppLocalizations.of(
+                  context,
+                )!.remainingPlaces(remaining.toString()),
           style: theme.textTheme.labelSmall?.copyWith(
             color: isBooked
                 ? theme.colorScheme.primary
@@ -165,7 +171,7 @@ class SessionScheduleCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(ThemeData theme) {
+  Widget _buildActionButton(BuildContext context, ThemeData theme) {
     if (isBooked) {
       return SizedBox(
         height: 32,

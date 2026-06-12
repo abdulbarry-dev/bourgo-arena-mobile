@@ -4,7 +4,6 @@ import 'package:bourgo_arena_mobile/presentation/notifications/notifications_scr
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
     as entity;

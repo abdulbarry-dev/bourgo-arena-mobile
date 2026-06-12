@@ -266,7 +266,7 @@ class ApiAuthRepository implements AuthRepository {
           await _apiClient.post('/auth/login', {
                 isEmail ? 'email' : 'phone': identifier,
                 'password': password,
-                if (deviceId != null) 'device_id': deviceId,
+                'device_id': ?deviceId,
               })
               as Map<String, dynamic>;
 
@@ -553,7 +553,7 @@ class ApiAuthRepository implements AuthRepository {
         'date_of_birth': dateOfBirth,
         'gender': gender,
         'is_parent_account': isFamilyAccount,
-        if (deviceId != null) 'device_id': deviceId,
+        'device_id': ?deviceId,
       });
       final response = rawResponse is Map<String, dynamic>
           ? rawResponse

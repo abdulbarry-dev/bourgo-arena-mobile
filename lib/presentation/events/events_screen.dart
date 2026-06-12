@@ -249,6 +249,41 @@ class _EventsScreenState extends State<EventsScreen> {
       ],
     );
   }
+
+  Widget _buildFilterBar(ThemeData theme) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: Row(
+        children: [
+          _buildFilterChip(theme, 'All', null),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Football', 'football'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Padel', 'padel'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Tennis', 'tennis'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(ThemeData theme, String label, String? value) {
+    final isSelected = _viewModel.selectedSportType == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => _viewModel.setSportType(value),
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.black : theme.colorScheme.onSurfaceVariant,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    );
+  }
 }
 
 class _EventCard extends StatelessWidget {
@@ -631,41 +666,6 @@ class _SkeletonEventCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildFilterBar(ThemeData theme) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      child: Row(
-        children: [
-          _buildFilterChip(theme, 'All', null),
-          const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Football', 'football'),
-          const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Padel', 'padel'),
-          const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Tennis', 'tennis'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(ThemeData theme, String label, String? value) {
-    final isSelected = _viewModel.selectedSportType == value;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => _viewModel.setSportType(value),
-      selectedColor: theme.colorScheme.primary,
-      backgroundColor: theme.colorScheme.surfaceContainerHighest,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.black : theme.colorScheme.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      side: BorderSide.none,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
   }
 }

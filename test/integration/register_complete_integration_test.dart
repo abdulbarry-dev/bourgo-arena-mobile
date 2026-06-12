@@ -178,7 +178,7 @@ void main() {
       final completeResult = await repository.completeRegistration(user);
       if (completeResult is FailureResult) {
         print(
-          'completeRegistration Failed: ${(completeResult as FailureResult).failure.message}',
+          'completeRegistration Failed: ${(completeResult).failure.message}',
         );
       }
       expect(completeResult, isA<Success<void, dynamic>>());

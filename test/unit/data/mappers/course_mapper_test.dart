@@ -1,7 +1,6 @@
 import 'package:bourgo_arena_mobile/data/mappers/course_mapper.dart';
 import 'package:bourgo_arena_mobile/data/models/course_model.dart';
 import 'package:bourgo_arena_mobile/data/models/course_session_model.dart';
-import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:test/test.dart';
 
 import 'mapper_test_fixtures.dart';
