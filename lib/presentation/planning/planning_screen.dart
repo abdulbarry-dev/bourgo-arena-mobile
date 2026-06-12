@@ -136,10 +136,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
         height: MediaQuery.of(context).size.height * 0.7,
         padding: const EdgeInsets.symmetric(horizontal: 32),
         child: PremiumErrorState(
-          title: "ERREUR DE PLANNING",
-          message:
-              "Impossible de récupérer le programme des cours. Veuillez vérifier votre connexion.",
-          actionLabel: "Réessayer",
+          title: AppLocalizations.of(context)!.planningErrorTitle,
+          message: AppLocalizations.of(context)!.planningErrorMessage,
+          actionLabel: AppLocalizations.of(context)!.retryAction,
           onRetry: _viewModel.loadPlanning,
         ),
       ),
@@ -154,10 +153,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
           height: MediaQuery.of(context).size.height * 0.7,
           padding: const EdgeInsets.symmetric(horizontal: 32),
           child: PremiumErrorState(
-            title: "CONNECTEZ-VOUS",
-            message:
-                "Connectez-vous pour accéder à votre planning de cours et réserver vos séances.",
-            actionLabel: "SE CONNECTER",
+            title: AppLocalizations.of(context)!.planningSignInTitle,
+            message: AppLocalizations.of(context)!.planningSignInMessage,
+            actionLabel: AppLocalizations.of(context)!.signInButton,
             onRetry: () => context.push('/login'),
           ),
         ),
@@ -169,9 +167,10 @@ class _PlanningScreenState extends State<PlanningScreen> {
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.6,
         child: EmptyState(
-          title: "AUCUNE SÉANCE",
-          message:
-              "Aucune séance disponible avec votre abonnement actuel. Passez à un abonnement supérieur pour accéder à plus de cours.",
+          title: AppLocalizations.of(context)!.planningNoSessionsTitle,
+          message: AppLocalizations.of(
+            context,
+          )!.planningNoSessionsSubscriptionMessage,
           icon: Symbols.subscriptions,
         ),
       ),
@@ -184,9 +183,8 @@ class _PlanningScreenState extends State<PlanningScreen> {
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.6,
         child: EmptyState(
-          title: "AUCUNE SÉANCE",
-          message:
-              "Aucune séance à venir cette semaine. Revenez plus tard pour découvrir le programme.",
+          title: AppLocalizations.of(context)!.planningNoSessionsTitle,
+          message: AppLocalizations.of(context)!.planningNoSessionsWeekMessage,
           icon: Symbols.calendar_today,
         ),
       ),
@@ -229,7 +227,9 @@ class _PlanningScreenState extends State<PlanningScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Réservé ${entry.title} le $dateStr à ${entry.startTime}',
+            AppLocalizations.of(
+              context,
+            )!.courseDetailBookedSession(entry.title, dateStr, entry.startTime),
           ),
         ),
       );
@@ -250,19 +250,19 @@ class _PlanningScreenState extends State<PlanningScreen> {
   ) async {
     final theme = Theme.of(context);
     final capitalDay = _formatDayName(entry.dayOfWeek);
-    const months = [
-      'Janvier',
-      'Février',
-      'Mars',
-      'Avril',
-      'Mai',
-      'Juin',
-      'Juillet',
-      'Août',
-      'Septembre',
-      'Octobre',
-      'Novembre',
-      'Décembre',
+    final months = [
+      AppLocalizations.of(context)!.monthJanuary,
+      AppLocalizations.of(context)!.monthFebruary,
+      AppLocalizations.of(context)!.monthMarch,
+      AppLocalizations.of(context)!.monthApril,
+      AppLocalizations.of(context)!.monthMay,
+      AppLocalizations.of(context)!.monthJune,
+      AppLocalizations.of(context)!.monthJuly,
+      AppLocalizations.of(context)!.monthAugust,
+      AppLocalizations.of(context)!.monthSeptember,
+      AppLocalizations.of(context)!.monthOctober,
+      AppLocalizations.of(context)!.monthNovember,
+      AppLocalizations.of(context)!.monthDecember,
     ];
     final formattedDate =
         '$capitalDay ${nextDate.day} ${months[nextDate.month - 1]} ${nextDate.year}';
@@ -270,7 +270,7 @@ class _PlanningScreenState extends State<PlanningScreen> {
     return await ConfirmActionModal.show(
           context: context,
           icon: Symbols.event,
-          title: 'RÉSERVER',
+          title: AppLocalizations.of(context)!.reserveAction,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -311,14 +311,14 @@ class _PlanningScreenState extends State<PlanningScreen> {
   }
 
   String _formatDayName(int dayOfWeek) {
-    const raw = [
-      'Dimanche',
-      'Lundi',
-      'Mardi',
-      'Mercredi',
-      'Jeudi',
-      'Vendredi',
-      'Samedi',
+    final raw = [
+      AppLocalizations.of(context)!.daySunday,
+      AppLocalizations.of(context)!.dayMonday,
+      AppLocalizations.of(context)!.dayTuesday,
+      AppLocalizations.of(context)!.dayWednesday,
+      AppLocalizations.of(context)!.dayThursday,
+      AppLocalizations.of(context)!.dayFriday,
+      AppLocalizations.of(context)!.daySaturday,
     ];
     return raw[dayOfWeek];
   }
@@ -365,7 +365,8 @@ class _MemberSelector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              viewModel.selectedMember?.name ?? "Moi",
+              viewModel.selectedMember?.name ??
+                  AppLocalizations.of(context)!.meLabel,
               style: TextStyle(
                 color: theme.colorScheme.primary,
                 fontWeight: FontWeight.w900,
@@ -386,7 +387,9 @@ class _MemberSelector extends StatelessWidget {
         return PopupMenuItem(
           value: m.id,
           child: Text(
-            m.isPrimary ? '${m.name} (Moi)' : m.name,
+            m.isPrimary
+                ? AppLocalizations.of(context)!.meMemberName(m.name)
+                : m.name,
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
         );
@@ -500,10 +503,10 @@ class _SessionSkeletonLoading extends StatelessWidget {
         for (int d = 0; d < 3; d++) ...[
           _DayHeader(
             dayName: d == 0
-                ? 'DIMANCHE'
+                ? AppLocalizations.of(context)!.daySunday.toUpperCase()
                 : d == 1
-                ? 'LUNDI'
-                : 'MARDI',
+                ? AppLocalizations.of(context)!.dayMonday.toUpperCase()
+                : AppLocalizations.of(context)!.dayTuesday.toUpperCase(),
             theme: theme,
           ),
           const SizedBox(height: 10),

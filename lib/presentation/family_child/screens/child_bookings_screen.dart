@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
@@ -63,7 +64,9 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'BOOKINGS'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!.familyChildBookingsTitle,
+          ),
           body: _viewModel.isLoading
               ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
@@ -245,8 +248,12 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
           SnackBar(
             content: Text(
               success
-                  ? 'Booking marked as completed'
-                  : 'Failed to complete booking',
+                  ? AppLocalizations.of(
+                      context,
+                    )!.familyChildBookingCompletedSuccess
+                  : AppLocalizations.of(
+                      context,
+                    )!.familyChildBookingCompletedFailure,
             ),
             backgroundColor: success
                 ? appColors.statusSuccess
@@ -285,7 +292,7 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                 ),
                 SizedBox(height: spacing.xl),
                 Text(
-                  'No bookings',
+                  AppLocalizations.of(context)!.familyChildBookingsEmptyTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
@@ -293,7 +300,7 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                 ),
                 SizedBox(height: spacing.md),
                 Text(
-                  'Bookings for this child will appear here.',
+                  AppLocalizations.of(context)!.familyChildBookingsEmptyMessage,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -350,7 +357,9 @@ class _BookingCard extends StatelessWidget {
                   child: Center(
                     child: booking.isCompleted
                         ? Semantics(
-                            label: 'Completed',
+                            label: AppLocalizations.of(
+                              context,
+                            )!.familyChildBookingsCompletedStatus,
                             child: Icon(
                               Symbols.check_circle,
                               color: appColors.statusSuccess,
@@ -415,7 +424,9 @@ class _BookingCard extends StatelessWidget {
                       Symbols.check_circle_outline,
                       color: theme.colorScheme.primary,
                     ),
-                    tooltip: 'Mark completed',
+                    tooltip: AppLocalizations.of(
+                      context,
+                    )!.familyChildBookingsMarkCompletedTooltip,
                   ),
               ],
             ),

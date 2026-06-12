@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ServicesScreen extends StatefulWidget {
@@ -59,6 +60,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -73,7 +75,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           color: theme.colorScheme.onSurface,
         ),
         title: Text(
-          'SERVICES',
+          l10n.servicesTitle.toUpperCase(),
           style: theme.textTheme.titleMedium?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
@@ -92,6 +94,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   Widget _buildSearchBar(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
       child: TextField(
@@ -99,7 +102,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
         focusNode: _searchFocus,
         onChanged: _viewModel.setSearchQuery,
         decoration: InputDecoration(
-          hintText: 'Search services...',
+          hintText: l10n.servicesSearchHint,
           hintStyle: theme.textTheme.bodySmall?.copyWith(
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
           ),
@@ -140,11 +143,12 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   Widget _buildFilterChips(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     final filters = [
-      (ServiceFilterType.all, 'All'),
-      (ServiceFilterType.plans, 'Plans'),
-      (ServiceFilterType.courses, 'Courses'),
-      (ServiceFilterType.events, 'Events'),
+      (ServiceFilterType.all, l10n.servicesFilterAll),
+      (ServiceFilterType.plans, l10n.servicesFilterPlans),
+      (ServiceFilterType.courses, l10n.servicesFilterCourses),
+      (ServiceFilterType.events, l10n.servicesFilterEvents),
     ];
 
     return Padding(
@@ -169,6 +173,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   Widget _buildBody(ThemeData theme) {
+    final l10n = AppLocalizations.of(context)!;
     if (_viewModel.isLoading) {
       return _buildSkeletonLoading(theme);
     }
@@ -202,9 +207,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text(
-                'RETRY',
-                style: TextStyle(
+              child: Text(
+                l10n.serviceDetailRetry.toUpperCase(),
+                style: const TextStyle(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.2,
                 ),
@@ -231,8 +236,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
             Text(
               _viewModel.searchQuery.isNotEmpty ||
                       _viewModel.filterType != ServiceFilterType.all
-                  ? 'No matching services'
-                  : 'No services available',
+                  ? l10n.servicesNoMatching
+                  : l10n.servicesNoAvailable,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontFamily: AppConstants.displayFontFamily,
@@ -243,8 +248,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
             Text(
               _viewModel.searchQuery.isNotEmpty ||
                       _viewModel.filterType != ServiceFilterType.all
-                  ? 'Try adjusting your search or filters.'
-                  : 'Check back soon for new services.',
+                  ? l10n.servicesAdjustSearch
+                  : l10n.servicesCheckBack,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant.withValues(
                   alpha: 0.7,

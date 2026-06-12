@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ServiceDetailScreen extends StatefulWidget {
@@ -55,6 +56,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (_viewModel.isLoading && _service == null) {
       return _buildLoading(theme);
@@ -83,7 +85,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           if (service.plans.isNotEmpty)
             _buildHorizSection(
               theme: theme,
-              title: 'PLANS',
+              title: l10n.serviceDetailPlans.toUpperCase(),
               icon: Symbols.workspace_premium,
               accentColor: theme.colorScheme.primary,
               itemCount: service.plans.length,
@@ -94,7 +96,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           if (service.courses.isNotEmpty)
             _buildHorizSection(
               theme: theme,
-              title: 'COURSES',
+              title: l10n.serviceDetailCourses.toUpperCase(),
               icon: Symbols.school,
               accentColor: Colors.orange.shade400,
               itemCount: service.courses.length,
@@ -105,7 +107,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           if (service.events.isNotEmpty)
             _buildHorizSection(
               theme: theme,
-              title: 'EVENTS',
+              title: l10n.serviceDetailEvents.toUpperCase(),
               icon: Symbols.emoji_events,
               accentColor: Colors.purple.shade400,
               itemCount: service.events.length,
@@ -116,7 +118,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
           if (service.activities.isNotEmpty)
             _buildHorizSection(
               theme: theme,
-              title: 'ACTIVITIES',
+              title: l10n.serviceDetailActivities.toUpperCase(),
               icon: Symbols.sports_soccer,
               accentColor: Colors.teal.shade400,
               itemCount: service.activities.length,
@@ -187,7 +189,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _viewModel.errorMessage ?? 'Something went wrong',
+              _viewModel.errorMessage ?? l10n.serviceDetailErrorMsg,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -205,7 +207,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              child: const Text('RETRY'),
+              child: Text(l10n.serviceDetailRetry.toUpperCase()),
             ),
           ],
         ),
@@ -287,7 +289,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                'ACTIVE',
+                l10n.serviceDetailActive.toUpperCase(),
                 style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
@@ -420,17 +422,22 @@ class _PlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = theme.extension<AppColors>()!;
+    final l10n = AppLocalizations.of(context)!;
 
     String durationText = '';
     if (plan.durationDays != null) {
       if (plan.durationDays! >= 365) {
         final years = plan.durationDays! ~/ 365;
-        durationText = years == 1 ? 'Annual' : '$years Years';
+        durationText = years == 1
+            ? l10n.serviceDetailAnnual
+            : '$years ${l10n.serviceDetailYears}';
       } else if (plan.durationDays! >= 30) {
         final months = plan.durationDays! ~/ 30;
-        durationText = months == 1 ? 'Monthly' : '$months Months';
+        durationText = months == 1
+            ? l10n.serviceDetailMonthly
+            : '$months ${l10n.serviceDetailMonths}';
       } else {
-        durationText = '${plan.durationDays} Days';
+        durationText = '${plan.durationDays} ${l10n.serviceDetailDays}';
       }
     }
 
@@ -503,7 +510,7 @@ class _PlanCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  'ALL COURSES',
+                  l10n.serviceDetailAllCourses.toUpperCase(),
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -631,6 +638,7 @@ class _EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = theme.extension<AppColors>()!;
+    final l10n = AppLocalizations.of(context)!;
     final hasImage = event.images.isNotEmpty;
 
     String? formattedDate;
@@ -684,7 +692,8 @@ class _EventCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      event.name?.toUpperCase() ?? 'EVENT',
+                      event.name?.toUpperCase() ??
+                          l10n.serviceDetailEventLabel.toUpperCase(),
                       style: theme.textTheme.labelLarge?.copyWith(
                         fontFamily: AppConstants.displayFontFamily,
                         fontWeight: FontWeight.w900,

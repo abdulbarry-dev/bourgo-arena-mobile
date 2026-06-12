@@ -63,7 +63,9 @@ class _PaymentStepState extends State<PaymentStep> {
     if (!success) {
       setState(() {
         _konnectState = _KonnectPaymentState.failed;
-        _errorMessage = widget.viewModel.errorMessage ?? 'Reservation failed.';
+        _errorMessage =
+            widget.viewModel.errorMessage ??
+            AppLocalizations.of(context)!.paymentErrorGeneric;
       });
       return;
     }
@@ -76,9 +78,8 @@ class _PaymentStepState extends State<PaymentStep> {
       final confirmed = await ConfirmActionModal.show(
         context: context,
         icon: Symbols.stars,
-        title: 'PAY WITH POINTS',
-        message:
-            'You are about to pay for your booking using your loyalty points. This action cannot be undone.',
+        title: AppLocalizations.of(context)!.paymentPointsTitle,
+        message: AppLocalizations.of(context)!.paymentPointsDesc,
         content: Container(
           margin: const EdgeInsets.only(top: 16),
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
@@ -90,7 +91,7 @@ class _PaymentStepState extends State<PaymentStep> {
           ),
           child: const AnimatedLoyaltyBalance(isVisible: true),
         ),
-        confirmLabel: 'PAY NOW',
+        confirmLabel: AppLocalizations.of(context)!.actionPayNow,
       );
       if (confirmed != true) {
         setState(() => _konnectState = _KonnectPaymentState.idle);
@@ -111,7 +112,7 @@ class _PaymentStepState extends State<PaymentStep> {
     if (reservationId == null) {
       setState(() {
         _konnectState = _KonnectPaymentState.failed;
-        _errorMessage = 'Missing reservation ID for loyalty payment.';
+        _errorMessage = AppLocalizations.of(context)!.paymentErrorMissingId;
       });
       return;
     }
@@ -120,7 +121,7 @@ class _PaymentStepState extends State<PaymentStep> {
     if (parsedId == null) {
       setState(() {
         _konnectState = _KonnectPaymentState.failed;
-        _errorMessage = 'Invalid reservation ID format.';
+        _errorMessage = AppLocalizations.of(context)!.paymentErrorInvalidId;
       });
       return;
     }
@@ -154,7 +155,7 @@ class _PaymentStepState extends State<PaymentStep> {
     if (depositUrl == null || reservationId == null) {
       setState(() {
         _konnectState = _KonnectPaymentState.failed;
-        _errorMessage = 'No payment URL received from server. Please retry.';
+        _errorMessage = AppLocalizations.of(context)!.paymentErrorNoUrl;
       });
       return;
     }
@@ -180,8 +181,7 @@ class _PaymentStepState extends State<PaymentStep> {
         // Gateway explicitly signalled failure.
         setState(() {
           _konnectState = _KonnectPaymentState.failed;
-          _errorMessage =
-              'Payment failed. Please try again or choose another method.';
+          _errorMessage = AppLocalizations.of(context)!.paymentErrorGeneric;
         });
       case PaymentWebViewResult.dismissed:
       case null:
@@ -213,9 +213,9 @@ class _PaymentStepState extends State<PaymentStep> {
         } else {
           setState(() {
             _konnectState = _KonnectPaymentState.idle;
-            _errorMessage =
-                'Payment not yet confirmed (status: $status). '
-                'You can check your bookings.';
+            _errorMessage = AppLocalizations.of(
+              context,
+            )!.paymentErrorUnconfirmed;
           });
         }
       },
@@ -232,11 +232,17 @@ class _PaymentStepState extends State<PaymentStep> {
   Widget build(BuildContext context) {
     switch (_konnectState) {
       case _KonnectPaymentState.processingReservation:
-        return _LoadingView(message: 'Creating reservation...');
+        return _LoadingView(
+          message: AppLocalizations.of(context)!.paymentCreatingReservation,
+        );
       case _KonnectPaymentState.openingGateway:
-        return _LoadingView(message: 'Opening payment gateway...');
+        return _LoadingView(
+          message: AppLocalizations.of(context)!.paymentOpeningGateway,
+        );
       case _KonnectPaymentState.verifying:
-        return _LoadingView(message: 'Verifying payment...');
+        return _LoadingView(
+          message: AppLocalizations.of(context)!.paymentVerifying,
+        );
       case _KonnectPaymentState.success:
         return _SuccessView(
           onContinue: () => context.push(
@@ -246,7 +252,9 @@ class _PaymentStepState extends State<PaymentStep> {
         );
       case _KonnectPaymentState.failed:
         return _FailedView(
-          message: _errorMessage ?? 'An error occurred.',
+          message:
+              _errorMessage ??
+              AppLocalizations.of(context)!.paymentErrorGeneric,
           onRetry: () => setState(() {
             _konnectState = _KonnectPaymentState.idle;
             _errorMessage = null;
@@ -312,7 +320,7 @@ class _SuccessView extends StatelessWidget {
           ),
           const SizedBox(height: 32),
           Text(
-            'PAYMENT SUCCESSFUL',
+            AppLocalizations.of(context)!.paymentSuccessTitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontFamily: AppConstants.displayFontFamily,
@@ -323,7 +331,7 @@ class _SuccessView extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Your booking deposit has been confirmed.',
+            AppLocalizations.of(context)!.paymentSuccessDesc,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -340,9 +348,12 @@ class _SuccessView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: const Text(
-              'VIEW MY BOOKING',
-              style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            child: Text(
+              AppLocalizations.of(context)!.paymentViewBooking,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
         ],
@@ -370,7 +381,7 @@ class _FailedView extends StatelessWidget {
           Icon(Symbols.error, size: 100, color: theme.colorScheme.error),
           const SizedBox(height: 32),
           Text(
-            'PAYMENT FAILED',
+            AppLocalizations.of(context)!.paymentFailedTitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontFamily: AppConstants.displayFontFamily,
@@ -399,9 +410,12 @@ class _FailedView extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: const Text(
-              'TRY AGAIN',
-              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+            child: Text(
+              AppLocalizations.of(context)!.paymentTryAgain,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
         ],
@@ -621,7 +635,7 @@ class _SummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           _SummaryRow(
             icon: Symbols.payments,
-            label: '10% Deposit Required',
+            label: AppLocalizations.of(context)!.paymentDepositRequired,
             value:
                 '${viewModel.depositAmount.toStringAsFixed(2)} ${activity?.currency ?? ''}',
           ),
@@ -700,7 +714,7 @@ class _PaymentMethodSelector extends StatelessWidget {
         _PaymentOption(
           icon: Symbols.credit_card,
           label: AppLocalizations.of(context)!.bookingMethodCard,
-          subtitle: 'Bank Cards, E-Dinar, Wallets',
+          subtitle: AppLocalizations.of(context)!.paymentMethodCardDesc,
           isSelected:
               viewModel.paymentMethod == AppConstants.paymentMethodCardId,
           isLoyaltyOption: false,
@@ -711,7 +725,7 @@ class _PaymentMethodSelector extends StatelessWidget {
         _PaymentOption(
           icon: Symbols.stars,
           label: AppLocalizations.of(context)!.bookingMethodWallet,
-          subtitle: 'Use your accumulated loyalty points',
+          subtitle: AppLocalizations.of(context)!.paymentMethodPointsDesc,
           isSelected:
               viewModel.paymentMethod == AppConstants.paymentMethodWalletId,
           isLoyaltyOption: true,

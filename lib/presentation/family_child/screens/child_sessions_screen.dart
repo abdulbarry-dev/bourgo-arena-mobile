@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
@@ -66,7 +67,9 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             return AlertDialog(
-              title: Text('Book Session'),
+              title: Text(
+                AppLocalizations.of(context)!.familyChildSessionsBookTitle,
+              ),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,13 +79,19 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
-                  Text('Day: $dayName'),
-                  Text('Time: ${session.startTime} - ${session.endTime}'),
-                  Text('Spots: ${session.remainingSpots}/${session.capacity}'),
+                  Text(
+                    '${AppLocalizations.of(context)!.familyChildSessionsBookDay} $dayName',
+                  ),
+                  Text(
+                    '${AppLocalizations.of(context)!.familyChildSessionsBookTime} ${session.startTime} - ${session.endTime}',
+                  ),
+                  Text(
+                    '${AppLocalizations.of(context)!.familyChildSessionsBookSpots} ${session.remainingSpots}/${session.capacity}',
+                  ),
                   if (session.isFull) ...[
                     const SizedBox(height: 8),
                     Text(
-                      'Session is full',
+                      AppLocalizations.of(context)!.familyChildSessionsBookFull,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
                       ),
@@ -105,7 +114,7 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                         }
                       },
                       child: Text(
-                        'Date: ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                        '${AppLocalizations.of(context)!.familyChildSessionsBookDate} ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
                       ),
                     ),
                 ],
@@ -116,7 +125,9 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                     AppHaptics.light();
                     Navigator.pop(dialogContext);
                   },
-                  child: const Text('Cancel'),
+                  child: Text(
+                    AppLocalizations.of(context)!.familyChildSessionsBookCancel,
+                  ),
                 ),
                 if (!session.isFull)
                   ElevatedButton(
@@ -145,9 +156,13 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                             SnackBar(
                               content: Text(
                                 booking != null
-                                    ? 'Successfully booked!'
+                                    ? AppLocalizations.of(
+                                        context,
+                                      )!.familyChildSessionsBookSuccess
                                     : _viewModel.errorMessage ??
-                                          'Failed to book',
+                                          AppLocalizations.of(
+                                            context,
+                                          )!.familyChildSessionsBookFailure,
                               ),
                               backgroundColor: booking != null
                                   ? appColors.statusSuccess
@@ -158,7 +173,11 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                         if (booking != null) _viewModel.load(widget.childId);
                       }
                     },
-                    child: const Text('Confirm Booking'),
+                    child: Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.familyChildSessionsBookConfirm,
+                    ),
                   ),
               ],
             );
@@ -179,7 +198,9 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'AVAILABLE SESSIONS'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!.familyChildSessionsTitle,
+          ),
           body: _viewModel.isLoading
               ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
@@ -292,7 +313,7 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                 ),
                 SizedBox(height: spacing.xl),
                 Text(
-                  'No sessions available',
+                  AppLocalizations.of(context)!.familyChildSessionsEmptyTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
@@ -356,7 +377,9 @@ class _SessionCard extends StatelessWidget {
                     if (session.isBooked) ...[
                       SizedBox(width: spacing.sm),
                       Semantics(
-                        label: 'Booked',
+                        label: AppLocalizations.of(
+                          context,
+                        )!.familyChildSessionsStatusBooked,
                         child: Icon(
                           Symbols.check_circle,
                           size: 16,
@@ -428,7 +451,9 @@ class _SessionCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          'FULL',
+                          AppLocalizations.of(
+                            context,
+                          )!.familyChildSessionsStatusFull,
                           style: theme.textTheme.labelSmall?.copyWith(
                             fontWeight: FontWeight.w900,
                             color: appColors.statusError,
@@ -446,7 +471,9 @@ class _SessionCard extends StatelessWidget {
             IconButton(
               onPressed: onBook,
               icon: Icon(Symbols.add_circle, color: theme.colorScheme.primary),
-              tooltip: 'Book session',
+              tooltip: AppLocalizations.of(
+                context,
+              )!.familyChildSessionsBookTooltip,
             ),
         ],
       ),

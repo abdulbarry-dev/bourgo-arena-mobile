@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
@@ -244,7 +245,7 @@ class _ActionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'EXPLORE',
+      AppLocalizations.of(context)!.homeActivityExploreButton,
       style: theme.textTheme.labelSmall?.copyWith(
         color: theme.colorScheme.primary,
         fontWeight: FontWeight.w900,

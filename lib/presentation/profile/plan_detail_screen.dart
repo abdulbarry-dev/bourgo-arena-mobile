@@ -210,7 +210,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
             ),
             const SizedBox(width: 12),
             Text(
-              'Child-Only Plan',
+              AppLocalizations.of(context)!.planDetailChildOnlyPlan,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
               ),
@@ -218,8 +218,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
           ],
         ),
         content: Text(
-          'This plan is designed for children only. '
-          'Select a child to purchase this plan for them.',
+          AppLocalizations.of(context)!.planDetailChildOnlyDesc,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
             height: 1.4,
@@ -228,11 +227,11 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, 'cancel'),
-            child: const Text('CANCEL'),
+            child: Text(AppLocalizations.of(context)!.commonCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, 'select_child'),
-            child: const Text('SELECT A CHILD'),
+            child: Text(AppLocalizations.of(context)!.planDetailSelectChild),
           ),
         ],
       ),
@@ -248,7 +247,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Child added. Please select them to continue.'),
+          content: Text(AppLocalizations.of(context)!.planDetailChildAdded),
         ),
       );
       return;
@@ -303,7 +302,9 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     if (_isLoading || _isLoadingUser) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: const SubScreenAppBar(title: 'PLAN DETAILS'),
+        appBar: SubScreenAppBar(
+          title: AppLocalizations.of(context)!.planDetailTitle,
+        ),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -392,7 +393,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                           ),
                       const SizedBox(height: 32),
                       Text(
-                            'INCLUDES',
+                            AppLocalizations.of(context)!.planDetailIncludes,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.bold,
@@ -424,7 +425,9 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                         _buildFeatureRow(
                               theme,
                               Symbols.all_inclusive,
-                              'Access to ALL courses',
+                              AppLocalizations.of(
+                                context,
+                              )!.planDetailAccessAllCourses,
                             )
                             .animate(delay: 300.ms)
                             .fade(duration: 400.ms)
@@ -645,7 +648,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'SUBSCRIBE FOR',
+                    AppLocalizations.of(context)!.planDetailSubscribeFor,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.bold,
@@ -654,7 +657,9 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _selectedChildId == null ? 'Myself' : 'Child',
+                    _selectedChildId == null
+                        ? AppLocalizations.of(context)!.planDetailMyself
+                        : AppLocalizations.of(context)!.planDetailChild,
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
@@ -704,7 +709,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
               Icon(Symbols.check_circle, color: appColors.statusSuccess),
               const SizedBox(width: 8),
               Text(
-                'ACTIVE PLAN',
+                AppLocalizations.of(context)!.planDetailActivePlan,
                 style: TextStyle(
                   color: appColors.statusSuccess,
                   fontWeight: FontWeight.w900,
@@ -738,7 +743,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
               ),
             )
           : Text(
-              'SUBSCRIBE  —  ${_plan!.price.toStringAsFixed(0)} TND',
+              '${AppLocalizations.of(context)!.planDetailSubscribeBtn}  —  ${_plan!.price.toStringAsFixed(0)} TND',
               style: const TextStyle(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.2,
@@ -757,7 +762,10 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
             Icon(Symbols.error, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text(
-              _errorMessage ?? 'Something went wrong',
+              _errorMessage ??
+                  AppLocalizations.of(
+                    context,
+                  )!.planDetailErrorSomethingWentWrong,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -772,7 +780,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                 });
                 _loadPlan();
               },
-              child: const Text('RETRY'),
+              child: Text(AppLocalizations.of(context)!.planDetailRetryBtn),
             ),
           ],
         ),
@@ -794,7 +802,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Plan not found',
+              AppLocalizations.of(context)!.planDetailNotFound,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontFamily: AppConstants.displayFontFamily,
                 fontWeight: FontWeight.w900,
@@ -803,7 +811,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'This plan may have been archived or removed.',
+              AppLocalizations.of(context)!.planDetailArchived,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -812,7 +820,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => context.pop(),
-              child: const Text('GO BACK'),
+              child: Text(AppLocalizations.of(context)!.commonGoBack),
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 
 class PlanningAuthState extends StatelessWidget {
   const PlanningAuthState({super.key});
@@ -33,7 +34,9 @@ class PlanningAuthState extends StatelessWidget {
             ),
             SizedBox(height: spacing.xl),
             Text(
-              'Sign In Required', // TODO: Localize if needed, though hardcoded for now or use generic auth prompt
+              AppLocalizations.of(
+                context,
+              )!.signInRequiredTitle, // TODO: Localize if needed, though hardcoded for now or use generic auth prompt
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -41,7 +44,7 @@ class PlanningAuthState extends StatelessWidget {
             ),
             SizedBox(height: spacing.sm),
             Text(
-              'You need to be logged in to view and book courses. Join us to start your fitness journey!',
+              AppLocalizations.of(context)!.signInRequiredMessage,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -53,7 +56,7 @@ class PlanningAuthState extends StatelessWidget {
                 context.push('/login');
               },
               icon: const Icon(Symbols.login),
-              label: const Text('Sign In / Register'),
+              label: Text(AppLocalizations.of(context)!.signInRegisterButton),
               style: FilledButton.styleFrom(
                 minimumSize: const Size(double.infinity, 56),
                 shape: RoundedRectangleBorder(
@@ -124,7 +127,7 @@ class PlanningSubscriptionState extends StatelessWidget {
                       ),
                       SizedBox(height: spacing.xl),
                       Text(
-                        'Unlock Planning',
+                        AppLocalizations.of(context)!.unlockPlanningTitle,
                         style: theme.textTheme.headlineSmall?.copyWith(
                           fontWeight: FontWeight.w900,
                           letterSpacing: 0.5,
@@ -133,7 +136,7 @@ class PlanningSubscriptionState extends StatelessWidget {
                       ),
                       SizedBox(height: spacing.sm),
                       Text(
-                        'An active subscription is required to view course schedules and book classes. Join us and elevate your fitness journey!',
+                        AppLocalizations.of(context)!.unlockPlanningMessage,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                           height: 1.5,
@@ -146,8 +149,8 @@ class PlanningSubscriptionState extends StatelessWidget {
                           context.push('/plans');
                         },
                         icon: const Icon(Symbols.rocket_launch, size: 20),
-                        label: const Text(
-                          'View Plans',
+                        label: Text(
+                          AppLocalizations.of(context)!.viewPlansLabel,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

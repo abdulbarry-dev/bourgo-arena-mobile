@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/events/events_view_model.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -69,7 +70,7 @@ class _EventsScreenState extends State<EventsScreen> {
               color: theme.colorScheme.onSurface,
             ),
             title: Text(
-              'TOURNAMENTS & EVENTS',
+              AppLocalizations.of(context)!.eventsScreenTitle,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontFamily: AppConstants.displayFontFamily,
                 fontWeight: FontWeight.w900,
@@ -77,7 +78,12 @@ class _EventsScreenState extends State<EventsScreen> {
               ),
             ),
           ),
-          body: _buildBody(theme),
+          body: Column(
+            children: [
+              _buildFilterBar(theme),
+              Expanded(child: _buildBody(theme)),
+            ],
+          ),
         );
       },
     );
@@ -118,7 +124,7 @@ class _EventsScreenState extends State<EventsScreen> {
                 ),
               ),
               child: Text(
-                'RETRY',
+                AppLocalizations.of(context)!.eventsScreenRetryButton,
                 style: TextStyle(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.2,
@@ -143,7 +149,7 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No tournaments available',
+              AppLocalizations.of(context)!.eventsScreenNoTournaments,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontFamily: AppConstants.displayFontFamily,
@@ -152,7 +158,7 @@ class _EventsScreenState extends State<EventsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Check back soon for upcoming events.',
+              AppLocalizations.of(context)!.eventsScreenCheckBackSoon,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant.withValues(
                   alpha: 0.7,
@@ -198,8 +204,12 @@ class _EventsScreenState extends State<EventsScreen> {
                         if (success) {
                           final status = _viewModel.lastRegistrationStatus;
                           final msg = status == 'waitlisted'
-                              ? 'Added to waitlist.'
-                              : 'Successfully registered!';
+                              ? AppLocalizations.of(
+                                  context,
+                                )!.eventsScreenWaitlistSuccess
+                              : AppLocalizations.of(
+                                  context,
+                                )!.eventsScreenRegisterSuccess;
                           ScaffoldMessenger.of(
                             context,
                           ).showSnackBar(SnackBar(content: Text(msg)));
@@ -356,7 +366,8 @@ class _EventCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event.name?.toUpperCase() ?? 'EVENT',
+                    event.name?.toUpperCase() ??
+                        AppLocalizations.of(context)!.eventsScreenEventFallback,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontFamily: AppConstants.displayFontFamily,
                       fontWeight: FontWeight.w900,
@@ -414,7 +425,9 @@ class _EventCard extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        'VIEW DETAILS',
+                        AppLocalizations.of(
+                          context,
+                        )!.eventsScreenViewDetailsButton,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w900,
@@ -469,7 +482,11 @@ class _EventCard extends StatelessWidget {
                                   color: theme.colorScheme.onPrimary,
                                 ),
                               )
-                            : Text('REGISTER'.toUpperCase()),
+                            : Text(
+                                AppLocalizations.of(
+                                  context,
+                                )!.eventsScreenRegisterButton.toUpperCase(),
+                              ),
                       ),
                     ),
                   ],
@@ -614,6 +631,41 @@ class _SkeletonEventCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFilterBar(ThemeData theme) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: Row(
+        children: [
+          _buildFilterChip(theme, 'All', null),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Football', 'football'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Padel', 'padel'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Tennis', 'tennis'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(ThemeData theme, String label, String? value) {
+    final isSelected = _viewModel.selectedSportType == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => _viewModel.setSportType(value),
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.black : theme.colorScheme.onSurfaceVariant,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
   }
 }

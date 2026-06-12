@@ -84,7 +84,7 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
           ),
           SizedBox(height: spacing.lg),
           Text(
-            'WHO IS THIS FOR?',
+            AppLocalizations.of(context)!.childSelectorTitle,
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w900,
             ),
@@ -100,15 +100,19 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
             _OptionTile(
               icon: Symbols.person,
               title: l10n.commonMe,
-              subtitle: 'Subscribe for yourself',
+              subtitle: AppLocalizations.of(context)!.childSelectorSelfDesc,
               onTap: () => Navigator.pop(context, null),
             ),
             if (_children != null) ...[
               if (_children!.isEmpty)
                 _OptionTile(
                   icon: Symbols.person,
-                  title: 'No children found',
-                  subtitle: 'You currently have no children added.',
+                  title: AppLocalizations.of(
+                    context,
+                  )!.childSelectorNoChildrenTitle,
+                  subtitle: AppLocalizations.of(
+                    context,
+                  )!.childSelectorNoChildrenDesc,
                   onTap: () {},
                 )
               else ...[

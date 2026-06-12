@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
@@ -63,7 +64,9 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'RESERVATIONS'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!.familyChildReservationsTitle,
+          ),
           body: _viewModel.isLoading
               ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
@@ -251,7 +254,9 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                 ),
                 SizedBox(height: spacing.xl),
                 Text(
-                  'No reservations',
+                  AppLocalizations.of(
+                    context,
+                  )!.familyChildReservationsEmptyTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
@@ -259,7 +264,9 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                 ),
                 SizedBox(height: spacing.md),
                 Text(
-                  'Reservations for this child will appear here.',
+                  AppLocalizations.of(
+                    context,
+                  )!.familyChildReservationsEmptyMessage,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -408,7 +415,9 @@ class _ReservationCard extends StatelessWidget {
                       Symbols.qr_code,
                       color: theme.colorScheme.primary,
                     ),
-                    tooltip: 'Show QR code',
+                    tooltip: AppLocalizations.of(
+                      context,
+                    )!.familyChildReservationsShowQrTooltip,
                   ),
               ],
             ),
@@ -467,7 +476,11 @@ class _ReservationCard extends StatelessWidget {
               const SizedBox(height: 20),
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('CLOSE'),
+                child: Text(
+                  AppLocalizations.of(
+                    context,
+                  )!.familyChildReservationsCloseButton,
+                ),
               ),
             ],
           ),

@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
               IconButton(
                 onPressed: () => context.push('/search'),
                 icon: const Icon(Symbols.search),
-                tooltip: 'Global Search',
+                tooltip: AppLocalizations.of(context)!.homeGlobalSearchTooltip,
               ),
               IconButton(
                 onPressed: () {
@@ -132,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
                 _DashboardSection(
-                  title: 'TOURNAMENTS & EVENTS',
+                  title: AppLocalizations.of(context)!.homeEventsTitle,
                   icon: Symbols.emoji_events,
                   accentColor: Colors.purple.shade400,
                   isLoading: _viewModel.eventsLoading,
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 _DashboardSection(
-                  title: 'COURSES',
+                  title: AppLocalizations.of(context)!.homeCoursesTitle,
                   icon: Symbols.school,
                   accentColor: Colors.orange.shade400,
                   isLoading: _viewModel.coursesLoading,
@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 _DashboardSection(
-                  title: 'ACTIVITIES',
+                  title: AppLocalizations.of(context)!.homeActivitiesTitle,
                   icon: Symbols.sports_soccer,
                   accentColor: Colors.teal.shade400,
                   isLoading: _viewModel.activitiesLoading,
@@ -255,7 +255,7 @@ class _ServicesHeroContent extends StatelessWidget {
           child: TextButton.icon(
             onPressed: onRetry,
             icon: const Icon(Symbols.refresh, size: 16),
-            label: const Text('RETRY'),
+            label: Text(AppLocalizations.of(context)!.homeRetryButton),
           ),
         ),
       );
@@ -264,7 +264,7 @@ class _ServicesHeroContent extends StatelessWidget {
       return const Padding(
         padding: EdgeInsets.only(top: 24),
         child: _EmptyRow(
-          message: 'No services available',
+          message: AppLocalizations.of(context)!.homeServicesEmpty,
           accentColor: Colors.blueGrey,
           icon: Symbols.grid_view,
           iconSize: 32,
@@ -287,7 +287,7 @@ class _ServicesHeroContent extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'OUR SERVICES',
+                AppLocalizations.of(context)!.homeServicesTitle,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.5,
@@ -301,7 +301,7 @@ class _ServicesHeroContent extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'SEE ALL',
+                      AppLocalizations.of(context)!.homeSeeAllButton,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.primary,
                         fontWeight: FontWeight.w900,
@@ -467,9 +467,12 @@ class _RotatingServiceHeroContentState
     final service = _currentService;
     final hasImage = service.imageUrl != null;
     final stats = [
-      if (service.plansCount > 0) '${service.plansCount} plans',
-      if (service.coursesCount > 0) '${service.coursesCount} courses',
-      if (service.eventsCount > 0) '${service.eventsCount} events',
+      if (service.plansCount > 0)
+        '${service.plansCount} ${AppLocalizations.of(context)!.homeServicePlans}',
+      if (service.coursesCount > 0)
+        '${service.coursesCount} ${AppLocalizations.of(context)!.homeServiceCourses}',
+      if (service.eventsCount > 0)
+        '${service.eventsCount} ${AppLocalizations.of(context)!.homeServiceEvents}',
     ];
 
     return Padding(
@@ -572,9 +575,9 @@ class _RotatingServiceHeroContentState
                             borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: const Text(
-                          'EXPLORE',
-                          style: TextStyle(
+                        child: Text(
+                          AppLocalizations.of(context)!.homeExploreButton,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w900,
                             fontSize: 12,
                             letterSpacing: 1,
@@ -679,7 +682,7 @@ class _SectionHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'SEE ALL',
+                    AppLocalizations.of(context)!.homeSeeAllButton,
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: accentColor,
                       fontWeight: FontWeight.w900,
@@ -730,7 +733,8 @@ class _DashboardSection extends SliverToBoxAdapter {
                )
              else if (isEmpty)
                _EmptyRow(
-                 message: 'No $title available',
+                 message:
+                     '${AppLocalizations.of(context)!.homeNo} $title ${AppLocalizations.of(context)!.homeAvailable}',
                  accentColor: accentColor,
                  icon: icon,
                )

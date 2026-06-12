@@ -522,7 +522,7 @@ class _ProfileMenu extends StatelessWidget {
           ProfileListItem(
             icon: Symbols.card_membership,
             title: l10n.profileMySubscription,
-            subtitle: "Gérer votre forfait et accès premium",
+            subtitle: l10n.profileSubscriptionSubtitle,
             onTap: onTapAbonnement,
           ),
         ),
@@ -531,7 +531,7 @@ class _ProfileMenu extends StatelessWidget {
           ProfileListItem(
             icon: Symbols.notifications,
             title: l10n.profileNotifications,
-            subtitle: "Gérer vos alertes et rappels de cours",
+            subtitle: l10n.profileNotificationsSubtitle,
             onTap: onTapNotifications,
           ),
         ),
@@ -540,7 +540,7 @@ class _ProfileMenu extends StatelessWidget {
           ProfileListItem(
             icon: Symbols.settings,
             title: l10n.profileSettings,
-            subtitle: "Informations personnelles et sécurité",
+            subtitle: l10n.profileSettingsSubtitle,
             onTap: onTapSettings,
           ),
         ),

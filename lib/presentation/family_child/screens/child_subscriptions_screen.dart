@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
@@ -79,7 +80,9 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'SUBSCRIPTIONS'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!.familyChildSubscriptionsTitle,
+          ),
           body: _viewModel.isLoading
               ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
@@ -136,9 +139,11 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                             context.push('/plans');
                           },
                           icon: const Icon(Symbols.add, size: 20),
-                          label: const Text(
-                            'BUY NEW SUBSCRIPTION',
-                            style: TextStyle(
+                          label: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.familyChildSubscriptionsBuyNew,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1.2,
                             ),
@@ -234,7 +239,9 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
               ),
               SizedBox(height: spacing.xl),
               Text(
-                'No subscriptions',
+                AppLocalizations.of(
+                  context,
+                )!.familyChildSubscriptionsEmptyTitle,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
@@ -242,7 +249,9 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
               ),
               SizedBox(height: spacing.sm),
               Text(
-                'Buy a subscription to get started.',
+                AppLocalizations.of(
+                  context,
+                )!.familyChildSubscriptionsEmptyMessage,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
@@ -353,7 +362,7 @@ class _SubCard extends StatelessWidget {
               ),
               SizedBox(width: spacing.xxs),
               Text(
-                '${subscription.daysRemaining ?? 0} days remaining',
+                '${subscription.daysRemaining ?? 0} ${AppLocalizations.of(context)!.familyChildSubscriptionsDaysRemaining}',
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.onSurfaceVariant,
@@ -366,7 +375,7 @@ class _SubCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Start: ${subscription.startsAt ?? '—'}',
+                  '${AppLocalizations.of(context)!.familyChildSubscriptionsStart} ${subscription.startsAt ?? '—'}',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -374,7 +383,7 @@ class _SubCard extends StatelessWidget {
               ),
               Expanded(
                 child: Text(
-                  'End: ${subscription.endsAt ?? '—'}',
+                  '${AppLocalizations.of(context)!.familyChildSubscriptionsEnd} ${subscription.endsAt ?? '—'}',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

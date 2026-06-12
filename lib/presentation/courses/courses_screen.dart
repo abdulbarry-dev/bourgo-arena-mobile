@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_cas
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/skeleton_card.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -25,6 +26,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
   bool _isLoading = true;
   bool _hasSubscriptionGap = false;
   String? _error;
+  String _selectedFilter = 'All';
 
   @override
   void initState() {
@@ -121,7 +123,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
           color: theme.colorScheme.onSurface,
         ),
         title: Text(
-          'COURSES',
+          AppLocalizations.of(context)!.coursesTitle,
           style: theme.textTheme.titleMedium?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
@@ -130,12 +132,49 @@ class _CoursesScreenState extends State<CoursesScreen> {
         ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (_hasSubscriptionGap && !_isLoading && _error == null)
             _buildSubscriptionBanner(context),
+          if (!_isLoading && _courses.isNotEmpty) _buildFilterBar(theme),
           Expanded(child: _buildBody()),
         ],
       ),
+    );
+  }
+
+  Widget _buildFilterBar(ThemeData theme) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: Row(
+        children: [
+          _buildFilterChip(theme, 'All'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Football'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Padel'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Tennis'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(ThemeData theme, String label) {
+    final isSelected = _selectedFilter == label;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => setState(() => _selectedFilter = label),
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.black : theme.colorScheme.onSurfaceVariant,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
   }
 
@@ -160,7 +199,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Certains cours nécessitent un abonnement pour réserver des séances.',
+              AppLocalizations.of(context)!.coursesSubscriptionRequired,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: theme.colorScheme.onSurface,
                 height: 1.3,
@@ -176,7 +215,7 @@ class _CoursesScreenState extends State<CoursesScreen> {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             ),
             child: Text(
-              'VOIR LES OFFRES',
+              AppLocalizations.of(context)!.coursesViewOffers,
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 0.5,
@@ -210,13 +249,25 @@ class _CoursesScreenState extends State<CoursesScreen> {
               style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: _load, child: const Text('RETRY')),
+            ElevatedButton(
+              onPressed: _load,
+              child: Text(AppLocalizations.of(context)!.actionRetry),
+            ),
           ],
         ),
       );
     }
 
-    if (_courses.isEmpty) {
+    List<Course> filteredCourses = _courses;
+    if (_selectedFilter != 'All') {
+      final lowerFilter = _selectedFilter.toLowerCase();
+      filteredCourses = _courses.where((c) {
+        final text = '${c.name} ${c.description}'.toLowerCase();
+        return text.contains(lowerFilter);
+      }).toList();
+    }
+
+    if (filteredCourses.isEmpty) {
       return RefreshIndicator(
         onRefresh: _load,
         child: ListView(children: const []),
@@ -226,10 +277,10 @@ class _CoursesScreenState extends State<CoursesScreen> {
     return RefreshIndicator(
       onRefresh: _load,
       child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        itemCount: _courses.length,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        itemCount: filteredCourses.length,
         itemBuilder: (context, index) {
-          final course = _courses[index];
+          final course = filteredCourses[index];
           return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: PressableCard(

@@ -43,12 +43,13 @@ class NotificationsPreferencesScreen extends StatelessWidget {
             children: [
               _buildSection(
                 context: context,
-                title: 'GLOBAL NOTIFICATIONS', // Could be localized
+                title: l10n.notifGlobalTitle
+                    .toUpperCase(), // Could be localized
                 children: [
                   _NotificationSwitchTile(
                     icon: Symbols.notifications_active,
-                    title: 'Enable Push Notifications',
-                    subtitle: 'Master toggle for all push notifications',
+                    title: l10n.notifEnablePush,
+                    subtitle: l10n.notifEnablePushSub,
                     value: viewModel.notificationsEnabled,
                     onChanged: viewModel.toggleNotifications,
                     isLast: true,
@@ -65,22 +66,20 @@ class NotificationsPreferencesScreen extends StatelessWidget {
                     children: [
                       _buildSection(
                         context: context,
-                        title: 'PLANNING & COURSES',
+                        title: l10n.notifPlanningTitle.toUpperCase(),
                         children: [
                           _NotificationSwitchTile(
                             icon: Symbols.calendar_month,
-                            title: 'Reservations & Planning',
-                            subtitle:
-                                'Booking confirmations, reminders, and cancellations',
+                            title: l10n.notifReservations,
+                            subtitle: l10n.notifReservationsSub,
                             value: viewModel.reservationsNotificationsEnabled,
                             onChanged:
                                 viewModel.toggleReservationsNotifications,
                           ),
                           _NotificationSwitchTile(
                             icon: Symbols.school,
-                            title: 'Courses',
-                            subtitle:
-                                'Updates from your enrolled courses and instructors',
+                            title: l10n.notifCourses,
+                            subtitle: l10n.notifCoursesSub,
                             value: viewModel.coursesNotificationsEnabled,
                             onChanged: viewModel.toggleCoursesNotifications,
                             isLast: true,
@@ -90,21 +89,20 @@ class NotificationsPreferencesScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       _buildSection(
                         context: context,
-                        title: 'ACCOUNT & PAYMENTS',
+                        title: l10n.notifAccountTitle.toUpperCase(),
                         children: [
                           _NotificationSwitchTile(
                             icon: Symbols.card_membership,
-                            title: 'Subscriptions',
-                            subtitle: 'Renewal notices and payment issues',
+                            title: l10n.notifSubscriptions,
+                            subtitle: l10n.notifSubscriptionsSub,
                             value: viewModel.subscriptionsNotificationsEnabled,
                             onChanged:
                                 viewModel.toggleSubscriptionsNotifications,
                           ),
                           _NotificationSwitchTile(
                             icon: Symbols.warning,
-                            title: 'Security Warnings & Updates',
-                            subtitle:
-                                'Crucial account security and activity updates',
+                            title: l10n.notifSecurity,
+                            subtitle: l10n.notifSecuritySub,
                             value: viewModel.accountNotificationsEnabled,
                             onChanged: viewModel.toggleAccountNotifications,
                             isLast: true,
@@ -114,28 +112,27 @@ class NotificationsPreferencesScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       _buildSection(
                         context: context,
-                        title: 'COMMUNITY & OFFERS',
+                        title: l10n.notifCommunityTitle.toUpperCase(),
                         children: [
                           if (viewModel.showFamilyManagement)
                             _NotificationSwitchTile(
                               icon: Symbols.family_restroom,
-                              title: 'Family Activity',
-                              subtitle:
-                                  'Child account activities and approvals',
+                              title: l10n.notifFamily,
+                              subtitle: l10n.notifFamilySub,
                               value: viewModel.familyNotificationsEnabled,
                               onChanged: viewModel.toggleFamilyNotifications,
                             ),
                           _NotificationSwitchTile(
                             icon: Symbols.star,
-                            title: 'Loyalty & Points',
-                            subtitle: 'Rewards earned and tier upgrades',
+                            title: l10n.notifLoyalty,
+                            subtitle: l10n.notifLoyaltySub,
                             value: viewModel.loyaltyNotificationsEnabled,
                             onChanged: viewModel.toggleLoyaltyNotifications,
                           ),
                           _NotificationSwitchTile(
                             icon: Symbols.campaign,
-                            title: 'Promotions & Offers',
-                            subtitle: 'Receive updates on new deals and events',
+                            title: l10n.notifPromo,
+                            subtitle: l10n.notifPromoSub,
                             value: viewModel.promoNotificationsEnabled,
                             onChanged: viewModel.togglePromoNotifications,
                             isLast: true,

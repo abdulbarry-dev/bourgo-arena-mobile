@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:shimmer/shimmer.dart';
@@ -98,7 +99,11 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Réservé ${session.title} le $dateStr à ${session.startTime}',
+              AppLocalizations.of(context)!.courseDetailBookedSession(
+                session.title,
+                dateStr,
+                session.startTime,
+              ),
             ),
           ),
         );
@@ -132,7 +137,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ),
         ),
         title: Text(
-          'SUBSCRIPTION REQUIRED',
+          AppLocalizations.of(context)!.subscriptionRequiredTitle,
           textAlign: TextAlign.center,
           style: theme.textTheme.titleMedium?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
@@ -142,8 +147,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         ),
         content: Text(
           isAuthenticated
-              ? 'You need an active subscription to book sessions. Subscribe to a plan and try again.'
-              : 'Sign in and subscribe to a plan to book sessions.',
+              ? AppLocalizations.of(context)!.subscriptionRequiredBookMessage
+              : AppLocalizations.of(context)!.subscriptionRequiredSignInMessage,
           textAlign: TextAlign.center,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
@@ -153,7 +158,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('CLOSE'),
+            child: Text(AppLocalizations.of(context)!.closeButton),
           ),
           const SizedBox(height: 8),
           SizedBox(
@@ -164,7 +169,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                 context.push(isAuthenticated ? '/plans' : '/login');
               },
               child: Text(
-                isAuthenticated ? 'VIEW PLANS' : 'SIGN IN',
+                isAuthenticated
+                    ? AppLocalizations.of(context)!.viewPlansButton
+                    : AppLocalizations.of(context)!.signInButton,
                 style: const TextStyle(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.2,
@@ -184,19 +191,19 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   ) async {
     final theme = Theme.of(context);
     final capitalDay = _formatDayName(session.dayOfWeek);
-    const months = [
-      'Janvier',
-      'Février',
-      'Mars',
-      'Avril',
-      'Mai',
-      'Juin',
-      'Juillet',
-      'Août',
-      'Septembre',
-      'Octobre',
-      'Novembre',
-      'Décembre',
+    final months = [
+      AppLocalizations.of(context)!.monthJanuary,
+      AppLocalizations.of(context)!.monthFebruary,
+      AppLocalizations.of(context)!.monthMarch,
+      AppLocalizations.of(context)!.monthApril,
+      AppLocalizations.of(context)!.monthMay,
+      AppLocalizations.of(context)!.monthJune,
+      AppLocalizations.of(context)!.monthJuly,
+      AppLocalizations.of(context)!.monthAugust,
+      AppLocalizations.of(context)!.monthSeptember,
+      AppLocalizations.of(context)!.monthOctober,
+      AppLocalizations.of(context)!.monthNovember,
+      AppLocalizations.of(context)!.monthDecember,
     ];
     final formattedDate =
         '$capitalDay ${nextDate.day} ${months[nextDate.month - 1]} ${nextDate.year}';
@@ -204,7 +211,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     return await ConfirmActionModal.show(
           context: context,
           icon: Symbols.event,
-          title: 'RÉSERVER',
+          title: AppLocalizations.of(context)!.reserveAction,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -245,14 +252,14 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   }
 
   String _formatDayName(int dayOfWeek) {
-    const raw = [
-      'Dimanche',
-      'Lundi',
-      'Mardi',
-      'Mercredi',
-      'Jeudi',
-      'Vendredi',
-      'Samedi',
+    final raw = [
+      AppLocalizations.of(context)!.daySunday,
+      AppLocalizations.of(context)!.dayMonday,
+      AppLocalizations.of(context)!.dayTuesday,
+      AppLocalizations.of(context)!.dayWednesday,
+      AppLocalizations.of(context)!.dayThursday,
+      AppLocalizations.of(context)!.dayFriday,
+      AppLocalizations.of(context)!.daySaturday,
     ];
     return raw[dayOfWeek];
   }
@@ -282,7 +289,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ),
           backgroundColor: theme.colorScheme.surface,
           title: Text(
-            widget.course?.name.toUpperCase() ?? 'COURSE',
+            widget.course?.name.toUpperCase() ??
+                AppLocalizations.of(context)!.courseDefaultTitle,
             style: theme.textTheme.titleMedium?.copyWith(
               fontFamily: AppConstants.displayFontFamily,
               fontWeight: FontWeight.w900,
@@ -307,7 +315,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           color: theme.colorScheme.onSurface,
         ),
         title: Text(
-          _course?.name.toUpperCase() ?? 'COURSE',
+          _course?.name.toUpperCase() ??
+              AppLocalizations.of(context)!.courseDefaultTitle,
           style: theme.textTheme.titleMedium?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
@@ -388,7 +397,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                     _buildAccessDenied(theme)
                   else ...[
                     Text(
-                      'UPCOMING SESSIONS',
+                      AppLocalizations.of(context)!.upcomingSessionsTitle,
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.bold,
@@ -401,7 +410,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 32),
                         child: Center(
                           child: Text(
-                            'No upcoming sessions this week',
+                            AppLocalizations.of(
+                              context,
+                            )!.noUpcomingSessionsMessage,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
@@ -538,7 +549,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'SUBSCRIPTION REQUIRED',
+            AppLocalizations.of(context)!.subscriptionRequiredTitle,
             style: theme.textTheme.titleMedium?.copyWith(
               fontFamily: AppConstants.displayFontFamily,
               fontWeight: FontWeight.w900,
@@ -550,8 +561,12 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           const SizedBox(height: 8),
           Text(
             isAuthenticated
-                ? 'You need an active subscription to view and book sessions for this course.'
-                : 'Sign in and subscribe to a plan to view and book sessions.',
+                ? AppLocalizations.of(
+                    context,
+                  )!.subscriptionRequiredViewBookMessage
+                : AppLocalizations.of(
+                    context,
+                  )!.subscriptionRequiredSignInViewBookMessage,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
@@ -571,7 +586,9 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
               ),
             ),
             child: Text(
-              isAuthenticated ? 'VIEW PLANS' : 'SIGN IN',
+              isAuthenticated
+                  ? AppLocalizations.of(context)!.viewPlansButton
+                  : AppLocalizations.of(context)!.signInButton,
               style: const TextStyle(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.2,
@@ -720,10 +737,10 @@ class _SessionTile extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           session.isBooked
-              ? 'RÉSERVÉ'
+              ? AppLocalizations.of(context)!.statusBooked
               : session.isFull
-              ? 'COMPLET'
-              : '$remaining PLACES',
+              ? AppLocalizations.of(context)!.statusFull
+              : AppLocalizations.of(context)!.remainingPlaces(remaining),
           style: theme.textTheme.labelSmall?.copyWith(
             color: session.isBooked
                 ? theme.colorScheme.primary
@@ -746,7 +763,7 @@ class _SessionTile extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: null,
           icon: Icon(Symbols.check, size: 14),
-          label: const Text('RÉSERVÉ'),
+          label: Text(AppLocalizations.of(context)!.statusBooked),
           style: OutlinedButton.styleFrom(
             disabledForegroundColor: theme.colorScheme.primary,
             side: BorderSide(
@@ -799,7 +816,11 @@ class _SessionTile extends StatelessWidget {
                   color: theme.colorScheme.onPrimary,
                 ),
               )
-            : Text(session.isFull ? 'COMPLET' : 'RESERVER'),
+            : Text(
+                session.isFull
+                    ? AppLocalizations.of(context)!.statusFull
+                    : AppLocalizations.of(context)!.reserveAction,
+              ),
       ),
     );
   }

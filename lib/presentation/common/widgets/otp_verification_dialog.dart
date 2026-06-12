@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -160,7 +161,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
             ),
             const SizedBox(height: 24),
             Text(
-              "VERIFY ${widget.type.toUpperCase()}",
+              "${AppLocalizations.of(context)!.otpVerifyTitlePrefix} ${widget.type.toUpperCase()}",
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 fontFamily: AppConstants.displayFontFamily,
@@ -179,7 +180,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                   height: 1.5,
                 ),
                 children: [
-                  const TextSpan(text: "We've sent a code to\n"),
+                  TextSpan(text: AppLocalizations.of(context)!.otpSentToText),
                   TextSpan(
                     text: widget.identifier,
                     style: TextStyle(
@@ -199,9 +200,9 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
             TextButton.icon(
               onPressed: _pasteFromClipboard,
               icon: const Icon(Symbols.content_paste, size: 18),
-              label: const Text(
-                "PASTE FROM CLIPBOARD",
-                style: TextStyle(
+              label: Text(
+                AppLocalizations.of(context)!.otpPasteClipboard,
+                style: const TextStyle(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.0,
                   fontSize: 11,
@@ -235,7 +236,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                       ),
                     ),
                     child: Text(
-                      "CANCEL",
+                      AppLocalizations.of(context)!.actionCancel,
                       style: TextStyle(
                         color: theme.colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
@@ -254,8 +255,12 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                             if (code.length != 6) {
                               if (!mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Please enter all 6 digits"),
+                                SnackBar(
+                                  content: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.otpErrorIncomplete,
+                                  ),
                                 ),
                               );
                               return;
@@ -269,7 +274,11 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                               setState(() => _isVerifying = false);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: const Text("Verification failed"),
+                                  content: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.otpErrorFailed,
+                                  ),
                                   backgroundColor: theme.colorScheme.error,
                                 ),
                               );
@@ -291,9 +300,9 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                               color: theme.colorScheme.onPrimary,
                             ),
                           )
-                        : const Text(
-                            "VERIFY",
-                            style: TextStyle(
+                        : Text(
+                            AppLocalizations.of(context)!.actionVerify,
+                            style: const TextStyle(
                               fontWeight: FontWeight.w900,
                               letterSpacing: 1,
                             ),

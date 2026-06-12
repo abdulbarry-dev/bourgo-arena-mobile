@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/format.dart';
 import 'package:bourgo_arena_mobile/domain/entities/loyalty_balance.dart';
@@ -8,24 +9,36 @@ import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:shimmer/shimmer.dart';
 
-({String label, IconData icon}) _mapSourceType(String sourceType) {
+({String label, IconData icon}) _mapSourceType(
+  String sourceType,
+  AppLocalizations l10n,
+) {
   switch (sourceType) {
     case 'daily_checkin':
-      return (label: 'Check-in quotidien', icon: Symbols.calendar_check);
+      return (
+        label: l10n.loyaltySourceDailyCheckin,
+        icon: Symbols.calendar_check,
+      );
     case 'referral':
-      return (label: 'Parrainage', icon: Symbols.person_add);
+      return (label: l10n.loyaltySourceReferral, icon: Symbols.person_add);
     case 'subscription_renewal':
       return (
-        label: "Renouvellement d'abonnement",
+        label: l10n.loyaltySourceSubscriptionRenewal,
         icon: Symbols.card_membership,
       );
     case 'reservation_completed':
-      return (label: 'Réservation complétée', icon: Symbols.event_available);
+      return (
+        label: l10n.loyaltySourceReservationCompleted,
+        icon: Symbols.event_available,
+      );
     case 'welcome_bonus':
-      return (label: 'Bonus de bienvenue', icon: Symbols.celebration);
+      return (label: l10n.loyaltySourceWelcomeBonus, icon: Symbols.celebration);
     default:
       if (sourceType.isEmpty) {
-        return (label: 'Transaction', icon: Symbols.receipt_long);
+        return (
+          label: l10n.loyaltySourceTransaction,
+          icon: Symbols.receipt_long,
+        );
       }
       final label = sourceType.replaceAll('_', ' ');
       return (
@@ -71,7 +84,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             behavior: SnackBarBehavior.floating,
             backgroundColor: Theme.of(context).colorScheme.error,
             action: SnackBarAction(
-              label: 'RÉESSAYER',
+              label: AppLocalizations.of(context)!.loyaltyRetryButton,
               textColor: Theme.of(context).colorScheme.onError,
               onPressed: () => _viewModel.loadBalance(),
             ),
@@ -93,7 +106,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
         scrolledUnderElevation: 0,
         centerTitle: false,
         title: Text(
-          'MES POINTS',
+          AppLocalizations.of(context)!.loyaltyMyPointsTitle,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w900,
             letterSpacing: 1.5,
@@ -161,7 +174,10 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
                       else
                         _buildMaxTierMessage(context, theme, spacing),
                       SizedBox(height: spacing.xl),
-                      _buildSectionTitle(theme, 'HISTORIQUE DES POINTS'),
+                      _buildSectionTitle(
+                        theme,
+                        AppLocalizations.of(context)!.loyaltyPointsHistoryTitle,
+                      ),
                       SizedBox(height: spacing.md),
                     ]),
                   ),
@@ -261,7 +277,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
           ),
           SizedBox(height: spacing.xl),
           Text(
-            'SOLDE DE POINTS',
+            AppLocalizations.of(context)!.loyaltyPointsBalance,
             style: theme.textTheme.labelSmall?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
               fontWeight: FontWeight.w700,
@@ -307,14 +323,14 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Prochain palier : ${nextTier.label}',
+                '${AppLocalizations.of(context)!.loyaltyNextTier} : ${nextTier.label}',
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               Text(
-                '$formattedPoints pts',
+                '$formattedPoints ${AppLocalizations.of(context)!.loyaltyPts}',
                 style: theme.textTheme.labelMedium?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: theme.colorScheme.primary,
@@ -360,7 +376,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
           ),
           SizedBox(width: spacing.sm),
           Text(
-            'Niveau maximum atteint',
+            AppLocalizations.of(context)!.loyaltyMaxTierReached,
             style: theme.textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w700,
               color: theme.colorScheme.primary,
@@ -389,8 +405,9 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     LoyaltyTransaction tx,
   ) {
     final appColors = theme.extension<AppColors>()!;
+    final l10n = AppLocalizations.of(context)!;
     final sourceType = tx.description ?? '';
-    final mapped = _mapSourceType(sourceType);
+    final mapped = _mapSourceType(sourceType, l10n);
     final isPositive = tx.points >= 0;
     final sign = isPositive ? '+' : '';
 
@@ -482,7 +499,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             ),
             SizedBox(height: spacing.lg),
             Text(
-              'Aucune transaction',
+              AppLocalizations.of(context)!.loyaltyNoTransactionTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.onSurface,
@@ -492,7 +509,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: spacing.xl),
               child: Text(
-                'Vos transactions de points apparaîtront ici.',
+                AppLocalizations.of(context)!.loyaltyNoTransactionMessage,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -729,7 +746,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             ),
             SizedBox(height: spacing.lg),
             Text(
-              'Chargement échoué',
+              AppLocalizations.of(context)!.loyaltyLoadFailedTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.onSurface,
@@ -739,7 +756,8 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: spacing.xl),
               child: Text(
-                _viewModel.errorMessage ?? 'Impossible de charger vos points.',
+                _viewModel.errorMessage ??
+                    AppLocalizations.of(context)!.loyaltyLoadFailedMessage,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -750,7 +768,7 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
             FilledButton.icon(
               onPressed: () => _viewModel.loadBalance(),
               icon: const Icon(Symbols.refresh, size: 20),
-              label: const Text('Réessayer'),
+              label: Text(AppLocalizations.of(context)!.loyaltyRetryButton),
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

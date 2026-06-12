@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 
 /// Result returned when [PaymentWebViewScreen] closes.
 enum PaymentWebViewResult {
@@ -107,7 +108,7 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         title: Text(
-          'SECURE PAYMENT',
+          AppLocalizations.of(context)!.paymentSecurePaymentTitle,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,

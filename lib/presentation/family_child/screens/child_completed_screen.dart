@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/completed_item.dart';
@@ -59,7 +60,9 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'COMPLETED'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!.familyChildCompletedTitle,
+          ),
           body: _viewModel.isLoading
               ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
@@ -162,7 +165,7 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
                 ),
                 SizedBox(height: spacing.xl),
                 Text(
-                  'No completed items',
+                  AppLocalizations.of(context)!.familyChildCompletedEmptyTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
@@ -170,7 +173,9 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
                 ),
                 SizedBox(height: spacing.md),
                 Text(
-                  'Completed bookings and activities will appear here.',
+                  AppLocalizations.of(
+                    context,
+                  )!.familyChildCompletedEmptyMessage,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -228,7 +233,9 @@ class _CompletedCard extends StatelessWidget {
                   ),
                   child: Center(
                     child: Semantics(
-                      label: 'Completed',
+                      label: AppLocalizations.of(
+                        context,
+                      )!.familyChildCompletedStatus,
                       child: Icon(
                         Symbols.check_circle,
                         color: appColors.statusSuccess,
@@ -288,7 +295,7 @@ class _CompletedCard extends StatelessWidget {
                           ),
                           SizedBox(width: spacing.xxs),
                           Text(
-                            'Completed: ${item.completedAt}',
+                            '${AppLocalizations.of(context)!.familyChildCompletedAtPrefix} ${item.completedAt}',
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),

@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.da
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 
 class SessionScheduleCard extends StatelessWidget {
   final PlanningEntry entry;
@@ -145,10 +146,10 @@ class SessionScheduleCard extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           isBooked
-              ? 'RÉSERVÉ'
+              ? AppLocalizations.of(context)!.statusBooked
               : entry.isFull
-              ? 'COMPLET'
-              : '$remaining PLACES',
+              ? AppLocalizations.of(context)!.statusFull
+              : AppLocalizations.of(context)!.remainingPlaces(remaining),
           style: theme.textTheme.labelSmall?.copyWith(
             color: isBooked
                 ? theme.colorScheme.primary
@@ -171,7 +172,7 @@ class SessionScheduleCard extends StatelessWidget {
         child: OutlinedButton.icon(
           onPressed: null,
           icon: Icon(Symbols.check, size: 14),
-          label: const Text('RÉSERVÉ'),
+          label: Text(AppLocalizations.of(context)!.statusBooked),
           style: OutlinedButton.styleFrom(
             disabledForegroundColor: theme.colorScheme.primary,
             side: BorderSide(
@@ -215,7 +216,11 @@ class SessionScheduleCard extends StatelessWidget {
             fontFamily: GoogleFonts.lexend().fontFamily,
           ),
         ),
-        child: Text(entry.isFull ? 'COMPLET' : 'RESERVER'),
+        child: Text(
+          entry.isFull
+              ? AppLocalizations.of(context)!.statusFull
+              : AppLocalizations.of(context)!.reserveAction,
+        ),
       ),
     );
   }

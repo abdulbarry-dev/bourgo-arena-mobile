@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/payment_view_model.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -88,7 +89,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Could not open payment page.'),
+          content: Text(AppLocalizations.of(context)!.paymentErrorLaunch),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
@@ -101,7 +102,7 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Payment'),
+        title: Text(AppLocalizations.of(context)!.paymentTitle),
         backgroundColor: theme.colorScheme.surface,
       ),
       body: ListenableBuilder(
@@ -146,7 +147,7 @@ class _PaymentStatus extends StatelessWidget {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Preparing payment...'),
+              Text(AppLocalizations.of(context)!.paymentPreparing),
             ],
           ),
         ),
@@ -156,7 +157,7 @@ class _PaymentStatus extends StatelessWidget {
             children: [
               CircularProgressIndicator(),
               SizedBox(height: 16),
-              Text('Verifying payment...'),
+              Text(AppLocalizations.of(context)!.paymentVerifying),
             ],
           ),
         ),
@@ -171,7 +172,7 @@ class _PaymentStatus extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Payment Successful!',
+              AppLocalizations.of(context)!.paymentSuccessTitle,
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
@@ -179,7 +180,7 @@ class _PaymentStatus extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Your booking is confirmed.',
+              AppLocalizations.of(context)!.paymentSuccessDesc,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
@@ -191,7 +192,7 @@ class _PaymentStatus extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 56),
               ),
-              child: const Text('Back to Home'),
+              child: Text(AppLocalizations.of(context)!.paymentBackHome),
             ),
           ],
         ),
@@ -202,7 +203,7 @@ class _PaymentStatus extends StatelessWidget {
             Icon(Icons.cancel, size: 80, color: theme.colorScheme.error),
             const SizedBox(height: 24),
             Text(
-              'Payment Failed',
+              AppLocalizations.of(context)!.paymentFailedTitle,
               textAlign: TextAlign.center,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
@@ -225,7 +226,7 @@ class _PaymentStatus extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 56),
               ),
-              child: const Text('Try Again'),
+              child: Text(AppLocalizations.of(context)!.paymentTryAgain),
             ),
           ],
         ),

@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
@@ -63,7 +64,9 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
       builder: (context, _) {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'SCHEDULE'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!.familyChildScheduleTitle,
+          ),
           body: _viewModel.isLoading
               ? _buildLoadingState(theme, spacing)
               : RefreshIndicator(
@@ -129,7 +132,7 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                 _pickDate(true);
               },
               child: _DateChip(
-                label: 'FROM',
+                label: AppLocalizations.of(context)!.familyChildScheduleFrom,
                 date: _toIsoDate(_from),
                 theme: theme,
                 spacing: spacing,
@@ -151,7 +154,7 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                 _pickDate(false);
               },
               child: _DateChip(
-                label: 'TO',
+                label: AppLocalizations.of(context)!.familyChildScheduleTo,
                 date: _toIsoDate(_to),
                 theme: theme,
                 spacing: spacing,
@@ -264,7 +267,7 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                 ),
                 SizedBox(height: spacing.xl),
                 Text(
-                  'No events scheduled',
+                  AppLocalizations.of(context)!.familyChildScheduleEmptyTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
@@ -272,7 +275,7 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                 ),
                 SizedBox(height: spacing.sm),
                 Text(
-                  'No courses or activities in this date range.',
+                  AppLocalizations.of(context)!.familyChildScheduleEmptyMessage,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
@@ -412,7 +415,9 @@ class _ScheduleItemCard extends StatelessWidget {
                         SizedBox(width: spacing.sm),
                         if (item.isCompleted)
                           Semantics(
-                            label: 'Completed',
+                            label: AppLocalizations.of(
+                              context,
+                            )!.familyChildScheduleCompletedStatus,
                             child: Icon(
                               Symbols.check_circle,
                               size: 14,

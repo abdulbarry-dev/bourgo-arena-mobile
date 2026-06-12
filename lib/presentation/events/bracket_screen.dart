@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/bracket.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -65,7 +66,7 @@ class _BracketScreenState extends State<BracketScreen> {
           color: theme.colorScheme.onSurface,
         ),
         title: Text(
-          'BRACKET',
+          AppLocalizations.of(context)!.eventsBracketTitle,
           style: theme.textTheme.titleSmall?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
@@ -121,7 +122,9 @@ class _BracketScreenState extends State<BracketScreen> {
               FilledButton.icon(
                 onPressed: _load,
                 icon: const Icon(Symbols.refresh, size: 18),
-                label: const Text('Retry'),
+                label: Text(
+                  AppLocalizations.of(context)!.eventsBracketRetryButton,
+                ),
               ),
             ],
           ),
@@ -141,7 +144,7 @@ class _BracketScreenState extends State<BracketScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Bracket not yet available',
+              AppLocalizations.of(context)!.eventsBracketNotAvailable,
               style: theme.textTheme.titleMedium,
             ),
           ],
@@ -172,12 +175,16 @@ class _BracketRoundCard extends StatelessWidget {
 
   const _BracketRoundCard({required this.round, required this.isLast});
 
-  String _roundLabel(int roundNumber, int totalRounds) {
-    if (totalRounds == 1) return 'FINAL';
-    if (roundNumber == totalRounds) return 'FINAL';
-    if (roundNumber == totalRounds - 1) return 'SEMI-FINALS';
-    if (roundNumber == totalRounds - 2) return 'QUARTER-FINALS';
-    return 'ROUND $roundNumber';
+  String _roundLabel(BuildContext context, int roundNumber, int totalRounds) {
+    if (totalRounds == 1)
+      return AppLocalizations.of(context)!.eventsBracketFinal;
+    if (roundNumber == totalRounds)
+      return AppLocalizations.of(context)!.eventsBracketFinal;
+    if (roundNumber == totalRounds - 1)
+      return AppLocalizations.of(context)!.eventsBracketSemiFinals;
+    if (roundNumber == totalRounds - 2)
+      return AppLocalizations.of(context)!.eventsBracketQuarterFinals;
+    return '${AppLocalizations.of(context)!.eventsBracketRound} $roundNumber';
   }
 
   @override
@@ -185,7 +192,7 @@ class _BracketRoundCard extends StatelessWidget {
     final theme = Theme.of(context);
     final typography = context.typography;
     final totalRounds = round.round;
-    final label = _roundLabel(round.round, totalRounds);
+    final label = _roundLabel(context, round.round, totalRounds);
 
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : 8),
@@ -239,7 +246,7 @@ class _MatchCard extends StatelessWidget {
         child: Column(
           children: [
             _ParticipantRow(
-              name: p1?.name ?? 'TBD',
+              name: p1?.name ?? AppLocalizations.of(context)!.eventsBracketTBD,
               initials: p1?.initials,
               isWinner: match.winnerId != null && p1?.id == match.winnerId,
               score: isCompleted ? _participantScore(match.score, 0) : null,
@@ -253,7 +260,7 @@ class _MatchCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             _ParticipantRow(
-              name: p2?.name ?? 'TBD',
+              name: p2?.name ?? AppLocalizations.of(context)!.eventsBracketTBD,
               initials: p2?.initials,
               isWinner: match.winnerId != null && p2?.id == match.winnerId,
               score: isCompleted ? _participantScore(match.score, 1) : null,
@@ -263,7 +270,9 @@ class _MatchCard extends StatelessWidget {
             if (isCompleted || isWalkover) ...[
               const SizedBox(height: 10),
               _MatchStatusChip(
-                label: isWalkover ? 'WALKOVER' : 'COMPLETED',
+                label: isWalkover
+                    ? AppLocalizations.of(context)!.eventsBracketWalkover
+                    : AppLocalizations.of(context)!.eventsBracketCompleted,
                 color: isWalkover
                     ? theme.colorScheme.error
                     : appColors.statusSuccess,

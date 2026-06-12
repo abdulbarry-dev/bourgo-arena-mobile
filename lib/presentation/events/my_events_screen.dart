@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -73,7 +74,7 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
           color: theme.colorScheme.onSurface,
         ),
         title: Text(
-          'MY EVENTS',
+          AppLocalizations.of(context)!.myEventsScreenTitle,
           style: theme.textTheme.titleSmall?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
@@ -120,7 +121,9 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
               FilledButton.icon(
                 onPressed: _load,
                 icon: const Icon(Symbols.refresh, size: 18),
-                label: const Text('Retry'),
+                label: Text(
+                  AppLocalizations.of(context)!.myEventsScreenRetryButton,
+                ),
               ),
             ],
           ),
@@ -140,7 +143,7 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No event participations yet',
+              AppLocalizations.of(context)!.myEventsScreenNoEvents,
               style: theme.textTheme.titleMedium,
             ),
           ],

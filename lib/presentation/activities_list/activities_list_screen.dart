@@ -22,6 +22,7 @@ class ActivitiesListScreen extends StatefulWidget {
 
 class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
   late final ActivitiesViewModel _viewModel;
+  String _selectedFilter = 'All';
 
   @override
   void initState() {
@@ -51,7 +52,7 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
           color: theme.colorScheme.onSurface,
         ),
         title: Text(
-          'ACTIVITIES',
+          AppLocalizations.of(context)!.activitiesTitle,
           style: theme.textTheme.titleMedium?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
@@ -61,8 +62,48 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
       ),
       body: ListenableBuilder(
         listenable: _viewModel,
-        builder: (context, _) => _buildBody(),
+        builder: (context, _) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (!_viewModel.isLoading && _viewModel.activities.isNotEmpty)
+              _buildFilterBar(theme),
+            Expanded(child: _buildBody()),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildFilterBar(ThemeData theme) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: Row(
+        children: [
+          _buildFilterChip(theme, 'All'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Sports'),
+          const SizedBox(width: 8),
+          _buildFilterChip(theme, 'Well-being'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(ThemeData theme, String label) {
+    final isSelected = _selectedFilter == label;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => setState(() => _selectedFilter = label),
+      selectedColor: theme.colorScheme.primary,
+      backgroundColor: theme.colorScheme.surfaceContainerHighest,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.black : theme.colorScheme.onSurfaceVariant,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      side: BorderSide.none,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
     );
   }
 
@@ -89,14 +130,21 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _viewModel.loadData,
-              child: const Text('RETRY'),
+              child: Text(AppLocalizations.of(context)!.actionRetry),
             ),
           ],
         ),
       );
     }
 
-    if (_viewModel.activities.isEmpty) {
+    List<Activity> filteredActivities = _viewModel.activities;
+    if (_selectedFilter == 'Sports') {
+      filteredActivities = _viewModel.sports;
+    } else if (_selectedFilter == 'Well-being') {
+      filteredActivities = _viewModel.wellbeing;
+    }
+
+    if (filteredActivities.isEmpty) {
       return RefreshIndicator(
         onRefresh: _viewModel.loadData,
         child: ListView(children: const []),
@@ -107,10 +155,10 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
       onRefresh: _viewModel.loadData,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        itemCount: _viewModel.activities.length,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        itemCount: filteredActivities.length,
         itemBuilder: (context, index) {
-          final activity = _viewModel.activities[index];
+          final activity = filteredActivities[index];
           return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: PressableCard(

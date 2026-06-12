@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notifications_use_case.dart';
@@ -25,7 +26,27 @@ const Map<String, List<String>> _filterCategories = {
   'FAMILLE': ['family_activity'],
 };
 
-String _filterLabel(String key) => key;
+String _filterLabel(BuildContext context, String key) {
+  final l10n = AppLocalizations.of(context)!;
+  switch (key) {
+    case 'TOUT':
+      return l10n.notificationFilterAll;
+    case 'NON LUS':
+      return l10n.notificationFilterUnread;
+    case 'RÉSERVATIONS':
+      return l10n.notificationFilterReservations;
+    case 'ABONNEMENTS':
+      return l10n.notificationFilterSubscriptions;
+    case 'LOYALITÉ':
+      return l10n.notificationFilterLoyalty;
+    case 'OFFRES':
+      return l10n.notificationFilterOffers;
+    case 'FAMILLE':
+      return l10n.notificationFilterFamily;
+    default:
+      return key;
+  }
+}
 
 IconData _getIcon(String type) {
   switch (type) {
@@ -131,7 +152,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             scrolledUnderElevation: 0,
             centerTitle: false,
             title: Text(
-              'NOTIFICATIONS',
+              AppLocalizations.of(context)!.notificationScreenTitle,
               style: theme.textTheme.titleSmall?.copyWith(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.5,
@@ -146,7 +167,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               if (_viewModel.notifications.isNotEmpty)
                 IconButton(
                   icon: const Icon(Symbols.done_all, size: 22),
-                  tooltip: 'Tout marquer comme lu',
+                  tooltip: AppLocalizations.of(
+                    context,
+                  )!.notificationMarkAllReadTooltip,
                   onPressed: _viewModel.markAllAsRead,
                   color: theme.colorScheme.primary,
                 ),
@@ -173,7 +196,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       return Padding(
                         padding: EdgeInsets.only(right: spacing.xs),
                         child: _FilterChip(
-                          label: _filterLabel(key),
+                          label: _filterLabel(context, key),
                           isSelected: isSelected,
                           onTap: () => setState(() {
                             _selectedFilter = key;
@@ -299,7 +322,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             SizedBox(height: spacing.lg),
             Text(
-              'Chargement échoué',
+              AppLocalizations.of(context)!.notificationLoadFailedTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.onSurface,
@@ -321,7 +344,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Symbols.refresh, size: 20),
-              label: const Text('Réessayer'),
+              label: Text(
+                AppLocalizations.of(context)!.notificationRetryButton,
+              ),
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -358,7 +383,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             SizedBox(height: spacing.lg),
             Text(
-              'Aucune notification',
+              AppLocalizations.of(context)!.notificationEmptyTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.onSurface,
@@ -369,7 +394,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: spacing.xl),
               child: Text(
-                'Vous n\'avez aucune notification pour le moment.',
+                AppLocalizations.of(context)!.notificationEmptyMessage,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -409,7 +434,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             SizedBox(height: spacing.lg),
             Text(
-              'Aucun résultat',
+              AppLocalizations.of(context)!.notificationEmptyFilterTitle,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.onSurface,
@@ -418,7 +443,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             SizedBox(height: spacing.sm),
             Text(
-              'Aucune notification ne correspond à ce filtre.',
+              AppLocalizations.of(context)!.notificationEmptyFilterMessage,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -454,7 +479,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
           SizedBox(height: spacing.sm),
           Text(
-            'VOUS ÊTES À JOUR',
+            AppLocalizations.of(context)!.notificationCaughtUpMessage,
             style: theme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: 1.5,

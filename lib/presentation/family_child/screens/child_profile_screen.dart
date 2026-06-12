@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_profile_use_case.dart';
@@ -195,7 +196,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
               ),
               SizedBox(width: spacing.sm),
               Text(
-                'ABONNEMENT ACTIF',
+                AppLocalizations.of(
+                  context,
+                )!.familyChildProfileActiveSubscription,
                 style: theme.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   letterSpacing: 1.5,
@@ -214,7 +217,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
           SizedBox(height: spacing.xs),
           if (sub.daysRemaining != null)
             Text(
-              '${sub.daysRemaining} jours restants',
+              '${sub.daysRemaining} ${AppLocalizations.of(context)!.familyChildProfileDaysRemainingText}',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -224,7 +227,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
             children: [
               Expanded(
                 child: _DateLabel(
-                  label: 'DÉBUT',
+                  label: AppLocalizations.of(context)!.familyChildProfileStart,
                   date: sub.startsAt,
                   theme: theme,
                 ),
@@ -237,7 +240,11 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
               ),
               SizedBox(width: spacing.xs),
               Expanded(
-                child: _DateLabel(label: 'FIN', date: sub.endsAt, theme: theme),
+                child: _DateLabel(
+                  label: AppLocalizations.of(context)!.familyChildProfileEnd,
+                  date: sub.endsAt,
+                  theme: theme,
+                ),
               ),
             ],
           ),
@@ -258,7 +265,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
       children: [
         _ActionButton(
           icon: Symbols.calendar_month,
-          label: 'SCHEDULE',
+          label: AppLocalizations.of(context)!.familyChildProfileScheduleButton,
           onTap: () => context.push('/child/$childId/schedule'),
           theme: theme,
           spacing: spacing,
@@ -267,7 +274,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         SizedBox(height: spacing.md),
         _ActionButton(
               icon: Symbols.workspace_premium,
-              label: 'SUBSCRIPTIONS',
+              label: AppLocalizations.of(
+                context,
+              )!.familyChildProfileSubscriptionsButton,
               onTap: () => context.push('/child/$childId/subscriptions'),
               theme: theme,
               spacing: spacing,
@@ -279,7 +288,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         SizedBox(height: spacing.md),
         _ActionButton(
               icon: Symbols.event_note,
-              label: 'BOOKINGS',
+              label: AppLocalizations.of(
+                context,
+              )!.familyChildProfileBookingsButton,
               onTap: () => context.push('/child/$childId/bookings'),
               theme: theme,
               spacing: spacing,
@@ -291,7 +302,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         SizedBox(height: spacing.md),
         _ActionButton(
               icon: Symbols.sports,
-              label: 'SESSIONS',
+              label: AppLocalizations.of(
+                context,
+              )!.familyChildProfileSessionsButton,
               onTap: () => context.push('/child/$childId/sessions'),
               theme: theme,
               spacing: spacing,
@@ -303,7 +316,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         SizedBox(height: spacing.md),
         _ActionButton(
               icon: Symbols.list_alt,
-              label: 'RESERVATIONS',
+              label: AppLocalizations.of(
+                context,
+              )!.familyChildProfileReservationsButton,
               onTap: () => context.push('/child/$childId/reservations'),
               theme: theme,
               spacing: spacing,
@@ -315,7 +330,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
         SizedBox(height: spacing.md),
         _ActionButton(
               icon: Symbols.check_circle,
-              label: 'COMPLETED',
+              label: AppLocalizations.of(
+                context,
+              )!.familyChildProfileCompletedButton,
               onTap: () => context.push('/child/$childId/completed'),
               theme: theme,
               spacing: spacing,
@@ -337,7 +354,8 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
             Icon(Symbols.error, size: 64, color: theme.colorScheme.error),
             SizedBox(height: spacing.lg),
             Text(
-              _viewModel.errorMessage ?? 'Failed to load profile',
+              _viewModel.errorMessage ??
+                  AppLocalizations.of(context)!.familyChildProfileErrorFallback,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge,
             ),
@@ -345,7 +363,9 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
             FilledButton.icon(
               onPressed: () => _viewModel.load(widget.childId),
               icon: const Icon(Symbols.refresh, size: 20),
-              label: const Text('RETRY'),
+              label: Text(
+                AppLocalizations.of(context)!.familyChildProfileRetryButton,
+              ),
             ),
           ],
         ),

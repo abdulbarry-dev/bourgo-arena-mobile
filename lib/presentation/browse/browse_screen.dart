@@ -146,10 +146,10 @@ class _BrowseScreenState extends State<BrowseScreen>
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,
           ),
-          tabs: const [
-            Tab(text: 'COURSES'),
-            Tab(text: 'ACTIVITIES'),
-            Tab(text: 'EVENTS'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.browseTabCourses),
+            Tab(text: AppLocalizations.of(context)!.browseTabActivities),
+            Tab(text: AppLocalizations.of(context)!.browseTabEvents),
           ],
         ),
       ),
@@ -206,9 +206,9 @@ class _CoursesTab extends StatelessWidget {
     }
     if (error != null) {
       return PremiumErrorState(
-        title: 'ERROR',
+        title: AppLocalizations.of(context)!.browseErrorTitle,
         message: error!,
-        actionLabel: 'RETRY',
+        actionLabel: AppLocalizations.of(context)!.browseErrorRetry,
         onRetry: onRetry,
       );
     }
@@ -268,9 +268,9 @@ class _ActivitiesTab extends StatelessWidget {
     }
     if (error != null) {
       return PremiumErrorState(
-        title: 'ERROR',
+        title: AppLocalizations.of(context)!.browseErrorTitle,
         message: error!,
-        actionLabel: 'RETRY',
+        actionLabel: AppLocalizations.of(context)!.browseErrorRetry,
         onRetry: onRetry,
       );
     }
@@ -334,9 +334,9 @@ class _EventsTab extends StatelessWidget {
     }
     if (error != null) {
       return PremiumErrorState(
-        title: 'ERROR',
+        title: AppLocalizations.of(context)!.browseErrorTitle,
         message: error!,
-        actionLabel: 'RETRY',
+        actionLabel: AppLocalizations.of(context)!.browseErrorRetry,
         onRetry: onRetry,
       );
     }
@@ -453,7 +453,11 @@ class _EventTile extends StatelessWidget {
                           const SizedBox(width: 6),
                           _miniChip(
                             theme,
-                            (event.status ?? 'unknown').toUpperCase(),
+                            (event.status ??
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.browseUnknownStatus)
+                                .toUpperCase(),
                             _chipColor(theme, event.status),
                           ),
                         ],
@@ -468,7 +472,10 @@ class _EventTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      event.name?.toUpperCase() ?? 'EVENT',
+                      event.name?.toUpperCase() ??
+                          AppLocalizations.of(
+                            context,
+                          )!.browseEventFallback.toUpperCase(),
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontFamily: AppConstants.displayFontFamily,
                         fontWeight: FontWeight.w900,

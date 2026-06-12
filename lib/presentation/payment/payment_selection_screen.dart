@@ -17,6 +17,7 @@ import 'package:bourgo_arena_mobile/presentation/payment/payment_webview_screen.
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 
 class PaymentSelectionScreen extends StatefulWidget {
   final Plan plan;
@@ -65,10 +66,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       final confirmed = await ConfirmActionModal.show(
         context: context,
         icon: Symbols.stars,
-        title: 'PAY WITH POINTS',
-        message:
-            'You are about to pay ${widget.plan.price.toStringAsFixed(2)} TND using your loyalty points. This action cannot be undone.',
-        confirmLabel: 'PAY NOW',
+        title: AppLocalizations.of(context)!.paymentPayWithPointsTitle,
+        message: AppLocalizations.of(context)!.paymentPayWithPointsWarning
+            .replaceAll('{price}', widget.plan.price.toStringAsFixed(2)),
+        confirmLabel: AppLocalizations.of(context)!.paymentPayNow,
       );
       if (confirmed != true) return;
     }
@@ -94,7 +95,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Could not open payment page.'),
+            content: Text(AppLocalizations.of(context)!.paymentErrorCannotOpen),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -114,7 +115,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Payment failed. Please try again.'),
+            content: Text(AppLocalizations.of(context)!.paymentFailedRetry),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
@@ -135,7 +136,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: SubScreenAppBar(
-        title: 'PAYMENT METHOD',
+        title: AppLocalizations.of(context)!.paymentMethodTitle,
         onBack: () {
           if (_viewModel.state == PaymentSelectionState.verified) {
             context.go('/home');
@@ -151,13 +152,25 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
   Widget _buildBody(ThemeData theme, AppColors appColors) {
     switch (_viewModel.state) {
       case PaymentSelectionState.subscribing:
-        return _buildLoading(theme, 'Creating subscription...');
+        return _buildLoading(
+          theme,
+          AppLocalizations.of(context)!.paymentLoadingCreatingSub,
+        );
       case PaymentSelectionState.initiating:
-        return _buildLoading(theme, 'Preparing payment...');
+        return _buildLoading(
+          theme,
+          AppLocalizations.of(context)!.paymentLoadingPreparing,
+        );
       case PaymentSelectionState.loyaltyPaying:
-        return _buildLoading(theme, 'Processing loyalty payment...');
+        return _buildLoading(
+          theme,
+          AppLocalizations.of(context)!.paymentLoadingLoyalty,
+        );
       case PaymentSelectionState.awaitingVerification:
-        return _buildLoading(theme, 'Verifying payment...');
+        return _buildLoading(
+          theme,
+          AppLocalizations.of(context)!.paymentLoadingVerifying,
+        );
       case PaymentSelectionState.verified:
       case PaymentSelectionState.loyaltySuccess:
         return _buildSuccess(theme);
@@ -201,7 +214,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           ),
           const SizedBox(height: 32),
           Text(
-            'PAYMENT SUCCESSFUL',
+            AppLocalizations.of(context)!.paymentSuccessTitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontFamily: AppConstants.displayFontFamily,
@@ -213,8 +226,12 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           const SizedBox(height: 16),
           Text(
             widget.childId != null
-                ? 'Subscription to ${widget.plan.name} is now active for your child.'
-                : 'Your subscription to ${widget.plan.name} is now active.',
+                ? AppLocalizations.of(context)!.paymentSuccessChildDesc
+                      .replaceAll('{planName}', widget.plan.name)
+                : AppLocalizations.of(context)!.paymentSuccessDesc.replaceAll(
+                    '{planName}',
+                    widget.plan.name,
+                  ),
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -228,9 +245,12 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               foregroundColor: theme.colorScheme.onPrimary,
               minimumSize: const Size(double.infinity, 56),
             ),
-            child: const Text(
-              'BACK TO HOME',
-              style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1.2),
+            child: Text(
+              AppLocalizations.of(context)!.paymentBackToHome,
+              style: const TextStyle(
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
         ],
@@ -248,7 +268,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           Icon(Symbols.error, size: 100, color: theme.colorScheme.error),
           const SizedBox(height: 32),
           Text(
-            'PAYMENT FAILED',
+            AppLocalizations.of(context)!.paymentFailedTitle,
             textAlign: TextAlign.center,
             style: theme.textTheme.headlineSmall?.copyWith(
               fontFamily: AppConstants.displayFontFamily,
@@ -259,7 +279,8 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            _viewModel.errorMessage ?? 'An unknown error occurred.',
+            _viewModel.errorMessage ??
+                AppLocalizations.of(context)!.paymentUnknownError,
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -274,9 +295,12 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               minimumSize: const Size(double.infinity, 56),
               side: BorderSide(color: theme.colorScheme.outlineVariant),
             ),
-            child: const Text(
-              'TRY AGAIN',
-              style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.2),
+            child: Text(
+              AppLocalizations.of(context)!.paymentTryAgain,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
             ),
           ),
         ],
@@ -313,7 +337,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           const SizedBox(height: 24),
           Text(
-                'TOTAL AMOUNT',
+                AppLocalizations.of(context)!.paymentTotalAmount,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.bold,
@@ -338,7 +362,9 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               .fade(duration: 400.ms)
               .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
           Text(
-                'For ${widget.plan.name}',
+                AppLocalizations.of(
+                  context,
+                )!.paymentForPlan.replaceAll('{planName}', widget.plan.name),
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -350,7 +376,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           const SizedBox(height: 48),
 
           Text(
-                'SELECT PAYMENT METHOD',
+                AppLocalizations.of(context)!.paymentSelectMethod,
                 style: theme.textTheme.labelMedium?.copyWith(
                   color: theme.colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
@@ -364,8 +390,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
 
           // Konnect Button
           _PaymentMethodCard(
-                title: 'Pay with Konnect',
-                subtitle: 'Bank Cards, E-Dinar, Wallets',
+                title: AppLocalizations.of(context)!.paymentMethodKonnectTitle,
+                subtitle: AppLocalizations.of(
+                  context,
+                )!.paymentMethodKonnectSubtitle,
                 icon: Symbols.credit_card,
                 brandColor: theme.colorScheme.primary,
                 theme: theme,
@@ -384,7 +412,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
-                  'OR',
+                  AppLocalizations.of(context)!.paymentOr,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                     letterSpacing: 1.0,
@@ -398,8 +426,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
 
           // Loyalty Balance Button
           _PaymentMethodCard(
-                title: 'Pay with Loyalty Balance',
-                subtitle: 'Use your accumulated points',
+                title: AppLocalizations.of(context)!.paymentMethodLoyaltyTitle,
+                subtitle: AppLocalizations.of(
+                  context,
+                )!.paymentMethodLoyaltySubtitle,
                 icon: Symbols.stars,
                 brandColor: theme.colorScheme.primary,
                 theme: theme,

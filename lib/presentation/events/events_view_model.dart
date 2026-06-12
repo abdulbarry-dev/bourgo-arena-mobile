@@ -17,6 +17,7 @@ class EventsViewModel extends ChangeNotifier {
   String? _lastRegistrationStatus;
   int _currentPage = 1;
   bool _hasMore = true;
+  String? _selectedSportType;
 
   EventsViewModel({
     required GetEventsUseCase getEventsUseCase,
@@ -33,6 +34,13 @@ class EventsViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get registeringEventId => _registeringEventId;
   bool get hasMore => _hasMore;
+  String? get selectedSportType => _selectedSportType;
+
+  void setSportType(String? sportType) {
+    if (_selectedSportType == sportType) return;
+    _selectedSportType = sportType;
+    loadEvents();
+  }
 
   Future<void> loadEvents() async {
     _state = EventsLoadState.loading;
@@ -41,7 +49,10 @@ class EventsViewModel extends ChangeNotifier {
     _hasMore = true;
     notifyListeners();
 
-    final result = await _getEventsUseCase(page: _currentPage);
+    final result = await _getEventsUseCase(
+      sportType: _selectedSportType,
+      page: _currentPage,
+    );
     result.when(
       success: (events) {
         _events = events;
@@ -63,7 +74,10 @@ class EventsViewModel extends ChangeNotifier {
     notifyListeners();
 
     final nextPage = _currentPage + 1;
-    final result = await _getEventsUseCase(page: nextPage);
+    final result = await _getEventsUseCase(
+      sportType: _selectedSportType,
+      page: nextPage,
+    );
     result.when(
       success: (events) {
         _events.addAll(events);

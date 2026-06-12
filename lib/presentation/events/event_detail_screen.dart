@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -68,7 +69,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final confirmed = await ConfirmActionModal.show(
       context: context,
       icon: Symbols.emoji_events,
-      title: "S'INSCRIRE",
+      title: AppLocalizations.of(context)!.eventsDetailRegisterTitle,
       content: Padding(
         padding: const EdgeInsets.only(top: 4),
         child: Column(
@@ -76,7 +77,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              _event!.name?.toUpperCase() ?? 'EVENT',
+              _event!.name?.toUpperCase() ??
+                  AppLocalizations.of(context)!.eventsDetailEventFallback,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: theme.colorScheme.onSurface,
@@ -90,7 +92,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             _infoRow(
               theme,
               Symbols.group,
-              '${_event!.participantsCount ?? 0} / ${_event!.maxParticipants ?? 0} participants',
+              '${_event!.participantsCount ?? 0} / ${_event!.maxParticipants ?? 0} ${AppLocalizations.of(context)!.eventsDetailParticipantsText}',
             ),
           ],
         ),
@@ -105,13 +107,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       success: (reg) {
         setState(() => _isRegistered = true);
         if (reg.isWaitlisted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Added to waitlist.')));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.eventsDetailWaitlistSuccess,
+              ),
+            ),
+          );
         } else {
           CelebrationOverlay.show(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Successfully registered!')),
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.eventsDetailRegisterSuccess,
+              ),
+            ),
           );
         }
       },
@@ -132,9 +142,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     final confirmed = await ConfirmActionModal.show(
       context: context,
       icon: Symbols.cancel,
-      title: 'RETIRER',
+      title: AppLocalizations.of(context)!.eventsDetailWithdrawTitle,
       message:
-          'Voulez-vous vous retirer de ${_event!.name ?? 'cet événement'} ?',
+          '${AppLocalizations.of(context)!.eventsDetailWithdrawPromptPrefix} ${_event!.name ?? AppLocalizations.of(context)!.eventsDetailThisEvent} ?',
       isDestructive: true,
     );
 
@@ -146,9 +156,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     result.when(
       success: (_) {
         setState(() => _isRegistered = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Withdrawn from event.')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.eventsDetailWithdrawSuccess,
+            ),
+          ),
+        );
       },
       failure: (f) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -170,9 +184,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     result.when(
       success: (_) {
         setState(() => _isCheckedIn = true);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Checked in!')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              AppLocalizations.of(context)!.eventsDetailCheckInSuccess,
+            ),
+          ),
+        );
       },
       failure: (f) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -199,9 +217,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       return Scaffold(
         appBar: AppBar(),
         body: PremiumErrorState(
-          title: 'ERROR',
+          title: AppLocalizations.of(context)!.eventsDetailErrorTitle,
           message: _errorMessage!,
-          actionLabel: 'RETRY',
+          actionLabel: AppLocalizations.of(context)!.eventsDetailRetryButton,
           onRetry: () {
             setState(() {
               _isLoading = true;
@@ -214,7 +232,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     if (_event == null)
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Event not found')),
+        body: Center(
+          child: Text(AppLocalizations.of(context)!.eventsDetailNotFound),
+        ),
       );
 
     return Scaffold(
@@ -389,7 +409,8 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _event!.name?.toUpperCase() ?? 'EVENT',
+          _event!.name?.toUpperCase() ??
+              AppLocalizations.of(context)!.eventsDetailEventFallback,
           style: theme.textTheme.headlineSmall?.copyWith(
             fontFamily: AppConstants.displayFontFamily,
             fontWeight: FontWeight.w900,
@@ -398,22 +419,30 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        _infoRow(theme, Symbols.calendar_month, _formatDateRange()),
+        _infoRow(theme, Symbols.calendar_month, _formatDateRange(context)),
         if (_event!.registrationDeadline != null) ...[
           const SizedBox(height: 10),
           _infoRow(
             theme,
             Symbols.edit_calendar,
-            'Register by ${_formatDate(_event!.registrationDeadline!)}',
+            '${AppLocalizations.of(context)!.eventsDetailRegisterBy} ${_formatDate(_event!.registrationDeadline!)}',
           ),
         ],
         if (_event!.format != null) ...[
           const SizedBox(height: 10),
-          _infoRow(theme, Symbols.sports_esports, '${_event!.format!} Format'),
+          _infoRow(
+            theme,
+            Symbols.sports_esports,
+            '${_event!.format!} ${AppLocalizations.of(context)!.eventsDetailFormat}',
+          ),
         ],
         if (_event!.requiresCheckIn) ...[
           const SizedBox(height: 10),
-          _infoRow(theme, Symbols.how_to_reg, 'Check-in required on event day'),
+          _infoRow(
+            theme,
+            Symbols.how_to_reg,
+            AppLocalizations.of(context)!.eventsDetailCheckInRequired,
+          ),
         ],
         const SizedBox(height: 20),
         _participantsProgress(theme),
@@ -431,7 +460,9 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           onPressed: () =>
               context.push('/events/${_event!.id}/bracket', extra: _event),
           icon: const Icon(Symbols.emoji_events, size: 18),
-          label: const Text('VIEW BRACKET'),
+          label: Text(
+            AppLocalizations.of(context)!.eventsDetailViewBracketButton,
+          ),
           style: OutlinedButton.styleFrom(
             minimumSize: const Size(double.infinity, 48),
             shape: RoundedRectangleBorder(
@@ -464,12 +495,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
   }
 
-  String _formatDateRange() {
+  String _formatDateRange(BuildContext context) {
     final start = _event!.startDate;
     final end = _event!.endDate;
-    if (start == null && end == null) return 'Date TBD';
-    final s = start != null ? _formatDate(start) : 'TBD';
-    final e = end != null ? _formatDate(end) : 'TBD';
+    if (start == null && end == null)
+      return AppLocalizations.of(context)!.eventsDetailDateTBD;
+    final s = start != null
+        ? _formatDate(start)
+        : AppLocalizations.of(context)!.eventsDetailTBD;
+    final e = end != null
+        ? _formatDate(end)
+        : AppLocalizations.of(context)!.eventsDetailTBD;
     return s == e ? s : '$s – $e';
   }
 
@@ -497,7 +533,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ),
             const SizedBox(width: 6),
             Text(
-              '$count / $max participants',
+              '$count / $max ${AppLocalizations.of(context)!.eventsDetailParticipantsText}',
               style: theme.textTheme.labelMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600,
@@ -551,20 +587,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       _event!,
     )) {
       (true, _, _, _) => ('', null),
-      (_, true, _, _) => ('CHECKED IN', null),
+      (_, true, _, _) => (
+        AppLocalizations.of(context)!.eventsDetailCheckedInStatus,
+        null,
+      ),
       (_, _, true, final e) when e.requiresCheckIn && _isEventDay() => (
-        'CHECK IN',
+        AppLocalizations.of(context)!.eventsDetailCheckInAction,
         _checkIn,
       ),
       (_, _, true, final e) when e.status == 'open' => (
-        'REGISTERED',
+        AppLocalizations.of(context)!.eventsDetailRegisteredStatus,
         _withdraw,
       ),
       (_, _, false, final e) when e.isRegistrationOpen => (
-        'REGISTER FOR EVENT',
+        AppLocalizations.of(context)!.eventsDetailRegisterAction,
         _register,
       ),
-      _ => ('REGISTRATION CLOSED', null),
+      _ => (AppLocalizations.of(context)!.eventsDetailRegistrationClosed, null),
     };
 
     final isRegisteredOpen = _isRegistered && _event?.status == 'open';

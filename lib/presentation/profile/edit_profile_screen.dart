@@ -140,7 +140,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                   ),
                 ),
                 Text(
-                  "PHOTO DE PROFIL",
+                  AppLocalizations.of(context)!.editProfilePhotoTitle,
                   style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.2,
@@ -163,7 +163,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                         ),
                       ),
                       title: Text(
-                        "PRENDRE UNE PHOTO",
+                        AppLocalizations.of(context)!.editProfileTakePhoto,
                         style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -201,7 +201,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                         ),
                       ),
                       title: Text(
-                        "CHOISIR UNE PHOTO",
+                        AppLocalizations.of(context)!.editProfileChoosePhoto,
                         style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -240,7 +240,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                           ),
                         ),
                         title: Text(
-                          "SUPPRIMER LA PHOTO",
+                          AppLocalizations.of(context)!.editProfileDeletePhoto,
                           style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(ctx).colorScheme.error,
@@ -289,7 +289,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          success ? "Photo de profil mise à jour" : "Échec du téléchargement",
+          success
+              ? AppLocalizations.of(context)!.editProfilePhotoUpdated
+              : AppLocalizations.of(context)!.editProfilePhotoFailed,
         ),
         backgroundColor: success ? Colors.green : Colors.red,
       ),
@@ -302,23 +304,23 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: const Text(
-          "SUPPRIMER LA PHOTO",
+          AppLocalizations.of(context)!.editProfileDeletePhoto,
           style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1),
         ),
         content: const Text(
-          "Voulez-vous vraiment supprimer votre photo de profil ?",
+          AppLocalizations.of(context)!.editProfileDeletePhotoConfirm,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text("ANNULER"),
+            child: Text(AppLocalizations.of(context)!.commonCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(ctx).colorScheme.error,
             ),
-            child: const Text("SUPPRIMER"),
+            child: Text(AppLocalizations.of(context)!.commonDelete),
           ),
         ],
       ),
@@ -331,7 +333,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          success ? "Photo de profil supprimée" : "Échec de la suppression",
+          success
+              ? AppLocalizations.of(context)!.editProfilePhotoDeleted
+              : AppLocalizations.of(context)!.editProfilePhotoDeleteFailed,
         ),
         backgroundColor: success ? Colors.green : Colors.red,
       ),
@@ -362,7 +366,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     if (!sent) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Failed to send OTP to $identifier"),
+          content: Text(
+            '${AppLocalizations.of(context)!.editProfileOtpSendFailed} $identifier',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -401,14 +407,18 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       if (saved && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("$type verified and updated successfully!"),
+            content: Text(
+              "$type ${AppLocalizations.of(context)!.editProfileVerifiedUpdated}",
+            ),
             backgroundColor: Colors.green,
           ),
         );
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to update $type. Please try again."),
+            content: Text(
+              "${AppLocalizations.of(context)!.editProfileUpdateFailed} $type.",
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -489,8 +499,8 @@ class _EditProfileScreenState extends State<EditProfileScreen>
             letterSpacing: 0.5,
           ),
           tabs: const [
-            Tab(text: "PERSONAL"),
-            Tab(text: "SECURITY"),
+            Tab(text: AppLocalizations.of(context)!.editProfileTabPersonal),
+            Tab(text: AppLocalizations.of(context)!.editProfileTabSecurity),
           ],
         ),
       ),
@@ -605,7 +615,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 8),
           child: Text(
-            "GENDER",
+            AppLocalizations.of(context)!.editProfileGender,
             style: theme.textTheme.labelMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.onSurface,
@@ -644,10 +654,18 @@ class _EditProfileScreenState extends State<EditProfileScreen>
               ),
             ),
           ),
-          hint: const Text("Select Gender"),
+          hint: Text(AppLocalizations.of(context)!.editProfileGenderHint),
           items: const [
-            DropdownMenuItem(value: 'male', child: Text("Male")),
-            DropdownMenuItem(value: 'female', child: Text("Female")),
+            DropdownMenuItem(
+              value: 'male',
+              child: Text(AppLocalizations.of(context)!.editProfileGenderMale),
+            ),
+            DropdownMenuItem(
+              value: 'female',
+              child: Text(
+                AppLocalizations.of(context)!.editProfileGenderFemale,
+              ),
+            ),
           ],
           onChanged: (value) {
             setState(() {
@@ -675,7 +693,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           minimumSize: const Size(0, 36),
         ),
         child: const Text(
-          "VERIFY",
+          AppLocalizations.of(context)!.commonVerify,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 12,
@@ -719,7 +737,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 const SizedBox(width: 16),
                 Expanded(
                   child: Text(
-                    "Changes to your email or phone number require OTP verification. Enter a new value and click VERIFY.",
+                    AppLocalizations.of(context)!.editProfileSecurityNotice,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurface,
                       height: 1.4,
@@ -742,7 +760,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
               children: [
                 AuthTextField(
                   label: l10n.authEmailLabel,
-                  hint: "Enter your email",
+                  hint: AppLocalizations.of(context)!.editProfileEmailHint,
                   leadingIcon: Symbols.mail,
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -756,7 +774,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 const SizedBox(height: 24),
                 AuthTextField(
                   label: l10n.authPhoneLabel,
-                  hint: "Enter your phone number",
+                  hint: AppLocalizations.of(context)!.editProfilePhoneHint,
                   leadingIcon: Symbols.phone,
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,

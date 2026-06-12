@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservat
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_reservation_history_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/activities/widgets/reservation_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -92,7 +93,7 @@ class _ReservationsScreenState extends State<ReservationsScreen>
           color: theme.colorScheme.onSurface,
         ),
         title: Text(
-          'MES RÉSERVATIONS',
+          AppLocalizations.of(context)!.reservationsTitle,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w900,
             letterSpacing: 1.5,
@@ -111,9 +112,9 @@ class _ReservationsScreenState extends State<ReservationsScreen>
             letterSpacing: 1,
             fontSize: 12,
           ),
-          tabs: const [
-            Tab(text: 'À VENIR'),
-            Tab(text: 'HISTORIQUE'),
+          tabs: [
+            Tab(text: AppLocalizations.of(context)!.reservationsUpcomingTab),
+            Tab(text: AppLocalizations.of(context)!.reservationsHistoryTab),
           ],
         ),
       ),
@@ -124,8 +125,12 @@ class _ReservationsScreenState extends State<ReservationsScreen>
             state: _ongoingState,
             reservations: _ongoing,
             errorMessage: _ongoingError,
-            emptyTitle: 'AUCUNE RÉSERVATION À VENIR',
-            emptyMessage: "Vous n'avez pas encore de réservations à venir.",
+            emptyTitle: AppLocalizations.of(
+              context,
+            )!.reservationsEmptyUpcomingTitle,
+            emptyMessage: AppLocalizations.of(
+              context,
+            )!.reservationsEmptyUpcomingDesc,
             onRetry: _fetchOngoing,
             onRefresh: _fetchOngoing,
           ),
@@ -133,8 +138,12 @@ class _ReservationsScreenState extends State<ReservationsScreen>
             state: _historyState,
             reservations: _history,
             errorMessage: _historyError,
-            emptyTitle: 'HISTORIQUE VIDE',
-            emptyMessage: "Vous n'avez pas encore de réservations passées.",
+            emptyTitle: AppLocalizations.of(
+              context,
+            )!.reservationsEmptyHistoryTitle,
+            emptyMessage: AppLocalizations.of(
+              context,
+            )!.reservationsEmptyHistoryDesc,
             onRetry: _fetchHistory,
             onRefresh: _fetchHistory,
           ),
@@ -258,7 +267,7 @@ class _ErrorView extends StatelessWidget {
             ),
             SizedBox(height: spacing.lg),
             Text(
-              'Chargement échoué',
+              AppLocalizations.of(context)!.errorLoadingFailed,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w900,
                 color: theme.colorScheme.onSurface,
@@ -277,7 +286,7 @@ class _ErrorView extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Symbols.refresh, size: 20),
-              label: const Text('Réessayer'),
+              label: Text(AppLocalizations.of(context)!.actionRetry),
               style: FilledButton.styleFrom(
                 padding: EdgeInsets.symmetric(
                   horizontal: spacing.xl,

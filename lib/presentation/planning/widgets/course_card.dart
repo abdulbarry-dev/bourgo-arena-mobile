@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 
 class CourseCard extends StatelessWidget {
   final Course course;
@@ -167,7 +168,7 @@ class _ActionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      'VIEW DETAILS',
+      AppLocalizations.of(context)!.viewDetailsLabel,
       style: theme.textTheme.labelSmall?.copyWith(
         color: theme.colorScheme.primary,
         fontWeight: FontWeight.w900,
