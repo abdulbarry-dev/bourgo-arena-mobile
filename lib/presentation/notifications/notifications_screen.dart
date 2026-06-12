@@ -177,7 +177,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           isSelected: isSelected,
                           onTap: () => setState(() {
                             _selectedFilter = key;
-                            _scrollController.jumpTo(0);
+                            if (_scrollController.hasClients) {
+                              _scrollController.jumpTo(0);
+                            }
                           }),
                         ),
                       );

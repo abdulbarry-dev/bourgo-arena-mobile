@@ -235,7 +235,7 @@ class _ServiceDetailScreenState extends State<ServiceDetailScreen> {
               Container(
                 color: appColors.bgElevated,
                 child: Icon(
-                  Symbols.build,
+                  Symbols.grid_view,
                   size: 80,
                   color: theme.colorScheme.primary.withValues(alpha: 0.3),
                 ),

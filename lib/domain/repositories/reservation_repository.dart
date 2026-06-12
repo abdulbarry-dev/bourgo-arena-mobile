@@ -23,9 +23,11 @@ abstract interface class ReservationRepository {
 
   /// Creates a new reservation via POST /reservations.
   /// Returns the created reservation along with optional deposit payment info.
+  /// [paymentMethod] can be 'konnect' or 'loyalty' (defaults to 'konnect' on the backend).
   Future<Result<ReservationWithPayment, Failure>> makeReservation(
-    Reservation reservation,
-  );
+    Reservation reservation, {
+    String? paymentMethod,
+  });
 
   /// Cancels an existing reservation by its [id].
   Future<Result<void, Failure>> cancelReservation(String id);

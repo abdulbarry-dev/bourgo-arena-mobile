@@ -36,6 +36,11 @@ Future<Result<T, Failure>> executeApiCall<T>(
     return FailureResult(
       NotFoundFailure(AppErrorCode.notFound, e.message, e.state, e.token),
     );
+  } on ForbiddenException catch (e) {
+    developer.log('API ForbiddenException: ${e.message}');
+    return FailureResult(
+      ServerFailure(AppErrorCode.serverError, e.message, e.state, e.token),
+    );
   } on ServerException catch (e) {
     developer.log('API ServerException: ${e.message}');
     return FailureResult(

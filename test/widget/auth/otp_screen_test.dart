@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_screen.dart';
@@ -24,12 +25,16 @@ class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
 class MockGetVerificationStatusUseCase extends Mock
     implements GetVerificationStatusUseCase {}
 
+class MockRequestFamilyAccountOtpUseCase extends Mock
+    implements RequestFamilyAccountOtpUseCase {}
+
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 void main() {
   late MockVerifyOtpUseCase mockVerifyOtpUseCase;
   late MockSendOtpUseCase mockSendOtpUseCase;
   late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
+  late MockRequestFamilyAccountOtpUseCase mockRequestFamilyAccountOtpUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUpAll(() {
@@ -41,6 +46,7 @@ void main() {
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockSendOtpUseCase = MockSendOtpUseCase();
     mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
+    mockRequestFamilyAccountOtpUseCase = MockRequestFamilyAccountOtpUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
 
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
@@ -84,6 +90,7 @@ void main() {
             verifyOtpUseCase: mockVerifyOtpUseCase,
             sendOtpUseCase: mockSendOtpUseCase,
             getVerificationStatusUseCase: mockGetVerificationStatusUseCase,
+            requestFamilyAccountOtpUseCase: mockRequestFamilyAccountOtpUseCase,
           ),
         ),
         GoRoute(

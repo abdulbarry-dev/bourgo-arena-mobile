@@ -58,6 +58,11 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
         scrolledUnderElevation: 0,
         centerTitle: false,
         backgroundColor: theme.scaffoldBackgroundColor,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => context.pop(),
+          color: theme.colorScheme.onSurface,
+        ),
         title: Text(
           'ACTIVITIES',
           style: theme.textTheme.titleMedium?.copyWith(

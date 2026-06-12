@@ -2,11 +2,9 @@ import 'dart:io';
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/presentation/browse/browse_screen.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
-import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
-import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/result.dart';
@@ -17,15 +15,14 @@ import 'package:mocktail/mocktail.dart';
 
 class MockGetCoursesUseCase extends Mock implements GetCoursesUseCase {}
 
-class MockGetUserBookingsUseCase extends Mock
-    implements GetUserBookingsUseCase {}
+class MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 
-class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+class MockGetEventsUseCase extends Mock implements GetEventsUseCase {}
 
 void main() {
   late MockGetCoursesUseCase mockGetCoursesUseCase;
-  late MockGetUserBookingsUseCase mockGetUserBookingsUseCase;
-  late MockAuthStateNotifier mockAuthStateNotifier;
+  late MockGetActivitiesUseCase mockGetActivitiesUseCase;
+  late MockGetEventsUseCase mockGetEventsUseCase;
 
   setUpAll(() {
     HttpOverrides.global = _FakeHttpOverrides();
@@ -37,23 +34,25 @@ void main() {
 
   setUp(() {
     mockGetCoursesUseCase = MockGetCoursesUseCase();
-    mockGetUserBookingsUseCase = MockGetUserBookingsUseCase();
-    mockAuthStateNotifier = MockAuthStateNotifier();
+    mockGetActivitiesUseCase = MockGetActivitiesUseCase();
+    mockGetEventsUseCase = MockGetEventsUseCase();
 
     locator.allowReassignment = true;
     locator.registerFactory<GetCoursesUseCase>(() => mockGetCoursesUseCase);
-    locator.registerFactory<GetUserBookingsUseCase>(
-      () => mockGetUserBookingsUseCase,
+    locator.registerFactory<GetActivitiesUseCase>(
+      () => mockGetActivitiesUseCase,
     );
-    locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
+    locator.registerFactory<GetEventsUseCase>(() => mockGetEventsUseCase);
 
-    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(false);
-    when(
-      () => mockGetCoursesUseCase.call(),
-    ).thenAnswer((_) async => Result.success([]));
-    when(
-      () => mockGetUserBookingsUseCase.call(),
-    ).thenAnswer((_) async => Result.success([]));
+    when(() => mockGetCoursesUseCase.call()).thenAnswer(
+      (_) async => Result.success([]),
+    );
+    when(() => mockGetActivitiesUseCase.call()).thenAnswer(
+      (_) async => Result.success([]),
+    );
+    when(() => mockGetEventsUseCase.call()).thenAnswer(
+      (_) async => Result.success([]),
+    );
   });
 
   tearDown(() {
@@ -80,44 +79,14 @@ void main() {
   }
 
   group('BrowseScreen Widget Tests', () {
-    testWidgets(
-      'shows EmptyState for courses and GuestAuthState for reservations when unauthenticated',
-      (tester) async {
-        when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(false);
+    testWidgets('shows tab bar with all three tabs', (tester) async {
+      await tester.pumpWidget(createWidgetUnderTest(tester));
+      await tester.pump(const Duration(seconds: 1));
 
-        await tester.pumpWidget(createWidgetUnderTest(tester));
-        await tester.pump(
-          const Duration(seconds: 1),
-        ); // Wait for futures and animations
-
-        // Initial tab is Explorer (Courses). Because it's empty, we should see EmptyState.
-        expect(find.byType(EmptyState), findsOneWidget);
-
-        // Tap on Reservations tab
-        await tester.tap(find.text('My Reservations'));
-        await tester.pumpAndSettle();
-
-        // Because unauthenticated, we should see GuestAuthState.
-        expect(find.byType(GuestAuthState), findsOneWidget);
-      },
-    );
-
-    testWidgets(
-      'shows EmptyState for reservations when authenticated but no reservations exist',
-      (tester) async {
-        when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
-
-        await tester.pumpWidget(createWidgetUnderTest(tester));
-        await tester.pump(const Duration(seconds: 1));
-
-        // Tap on Reservations tab
-        await tester.tap(find.text('My Reservations'));
-        await tester.pumpAndSettle();
-
-        // Because authenticated but no reservations, we should see EmptyState.
-        expect(find.byType(EmptyState), findsOneWidget);
-      },
-    );
+      expect(find.text('COURSES'), findsOneWidget);
+      expect(find.text('ACTIVITIES'), findsOneWidget);
+      expect(find.text('EVENTS'), findsOneWidget);
+    });
   });
 }
 

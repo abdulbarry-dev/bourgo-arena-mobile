@@ -37,6 +37,9 @@ LoyaltyBalanceModel _$LoyaltyBalanceModelFromJson(Map<String, dynamic> json) =>
             (e) => LoyaltyTransactionModel.fromJson(e as Map<String, dynamic>),
           )
           .toList(),
+      conversionRate: (json['conversion_rate'] as num?)?.toDouble(),
+      minimumPaymentPoints: (json['minimum_payment_points'] as num?)?.toInt(),
+      maximumPerTransaction: (json['maximum_per_transaction'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$LoyaltyBalanceModelToJson(
@@ -47,4 +50,7 @@ Map<String, dynamic> _$LoyaltyBalanceModelToJson(
   'redeemed_this_month': instance.redeemedThisMonth,
   'tier_name': instance.tierName,
   'transactions': instance.transactions,
+  'conversion_rate': instance.conversionRate,
+  'minimum_payment_points': instance.minimumPaymentPoints,
+  'maximum_per_transaction': instance.maximumPerTransaction,
 };

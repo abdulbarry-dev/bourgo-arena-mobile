@@ -39,6 +39,15 @@ class LoyaltyBalance {
   /// Current tier label (e.g. "Standard", "Ultra").
   final String? tierName;
 
+  /// How many TND each point is worth.
+  final double? conversionRate;
+
+  /// Minimum points required for a redemption.
+  final int? minimumPaymentPoints;
+
+  /// Maximum points that can be used per transaction.
+  final int? maximumPerTransaction;
+
   /// Recent transactions.
   final List<LoyaltyTransaction> transactions;
 
@@ -48,6 +57,9 @@ class LoyaltyBalance {
     this.earnedThisMonth,
     this.redeemedThisMonth,
     this.tierName,
+    this.conversionRate,
+    this.minimumPaymentPoints,
+    this.maximumPerTransaction,
     this.transactions = const [],
   });
 }

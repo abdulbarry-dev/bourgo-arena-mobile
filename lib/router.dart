@@ -54,6 +54,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_loyalty_balance_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/service/service_detail_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/service/services_screen.dart';
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/course_detail_screen.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
@@ -173,6 +174,7 @@ GoRouter createRouter(
         location == '/home' ||
         location == '/planning' ||
         location == '/search' ||
+        location == '/services' ||
         location.startsWith('/services/') ||
         location.startsWith('/courses/') ||
         location.startsWith('/activities/') ||
@@ -556,6 +558,10 @@ GoRouter createRouter(
     GoRoute(
       path: '/activities',
       builder: (context, state) => const ActivitiesListScreen(),
+    ),
+    GoRoute(
+      path: '/services',
+      builder: (context, state) => const ServicesScreen(),
     ),
     GoRoute(
       path: '/services/:id',

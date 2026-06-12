@@ -1,12 +1,14 @@
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
@@ -49,6 +51,8 @@ class _PlanningScreenState extends State<PlanningScreen> {
           getUserProfileUseCase: locator<GetUserProfileUseCase>(),
           bookSessionUseCase: locator<BookCourseSessionUseCase>(),
           authStateNotifier: locator<AuthStateNotifier>(),
+          getActiveSubscriptionsUseCase: locator<GetActiveSubscriptionsUseCase>(),
+          getServicesUseCase: locator<GetServicesUseCase>(),
         );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _viewModel.loadPlanning();

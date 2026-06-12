@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_ca
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_course_sessions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_screen.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -39,6 +40,8 @@ class MockGetCourseSessionsUseCase extends Mock
 class MockBookCourseSessionUseCase extends Mock
     implements BookCourseSessionUseCase {}
 
+class MockGetServicesUseCase extends Mock implements GetServicesUseCase {}
+
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 class MockGoRouter extends Mock implements GoRouter {}
@@ -51,6 +54,7 @@ void main() {
   late MockGetActiveSubscriptionsUseCase mockGetActiveSubscriptionsUseCase;
   late MockGetCourseSessionsUseCase mockGetCourseSessionsUseCase;
   late MockBookCourseSessionUseCase mockBookCourseSessionUseCase;
+  late MockGetServicesUseCase mockGetServicesUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
   late MockGoRouter mockGoRouter;
 
@@ -70,6 +74,7 @@ void main() {
     mockGetActiveSubscriptionsUseCase = MockGetActiveSubscriptionsUseCase();
     mockGetCourseSessionsUseCase = MockGetCourseSessionsUseCase();
     mockBookCourseSessionUseCase = MockBookCourseSessionUseCase();
+    mockGetServicesUseCase = MockGetServicesUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
     mockGoRouter = MockGoRouter();
 
@@ -93,6 +98,7 @@ void main() {
     locator.registerFactory<BookCourseSessionUseCase>(
       () => mockBookCourseSessionUseCase,
     );
+    locator.registerFactory<GetServicesUseCase>(() => mockGetServicesUseCase);
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
 
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
@@ -107,6 +113,9 @@ void main() {
         const ServerFailure(AppErrorCode.serverError, 'error'),
       ),
     );
+    when(
+      () => mockGetServicesUseCase.call(),
+    ).thenAnswer((_) async => const Success([]));
   });
 
   tearDown(() {

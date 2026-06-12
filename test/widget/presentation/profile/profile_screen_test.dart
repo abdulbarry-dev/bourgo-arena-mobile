@@ -1,11 +1,16 @@
 import 'dart:io';
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
+import 'package:bourgo_arena_mobile/domain/entities/auth_session.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/profile_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
@@ -23,6 +28,14 @@ class MockLogoutUseCase extends Mock implements LogoutUseCase {}
 
 class MockDeleteAccountUseCase extends Mock implements DeleteAccountUseCase {}
 
+class MockGetOngoingReservationsUseCase extends Mock
+    implements GetOngoingReservationsUseCase {}
+
+class MockGetFullPaymentHistoryUseCase extends Mock
+    implements GetFullPaymentHistoryUseCase {}
+
+class MockGetMyEventsUseCase extends Mock implements GetMyEventsUseCase {}
+
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
 class MockGoRouter extends Mock implements GoRouter {}
@@ -31,6 +44,9 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late MockLogoutUseCase mockLogoutUseCase;
   late MockDeleteAccountUseCase mockDeleteAccountUseCase;
+  late MockGetOngoingReservationsUseCase mockGetOngoingReservationsUseCase;
+  late MockGetFullPaymentHistoryUseCase mockGetFullPaymentHistoryUseCase;
+  late MockGetMyEventsUseCase mockGetMyEventsUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
   late MockGoRouter mockGoRouter;
 
@@ -47,6 +63,9 @@ void main() {
     mockAuthRepository = MockAuthRepository();
     mockLogoutUseCase = MockLogoutUseCase();
     mockDeleteAccountUseCase = MockDeleteAccountUseCase();
+    mockGetOngoingReservationsUseCase = MockGetOngoingReservationsUseCase();
+    mockGetFullPaymentHistoryUseCase = MockGetFullPaymentHistoryUseCase();
+    mockGetMyEventsUseCase = MockGetMyEventsUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
     mockGoRouter = MockGoRouter();
 
@@ -56,6 +75,15 @@ void main() {
     locator.registerFactory<DeleteAccountUseCase>(
       () => mockDeleteAccountUseCase,
     );
+    locator.registerFactory<GetOngoingReservationsUseCase>(
+      () => mockGetOngoingReservationsUseCase,
+    );
+    locator.registerFactory<GetFullPaymentHistoryUseCase>(
+      () => mockGetFullPaymentHistoryUseCase,
+    );
+    locator.registerFactory<GetMyEventsUseCase>(
+      () => mockGetMyEventsUseCase,
+    );
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
 
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(false);
@@ -63,10 +91,23 @@ void main() {
     when(
       () => mockAuthStateNotifier.state,
     ).thenReturn(AuthState.unauthenticated);
+    when(() => mockAuthStateNotifier.addListener(any())).thenReturn(null);
+    when(() => mockAuthStateNotifier.removeListener(any())).thenReturn(null);
 
-    // AuthStateNotifier implements ChangeNotifier, so we need to mock addListener/removeListener
-    // It's already mocked properly by mocktail if we just let it be, or we can use a Fake
-    // Wait, mocktail doesn't automatically mock ChangeNotifier correctly.
+    when(
+      () => mockGetOngoingReservationsUseCase(),
+    ).thenAnswer((_) async => Result.success([]));
+    when(
+      () => mockGetFullPaymentHistoryUseCase.execute(),
+    ).thenAnswer((_) async => Result.success([]));
+    when(
+      () => mockGetMyEventsUseCase(),
+    ).thenAnswer((_) async => Result.success([]));
+    when(() => mockAuthRepository.getMemberTier()).thenAnswer(
+      (_) async => Result.success(
+        const AuthSession(state: AuthState.unauthenticated),
+      ),
+    );
   });
 
   tearDown(() {

@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -16,20 +17,26 @@ class MockSendOtpUseCase extends Mock implements SendOtpUseCase {}
 class MockGetVerificationStatusUseCase extends Mock
     implements GetVerificationStatusUseCase {}
 
+class MockRequestFamilyAccountOtpUseCase extends Mock
+    implements RequestFamilyAccountOtpUseCase {}
+
 void main() {
   late MockVerifyOtpUseCase mockVerifyOtpUseCase;
   late MockSendOtpUseCase mockSendOtpUseCase;
   late MockGetVerificationStatusUseCase mockGetVerificationStatusUseCase;
+  late MockRequestFamilyAccountOtpUseCase mockRequestFamilyAccountOtpUseCase;
   late OtpViewModel viewModel;
 
   setUp(() {
     mockVerifyOtpUseCase = MockVerifyOtpUseCase();
     mockSendOtpUseCase = MockSendOtpUseCase();
     mockGetVerificationStatusUseCase = MockGetVerificationStatusUseCase();
+    mockRequestFamilyAccountOtpUseCase = MockRequestFamilyAccountOtpUseCase();
     viewModel = OtpViewModel(
       mockVerifyOtpUseCase,
       mockSendOtpUseCase,
       mockGetVerificationStatusUseCase,
+      mockRequestFamilyAccountOtpUseCase,
     );
   });
 
@@ -169,22 +176,22 @@ void main() {
 
       expect(viewModel.errorMessage, 'Rate limit exceeded');
     });
-    test('requestFamilyOtp sends OTP if method is not verified', () async {
+    test('requestFamilyOtp sends OTP via family endpoint if method is verified', () async {
       when(() => mockGetVerificationStatusUseCase()).thenAnswer(
         (_) async => const Success(
           VerificationStatus(
-            emailVerified: false,
+            emailVerified: true,
             phoneVerified: true,
             onboardingCompleted: true,
-            isFullyVerified: false,
+            isFullyVerified: true,
             email: 'test@example.com',
             phone: '+1234567890',
           ),
         ),
       );
       when(
-        () => mockSendOtpUseCase(any()),
-      ).thenAnswer((_) async => const Success(null));
+        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+      ).thenAnswer((_) async => const Success('OTP sent'));
 
       bool successCalled = false;
       await viewModel.requestFamilyOtp(
@@ -193,20 +200,22 @@ void main() {
         onError: (_) {},
       );
 
-      verify(() => mockSendOtpUseCase('test@example.com')).called(1);
+      verify(
+        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+      ).called(1);
       expect(successCalled, isTrue);
     });
 
     test(
-      'requestFamilyOtp reports error if email is already verified',
+      'requestFamilyOtp reports error if email is not yet verified',
       () async {
         when(() => mockGetVerificationStatusUseCase()).thenAnswer(
           (_) async => const Success(
             VerificationStatus(
-              emailVerified: true,
+              emailVerified: false,
               phoneVerified: true,
               onboardingCompleted: true,
-              isFullyVerified: true,
+              isFullyVerified: false,
               email: 'test@example.com',
               phone: '+1234567890',
             ),
@@ -220,8 +229,11 @@ void main() {
           onError: (err) => error = err,
         );
 
-        expect(error, 'This email address is already verified.');
+        expect(error, 'Your email address is not verified yet.');
         verifyNever(() => mockSendOtpUseCase(any()));
+        verifyNever(
+          () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+        );
       },
     );
   });

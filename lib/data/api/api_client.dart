@@ -429,7 +429,7 @@ class ApiClient {
           }
           throw AuthException(message, state, token);
         }
-        throw ServerException(message, state, token);
+        throw ForbiddenException(message, state, token);
       case 404:
         throw NotFoundException(message, state, token);
       case 422:

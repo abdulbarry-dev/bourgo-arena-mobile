@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_plan_repository.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/buy_child_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
@@ -86,12 +87,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         },
         failure: (failure) {
           setState(() => _isSubscribing = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(failure.message),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
+          _showErrorSnackBar(failure.message);
         },
       );
       return;
@@ -112,12 +108,114 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       },
       failure: (failure) {
         setState(() => _isSubscribing = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(failure.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
+        if (_isChildOnlyPlanError(failure)) {
+          _showChildOnlyPlanDialog();
+        } else {
+          _showErrorSnackBar(failure.message);
+        }
+      },
+    );
+  }
+
+  bool _isChildOnlyPlanError(Failure failure) {
+    if (failure is! ValidationFailure) return false;
+    final msg = failure.message.toLowerCase();
+    return msg.contains('children only') || msg.contains('child only');
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
+  }
+
+  Future<void> _showChildOnlyPlanDialog() async {
+    final theme = Theme.of(context);
+
+    final action = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Icon(Symbols.child_care, size: 24, color: theme.colorScheme.primary),
+            const SizedBox(width: 12),
+            Text(
+              'Child-Only Plan',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'This plan is designed for children only. '
+          'Select a child to purchase this plan for them.',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            height: 1.4,
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, 'cancel'),
+            child: const Text('CANCEL'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, 'select_child'),
+            child: const Text('SELECT A CHILD'),
+          ),
+        ],
+      ),
+    );
+
+    if (action != 'select_child' || !mounted) return;
+
+    final childId = await showChildSelectorSheet(context);
+    if (!mounted || childId == null) return;
+
+    if (childId == kAddChildSentinel) {
+      await context.push('/add-child');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Child added. Please select them to continue.'),
+        ),
+      );
+      return;
+    }
+
+    _retrySubscribeForChild(childId);
+  }
+
+  Future<void> _retrySubscribeForChild(String childId) async {
+    setState(() {
+      _isSubscribing = true;
+      _selectedChildId = childId;
+    });
+
+    final buyChildUseCase = locator<BuyChildSubscriptionUseCase>();
+    final result = await buyChildUseCase(
+      childId: childId,
+      planId: _plan!.id,
+    );
+
+    if (!mounted) return;
+
+    result.when(
+      success: (subscription) {
+        setState(() => _isSubscribing = false);
+        context.push(
+          '/payment-selection',
+          extra: {'plan': _plan, 'subscription': subscription, 'childId': childId},
         );
+      },
+      failure: (failure) {
+        setState(() => _isSubscribing = false);
+        _showErrorSnackBar(failure.message);
       },
     );
   }

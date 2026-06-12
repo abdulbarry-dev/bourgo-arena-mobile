@@ -102,7 +102,6 @@ void main() {
       await tester.pump(const Duration(seconds: 1));
 
       expect(find.text('ACTIVITIES'), findsOneWidget);
-      expect(find.text('SERVICES'), findsOneWidget);
     });
   });
 }

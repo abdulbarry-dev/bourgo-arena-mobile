@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
 
 import '../../unit/data/repositories/repository_test_fixtures.dart';
@@ -37,14 +38,20 @@ void main() {
 
   testWidgets('login button disabled when form invalid', (tester) async {
     await setupScreenSize(tester);
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: LoginScreen(
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (context, state) => LoginScreen(
           loginUseCase: mockLoginUseCase,
           sessionRepository: mockSessionRepository,
-        ),
+        )),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
       ),
     );
 
@@ -80,14 +87,20 @@ void main() {
       () => mockSessionRepository.clearRememberedIdentifier(),
     ).thenAnswer((_) async => const Success(null));
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: LoginScreen(
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (context, state) => LoginScreen(
           loginUseCase: mockLoginUseCase,
           sessionRepository: mockSessionRepository,
-        ),
+        )),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
       ),
     );
 
@@ -119,14 +132,20 @@ void main() {
           FailureResult(AuthFailure(AppErrorCode.invalidCredentials, 'bad')),
     );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        home: LoginScreen(
+    final router = GoRouter(
+      routes: [
+        GoRoute(path: '/', builder: (context, state) => LoginScreen(
           loginUseCase: mockLoginUseCase,
           sessionRepository: mockSessionRepository,
-        ),
+        )),
+      ],
+    );
+
+    await tester.pumpWidget(
+      MaterialApp.router(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
       ),
     );
 

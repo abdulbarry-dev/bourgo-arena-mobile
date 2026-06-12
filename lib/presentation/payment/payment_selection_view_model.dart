@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
@@ -40,6 +41,12 @@ class PaymentSelectionViewModel extends ChangeNotifier {
   String? get paymentUrl => _paymentUrl;
   bool get isProcessing => _isProcessing;
 
+  bool _isChildOnlyPlanError(Failure failure) {
+    if (failure is! ValidationFailure) return false;
+    final msg = failure.message.toLowerCase();
+    return msg.contains('children only') || msg.contains('child only');
+  }
+
   Future<void> subscribeAndPay({
     required String planId,
     required double amount,
@@ -58,7 +65,11 @@ class PaymentSelectionViewModel extends ChangeNotifier {
     final subscription = subResult.fold<Subscription?>(
       onSuccess: (sub) => sub,
       onFailure: (failure) {
-        _errorMessage = failure.message;
+        if (_isChildOnlyPlanError(failure)) {
+          _errorMessage = 'This plan is for children only. Please go back and select a child.';
+        } else {
+          _errorMessage = failure.message;
+        }
         _state = PaymentSelectionState.failed;
         _isProcessing = false;
         notifyListeners();

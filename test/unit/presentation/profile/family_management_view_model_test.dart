@@ -124,7 +124,7 @@ void main() {
       ).thenAnswer((_) async => Result.success(true));
       when(
         () => mockEnableFamilyFeatureUseCase(),
-      ).thenAnswer((_) async => Result.success(null));
+      ).thenAnswer((_) async => Result.success(true));
 
       await viewModel.requestFamilyAccountOtp(
         method: OtpDeliveryMethod.email,

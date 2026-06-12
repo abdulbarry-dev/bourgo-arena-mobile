@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/presentation/common/widgets/brand_logo.dart'
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_view_model.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'dart:async';
 
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -109,9 +110,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       context.push('/services/${service.id}', extra: service),
                 ),
                 if (_viewModel.services.isNotEmpty && !_viewModel.servicesLoading)
-                  _FeaturedServiceCard(
-                    service: _viewModel.services.first,
-                    theme: theme,
+                  _RotatingServiceHero(
+                    services: _viewModel.services,
+                    onServiceTap: (service) =>
+                        context.push('/services/${service.id}', extra: service),
                   ),
                 const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
@@ -245,7 +247,15 @@ class _ServicesHeroContent extends StatelessWidget {
       );
     }
     if (services.isEmpty) {
-      return const SizedBox(height: 180);
+      return const Padding(
+        padding: EdgeInsets.only(top: 24),
+        child: _EmptyRow(
+          message: 'No services available',
+          accentColor: Colors.blueGrey,
+          icon: Symbols.grid_view,
+          iconSize: 32,
+        ),
+      );
     }
 
     return Container(
@@ -256,7 +266,7 @@ class _ServicesHeroContent extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Symbols.build, size: 20, color: theme.colorScheme.primary),
+              Icon(Symbols.grid_view, size: 20, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 'OUR SERVICES',
@@ -296,7 +306,7 @@ class _ServicesHeroContent extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: services.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, index) {
                 final service = services[index];
                 final hasImage = service.imageUrl != null;
@@ -326,7 +336,7 @@ class _ServicesHeroContent extends StatelessWidget {
                                     fit: BoxFit.cover,
                                   )
                                 : Icon(
-                                    Symbols.build,
+                                    Symbols.grid_view,
                                     size: 28,
                                     color: theme.colorScheme.primary.withValues(
                                       alpha: 0.4,
@@ -364,30 +374,90 @@ class _ServicesHeroContent extends StatelessWidget {
   }
 }
 
-class _FeaturedServiceCard extends SliverToBoxAdapter {
-  _FeaturedServiceCard({
-    required Service service,
-    required ThemeData theme,
+class _RotatingServiceHero extends SliverToBoxAdapter {
+  _RotatingServiceHero({
+    required List<Service> services,
+    required void Function(Service service) onServiceTap,
   }) : super(
-          child: _FeaturedServiceContent(service: service, theme: theme),
+          child: _RotatingServiceHeroContent(
+            services: services,
+            onServiceTap: onServiceTap,
+          ),
         );
 }
 
-class _FeaturedServiceContent extends StatelessWidget {
-  final Service service;
-  final ThemeData theme;
+class _RotatingServiceHeroContent extends StatefulWidget {
+  final List<Service> services;
+  final void Function(Service service) onServiceTap;
 
-  const _FeaturedServiceContent({
-    required this.service,
-    required this.theme,
+  const _RotatingServiceHeroContent({
+    required this.services,
+    required this.onServiceTap,
   });
 
   @override
+  State<_RotatingServiceHeroContent> createState() =>
+      _RotatingServiceHeroContentState();
+}
+
+class _RotatingServiceHeroContentState
+    extends State<_RotatingServiceHeroContent> {
+  int _rotationIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  @override
+  void didUpdateWidget(covariant _RotatingServiceHeroContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.services.length != widget.services.length) {
+      _rotationIndex = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Timer? _timer;
+  static const _interval = Duration(seconds: 5);
+
+  void _startTimer() {
+    if (widget.services.length <= 1) return;
+    _timer?.cancel();
+    _timer = Timer.periodic(_interval, (_) => _advance());
+  }
+
+  void _advance() {
+    if (!mounted) return;
+    setState(() {
+      _rotationIndex = (_rotationIndex + 1) % widget.services.length;
+    });
+  }
+
+  Service get _currentService =>
+      widget.services[_rotationIndex % widget.services.length];
+
+  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final service = _currentService;
+    final hasImage = service.imageUrl != null;
+    final stats = [
+      if (service.plansCount > 0) '${service.plansCount} plans',
+      if (service.coursesCount > 0) '${service.coursesCount} courses',
+      if (service.eventsCount > 0) '${service.eventsCount} events',
+    ];
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
       child: GestureDetector(
-        onTap: () => context.push('/services/${service.id}', extra: service),
+        onTap: () => widget.onServiceTap(service),
         child: Container(
           height: 220,
           decoration: BoxDecoration(
@@ -398,32 +468,49 @@ class _FeaturedServiceContent extends StatelessWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              if (service.imageUrl != null)
-                PremiumNetworkImage(
-                  imageUrl: service.imageUrl!,
-                  fit: BoxFit.cover,
-                )
-              else
-                Container(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                  child: Icon(
-                    Symbols.build,
-                    size: 64,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                  ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 600),
+                transitionBuilder: (child, animation) => FadeTransition(
+                  opacity: animation,
+                  child: child,
                 ),
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.7),
-                      ],
-                      stops: const [0.4, 1.0],
-                    ),
+                child: SizedBox(
+                  key: ValueKey(service.id),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      if (hasImage)
+                        PremiumNetworkImage(
+                          imageUrl: service.imageUrl!,
+                          fit: BoxFit.cover,
+                        )
+                      else
+                        Container(
+                          color:
+                              theme.colorScheme.primary.withValues(alpha: 0.08),
+                          child: Icon(
+                            Symbols.grid_view,
+                            size: 64,
+                            color: theme.colorScheme.primary
+                                .withValues(alpha: 0.2),
+                          ),
+                        ),
+                      Positioned.fill(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withValues(alpha: 0.7),
+                              ],
+                              stops: const [0.4, 1.0],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -444,40 +531,22 @@ class _FeaturedServiceContent extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        if (service.plansCount > 0)
-                          _ServiceStatCompact(
-                            count: service.plansCount,
-                            label: 'plans',
-                          ),
-                        if (service.plansCount > 0 &&
-                            service.coursesCount > 0)
-                          const SizedBox(width: 8),
-                        if (service.coursesCount > 0)
-                          _ServiceStatCompact(
-                            count: service.coursesCount,
-                            label: 'courses',
-                          ),
-                        if (service.coursesCount > 0 &&
-                            service.eventsCount > 0)
-                          const SizedBox(width: 8),
-                        if (service.eventsCount > 0)
-                          _ServiceStatCompact(
-                            count: service.eventsCount,
-                            label: 'events',
-                          ),
-                      ],
-                    ),
+                    if (stats.isNotEmpty)
+                      Row(
+                        children: stats.map((stat) {
+                          final isLast = stats.last == stat;
+                          return Padding(
+                            padding: EdgeInsets.only(right: isLast ? 0 : 8),
+                            child: _StatBadge(label: stat),
+                          );
+                        }).toList(),
+                      ),
                     const SizedBox(height: 10),
                     SizedBox(
                       width: 120,
                       height: 36,
                       child: ElevatedButton(
-                        onPressed: () => context.push(
-                          '/services/${service.id}',
-                          extra: service,
-                        ),
+                        onPressed: () => widget.onServiceTap(service),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: theme.colorScheme.primary,
                           foregroundColor: theme.colorScheme.onPrimary,
@@ -498,6 +567,29 @@ class _FeaturedServiceContent extends StatelessWidget {
                   ],
                 ),
               ),
+              if (widget.services.length > 1)
+                Positioned(
+                  right: 16,
+                  bottom: 16,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children:
+                        List.generate(widget.services.length, (i) {
+                      final isActive = i == _rotationIndex;
+                      return Container(
+                        margin: const EdgeInsets.only(left: 5),
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isActive
+                              ? Colors.white
+                              : Colors.white.withValues(alpha: 0.4),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
             ],
           ),
         ),
@@ -506,14 +598,10 @@ class _FeaturedServiceContent extends StatelessWidget {
   }
 }
 
-class _ServiceStatCompact extends StatelessWidget {
-  final int count;
+class _StatBadge extends StatelessWidget {
   final String label;
 
-  const _ServiceStatCompact({
-    required this.count,
-    required this.label,
-  });
+  const _StatBadge({required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -524,7 +612,7 @@ class _ServiceStatCompact extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        '$count ${label.toUpperCase()}',
+        label.toUpperCase(),
         style: const TextStyle(
           color: Colors.white,
           fontSize: 10,
@@ -533,6 +621,42 @@ class _ServiceStatCompact extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  final Color color;
+  final double radius;
+
+  _DashedBorderPainter({required this.color, required this.radius});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5;
+
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      Radius.circular(radius),
+    );
+    final path = Path()..addRRect(rrect);
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0;
+      while (distance < metric.length) {
+        const dash = 8.0;
+        const gap = 4.0;
+        final end = (distance + dash).clamp(0.0, metric.length);
+        canvas.drawPath(metric.extractPath(distance, end), paint);
+        distance += dash + gap;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.radius != radius;
 }
 
 class _SectionHeader extends StatelessWidget {
@@ -623,11 +747,12 @@ class _DashboardSection extends SliverToBoxAdapter {
                  accentColor: accentColor,
                  onRetry: onRetry,
                )
-             else if (isEmpty)
-               _EmptyRow(
-                 message: 'No $title available',
-                 accentColor: accentColor,
-               )
+            else if (isEmpty)
+                _EmptyRow(
+                  message: 'No $title available',
+                  accentColor: accentColor,
+                  icon: icon,
+                )
              else
                SizedBox(
                  height: 200,
@@ -751,8 +876,15 @@ class _ErrorRow extends StatelessWidget {
 class _EmptyRow extends StatelessWidget {
   final String message;
   final Color accentColor;
+  final IconData icon;
+  final double iconSize;
 
-  const _EmptyRow({required this.message, required this.accentColor});
+  const _EmptyRow({
+    required this.message,
+    required this.accentColor,
+    required this.icon,
+    this.iconSize = 32,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -760,18 +892,48 @@ class _EmptyRow extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        height: 200,
-        decoration: BoxDecoration(
-          color: accentColor.withValues(alpha: 0.03),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: accentColor.withValues(alpha: 0.08)),
+      child: TweenAnimationBuilder<double>(
+        tween: Tween(begin: 0.0, end: 1.0),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+        builder: (context, value, child) => Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - value)),
+            child: child,
+          ),
         ),
-        child: Center(
-          child: Text(
-            message,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+        child: SizedBox(
+          height: 200,
+          child: CustomPaint(
+            painter: _DashedBorderPainter(
+              color: accentColor.withValues(alpha: 0.15),
+              radius: 16,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: accentColor.withValues(alpha: 0.03),
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      icon,
+                      size: iconSize,
+                      color: accentColor.withValues(alpha: 0.25),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      message,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

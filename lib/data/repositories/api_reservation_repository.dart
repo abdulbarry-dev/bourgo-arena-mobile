@@ -121,14 +121,18 @@ class ApiReservationRepository implements ReservationRepository {
 
   @override
   Future<Result<ReservationWithPayment, Failure>> makeReservation(
-    Reservation reservation,
-  ) {
+    Reservation reservation, {
+    String? paymentMethod,
+  }) {
     return executeApiCall(() async {
       final body = {
         'activity_id': reservation.activityId,
         'activity_slot_id': reservation.activitySlotId,
         'date': reservation.date,
       };
+      if (paymentMethod != null) {
+        body['payment_method'] = paymentMethod;
+      }
       final response =
           await _apiClient.post('/reservations', body) as Map<String, dynamic>;
       final data = response['data'] as Map<String, dynamic>? ?? response;

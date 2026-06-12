@@ -51,3 +51,11 @@ class ValidationException extends ApiException {
     this.errors,
   ]) : super(state: state, token: token);
 }
+
+class ForbiddenException extends ApiException {
+  const ForbiddenException([
+    super.message = 'Forbidden',
+    String? state,
+    String? token,
+  ]) : super(state: state, token: token);
+}

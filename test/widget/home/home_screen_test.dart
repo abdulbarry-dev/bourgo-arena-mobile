@@ -44,10 +44,11 @@ void main() {
     mockEvents = MockGetEvents();
 
     await locator.reset();
-    locator.registerLazySingleton<GetActivitiesUseCase>(() => mockActivities);
-    locator.registerLazySingleton<GetCoursesUseCase>(() => mockCourses);
-    locator.registerLazySingleton<GetServicesUseCase>(() => mockServices);
-    locator.registerLazySingleton<GetEventsUseCase>(() => mockEvents);
+    locator.allowReassignment = true;
+    locator.registerFactory<GetActivitiesUseCase>(() => mockActivities);
+    locator.registerFactory<GetCoursesUseCase>(() => mockCourses);
+    locator.registerFactory<GetServicesUseCase>(() => mockServices);
+    locator.registerFactory<GetEventsUseCase>(() => mockEvents);
   });
 
   setUpAll(() {
@@ -76,13 +77,16 @@ void main() {
     await tester.pump(const Duration(seconds: 2));
 
     expect(find.text('TOURNAMENTS & EVENTS'), findsOneWidget);
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
+    await tester.pump(const Duration(seconds: 1));
+
     expect(find.text('COURSES'), findsOneWidget);
 
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
     await tester.pump(const Duration(seconds: 1));
 
     expect(find.text('ACTIVITIES'), findsOneWidget);
-    expect(find.text('SERVICES'), findsOneWidget);
   });
 
   testWidgets('shows empty state messages when no data', (tester) async {

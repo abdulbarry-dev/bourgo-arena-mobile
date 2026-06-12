@@ -24,6 +24,9 @@ class LoyaltyBalanceMapper {
       earnedThisMonth: model.earnedThisMonth,
       redeemedThisMonth: model.redeemedThisMonth,
       tierName: model.tierName,
+      conversionRate: model.conversionRate,
+      minimumPaymentPoints: model.minimumPaymentPoints,
+      maximumPerTransaction: model.maximumPerTransaction,
       transactions: transactions,
     );
   }

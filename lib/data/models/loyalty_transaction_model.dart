@@ -59,12 +59,24 @@ class LoyaltyBalanceModel {
   final String? tierName;
   final List<LoyaltyTransactionModel>? transactions;
 
+  @JsonKey(name: 'conversion_rate')
+  final double? conversionRate;
+
+  @JsonKey(name: 'minimum_payment_points')
+  final int? minimumPaymentPoints;
+
+  @JsonKey(name: 'maximum_per_transaction')
+  final int? maximumPerTransaction;
+
   const LoyaltyBalanceModel({
     required this.totalPoints,
     this.earnedThisMonth,
     this.redeemedThisMonth,
     this.tierName,
     this.transactions,
+    this.conversionRate,
+    this.minimumPaymentPoints,
+    this.maximumPerTransaction,
   });
 
   factory LoyaltyBalanceModel.fromJson(Map<String, dynamic> json) =>

@@ -6,7 +6,10 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
-/// Returns `null` for self, or a child's `id` for a specific child.
+const kAddChildSentinel = '__add_child__';
+
+/// Returns `null` for self, a child's `id` for a specific child,
+/// or [kAddChildSentinel] to add a new child.
 Future<String?> showChildSelectorSheet(BuildContext context) {
   return showModalBottomSheet<String>(
     context: context,
@@ -97,17 +100,11 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
             ),
             if (_children != null) ...[
               if (_children!.isEmpty)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: spacing.lg),
-                  child: Text(
-                    'No children added yet.',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+                _AddChildTile(
+                  message: 'No children added yet. Add one to get started.',
+                  onTap: () => Navigator.pop(context, kAddChildSentinel),
                 )
-              else
+              else ...[
                 ..._children!.map(
                   (child) => Padding(
                     padding: EdgeInsets.only(top: spacing.sm),
@@ -121,6 +118,14 @@ class _ChildSelectorSheetState extends State<_ChildSelectorSheet> {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.only(top: spacing.sm),
+                  child: _AddChildTile(
+                    message: 'Add another child',
+                    onTap: () => Navigator.pop(context, kAddChildSentinel),
+                  ),
+                ),
+              ],
             ],
           ],
         ],
@@ -194,6 +199,80 @@ class _OptionTile extends StatelessWidget {
               Icon(
                 Symbols.chevron_right,
                 color: theme.colorScheme.onSurfaceVariant,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddChildTile extends StatelessWidget {
+  final String message;
+  final VoidCallback onTap;
+
+  const _AddChildTile({required this.message, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: appColors.bgElevated,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: theme.colorScheme.primary.withValues(alpha: 0.3),
+              strokeAlign: BorderSide.strokeAlignInside,
+            ),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                child: Icon(
+                  Symbols.person_add,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Add a Child',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      message,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Symbols.add_circle,
+                color: theme.colorScheme.primary,
                 size: 20,
               ),
             ],

@@ -1,8 +1,10 @@
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
     as entity;
@@ -23,6 +25,7 @@ void main() {
 
   Widget createWidget() {
     return MaterialApp(
+      theme: BourgoTheme.lightTheme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
       home: NotificationsScreen(viewModel: mockViewModel),
@@ -45,9 +48,7 @@ void main() {
     await tester.pumpWidget(createWidget());
     await tester.pumpAndSettle();
 
-    final context = tester.element(find.byType(NotificationsScreen));
-    final l10n = AppLocalizations.of(context)!;
-    expect(find.text(l10n.notificationsEmpty), findsOneWidget);
+    expect(find.text('Aucune notification'), findsOneWidget);
   });
 
   testWidgets('tapping mark all read calls viewModel', (tester) async {
@@ -63,12 +64,13 @@ void main() {
     when(() => mockViewModel.isLoading).thenReturn(false);
     when(() => mockViewModel.notifications).thenReturn([n]);
     when(() => mockViewModel.hasMore).thenReturn(false);
+    when(() => mockViewModel.isLoadingMore).thenReturn(false);
     when(() => mockViewModel.markAllAsRead()).thenAnswer((_) async {});
 
     await tester.pumpWidget(createWidget());
     await tester.pumpAndSettle();
 
-    final markBtn = find.byType(TextButton);
+    final markBtn = find.byTooltip('Tout marquer comme lu');
     expect(markBtn, findsOneWidget);
 
     await tester.tap(markBtn);

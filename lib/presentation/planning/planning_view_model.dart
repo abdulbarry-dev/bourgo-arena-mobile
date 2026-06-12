@@ -8,6 +8,8 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'dart:developer' as developer;
 
@@ -65,6 +67,8 @@ class PlanningViewModel extends BaseViewModel {
   final GetUserProfileUseCase _getUserProfileUseCase;
   final BookCourseSessionUseCase _bookSessionUseCase;
   final AuthStateNotifier _authStateNotifier;
+  final GetActiveSubscriptionsUseCase _getActiveSubscriptionsUseCase;
+  final GetServicesUseCase _getServicesUseCase;
 
   List<Course> _allCourses = [];
   List<PlanningEntry> _allSessions = [];
@@ -75,6 +79,7 @@ class PlanningViewModel extends BaseViewModel {
   MemberTier _selectedMemberTier = MemberTier.public;
   bool _isLoading = false;
   bool _isSubscriptionGate = false;
+  Set<String> _accessibleCourseIds = {};
 
   List<Course> get courses => _allCourses;
   List<PlanningEntry> get allSessions => _allSessions;
@@ -99,13 +104,17 @@ class PlanningViewModel extends BaseViewModel {
     required GetUserProfileUseCase getUserProfileUseCase,
     required BookCourseSessionUseCase bookSessionUseCase,
     required AuthStateNotifier authStateNotifier,
+    required GetActiveSubscriptionsUseCase getActiveSubscriptionsUseCase,
+    required GetServicesUseCase getServicesUseCase,
   }) : _getCoursesUseCase = getCoursesUseCase,
        _getCourseSessionsUseCase = getCourseSessionsUseCase,
        _getFamilyMembersUseCase = getFamilyMembersUseCase,
        _getMemberTierUseCase = getMemberTierUseCase,
        _getUserProfileUseCase = getUserProfileUseCase,
        _bookSessionUseCase = bookSessionUseCase,
-       _authStateNotifier = authStateNotifier;
+       _authStateNotifier = authStateNotifier,
+       _getActiveSubscriptionsUseCase = getActiveSubscriptionsUseCase,
+       _getServicesUseCase = getServicesUseCase;
 
   Future<void> loadPlanning() async {
     _isLoading = true;
@@ -121,6 +130,12 @@ class PlanningViewModel extends BaseViewModel {
 
       if (_authStateNotifier.isAuthenticated) {
         await _loadFamilyContext();
+        await _loadAccessibleCourseIds();
+        if (_accessibleCourseIds.isNotEmpty) {
+          _allCourses = _allCourses
+              .where((c) => _accessibleCourseIds.contains(c.id))
+              .toList();
+        }
         await _loadAllCourseSessions();
       } else {
         _selectedMemberTier = MemberTier.public;
@@ -208,6 +223,50 @@ class PlanningViewModel extends BaseViewModel {
       },
       failure: (_) => _selectedMemberTier = MemberTier.public,
     );
+  }
+
+  Future<void> _loadAccessibleCourseIds() async {
+    _accessibleCourseIds = {};
+
+    final servicesResult = await _getServicesUseCase();
+    final Map<String, int> courseServiceMap = {};
+    servicesResult.when(
+      success: (services) {
+        for (final service in services) {
+          for (final course in service.courses) {
+            courseServiceMap[course.id] = service.id;
+          }
+        }
+      },
+      failure: (_) {},
+    );
+
+    final subsResult = await _getActiveSubscriptionsUseCase.execute();
+    final Set<int> subscribedServiceIds = {};
+    subsResult.when(
+      success: (subscriptions) {
+        for (final sub in subscriptions) {
+          final sid = sub.service?.id;
+          if (sid != null) {
+            final parsed = int.tryParse(sid);
+            if (parsed != null) subscribedServiceIds.add(parsed);
+          }
+          final pid = sub.plan?.service?.id;
+          if (pid != null) {
+            final parsed = int.tryParse(pid);
+            if (parsed != null) subscribedServiceIds.add(parsed);
+          }
+        }
+      },
+      failure: (_) {},
+    );
+
+    if (subscribedServiceIds.isNotEmpty && courseServiceMap.isNotEmpty) {
+      _accessibleCourseIds = courseServiceMap.entries
+          .where((e) => subscribedServiceIds.contains(e.value))
+          .map((e) => e.key)
+          .toSet();
+    }
   }
 
   void selectMember(FamilyMember? member) {

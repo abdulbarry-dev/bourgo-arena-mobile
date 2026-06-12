@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -80,6 +81,7 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return MaterialApp(
+      theme: BourgoTheme.lightTheme,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -114,27 +116,47 @@ void main() {
     testWidgets('Step 2: shows time slots and handles navigation', (
       tester,
     ) async {
-      when(() => mockViewModel.currentStep).thenReturn(1);
+      when(() => mockViewModel.currentStep).thenReturn(2);
       when(() => mockViewModel.selectedActivity).thenReturn(testActivity);
-      when(() => mockViewModel.availableSlots).thenReturn([testSlot]);
+      when(() => mockViewModel.selectedDate).thenReturn(DateTime(2024, 1, 1));
+      when(() => mockViewModel.availableSlots).thenReturn([
+        const TimeSlot(
+          time: '10:00',
+          available: true,
+          startTime: '10:00:00',
+          endTime: '11:00:00',
+          durationMinutes: 60,
+          dayOfWeek: 1,
+        ),
+      ]);
       when(() => mockViewModel.selectedSlot).thenReturn(null);
+      when(() => mockViewModel.priceToPay).thenReturn(25.0);
+      when(() => mockViewModel.isPricingLoading).thenReturn(false);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
 
-      // Check if time slot is visible
-      expect(find.text('10:00'), findsOneWidget);
+      // Check if time slot is visible (formatted as "10:00 - 11:00")
+      expect(find.text('10:00 - 11:00'), findsOneWidget);
 
       // Select a slot
-      await tester.tap(find.text('10:00'));
-      verify(() => mockViewModel.selectSlot(testSlot)).called(1);
+      await tester.tap(find.text('10:00 - 11:00'));
+      verify(() => mockViewModel.selectSlot(any())).called(1);
 
       // Confirm button should be disabled if no slot selected
       final confirmBtnFinder = find.byType(ElevatedButton);
       expect(tester.widget<ElevatedButton>(confirmBtnFinder).enabled, isFalse);
 
       // Mock slot selected and notify listener
-      when(() => mockViewModel.selectedSlot).thenReturn(testSlot);
+      when(() => mockViewModel.selectedSlot).thenReturn(
+        const TimeSlot(
+          time: '10:00',
+          available: true,
+          startTime: '10:00:00',
+          endTime: '11:00:00',
+          durationMinutes: 60,
+        ),
+      );
       listener?.call();
       await tester.pump();
 
@@ -146,10 +168,21 @@ void main() {
     testWidgets('Step 3: shows confirmation summary and handles payment', (
       tester,
     ) async {
-      when(() => mockViewModel.currentStep).thenReturn(2);
+      when(() => mockViewModel.currentStep).thenReturn(3);
       when(() => mockViewModel.selectedActivity).thenReturn(testActivity);
-      when(() => mockViewModel.selectedSlot).thenReturn(testSlot);
+      when(() => mockViewModel.selectedSlot).thenReturn(
+        const TimeSlot(
+          time: '10:00',
+          available: true,
+          startTime: '10:00:00',
+          endTime: '11:00:00',
+          durationMinutes: 60,
+        ),
+      );
+      when(() => mockViewModel.selectedDate).thenReturn(DateTime(2024, 1, 1));
       when(() => mockViewModel.priceToPay).thenReturn(25.0);
+      when(() => mockViewModel.isPricingLoading).thenReturn(false);
+      when(() => mockViewModel.requiresDeposit).thenReturn(false);
       when(
         () => mockViewModel.paymentMethod,
       ).thenReturn(AppConstants.paymentMethodCardId);
@@ -161,7 +194,7 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
 
-      // Verify summary information
+      // Verify summary information — price uses currency from activity ('€')
       expect(find.text('25.00 €'), findsOneWidget);
       expect(find.text('10:00'), findsAtLeastNWidgets(1));
 

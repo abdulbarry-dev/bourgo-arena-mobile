@@ -10,6 +10,9 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/delete_account_use_case
 import 'package:bourgo_arena_mobile/domain/usecases/auth/logout_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservations_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
@@ -30,6 +33,14 @@ class MockUpdateUserProfileUseCase extends Mock
     implements UpdateUserProfileUseCase {}
 
 class MockLogoutUseCase extends Mock implements LogoutUseCase {}
+
+class MockGetOngoingReservationsUseCase extends Mock
+    implements GetOngoingReservationsUseCase {}
+
+class MockGetFullPaymentHistoryUseCase extends Mock
+    implements GetFullPaymentHistoryUseCase {}
+
+class MockGetMyEventsUseCase extends Mock implements GetMyEventsUseCase {}
 
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
 
@@ -157,6 +168,9 @@ void main() {
   late MockGetUserProfileUseCase mockGetUserProfileUseCase;
   late MockUpdateUserProfileUseCase mockUpdateUserProfileUseCase;
   late MockLogoutUseCase mockLogoutUseCase;
+  late MockGetOngoingReservationsUseCase mockGetOngoingReservationsUseCase;
+  late MockGetFullPaymentHistoryUseCase mockGetFullPaymentHistoryUseCase;
+  late MockGetMyEventsUseCase mockGetMyEventsUseCase;
   late MockAuthStateNotifier mockAuthStateNotifier;
   late MockAuthRepository mockAuthRepository;
 
@@ -177,15 +191,26 @@ void main() {
     mockGetUserProfileUseCase = MockGetUserProfileUseCase();
     mockUpdateUserProfileUseCase = MockUpdateUserProfileUseCase();
     mockLogoutUseCase = MockLogoutUseCase();
+    mockGetOngoingReservationsUseCase = MockGetOngoingReservationsUseCase();
+    mockGetFullPaymentHistoryUseCase = MockGetFullPaymentHistoryUseCase();
+    mockGetMyEventsUseCase = MockGetMyEventsUseCase();
     mockAuthStateNotifier = MockAuthStateNotifier();
     mockAuthRepository = MockAuthRepository();
 
+    locator.allowReassignment = true;
     locator.registerSingleton<DeleteAccountUseCase>(mockDeleteAccountUseCase);
     locator.registerSingleton<GetUserProfileUseCase>(mockGetUserProfileUseCase);
     locator.registerSingleton<UpdateUserProfileUseCase>(
       mockUpdateUserProfileUseCase,
     );
     locator.registerSingleton<LogoutUseCase>(mockLogoutUseCase);
+    locator.registerSingleton<GetOngoingReservationsUseCase>(
+      mockGetOngoingReservationsUseCase,
+    );
+    locator.registerSingleton<GetFullPaymentHistoryUseCase>(
+      mockGetFullPaymentHistoryUseCase,
+    );
+    locator.registerSingleton<GetMyEventsUseCase>(mockGetMyEventsUseCase);
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
     locator.registerSingleton<AuthRepository>(mockAuthRepository);
 
@@ -199,6 +224,18 @@ void main() {
       (_) async => Result.success(
         AuthSession(user: testUser, state: AuthState.authenticated),
       ),
+    );
+    when(() => mockGetUserProfileUseCase()).thenAnswer(
+      (_) async => Result.success(testUser),
+    );
+    when(() => mockGetOngoingReservationsUseCase()).thenAnswer(
+      (_) async => const Success([]),
+    );
+    when(() => mockGetFullPaymentHistoryUseCase.execute()).thenAnswer(
+      (_) async => const Success([]),
+    );
+    when(() => mockGetMyEventsUseCase()).thenAnswer(
+      (_) async => const Success([]),
     );
   });
 
@@ -254,7 +291,7 @@ void main() {
       );
 
       await tester.pumpWidget(createWidget());
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 3));
 
       expect(find.text('JOHN DOE'), findsOneWidget);
       expect(find.text('GOLD'), findsOneWidget);

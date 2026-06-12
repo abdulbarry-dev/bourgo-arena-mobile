@@ -224,7 +224,11 @@ class BookingViewModel extends BaseViewModel {
         loadUserBookings();
       },
       failure: (failure) {
-        setErrorMessage('booking_cancellation_failed');
+        if (failure.message.toLowerCase().contains('paid')) {
+          setErrorMessage('booking_already_paid');
+        } else {
+          setErrorMessage('booking_cancellation_failed');
+        }
         developer.log('Error cancelling booking: ${failure.message}');
       },
     );
@@ -272,7 +276,14 @@ class BookingViewModel extends BaseViewModel {
       qrCode: '',
     );
 
-    final result = await _makeReservationUseCase(reservation);
+    final apiPaymentMethod = _paymentMethod == AppConstants.paymentMethodWalletId
+        ? AppConstants.paymentMethodApiLoyalty
+        : AppConstants.paymentMethodApiKonnect;
+
+    final result = await _makeReservationUseCase(
+      reservation,
+      paymentMethod: apiPaymentMethod,
+    );
     bool success = false;
 
     result.when(
