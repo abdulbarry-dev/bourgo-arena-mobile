@@ -8,7 +8,6 @@ import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 class MyEventsScreen extends StatefulWidget {
@@ -60,7 +59,6 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final spacing = context.spacing;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -179,6 +177,7 @@ class _EventParticipantCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appColors = theme.extension<AppColors>()!;
+    final typography = context.typography;
     final event = participant.event;
     if (event == null) return const SizedBox.shrink();
 
@@ -214,8 +213,7 @@ class _EventParticipantCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   status.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  style: typography.overline?.copyWith(
                     color: status == 'open'
                         ? appColors.statusSuccess
                         : theme.colorScheme.onSurfaceVariant,
@@ -234,9 +232,7 @@ class _EventParticipantCard extends StatelessWidget {
             ),
             child: Text(
               (participant.status ?? '').toUpperCase(),
-              style: GoogleFonts.lexend(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
+              style: typography.overline?.copyWith(
                 color: participant.status == 'withdrawn'
                     ? theme.colorScheme.error
                     : theme.colorScheme.primary,

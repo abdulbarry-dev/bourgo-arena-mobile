@@ -19,7 +19,6 @@ import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 
@@ -179,16 +178,14 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildSectionHeader(BuildContext context, String title) {
     final theme = Theme.of(context);
     final spacing = context.spacing;
+    final typography = context.typography;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: spacing.xs),
       child: Text(
         title.toUpperCase(),
-        style: theme.textTheme.labelSmall?.copyWith(
+        style: typography.sectionTitle?.copyWith(
           color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
-          fontWeight: FontWeight.w900,
-          letterSpacing: 2,
-          fontFamily: GoogleFonts.lexend().fontFamily,
         ),
       ),
     );
@@ -410,22 +407,28 @@ class _StatsDashboard extends StatelessWidget {
                 ),
                 _buildDivider(appColors),
                 Expanded(
-                  child: _ReservationStatTile(
-                    count: ongoingReservationsCount,
+                  child: _StatTile(
+                    value: '$ongoingReservationsCount',
+                    icon: Symbols.event_available,
+                    color: theme.colorScheme.primary,
                     onTap: () => context.push('/bookings'),
                   ),
                 ),
                 _buildDivider(appColors),
                 Expanded(
-                  child: _HistoryStatTile(
-                    count: successfulPaymentsCount,
+                  child: _StatTile(
+                    value: '$successfulPaymentsCount',
+                    icon: Symbols.history,
+                    color: theme.colorScheme.primary,
                     onTap: () => context.push('/transactions'),
                   ),
                 ),
                 _buildDivider(appColors),
                 Expanded(
-                  child: _EventsStatTile(
-                    count: myEventsCount,
+                  child: _StatTile(
+                    value: '$myEventsCount',
+                    icon: Symbols.emoji_events,
+                    color: theme.colorScheme.primary,
                     onTap: () => context.push('/my-events'),
                   ),
                 ),
@@ -463,8 +466,8 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final spacing = context.spacing;
+    final typography = context.typography;
 
     return InkWell(
       onTap: onTap,
@@ -478,129 +481,14 @@ class _StatTile extends StatelessWidget {
           children: [
             Icon(icon, color: color.withValues(alpha: 0.8), size: 24),
             SizedBox(height: spacing.sm),
-            Text(
-              value,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: color,
-                fontFamily: GoogleFonts.lexend().fontFamily,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ReservationStatTile extends StatelessWidget {
-  final int count;
-  final VoidCallback onTap;
-
-  const _ReservationStatTile({required this.count, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final spacing = context.spacing;
-    final color = theme.colorScheme.primary;
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: spacing.lg,
-          horizontal: spacing.md,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Symbols.event_available, color: color, size: 24),
-            SizedBox(height: spacing.sm),
-            Text(
-              '$count',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: color,
-                fontFamily: GoogleFonts.lexend().fontFamily,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HistoryStatTile extends StatelessWidget {
-  final int count;
-  final VoidCallback onTap;
-
-  const _HistoryStatTile({required this.count, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final spacing = context.spacing;
-    final color = theme.colorScheme.primary;
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: spacing.lg,
-          horizontal: spacing.md,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Symbols.history, color: color, size: 24),
-            SizedBox(height: spacing.sm),
-            Text(
-              '$count',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: color,
-                fontFamily: GoogleFonts.lexend().fontFamily,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _EventsStatTile extends StatelessWidget {
-  final int count;
-  final VoidCallback onTap;
-
-  const _EventsStatTile({required this.count, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final spacing = context.spacing;
-    final color = theme.colorScheme.primary;
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: spacing.lg,
-          horizontal: spacing.md,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Symbols.emoji_events, color: color, size: 24),
-            SizedBox(height: spacing.sm),
-            Text(
-              '$count',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w900,
-                color: color,
-                fontFamily: GoogleFonts.lexend().fontFamily,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value,
+                style: typography.statValue?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: color,
+                ),
               ),
             ),
           ],

@@ -77,9 +77,12 @@ class ApiEventRepository implements EventRepository {
   @override
   Future<Result<List<EventParticipant>, Failure>> getMyEvents() {
     return executeApiCall(() async {
-      final response =
-          await _apiClient.get('/user/events') as Map<String, dynamic>;
-      final data = response['data'] as List<dynamic>? ?? [];
+      final response = await _apiClient.get('/user/events');
+      final List<dynamic> data = response is List
+          ? response
+          : ((response as Map<String, dynamic>)['data']
+                  as List<dynamic>? ??
+              []);
       final entities = data
           .map(
             (json) => EventMapper.toParticipantEntity(
