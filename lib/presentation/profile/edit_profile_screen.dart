@@ -123,125 +123,49 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 24),
-                decoration: BoxDecoration(
-                  color: Theme.of(
-                    ctx,
-                  ).colorScheme.onSurface.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              Text(
-                "PHOTO DE PROFIL",
-                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.2,
-                ),
-              ),
-              const SizedBox(height: 24),
-              ListTile(
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          ctx,
-                        ).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Symbols.camera_alt,
-                        color: Theme.of(ctx).colorScheme.primary,
-                        size: 22,
-                      ),
-                    ),
-                    title: Text(
-                      "PRENDRE UNE PHOTO",
-                      style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      _pickAndUploadAvatar(ImageSource.camera);
-                    },
-                  )
-                  .animate(delay: 100.ms)
-                  .fade(duration: 400.ms)
-                  .slideY(
-                    begin: 0.15,
-                    end: 0,
-                    duration: 400.ms,
-                    curve: Curves.easeOut,
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      ctx,
+                    ).colorScheme.onSurface.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-              const SizedBox(height: 4),
-              ListTile(
-                    leading: Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          ctx,
-                        ).colorScheme.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Symbols.photo_library,
-                        color: Theme.of(ctx).colorScheme.primary,
-                        size: 22,
-                      ),
-                    ),
-                    title: Text(
-                      "CHOISIR UNE PHOTO",
-                      style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    onTap: () {
-                      Navigator.pop(ctx);
-                      _pickAndUploadAvatar(ImageSource.gallery);
-                    },
-                  )
-                  .animate(delay: 200.ms)
-                  .fade(duration: 400.ms)
-                  .slideY(
-                    begin: 0.15,
-                    end: 0,
-                    duration: 400.ms,
-                    curve: Curves.easeOut,
+                ),
+                Text(
+                  "PHOTO DE PROFIL",
+                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
                   ),
-              if (avatarUrl != null) ...[
-                const SizedBox(height: 4),
+                ),
+                const SizedBox(height: 24),
                 ListTile(
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Theme.of(
                             ctx,
-                          ).colorScheme.error.withValues(alpha: 0.1),
+                          ).colorScheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
-                          Symbols.delete,
-                          color: Theme.of(ctx).colorScheme.error,
+                          Symbols.camera_alt,
+                          color: Theme.of(ctx).colorScheme.primary,
                           size: 22,
                         ),
                       ),
                       title: Text(
-                        "SUPPRIMER LA PHOTO",
+                        "PRENDRE UNE PHOTO",
                         style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: Theme.of(ctx).colorScheme.error,
                         ),
                       ),
                       shape: RoundedRectangleBorder(
@@ -249,10 +173,10 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       ),
                       onTap: () {
                         Navigator.pop(ctx);
-                        _handleDeleteAvatar();
+                        _pickAndUploadAvatar(ImageSource.camera);
                       },
                     )
-                    .animate(delay: 300.ms)
+                    .animate(delay: 100.ms)
                     .fade(duration: 400.ms)
                     .slideY(
                       begin: 0.15,
@@ -260,8 +184,87 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       duration: 400.ms,
                       curve: Curves.easeOut,
                     ),
+                const SizedBox(height: 4),
+                ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            ctx,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Symbols.photo_library,
+                          color: Theme.of(ctx).colorScheme.primary,
+                          size: 22,
+                        ),
+                      ),
+                      title: Text(
+                        "CHOISIR UNE PHOTO",
+                        style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _pickAndUploadAvatar(ImageSource.gallery);
+                      },
+                    )
+                    .animate(delay: 200.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(
+                      begin: 0.15,
+                      end: 0,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
+                if (avatarUrl != null) ...[
+                  const SizedBox(height: 4),
+                  ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              ctx,
+                            ).colorScheme.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Symbols.delete,
+                            color: Theme.of(ctx).colorScheme.error,
+                            size: 22,
+                          ),
+                        ),
+                        title: Text(
+                          "SUPPRIMER LA PHOTO",
+                          style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(ctx).colorScheme.error,
+                          ),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _handleDeleteAvatar();
+                        },
+                      )
+                      .animate(delay: 300.ms)
+                      .fade(duration: 400.ms)
+                      .slideY(
+                        begin: 0.15,
+                        end: 0,
+                        duration: 400.ms,
+                        curve: Curves.easeOut,
+                      ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),

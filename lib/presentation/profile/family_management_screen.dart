@@ -4,10 +4,10 @@ import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/otp_delivery_method.dart';
 import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/otp_verification_dialog.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -181,93 +181,33 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
     );
   }
 
-  void _showOtpDialog() {
+  void _showOtpDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final otpController = TextEditingController();
 
-    showDialog(
+    final result = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AppModal(
-        title: l10n.profileVerifyFamilyTitle,
-        subtitle: l10n.authMethodAccessInstruction,
-        icon: Symbols.shield_person,
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.profileVerifyFamilySubtitle(
-                _viewModel.selectedOtpIdentifier ?? '',
-              ),
-
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 24),
-            AuthTextField(
-              label: l10n.profileOtpCodeLabel,
-              hint: l10n.profileOtpCodeHint,
-              leadingIcon: Symbols.lock,
-              controller: otpController,
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
-        actionWidgets: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              l10n.commonCancel,
-              style: TextStyle(color: theme.colorScheme.onSurfaceVariant),
-            ),
-          ),
-          ListenableBuilder(
-            listenable: _viewModel,
-            builder: (context, _) => ElevatedButton(
-              onPressed: _viewModel.isVerifyingOtp
-                  ? null
-                  : () async {
-                      final success = await _viewModel.verifyFamilyAccountOtp(
-                        otpController.text,
-                      );
-                      if (!context.mounted) return;
-                      if (success) {
-                        AppHaptics.success();
-                        Navigator.pop(context);
-                        final messenger = ScaffoldMessenger.of(context);
-                        final successMessage = AppLocalizations.of(
-                          context,
-                        )!.profileFamilyEnabled;
-                        messenger.showSnackBar(
-                          SnackBar(
-                            content: Text(successMessage),
-                            backgroundColor: theme
-                                .extension<AppColors>()!
-                                .statusSuccess,
-                            behavior: SnackBarBehavior.floating,
-                          ),
-                        );
-                        if (context.mounted) {
-                          context.push('/manage-children');
-                        }
-                      }
-                    },
-              child: _viewModel.isVerifyingOtp
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(l10n.authVerify),
-            ),
-          ),
-        ],
-        showCloseButton: true,
+      builder: (dialogContext) => OtpVerificationDialog(
+        identifier: _viewModel.selectedOtpIdentifier ?? '',
+        type: 'Family Account',
+        onVerify: (code) => _viewModel.verifyFamilyAccountOtp(code),
       ),
     );
+
+    if (result == true && mounted) {
+      AppHaptics.success();
+      final messenger = ScaffoldMessenger.of(context);
+      final successMessage = l10n.profileFamilyEnabled;
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(successMessage),
+          backgroundColor: theme.extension<AppColors>()!.statusSuccess,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      context.push('/manage-children');
+    }
   }
 
   @override

@@ -111,7 +111,10 @@ class BookingViewModel extends BaseViewModel {
               r.status != 'cancelled' &&
               r.activityId == activity.id &&
               r.date == dateStr &&
-              r.activitySlotId != null,
+              r.activitySlotId != null &&
+              (_selectedMember == null ||
+                  r.memberId == _selectedMember!.id ||
+                  (_selectedMember!.isPrimary && r.memberId == null)),
         )
         .map((r) => r.activitySlotId!)
         .toSet();

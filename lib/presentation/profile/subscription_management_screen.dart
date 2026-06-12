@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_plans_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/plans_view_model.dart';
@@ -41,7 +42,10 @@ class _SubscriptionManagementScreenState
   @override
   void initState() {
     super.initState();
-    _viewModel = PlansViewModel(getPlansUseCase: locator<GetPlansUseCase>());
+    _viewModel = PlansViewModel(
+      getPlansUseCase: locator<GetPlansUseCase>(),
+      getActiveSubscriptionsUseCase: locator<GetActiveSubscriptionsUseCase>(),
+    );
   }
 
   @override
@@ -230,7 +234,7 @@ class _SubscriptionManagementScreenState
         itemCount: filteredPlans.length,
         itemBuilder: (context, index) {
           final plan = filteredPlans[index];
-          final isCurrent = widget.currentSubscription?.plan?.name == plan.name;
+          final isCurrent = _viewModel.isPlanActive(plan.id);
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 16),

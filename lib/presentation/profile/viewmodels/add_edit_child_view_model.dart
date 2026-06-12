@@ -38,6 +38,7 @@ class AddEditChildViewModel extends BaseViewModel {
   }
 
   // Getters
+  ChildProfile? get child => _existingChild;
   String? get selectedGender => _selectedGender;
   DateTime? get selectedBirthDate => _selectedBirthDate;
   String? get avatarFilePath => _avatarFilePath;

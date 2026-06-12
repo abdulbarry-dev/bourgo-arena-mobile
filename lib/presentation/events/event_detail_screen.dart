@@ -543,6 +543,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   Widget _buildCTA(ThemeData theme) {
+    final appColors = theme.extension<AppColors>()!;
     final (String label, VoidCallback? action) = switch ((
       _isActionLoading,
       _isCheckedIn,
@@ -555,7 +556,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         'CHECK IN',
         _checkIn,
       ),
-      (_, _, true, final e) when e.status == 'open' => ('WITHDRAW', _withdraw),
+      (_, _, true, final e) when e.status == 'open' => (
+        'REGISTERED',
+        _withdraw,
+      ),
       (_, _, false, final e) when e.isRegistrationOpen => (
         'REGISTER FOR EVENT',
         _register,
@@ -563,17 +567,24 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       _ => ('REGISTRATION CLOSED', null),
     };
 
+    final isRegisteredOpen = _isRegistered && _event?.status == 'open';
+
     return ElevatedButton(
       onPressed: _isActionLoading ? null : action,
       style: ElevatedButton.styleFrom(
-        backgroundColor: _isCheckedIn
-            ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)
+        backgroundColor: _isCheckedIn || isRegisteredOpen
+            ? appColors.statusSuccess.withValues(alpha: 0.1)
             : theme.colorScheme.primary,
-        foregroundColor: _isCheckedIn
-            ? theme.colorScheme.onSurfaceVariant
+        foregroundColor: _isCheckedIn || isRegisteredOpen
+            ? appColors.statusSuccess
             : theme.colorScheme.onPrimary,
         minimumSize: const Size(double.infinity, 56),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: _isCheckedIn || isRegisteredOpen
+              ? BorderSide(color: appColors.statusSuccess)
+              : BorderSide.none,
+        ),
         disabledBackgroundColor: theme.colorScheme.primary.withValues(
           alpha: 0.4,
         ),

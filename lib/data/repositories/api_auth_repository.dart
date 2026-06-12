@@ -711,11 +711,15 @@ class ApiAuthRepository implements AuthRepository {
   @override
   Future<Result<String, Failure>> requestFamilyAccountOtp({
     OtpDeliveryMethod? method,
+    String? identifier,
   }) {
     return executeApiCall(() async {
       final payload = <String, dynamic>{};
       if (method != null) {
         payload['method'] = method.value;
+      }
+      if (identifier != null) {
+        payload['identifier'] = identifier;
       }
       final response = await _apiClient.post(
         '/auth/request-family-otp',

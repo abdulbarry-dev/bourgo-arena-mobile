@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 
 class PlanDetailScreen extends StatefulWidget {
   final String planId;
@@ -39,18 +41,35 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   String? _selectedChildId;
   bool _showFamilyFeatures = false;
   bool _isLoadingUser = true;
+  List<Subscription> _activeSubscriptions = [];
+  Map<String, Subscription> _childSubscriptions = {};
 
   @override
   void initState() {
     super.initState();
     _selectedChildId = widget.childId;
     _loadUser();
+    _loadActiveSubscriptions();
     if (widget.plan != null) {
       _plan = widget.plan;
       _isLoading = false;
     } else {
       _loadPlan();
     }
+  }
+
+  Future<void> _loadActiveSubscriptions() async {
+    final useCase = locator<GetActiveSubscriptionsUseCase>();
+    final result = await useCase.execute();
+    if (!mounted) return;
+    result.when(
+      success: (subs) {
+        setState(() {
+          _activeSubscriptions = subs;
+        });
+      },
+      failure: (_) {},
+    );
   }
 
   Future<void> _loadUser() async {
@@ -61,8 +80,16 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
       success: (user) {
         final prefs = user.preferences ?? {};
         final familyEnabled = prefs['app']?['family_enabled'] as bool? ?? false;
+        final childSubs = <String, Subscription>{};
+        for (final child in user.children) {
+          if (child.hasActiveSubscription && child.activeSubscription != null) {
+            childSubs[child.id] = child.activeSubscription!;
+          }
+        }
         setState(() {
-          _showFamilyFeatures = familyEnabled || user.isParentAccount || user.children.isNotEmpty;
+          _showFamilyFeatures =
+              familyEnabled || user.isParentAccount || user.children.isNotEmpty;
+          _childSubscriptions = childSubs;
           _isLoadingUser = false;
         });
       },
@@ -647,6 +674,49 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   }
 
   Widget _buildCTA(ThemeData theme) {
+    final appColors = theme.extension<AppColors>()!;
+    bool isAlreadySubscribed = false;
+    if (_plan != null) {
+      if (_selectedChildId != null) {
+        final childSub = _childSubscriptions[_selectedChildId];
+        isAlreadySubscribed =
+            childSub != null && childSub.plan?.id == _plan!.id;
+      } else {
+        isAlreadySubscribed = _activeSubscriptions.any(
+          (sub) => sub.plan?.id == _plan!.id,
+        );
+      }
+    }
+
+    if (isAlreadySubscribed) {
+      return Container(
+        width: double.infinity,
+        height: 56,
+        decoration: BoxDecoration(
+          color: appColors.statusSuccess.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: appColors.statusSuccess),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Symbols.check_circle, color: appColors.statusSuccess),
+              const SizedBox(width: 8),
+              Text(
+                'ACTIVE PLAN',
+                style: TextStyle(
+                  color: appColors.statusSuccess,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return ElevatedButton(
       onPressed: _isSubscribing ? null : _subscribe,
       style: ElevatedButton.styleFrom(

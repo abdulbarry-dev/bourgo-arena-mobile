@@ -54,6 +54,7 @@ abstract interface class AuthRepository {
   /// Returns the backend response message to display in UI feedback.
   Future<Result<String, Failure>> requestFamilyAccountOtp({
     OtpDeliveryMethod? method,
+    String? identifier,
   });
 
   /// Requests account deletion. Requires the user's current password for confirmation.

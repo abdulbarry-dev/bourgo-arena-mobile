@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/get_ongoing_reservat
 import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/payment/get_full_payment_history_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'dart:developer' as developer;
 
 /// ViewModel for the Profile screen.
@@ -152,7 +153,12 @@ class ProfileViewModel extends BaseViewModel {
 
   /// Logs out the user.
   Future<Result<void, Failure>> logout() async {
-    return _logoutUseCase();
+    final result = await _logoutUseCase();
+    if (result.isSuccess) {
+      // Reset the MainLayout tab to Home to prevent landing on Profile tab upon next login
+      MainLayout.tabController.value = 0;
+    }
+    return result;
   }
 
   /// Deletes the user's account with confirmation password.

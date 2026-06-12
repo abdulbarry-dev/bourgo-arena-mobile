@@ -10,6 +10,9 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/animated_loyalty_balance.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_webview_screen.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:url_launcher/url_launcher.dart';
@@ -27,6 +30,7 @@ class PaymentSelectionScreen extends StatefulWidget {
 
 class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
   late final PaymentSelectionViewModel _viewModel;
+  bool _hasCelebrated = false;
 
   @override
   void initState() {
@@ -47,10 +51,28 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
   }
 
   void _onViewModelChanged() {
+    if ((_viewModel.state == PaymentSelectionState.verified ||
+            _viewModel.state == PaymentSelectionState.loyaltySuccess) &&
+        !_hasCelebrated) {
+      _hasCelebrated = true;
+      CelebrationOverlay.show(context);
+    }
     setState(() {}); // Rebuild on state change
   }
 
   Future<void> _startPayment(String provider) async {
+    if (provider == 'loyalty') {
+      final confirmed = await ConfirmActionModal.show(
+        context: context,
+        icon: Symbols.stars,
+        title: 'PAY WITH POINTS',
+        message:
+            'You are about to pay ${widget.plan.price.toStringAsFixed(2)} TND using your loyalty points. This action cannot be undone.',
+        confirmLabel: 'PAY NOW',
+      );
+      if (confirmed != true) return;
+    }
+
     await _viewModel.subscribeAndPay(
       planId: widget.plan.id,
       amount: widget.plan.price,
@@ -386,6 +408,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                 onTap: () {
                   _startPayment('loyalty');
                 },
+                bottomContent: const AnimatedLoyaltyBalance(isVisible: true),
               )
               .animate(delay: 350.ms)
               .fade(duration: 400.ms)
@@ -405,6 +428,7 @@ class _PaymentMethodCard extends StatelessWidget {
   final AppColors appColors;
   final bool isPrimary;
   final VoidCallback onTap;
+  final Widget? bottomContent;
 
   const _PaymentMethodCard({
     required this.title,
@@ -415,6 +439,7 @@ class _PaymentMethodCard extends StatelessWidget {
     required this.appColors,
     this.isPrimary = false,
     required this.onTap,
+    this.bottomContent,
   });
 
   @override
@@ -482,6 +507,7 @@ class _PaymentMethodCard extends StatelessWidget {
                             color: theme.colorScheme.onSurfaceVariant,
                           ),
                         ),
+                        if (bottomContent != null) bottomContent!,
                       ],
                     ),
                   ),

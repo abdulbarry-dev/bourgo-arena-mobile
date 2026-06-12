@@ -3,6 +3,8 @@ import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:flutter/foundation.dart';
 
 enum PaymentSelectionState {
@@ -110,6 +112,9 @@ class PaymentSelectionViewModel extends ChangeNotifier {
 
     result.fold(
       onSuccess: (data) {
+        // Refresh profile to update loyalty points balance locally
+        locator<GetUserProfileUseCase>().call();
+
         _state = PaymentSelectionState.loyaltySuccess;
         _isProcessing = false;
         notifyListeners();

@@ -65,20 +65,12 @@ class SettingsScreen extends StatelessWidget {
                     title: l10n.settingsChangePassword,
                     onTap: () => context.push('/change-password'),
                   ),
-                  _SettingsSwitchTile(
-                    icon: Symbols.family_home,
-                    title: l10n.profileEnableFamilyAccount,
-                    value: viewModel.familyFeaturesEnabled,
-                    onChanged: (val) => viewModel.toggleFamilyFeatures(val),
-                    isLast: !viewModel.showFamilyManagement,
+                  _SettingsTile(
+                    icon: Symbols.family_restroom,
+                    title: l10n.settingsManageFamily,
+                    onTap: () => context.push('/family-management'),
+                    isLast: true,
                   ),
-                  if (viewModel.showFamilyManagement)
-                    _SettingsTile(
-                      icon: Symbols.family_restroom,
-                      title: l10n.settingsManageFamily,
-                      onTap: () => context.push('/family-management'),
-                      isLast: true,
-                    ),
                 ],
               ),
               SizedBox(height: spacing.xl),
@@ -578,72 +570,6 @@ class _SettingsTile extends StatelessWidget {
             ],
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SettingsSwitchTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final bool isLast;
-
-  const _SettingsSwitchTile({
-    required this.icon,
-    required this.title,
-    required this.value,
-    required this.onChanged,
-    this.isLast = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-    final spacing = context.spacing;
-
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: spacing.md, vertical: spacing.sm),
-      decoration: BoxDecoration(
-        border: isLast
-            ? null
-            : Border(
-                bottom: BorderSide(
-                  color: appColors.bgBorder.withValues(alpha: 0.5),
-                  width: 1,
-                ),
-              ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 20, color: theme.colorScheme.primary),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: theme.colorScheme.onSurface,
-                fontFamily: GoogleFonts.lexend().fontFamily,
-              ),
-            ),
-          ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: theme.colorScheme.primary,
-          ),
-        ],
       ),
     );
   }

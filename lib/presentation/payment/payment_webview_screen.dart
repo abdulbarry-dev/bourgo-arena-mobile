@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -39,12 +40,10 @@ class PaymentWebViewScreen extends StatefulWidget {
   });
 
   @override
-  State<PaymentWebViewScreen> createState() =>
-      _PaymentWebViewScreenState();
+  State<PaymentWebViewScreen> createState() => _PaymentWebViewScreenState();
 }
 
-class _PaymentWebViewScreenState
-    extends State<PaymentWebViewScreen> {
+class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
   late final WebViewController _controller;
   bool _isLoading = true;
 
@@ -54,8 +53,13 @@ class _PaymentWebViewScreenState
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    _controller = WebViewController();
+
+    if (!kIsWeb) {
+      _controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+    }
+
+    _controller
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {
@@ -120,8 +124,7 @@ class _PaymentWebViewScreenState
       body: Stack(
         children: [
           WebViewWidget(controller: _controller),
-          if (_isLoading)
-            const Center(child: CircularProgressIndicator()),
+          if (_isLoading) const Center(child: CircularProgressIndicator()),
         ],
       ),
     );

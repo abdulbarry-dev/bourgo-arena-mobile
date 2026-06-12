@@ -4,6 +4,8 @@ import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.d
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/animated_loyalty_balance.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_webview_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -71,6 +73,29 @@ class _PaymentStepState extends State<PaymentStep> {
         widget.viewModel.paymentMethod == AppConstants.paymentMethodWalletId;
 
     if (isLoyalty) {
+      final confirmed = await ConfirmActionModal.show(
+        context: context,
+        icon: Symbols.stars,
+        title: 'PAY WITH POINTS',
+        message:
+            'You are about to pay for your booking using your loyalty points. This action cannot be undone.',
+        content: Container(
+          margin: const EdgeInsets.only(top: 16),
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+          decoration: BoxDecoration(
+            color: Theme.of(
+              context,
+            ).colorScheme.primary.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const AnimatedLoyaltyBalance(isVisible: true),
+        ),
+        confirmLabel: 'PAY NOW',
+      );
+      if (confirmed != true) {
+        setState(() => _konnectState = _KonnectPaymentState.idle);
+        return;
+      }
       await _handleLoyaltyPayment(reservationId);
     } else {
       await _openKonnectGateway(
@@ -129,8 +154,7 @@ class _PaymentStepState extends State<PaymentStep> {
     if (depositUrl == null || reservationId == null) {
       setState(() {
         _konnectState = _KonnectPaymentState.failed;
-        _errorMessage =
-            'No payment URL received from server. Please retry.';
+        _errorMessage = 'No payment URL received from server. Please retry.';
       });
       return;
     }
@@ -169,7 +193,6 @@ class _PaymentStepState extends State<PaymentStep> {
         });
     }
   }
-
 
   /// Calls the server to confirm the payment status.
   Future<void> _verifyPayment() async {
@@ -680,6 +703,7 @@ class _PaymentMethodSelector extends StatelessWidget {
           subtitle: 'Bank Cards, E-Dinar, Wallets',
           isSelected:
               viewModel.paymentMethod == AppConstants.paymentMethodCardId,
+          isLoyaltyOption: false,
           onTap: () =>
               viewModel.setPaymentMethod(AppConstants.paymentMethodCardId),
         ),
@@ -690,6 +714,7 @@ class _PaymentMethodSelector extends StatelessWidget {
           subtitle: 'Use your accumulated loyalty points',
           isSelected:
               viewModel.paymentMethod == AppConstants.paymentMethodWalletId,
+          isLoyaltyOption: true,
           onTap: () =>
               viewModel.setPaymentMethod(AppConstants.paymentMethodWalletId),
         ),
@@ -703,6 +728,7 @@ class _PaymentOption extends StatelessWidget {
   final String label;
   final String subtitle;
   final bool isSelected;
+  final bool isLoyaltyOption;
   final VoidCallback onTap;
 
   const _PaymentOption({
@@ -711,6 +737,7 @@ class _PaymentOption extends StatelessWidget {
     required this.subtitle,
     required this.isSelected,
     required this.onTap,
+    this.isLoyaltyOption = false,
   });
 
   @override
@@ -776,6 +803,8 @@ class _PaymentOption extends StatelessWidget {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
+                  if (isLoyaltyOption)
+                    AnimatedLoyaltyBalance(isVisible: isSelected),
                 ],
               ),
             ),

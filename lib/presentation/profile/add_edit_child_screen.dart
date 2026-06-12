@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
@@ -7,8 +8,8 @@ import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/add_edit_child_view_model.dart';
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -48,10 +49,10 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
     super.dispose();
   }
 
-  Future<void> _pickAvatar() async {
+  Future<void> _pickAndUploadAvatar(ImageSource source) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 85,
       maxWidth: 512,
       maxHeight: 512,
@@ -59,6 +60,168 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
     if (picked != null) {
       _viewModel.setAvatarFilePath(picked.path);
     }
+  }
+
+  void _showAvatarOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Theme.of(ctx).extension<AppColors>()!.bgElevated,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: SafeArea(
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 24),
+                  decoration: BoxDecoration(
+                    color: Theme.of(
+                      ctx,
+                    ).colorScheme.onSurface.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Text(
+                  "PHOTO DE PROFIL",
+                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            ctx,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Symbols.camera_alt,
+                          color: Theme.of(ctx).colorScheme.primary,
+                          size: 22,
+                        ),
+                      ),
+                      title: Text(
+                        "PRENDRE UNE PHOTO",
+                        style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _pickAndUploadAvatar(ImageSource.camera);
+                      },
+                    )
+                    .animate(delay: 100.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(
+                      begin: 0.15,
+                      end: 0,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
+                const SizedBox(height: 4),
+                ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Theme.of(
+                            ctx,
+                          ).colorScheme.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Symbols.photo_library,
+                          color: Theme.of(ctx).colorScheme.primary,
+                          size: 22,
+                        ),
+                      ),
+                      title: Text(
+                        "CHOISIR UNE PHOTO",
+                        style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        _pickAndUploadAvatar(ImageSource.gallery);
+                      },
+                    )
+                    .animate(delay: 200.ms)
+                    .fade(duration: 400.ms)
+                    .slideY(
+                      begin: 0.15,
+                      end: 0,
+                      duration: 400.ms,
+                      curve: Curves.easeOut,
+                    ),
+                if (_viewModel.avatarFilePath != null ||
+                    _viewModel.child?.avatarUrl != null) ...[
+                  const SizedBox(height: 4),
+                  ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Theme.of(
+                              ctx,
+                            ).colorScheme.error.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Symbols.delete,
+                            color: Theme.of(ctx).colorScheme.error,
+                            size: 22,
+                          ),
+                        ),
+                        title: Text(
+                          "SUPPRIMER LA PHOTO",
+                          style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(ctx).colorScheme.error,
+                          ),
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          _viewModel.setAvatarFilePath(
+                            '',
+                          ); // An empty string or null will trigger removal
+                        },
+                      )
+                      .animate(delay: 300.ms)
+                      .fade(duration: 400.ms)
+                      .slideY(
+                        begin: 0.15,
+                        end: 0,
+                        duration: 400.ms,
+                        curve: Curves.easeOut,
+                      ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _selectBirthDate() async {
@@ -336,9 +499,8 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
   }
 
   Widget _buildAvatarPicker(ThemeData theme) {
-    final hasAvatar = _viewModel.avatarFilePath != null || _viewModel.isEditing;
     return GestureDetector(
-      onTap: _pickAvatar,
+      onTap: _showAvatarOptions,
       child: Center(
         child: Container(
           width: 100,
@@ -352,9 +514,18 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
             ),
           ),
           child: ClipOval(
-            child: _viewModel.avatarFilePath != null
+            child:
+                _viewModel.avatarFilePath != null &&
+                    _viewModel.avatarFilePath!.isNotEmpty
                 ? Image.file(
                     File(_viewModel.avatarFilePath!),
+                    fit: BoxFit.cover,
+                    width: 100,
+                    height: 100,
+                  )
+                : _viewModel.child?.avatarUrl != null
+                ? Image.network(
+                    _viewModel.child!.avatarUrl!,
                     fit: BoxFit.cover,
                     width: 100,
                     height: 100,

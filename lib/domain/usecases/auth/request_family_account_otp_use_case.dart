@@ -10,7 +10,13 @@ class RequestFamilyAccountOtpUseCase {
   const RequestFamilyAccountOtpUseCase(this._repository);
 
   /// Executes the request family account OTP operation.
-  Future<Result<String, Failure>> call({OtpDeliveryMethod? method}) async {
-    return _repository.requestFamilyAccountOtp(method: method);
+  Future<Result<String, Failure>> call({
+    OtpDeliveryMethod? method,
+    String? identifier,
+  }) async {
+    return _repository.requestFamilyAccountOtp(
+      method: method,
+      identifier: identifier,
+    );
   }
 }

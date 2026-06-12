@@ -253,7 +253,10 @@ class FamilyManagementViewModel extends BaseViewModel {
       return false;
     }
 
-    final result = await _requestFamilyAccountOtpUseCase(method: method);
+    final result = await _requestFamilyAccountOtpUseCase(
+      method: method,
+      identifier: normalizedIdentifier,
+    );
     return result.fold(
       onSuccess: (message) {
         _selectedOtpMethod = method;

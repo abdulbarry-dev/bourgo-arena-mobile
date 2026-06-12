@@ -1,20 +1,27 @@
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_plans_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 
 class PlansViewModel extends BaseViewModel {
   final GetPlansUseCase _getPlansUseCase;
+  final GetActiveSubscriptionsUseCase _getActiveSubscriptionsUseCase;
 
   bool _isLoading = false;
   List<Plan> _plans = [];
+  Set<String> _activePlanIds = {};
 
-  PlansViewModel({required GetPlansUseCase getPlansUseCase})
-    : _getPlansUseCase = getPlansUseCase {
+  PlansViewModel({
+    required GetPlansUseCase getPlansUseCase,
+    required GetActiveSubscriptionsUseCase getActiveSubscriptionsUseCase,
+  }) : _getPlansUseCase = getPlansUseCase,
+       _getActiveSubscriptionsUseCase = getActiveSubscriptionsUseCase {
     loadPlans();
   }
 
   bool get isLoading => _isLoading;
   List<Plan> get plans => _plans;
+  Set<String> get activePlanIds => _activePlanIds;
 
   Map<String, String> get availableServices {
     final services = <String, String>{};
@@ -26,21 +33,46 @@ class PlansViewModel extends BaseViewModel {
     return services;
   }
 
+  bool isPlanActive(String planId) => _activePlanIds.contains(planId);
+
   Future<void> loadPlans() async {
     _isLoading = true;
     clearError();
     notifyListeners();
 
-    final result = await _getPlansUseCase();
+    try {
+      final results = await Future.wait([
+        _getPlansUseCase(),
+        _getActiveSubscriptionsUseCase.execute(),
+      ]);
 
-    result.when(
-      success: (plans) {
-        _plans = plans;
-      },
-      failure: (failure) {
-        setErrorMessage(failure.message);
-      },
-    );
+      final plansResult = results[0];
+      final subsResult = results[1];
+
+      plansResult.when(
+        success: (plansData) {
+          _plans = plansData as List<Plan>;
+        },
+        failure: (failure) {
+          setErrorMessage((failure as dynamic).message);
+        },
+      );
+
+      subsResult.when(
+        success: (subsData) {
+          _activePlanIds = (subsData as List<dynamic>)
+              .where(
+                (sub) =>
+                    sub.plan != null && sub.status.toLowerCase() == 'active',
+              )
+              .map((sub) => sub.plan!.id.toString())
+              .toSet();
+        },
+        failure: (_) {},
+      );
+    } catch (e) {
+      setErrorMessage(e.toString());
+    }
 
     _isLoading = false;
     notifyListeners();
