@@ -17,8 +17,9 @@ import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_b
 
 class PaymentSelectionScreen extends StatefulWidget {
   final Plan plan;
+  final String? childId;
 
-  const PaymentSelectionScreen({super.key, required this.plan});
+  const PaymentSelectionScreen({super.key, required this.plan, this.childId});
 
   @override
   State<PaymentSelectionScreen> createState() => _PaymentSelectionScreenState();
@@ -185,7 +186,9 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Your subscription to ${widget.plan.name} is now active.',
+            widget.childId != null
+                ? 'Subscription to ${widget.plan.name} is now active for your child.'
+                : 'Your subscription to ${widget.plan.name} is now active.',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
@@ -196,7 +199,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
             onPressed: () => context.go('/home'),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
-              foregroundColor: Colors.black,
+              foregroundColor: theme.colorScheme.onPrimary,
               minimumSize: const Size(double.infinity, 56),
             ),
             child: const Text(
@@ -338,7 +341,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
                 title: 'Pay with Konnect',
                 subtitle: 'Bank Cards, E-Dinar, Wallets',
                 icon: Symbols.credit_card,
-                brandColor: const Color(0xFF005AE2),
+                brandColor: theme.colorScheme.primary,
                 theme: theme,
                 appColors: appColors,
                 onTap: () => _startPayment('konnect'),

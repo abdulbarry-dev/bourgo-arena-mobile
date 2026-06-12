@@ -23,6 +23,7 @@ class ChildSubscriptionsScreen extends StatefulWidget {
 
 class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
   late final ChildSubscriptionsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -32,12 +33,23 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
       buyChildSubscriptionUseCase: locator<BuyChildSubscriptionUseCase>(),
     );
     _viewModel.load(widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   Color _statusColor(String status, AppColors appColors) {
@@ -68,12 +80,13 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                   onRefresh: () => _viewModel.load(widget.childId),
                   color: theme.colorScheme.primary,
                   child: ListView(
+                    controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: EdgeInsets.all(spacing.lg),
                     children: [
                       if (_viewModel.subscriptions.isEmpty)
                         _buildEmptyState(theme, spacing)
-                      else
+                      else ...[
                         ..._viewModel.subscriptions.asMap().entries.map((entry) {
                           return Padding(
                             padding: EdgeInsets.only(bottom: spacing.md),
@@ -95,6 +108,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                               ),
                           );
                         }),
+                        if (_viewModel.isLoadingMore)
+                          const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(child: CircularProgressIndicator()),
+                          ),
+                      ],
                       SizedBox(height: spacing.lg),
                       SizedBox(
                         width: double.infinity,

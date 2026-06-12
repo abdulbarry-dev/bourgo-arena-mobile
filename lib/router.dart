@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
@@ -314,6 +315,7 @@ GoRouter createRouter(
           sendOtpUseCase: locator<SendOtpUseCase>(),
           verifyOtpUseCase: locator<VerifyOtpUseCase>(),
           getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
+          requestFamilyAccountOtpUseCase: locator<RequestFamilyAccountOtpUseCase>(),
         );
       },
     ),
@@ -430,6 +432,7 @@ GoRouter createRouter(
         state,
         SubscriptionManagementScreen(
           currentSubscription: state.extra as Subscription?,
+          childId: state.uri.queryParameters['childId'],
         ),
       ),
     ),
@@ -438,9 +441,10 @@ GoRouter createRouter(
       pageBuilder: (context, state) {
         final planId = state.pathParameters['id']!;
         final plan = state.extra as Plan?;
+        final childId = state.uri.queryParameters['childId'];
         return AppPageTransitions.pushPage(
           state,
-          PlanDetailScreen(planId: planId, plan: plan),
+          PlanDetailScreen(planId: planId, plan: plan, childId: childId),
         );
       },
     ),
@@ -450,7 +454,10 @@ GoRouter createRouter(
         final extra = state.extra! as Map<String, dynamic>;
         return AppPageTransitions.pushPage(
           state,
-          PaymentSelectionScreen(plan: extra['plan'] as Plan),
+          PaymentSelectionScreen(
+            plan: extra['plan'] as Plan,
+            childId: extra['childId'] as String?,
+          ),
         );
       },
     ),

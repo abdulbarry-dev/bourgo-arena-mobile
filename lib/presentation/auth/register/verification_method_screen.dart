@@ -193,7 +193,7 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
             ),
             if (_isLoading)
               Container(
-                color: Colors.black.withAlpha(76),
+                color: theme.colorScheme.scrim,
                 child: const Center(child: CircularProgressIndicator()),
               ),
           ],

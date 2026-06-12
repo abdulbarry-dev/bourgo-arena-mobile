@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/theme/app_colors.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
@@ -27,6 +28,7 @@ class FamilyMemberCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppColors>()!;
 
     IconData genderIcon;
     Color genderColor;
@@ -34,10 +36,10 @@ class FamilyMemberCard extends StatelessWidget {
     switch (gender) {
       case 'male':
         genderIcon = Symbols.male;
-        genderColor = const Color(0xFF00D1FF); // Brighter blue
+        genderColor = appColors.genderMale;
       case 'female':
         genderIcon = Symbols.female;
-        genderColor = const Color(0xFFFF00D1); // Brighter pink
+        genderColor = appColors.genderFemale;
       default:
         genderIcon = Symbols.person;
         genderColor = theme.colorScheme.primary;

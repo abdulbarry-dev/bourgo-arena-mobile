@@ -15,6 +15,7 @@ class AddChildUseCase {
     required DateTime birthDate,
     required String gender,
     String? avatarUrl,
+    String? avatarFilePath,
   }) {
     return _repository.addChild(
       firstName: firstName,
@@ -22,6 +23,7 @@ class AddChildUseCase {
       birthDate: birthDate,
       gender: gender,
       avatarUrl: avatarUrl,
+      avatarFilePath: avatarFilePath,
     );
   }
 }

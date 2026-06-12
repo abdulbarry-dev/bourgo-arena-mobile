@@ -21,6 +21,7 @@ class ChildCompletedScreen extends StatefulWidget {
 
 class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
   late final ChildCompletedViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -29,12 +30,23 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
       getChildCompletedItemsUseCase: locator<GetChildCompletedItemsUseCase>(),
     );
     _viewModel.load(widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   @override
@@ -56,10 +68,17 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
                   child: _viewModel.items.isEmpty
                       ? _buildEmptyState(theme, spacing)
                       : ListView.builder(
+                          controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(spacing.lg),
-                          itemCount: _viewModel.items.length,
+                          itemCount: _viewModel.items.length + (_viewModel.isLoadingMore ? 1 : 0),
                           itemBuilder: (context, index) {
+                            if (index == _viewModel.items.length) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
                             final item = _viewModel.items[index];
                             return Padding(
                               padding: EdgeInsets.only(bottom: spacing.md),

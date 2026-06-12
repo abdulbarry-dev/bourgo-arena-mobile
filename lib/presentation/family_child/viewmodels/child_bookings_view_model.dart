@@ -11,7 +11,10 @@ class ChildBookingsViewModel extends BaseViewModel {
 
   List<ChildBooking> _bookings = [];
   bool _isLoading = false;
+  bool _isLoadingMore = false;
+  int _currentPage = 1;
   String _filter = 'all';
+  String _childId = '';
   PaginatedResult<ChildBooking>? _pagination;
 
   ChildBookingsViewModel({
@@ -22,6 +25,7 @@ class ChildBookingsViewModel extends BaseViewModel {
 
   List<ChildBooking> get bookings => _bookings;
   bool get isLoading => _isLoading;
+  bool get isLoadingMore => _isLoadingMore;
   String get filter => _filter;
   bool get hasMore => _pagination?.hasMore ?? false;
 
@@ -29,8 +33,11 @@ class ChildBookingsViewModel extends BaseViewModel {
     required String childId,
     String filter = 'all',
   }) async {
+    _childId = childId;
     _filter = filter;
     _isLoading = true;
+    _currentPage = 1;
+    _bookings = [];
     notifyListeners();
 
     try {
@@ -42,6 +49,7 @@ class ChildBookingsViewModel extends BaseViewModel {
         success: (paginated) {
           _bookings = paginated.data;
           _pagination = paginated;
+          _currentPage = paginated.currentPage;
           clearError();
         },
         failure: (failure) {
@@ -54,6 +62,35 @@ class ChildBookingsViewModel extends BaseViewModel {
       developer.log('Error loading child bookings: $e');
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (_isLoadingMore || !hasMore) return;
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      final result = await _getChildBookingsUseCase(
+        childId: _childId,
+        filter: _filter,
+        page: _currentPage + 1,
+      );
+      result.when(
+        success: (paginated) {
+          _bookings.addAll(paginated.data);
+          _pagination = paginated;
+          _currentPage = paginated.currentPage;
+        },
+        failure: (failure) {
+          developer.log('Failed to load more bookings: ${failure.message}');
+        },
+      );
+    } catch (e) {
+      developer.log('Error loading more bookings: $e');
+    } finally {
+      _isLoadingMore = false;
       notifyListeners();
     }
   }

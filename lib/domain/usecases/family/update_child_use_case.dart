@@ -16,6 +16,7 @@ class UpdateChildUseCase {
     required DateTime birthDate,
     required String gender,
     String? avatarUrl,
+    String? avatarFilePath,
   }) {
     return _repository.updateChild(
       id: id,
@@ -24,6 +25,7 @@ class UpdateChildUseCase {
       birthDate: birthDate,
       gender: gender,
       avatarUrl: avatarUrl,
+      avatarFilePath: avatarFilePath,
     );
   }
 }

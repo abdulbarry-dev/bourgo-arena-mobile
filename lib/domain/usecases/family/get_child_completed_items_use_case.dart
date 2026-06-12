@@ -11,10 +11,12 @@ class GetChildCompletedItemsUseCase {
 
   Future<Result<PaginatedResult<CompletedItem>, Failure>> call({
     required String childId,
+    int page = 1,
     int perPage = 15,
   }) {
     return _repository.getChildCompletedItems(
       childId: childId,
+      page: page,
       perPage: perPage,
     );
   }

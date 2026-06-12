@@ -3,8 +3,10 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/data/repositories/api_plan_repository.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/buy_child_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/child_selector_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -13,8 +15,9 @@ import 'package:material_symbols_icons/symbols.dart';
 class PlanDetailScreen extends StatefulWidget {
   final String planId;
   final Plan? plan;
+  final String? childId;
 
-  const PlanDetailScreen({super.key, required this.planId, this.plan});
+  const PlanDetailScreen({super.key, required this.planId, this.plan, this.childId});
 
   @override
   State<PlanDetailScreen> createState() => _PlanDetailScreenState();
@@ -26,10 +29,12 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   String? _errorMessage;
   bool _isSubscribing = false;
   int _currentImageIndex = 0;
+  String? _selectedChildId;
 
   @override
   void initState() {
     super.initState();
+    _selectedChildId = widget.childId;
     if (widget.plan != null) {
       _plan = widget.plan;
       _isLoading = false;
@@ -59,10 +64,40 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
 
   Future<void> _subscribe() async {
     if (_plan == null || _isSubscribing) return;
-    final subscribeUseCase = locator<SubscribeToPlanUseCase>();
 
     setState(() => _isSubscribing = true);
 
+    if (_selectedChildId != null) {
+      final buyChildUseCase = locator<BuyChildSubscriptionUseCase>();
+      final result = await buyChildUseCase(
+        childId: _selectedChildId!,
+        planId: _plan!.id,
+      );
+
+      if (!mounted) return;
+
+      result.when(
+        success: (subscription) {
+          setState(() => _isSubscribing = false);
+          context.push(
+            '/payment-selection',
+            extra: {'plan': _plan, 'subscription': subscription, 'childId': _selectedChildId},
+          );
+        },
+        failure: (failure) {
+          setState(() => _isSubscribing = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(failure.message),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        },
+      );
+      return;
+    }
+
+    final subscribeUseCase = locator<SubscribeToPlanUseCase>();
     final result = await subscribeUseCase(_plan!.id);
 
     if (!mounted) return;
@@ -240,6 +275,8 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                               curve: Curves.easeOutQuad,
                             ),
                       const SizedBox(height: 40),
+                      _buildForWhom(theme, appColors),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -400,6 +437,67 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     );
   }
 
+  Widget _buildForWhom(ThemeData theme, AppColors appColors) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: appColors.bgElevated,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: appColors.bgBorder),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () async {
+          final childId = await showChildSelectorSheet(context);
+          if (childId != _selectedChildId) {
+            setState(() => _selectedChildId = childId);
+          }
+        },
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+              child: Icon(
+                _selectedChildId == null ? Symbols.person : Symbols.child_care,
+                size: 20,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'SUBSCRIBE FOR',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    _selectedChildId == null ? 'Myself' : 'Child',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Symbols.chevron_right,
+              color: theme.colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCTA(ThemeData theme) {
     return ElevatedButton(
       onPressed: _isSubscribing ? null : _subscribe,
@@ -413,12 +511,12 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
         ),
       ),
       child: _isSubscribing
-          ? const SizedBox(
+          ? SizedBox(
               height: 22,
               width: 22,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: Colors.black,
+                color: theme.colorScheme.onPrimary,
               ),
             )
           : Text(

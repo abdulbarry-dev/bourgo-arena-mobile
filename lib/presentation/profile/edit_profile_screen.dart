@@ -804,7 +804,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 width: 20,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: theme.colorScheme.surface,
+                  color: theme.colorScheme.onPrimary,
                 ),
               )
             : Text(
@@ -1083,9 +1083,9 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
                             } else {
                               setState(() => _isVerifying = false);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text("Verification failed"),
-                                  backgroundColor: Colors.red,
+                                  backgroundColor: theme.colorScheme.error,
                                 ),
                               );
                             }
@@ -1098,12 +1098,12 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
                       ),
                     ),
                     child: _isVerifying
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: theme.colorScheme.onPrimary,
                             ),
                           )
                         : const Text(
@@ -1345,10 +1345,10 @@ class _AvatarSectionState extends State<_AvatarSection>
                         ),
                       ],
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Symbols.edit,
                       size: 18,
-                      color: Colors.white,
+                      color: theme.colorScheme.onPrimary,
                     ),
                   ),
                 ),

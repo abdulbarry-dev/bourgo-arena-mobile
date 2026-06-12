@@ -76,6 +76,7 @@ class MatchModel {
 /// DTO for an event/tournament matching EventResource.
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EventModel {
+  @JsonKey(fromJson: _idToString)
   final String id;
   final String? name;
   final String? description;
@@ -114,12 +115,15 @@ class EventModel {
       _$EventModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$EventModelToJson(this);
+
+  static String _idToString(dynamic id) => id.toString();
 }
 
 /// DTO for a registered event participant (from GET /user/events).
 @JsonSerializable(fieldRename: FieldRename.snake)
 class EventParticipantModel {
   final int id;
+  @JsonKey(fromJson: _idToString)
   final String eventId;
   final ParticipantUserModel? user;
   final int? seedNumber;
@@ -143,4 +147,6 @@ class EventParticipantModel {
       _$EventParticipantModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$EventParticipantModelToJson(this);
+
+  static String _idToString(dynamic id) => id.toString();
 }

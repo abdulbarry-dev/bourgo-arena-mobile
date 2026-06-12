@@ -438,12 +438,12 @@ class _EventCard extends StatelessWidget {
                           ),
                         ),
                         child: isRegistering
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 18,
                                 height: 18,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.black,
+                                  color: theme.colorScheme.onPrimary,
                                 ),
                               )
                             : Text('REGISTER'.toUpperCase()),

@@ -313,8 +313,8 @@ class _ScheduleItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isActivity = item.type == ScheduleItemType.activity;
-    final color = isActivity ? const Color(0xFF8B5CF6) : theme.colorScheme.primary;
+    final isReservation = item.type == ScheduleItemType.reservation;
+    final color = isReservation ? appColors.accentActivity : theme.colorScheme.primary;
 
     return Container(
       padding: EdgeInsets.all(spacing.lg),
@@ -378,7 +378,10 @@ class _ScheduleItemCard extends StatelessWidget {
                   children: [
                     Icon(Symbols.schedule, size: 14, color: theme.colorScheme.onSurfaceVariant),
                     SizedBox(width: spacing.xxs),
-                    Text('${item.startTime} · ${item.durationMinutes} min',
+                    Text(
+                      item.endTime != null
+                          ? '${item.startTime} - ${item.endTime}'
+                          : '${item.startTime} · ${item.durationMinutes} min',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       )),

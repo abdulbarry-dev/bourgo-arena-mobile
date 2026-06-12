@@ -11,8 +11,13 @@ class GetChildSubscriptionsUseCase {
 
   Future<Result<PaginatedResult<Subscription>, Failure>> call({
     required String childId,
+    int page = 1,
     int perPage = 15,
   }) {
-    return _repository.getChildSubscriptions(childId: childId, perPage: perPage);
+    return _repository.getChildSubscriptions(
+      childId: childId,
+      page: page,
+      perPage: perPage,
+    );
   }
 }

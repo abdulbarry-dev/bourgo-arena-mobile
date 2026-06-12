@@ -213,7 +213,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: theme.colorScheme.surface,
+                              color: theme.colorScheme.onPrimary,
                             ),
                           )
                         : Text(

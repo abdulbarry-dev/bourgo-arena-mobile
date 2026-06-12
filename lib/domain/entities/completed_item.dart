@@ -1,4 +1,4 @@
-enum CompletedItemType { course, activity }
+enum CompletedItemType { booking, reservation, activity }
 
 class CompletedItem {
   final CompletedItemType type;
@@ -6,6 +6,7 @@ class CompletedItem {
   final String id;
   final String date;
   final String name;
+  final String? status;
   final String completedAt;
 
   const CompletedItem({
@@ -14,6 +15,7 @@ class CompletedItem {
     required this.id,
     required this.date,
     required this.name,
+    this.status,
     required this.completedAt,
   });
 

@@ -15,7 +15,7 @@ class EnableFamilyFeatureUseCase {
   /// Executes the use case to enable the family feature.
   ///
   /// Returns a [Result] indicating success or failure of the operation.
-  Future<Result<void, Failure>> call() async {
+  Future<Result<bool, Failure>> call() async {
     return _familyRepository.enableFamilyFeature();
   }
 }

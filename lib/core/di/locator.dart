@@ -48,13 +48,10 @@ import 'package:bourgo_arena_mobile/data/repositories/api_service_repository.dar
 import 'package:bourgo_arena_mobile/domain/repositories/service_repository.dart';
 // NFC-related imports removed — NFC functionality has been excised.
 import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/add_family_member_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/update_family_member_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/family/remove_family_member_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/disable_family_feature_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/enable_family_feature_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_profile_use_case.dart';
@@ -281,9 +278,6 @@ Future<void> initLocator() async {
   locator.registerLazySingleton(() => AddChildUseCase(locator()));
   locator.registerLazySingleton(() => UpdateChildUseCase(locator()));
   locator.registerLazySingleton(() => RemoveChildUseCase(locator()));
-  locator.registerLazySingleton(() => AddFamilyMemberUseCase(locator()));
-  locator.registerLazySingleton(() => UpdateFamilyMemberUseCase(locator()));
-  locator.registerLazySingleton(() => RemoveFamilyMemberUseCase(locator()));
   locator.registerLazySingleton(() => DisableFamilyFeatureUseCase(locator()));
   locator.registerLazySingleton(() => EnableFamilyFeatureUseCase(locator()));
   locator.registerLazySingleton(() => GetChildProfileUseCase(locator()));

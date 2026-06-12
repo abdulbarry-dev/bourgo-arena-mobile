@@ -23,6 +23,7 @@ class ChildSessionsScreen extends StatefulWidget {
 
 class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
   late final ChildSessionsViewModel _viewModel;
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -32,12 +33,23 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
       bookChildSessionUseCase: locator<BookChildSessionUseCase>(),
     );
     _viewModel.load(widget.childId);
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      _viewModel.loadMore();
+    }
   }
 
   void _bookSession(CourseSession session) {
@@ -65,7 +77,7 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                   Text('Spots: ${session.remainingSpots}/${session.capacity}'),
                   if (session.isFull) ...[
                     const SizedBox(height: 8),
-                    const Text('Session is full', style: TextStyle(color: Colors.red)),
+                    Text('Session is full', style: TextStyle(color: Theme.of(context).colorScheme.error)),
                   ],
                   const SizedBox(height: 16),
                   if (!session.isFull)
@@ -164,10 +176,17 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                   child: _viewModel.sessions.isEmpty
                       ? _buildEmptyState(theme, spacing)
                       : ListView.builder(
+                          controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(spacing.lg),
-                          itemCount: _viewModel.sessions.length,
+                          itemCount: _viewModel.sessions.length + (_viewModel.isLoadingMore ? 1 : 0),
                           itemBuilder: (context, index) {
+                            if (index == _viewModel.sessions.length) {
+                              return const Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
                             final session = _viewModel.sessions[index];
                             return Padding(
                               padding: EdgeInsets.only(bottom: spacing.md),

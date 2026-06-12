@@ -1014,14 +1014,14 @@ class _ServiceCard extends StatelessWidget {
                         if (service.coursesCount > 0)
                           _ServiceStat(
                             label: '${service.coursesCount}c',
-                            color: Colors.orange.shade400,
+                            color: appColors.accentCourse,
                           ),
                         if (service.coursesCount > 0 && service.eventsCount > 0)
                           const SizedBox(width: 4),
                         if (service.eventsCount > 0)
                           _ServiceStat(
                             label: '${service.eventsCount}e',
-                            color: Colors.purple.shade400,
+                            color: appColors.accentEvent,
                           ),
                         if (service.eventsCount > 0 &&
                             service.activitiesCount > 0)
@@ -1029,7 +1029,7 @@ class _ServiceCard extends StatelessWidget {
                         if (service.activitiesCount > 0)
                           _ServiceStat(
                             label: '${service.activitiesCount}a',
-                            color: Colors.teal.shade400,
+                            color: appColors.accentService,
                           ),
                       ],
                     ),
