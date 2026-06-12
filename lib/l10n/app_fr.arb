@@ -146,7 +146,6 @@
   "bookingSuccess": "RÉSERVATION RÉUSSIE !",
   "bookingConfirmed": "RÉSERVATION CONFIRMÉE !",
   "bookingReturnHome": "RETOUR À L'ACCUEIL",
-  "bookingViewTicket": "VOIR LE TICKET",
   "bookingNoSlots": "Aucun créneau disponible pour cette date.",
   "bookingPay": "PAYER",
   "bookingStepMember": "MEMBRE",

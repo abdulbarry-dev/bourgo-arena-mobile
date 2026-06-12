@@ -81,7 +81,11 @@ class ReservationCard extends StatelessWidget {
           SizedBox(height: spacing.sm),
           Row(
             children: [
-              Icon(Symbols.receipt, size: 14, color: theme.colorScheme.primary),
+              Icon(
+                Symbols.payments,
+                size: 14,
+                color: theme.colorScheme.primary,
+              ),
               SizedBox(width: spacing.xs),
               Text(
                 '${reservation.price.toStringAsFixed(3)} TND',

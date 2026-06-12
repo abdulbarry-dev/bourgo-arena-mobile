@@ -145,7 +145,6 @@
   "bookingSuccess": "RESERVATION SUCCESSFUL!",
   "bookingConfirmed": "RESERVATION CONFIRMED!",
   "bookingReturnHome": "RETURN TO HOME",
-  "bookingViewTicket": "VIEW TICKET",
   "bookingNoSlots": "No slots available for this date.",
   "bookingPay": "PAY",
   "bookingStepMember": "MEMBER",

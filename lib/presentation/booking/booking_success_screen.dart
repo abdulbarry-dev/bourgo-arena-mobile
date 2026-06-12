@@ -83,18 +83,6 @@ class BookingSuccessScreen extends StatelessWidget {
                 ),
                 child: Text(AppLocalizations.of(context)!.bookingReturnHome),
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {}, // Navigate to reservation details
-                child: Text(
-                  AppLocalizations.of(context)!.bookingViewTicket,
-                  style: TextStyle(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1,
-                  ),
-                ),
-              ),
               const SizedBox(height: 24),
             ],
           ),

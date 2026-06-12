@@ -581,9 +581,7 @@ class _PaymentSection extends StatelessWidget {
     final theme = Theme.of(context);
     final spacing = context.spacing;
 
-    if (subscription.amountPaid == null &&
-        subscription.paymentMethod == null &&
-        subscription.receiptUrl == null) {
+    if (subscription.amountPaid == null && subscription.paymentMethod == null) {
       return const SizedBox.shrink();
     }
 
