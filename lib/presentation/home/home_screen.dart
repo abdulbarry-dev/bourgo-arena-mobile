@@ -243,10 +243,7 @@ class _ServicesHeroContent extends StatelessWidget {
     final theme = Theme.of(context);
 
     if (isLoading) {
-      return const SizedBox(
-        height: 180,
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return _ServicesSkeletonRow();
     }
     if (error != null) {
       return SizedBox(
@@ -769,8 +766,8 @@ class _SkeletonRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final baseColor = theme.colorScheme.onSurface.withValues(alpha: 0.05);
-    final highlightColor = theme.colorScheme.onSurface.withValues(alpha: 0.1);
+    final baseColor = theme.colorScheme.onSurface.withValues(alpha: 0.06);
+    final highlightColor = theme.colorScheme.onSurface.withValues(alpha: 0.13);
 
     return SizedBox(
       height: 200,
@@ -783,11 +780,129 @@ class _SkeletonRow extends StatelessWidget {
           itemCount: 3,
           itemBuilder: (context, index) => Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: Container(
+            child: SizedBox(
               width: cardWidth,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                  ),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Image area — mirrors flex:3 of _CourseCard
+                    const Expanded(
+                      flex: 3,
+                      child: ColoredBox(color: Colors.white),
+                    ),
+                    // Content area — mirrors flex:2 of _CourseCard
+                    Expanded(
+                      flex: 2,
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 13,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Container(
+                              height: 11,
+                              width: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ServicesSkeletonRow extends StatelessWidget {
+  const _ServicesSkeletonRow();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final baseColor = theme.colorScheme.onSurface.withValues(alpha: 0.06);
+    final highlightColor = theme.colorScheme.onSurface.withValues(alpha: 0.13);
+
+    return SizedBox(
+      height: 180,
+      child: Shimmer.fromColors(
+        baseColor: baseColor,
+        highlightColor: highlightColor,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          itemCount: 3,
+          itemBuilder: (context, index) => Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Container(
+              width: 140,
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Expanded(
+                    flex: 5,
+                    child: ColoredBox(color: Colors.white),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 12,
+                            width: 90,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Container(
+                            height: 10,
+                            width: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
