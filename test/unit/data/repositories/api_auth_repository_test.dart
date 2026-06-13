@@ -887,7 +887,7 @@ void main() {
     group('updatePassword', () {
       test('returns Success on 200', () async {
         when(
-          () => apiClient.put('/member/password', any()),
+          () => apiClient.put('/user/password', any()),
         ).thenAnswer((_) async => null);
 
         final result = await repository.updatePassword(
@@ -897,7 +897,7 @@ void main() {
 
         expect(result, isA<Success<void, Failure>>());
         verify(
-          () => apiClient.put('/member/password', {
+          () => apiClient.put('/user/password', {
             'current_password': 'old-pass',
             'new_password': 'new-pass',
             'new_password_confirmation': 'new-pass',
@@ -907,7 +907,7 @@ void main() {
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.put('/member/password', any()),
+          () => apiClient.put('/user/password', any()),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.updatePassword(
@@ -924,7 +924,7 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.put('/member/password', any()),
+          () => apiClient.put('/user/password', any()),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.updatePassword(
@@ -941,7 +941,7 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.put('/member/password', any()),
+          () => apiClient.put('/user/password', any()),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.updatePassword(
@@ -959,7 +959,7 @@ void main() {
 
     group('deleteAccount', () {
       test(
-        'sends the resolved identifier and preserves deletion cancellation state',
+        'sends the resolved identifier and clears the session',
         () async {
           const identifier = 'alex@example.com';
           final userJson = testUserJson(email: identifier);
@@ -969,15 +969,13 @@ void main() {
           ).thenAnswer((_) async => userJson);
           when(
             () => apiClient.post('/auth/delete-account', any()),
-          ).thenAnswer((_) async => {'state': 'pending_deletion_cancellation'});
+          ).thenAnswer((_) async => {});
 
           final eventExpectation = expectLater(
             repository.onAuthStateChanged,
             emits(
               predicate<AuthSession>(
-                (value) =>
-                    value.state == AuthState.pendingDeletionCancellation &&
-                    value.pendingEmail == identifier,
+                (value) => value.state == AuthState.unauthenticated,
               ),
             ),
           );
@@ -995,11 +993,7 @@ void main() {
             }),
           ).called(1);
           verify(
-            () => sessionRepository.savePendingVerificationEmail(identifier),
-          ).called(1);
-          verify(
-            () =>
-                sessionRepository.saveAuthState('pendingDeletionCancellation'),
+            () => sessionRepository.clearSession(),
           ).called(1);
           await eventExpectation;
         },
@@ -1162,7 +1156,7 @@ void main() {
         };
 
         when(
-          () => apiClient.post('/member/verify-email', {
+          () => apiClient.post('/user/verify-email', {
             'email': 'alex@example.com',
             'otp': '123456',
           }),
@@ -1188,7 +1182,7 @@ void main() {
         expect(result, isA<Success<bool, Failure>>());
         expect((result as Success<bool, Failure>).data, isTrue);
         verify(
-          () => apiClient.post('/member/verify-email', {
+          () => apiClient.post('/user/verify-email', {
             'email': 'alex@example.com',
             'otp': '123456',
           }),
@@ -1199,7 +1193,7 @@ void main() {
 
       test('returns failure on invalid OTP', () async {
         when(
-          () => apiClient.post('/member/verify-email', any()),
+          () => apiClient.post('/user/verify-email', any()),
         ).thenThrow(const ServerException('Invalid OTP'));
 
         final result = await repository.verifyEmail(
@@ -1216,7 +1210,7 @@ void main() {
 
       test('handles network error', () async {
         when(
-          () => apiClient.post('/member/verify-email', any()),
+          () => apiClient.post('/user/verify-email', any()),
         ).thenThrow(const NetworkException('Connection timeout'));
 
         final result = await repository.verifyEmail(
@@ -1240,7 +1234,7 @@ void main() {
         };
 
         when(
-          () => apiClient.post('/member/verify-email', any()),
+          () => apiClient.post('/user/verify-email', any()),
         ).thenAnswer((_) async => responseData);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -1267,7 +1261,7 @@ void main() {
       test('saves auth token on successful verification', () async {
         const token = 'new-token-456';
 
-        when(() => apiClient.post('/member/verify-email', any())).thenAnswer(
+        when(() => apiClient.post('/user/verify-email', any())).thenAnswer(
           (_) async => {
             'valid': true,
             'token': token,
@@ -1290,7 +1284,7 @@ void main() {
         final responseData = {'valid': true, 'token': token, 'state': 'active'};
 
         when(
-          () => apiClient.post('/member/verify-phone', {
+          () => apiClient.post('/user/verify-phone', {
             'phone': '+15550000000',
             'otp': '123456',
           }),
@@ -1316,7 +1310,7 @@ void main() {
         expect(result, isA<Success<bool, Failure>>());
         expect((result as Success<bool, Failure>).data, isTrue);
         verify(
-          () => apiClient.post('/member/verify-phone', {
+          () => apiClient.post('/user/verify-phone', {
             'phone': '+15550000000',
             'otp': '123456',
           }),
@@ -1326,7 +1320,7 @@ void main() {
 
       test('returns failure on invalid OTP', () async {
         when(
-          () => apiClient.post('/member/verify-phone', any()),
+          () => apiClient.post('/user/verify-phone', any()),
         ).thenThrow(const ServerException('Invalid OTP'));
 
         final result = await repository.verifyPhone('+15550000000', '999999');
@@ -1340,7 +1334,7 @@ void main() {
 
       test('handles network error', () async {
         when(
-          () => apiClient.post('/member/verify-phone', any()),
+          () => apiClient.post('/user/verify-phone', any()),
         ).thenThrow(const NetworkException('Connection timeout'));
 
         final result = await repository.verifyPhone('+15550000000', '123456');
@@ -1361,7 +1355,7 @@ void main() {
         };
 
         when(
-          () => apiClient.post('/member/verify-phone', any()),
+          () => apiClient.post('/user/verify-phone', any()),
         ).thenAnswer((_) async => responseData);
         when(
           () => sessionRepository.saveAuthToken(token),
@@ -1385,7 +1379,7 @@ void main() {
       test('saves auth token on successful verification', () async {
         const token = 'phone-token-789';
 
-        when(() => apiClient.post('/member/verify-phone', any())).thenAnswer(
+        when(() => apiClient.post('/user/verify-phone', any())).thenAnswer(
           (_) async => {'valid': true, 'token': token, 'state': 'active'},
         );
         when(
@@ -1405,7 +1399,7 @@ void main() {
 
         for (final phone in phoneNumbers) {
           when(
-            () => apiClient.post('/member/verify-phone', {
+            () => apiClient.post('/user/verify-phone', {
               'phone': phone,
               'otp': '123456',
             }),

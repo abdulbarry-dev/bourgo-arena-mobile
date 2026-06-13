@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
+import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_selection_view_model.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
@@ -23,8 +24,14 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 class PaymentSelectionScreen extends StatefulWidget {
   final Plan plan;
   final String? childId;
+  final Subscription? subscription;
 
-  const PaymentSelectionScreen({super.key, required this.plan, this.childId});
+  const PaymentSelectionScreen({
+    super.key,
+    required this.plan,
+    this.childId,
+    this.subscription,
+  });
 
   @override
   State<PaymentSelectionScreen> createState() => _PaymentSelectionScreenState();
@@ -82,6 +89,7 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       provider: provider,
       description: 'Subscription to ${widget.plan.name}',
       childId: widget.childId,
+      subscription: widget.subscription,
     );
 
     if (_viewModel.state == PaymentSelectionState.loyaltySuccess) {

@@ -7,13 +7,11 @@ import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/bracket.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/event_repository.dart';
-import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 
 class ApiEventRepository implements EventRepository {
   final ApiClient _apiClient;
-  final UserRepository _userRepository;
 
-  ApiEventRepository(this._apiClient, this._userRepository);
+  ApiEventRepository(this._apiClient);
 
   @override
   Future<Result<List<Event>, Failure>> getEvents({
@@ -104,11 +102,6 @@ class ApiEventRepository implements EventRepository {
           ? response
           : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
                 []);
-      final userResult = await _userRepository.getUserProfile();
-      final currentUserId = userResult.fold(
-        onSuccess: (user) => user.id,
-        onFailure: (_) => null,
-      );
 
       final entities = data
           .map(
@@ -116,10 +109,6 @@ class ApiEventRepository implements EventRepository {
               EventParticipantModel.fromJson(json as Map<String, dynamic>),
             ),
           )
-          .where((p) {
-            if (currentUserId == null) return false;
-            return p.user?.id.toString() == currentUserId.toString();
-          })
           .toList();
 
       return Result.success(entities);

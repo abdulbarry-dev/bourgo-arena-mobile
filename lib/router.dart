@@ -464,6 +464,7 @@ GoRouter createRouter(
           PaymentSelectionScreen(
             plan: extra['plan'] as Plan,
             childId: extra['childId'] as String?,
+            subscription: extra['subscription'] as Subscription?,
           ),
         );
       },

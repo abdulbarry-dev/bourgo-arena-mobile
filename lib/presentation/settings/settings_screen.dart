@@ -387,7 +387,6 @@ class SettingsScreen extends StatelessWidget {
         }
         final success = await viewModel.deleteAccount(password: pwd);
         if (success && dialogContext.mounted) {
-          context.go('/login');
           return true;
         }
         return false;

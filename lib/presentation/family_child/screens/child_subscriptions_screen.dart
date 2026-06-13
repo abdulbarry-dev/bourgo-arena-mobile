@@ -102,7 +102,9 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                                   child: ElevatedButton.icon(
                                     onPressed: () {
                                       AppHaptics.light();
-                                      context.push('/plans');
+                                      context.push(
+                                        '/plans?childId=${widget.childId}',
+                                      );
                                     },
                                     icon: const Icon(Symbols.add, size: 20),
                                     label: Text(
@@ -200,7 +202,9 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                               child: ElevatedButton.icon(
                                 onPressed: () {
                                   AppHaptics.light();
-                                  context.push('/plans');
+                                  context.push(
+                                    '/plans?childId=${widget.childId}',
+                                  );
                                 },
                                 icon: const Icon(Symbols.add, size: 20),
                                 label: Text(

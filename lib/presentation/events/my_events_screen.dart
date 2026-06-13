@@ -287,6 +287,16 @@ class _EventParticipantCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
+                if (participant.user?.name != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    'For: ${participant.user!.name}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 6),
                 Row(
                   children: [

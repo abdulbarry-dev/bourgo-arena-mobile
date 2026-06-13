@@ -453,46 +453,20 @@ class ApiAuthRepository implements AuthRepository {
         );
       }
 
-      final rawResponse = await _apiClient.post('/auth/delete-account', {
+      await _apiClient.post('/auth/delete-account', {
         'identifier': identifier,
         'password': password,
       });
 
-      final response = rawResponse is Map<String, dynamic>
-          ? rawResponse
-          : <String, dynamic>{};
-
-      Map<String, dynamic> payload = response;
-      if (response['data'] is Map<String, dynamic>) {
-        payload = response['data'] as Map<String, dynamic>;
+      // Clear session (same as logout)
+      _apiClient.setToken(null);
+      final deviceToken = _deviceIdentityStorage.getRegistrationToken();
+      if (deviceToken != null) {
+        _apiClient.setDeviceToken(deviceToken);
       }
-
-      final stateStr =
-          payload['state'] as String? ?? response['state'] as String?;
-      final token = payload['token'] as String? ?? response['token'] as String?;
-
-      if (stateStr != null) {
-        final state = _mapBackendState(stateStr);
-
-        User? user;
-        final userData =
-            payload['user'] ?? response['user'] ?? response['member'];
-        if (userData is Map<String, dynamic>) {
-          final userModel = UserProfileModel.fromJson(userData);
-          user = UserMapper.toEntity(userModel);
-        }
-
-        await _sessionRepository.savePendingVerificationEmail(identifier);
-        await _updateSession(
-          AuthSession(
-            user: user ?? _currentSession?.user,
-            state: state,
-            token: token ?? _currentSession?.token,
-            pendingEmail: identifier,
-            verificationData: _currentSession?.verificationData,
-          ),
-        );
-      }
+      await _sessionRepository.clearSession();
+      _currentSession = null;
+      _authStateController.add(AuthSession.unauthenticated());
 
       return const Success(null);
     });

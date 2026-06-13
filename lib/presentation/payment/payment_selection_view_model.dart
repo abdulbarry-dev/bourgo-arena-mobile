@@ -55,35 +55,42 @@ class PaymentSelectionViewModel extends ChangeNotifier {
     required String provider,
     String? description,
     String? childId,
+    Subscription? subscription,
   }) async {
     if (_isProcessing) return;
     _isProcessing = true;
 
-    _state = PaymentSelectionState.subscribing;
     _errorMessage = null;
-    notifyListeners();
 
-    final subResult = await _subscribeToPlanUseCase(planId, childId: childId);
+    if (subscription != null) {
+      _subscriptionId = int.tryParse(subscription.id);
+    } else {
+      _state = PaymentSelectionState.subscribing;
+      notifyListeners();
 
-    final subscription = subResult.fold<Subscription?>(
-      onSuccess: (sub) => sub,
-      onFailure: (failure) {
-        if (_isChildOnlyPlanError(failure)) {
-          _errorMessage =
-              'This plan is for children only. Please go back and select a child.';
-        } else {
-          _errorMessage = failure.message;
-        }
-        _state = PaymentSelectionState.failed;
-        _isProcessing = false;
-        notifyListeners();
-        return null;
-      },
-    );
+      final subResult = await _subscribeToPlanUseCase(planId, childId: childId);
 
-    if (subscription == null) return;
+      final sub = subResult.fold<Subscription?>(
+        onSuccess: (sub) => sub,
+        onFailure: (failure) {
+          if (_isChildOnlyPlanError(failure)) {
+            _errorMessage =
+                'This plan is for children only. '
+                'Please go back and select a child.';
+          } else {
+            _errorMessage = failure.message;
+          }
+          _state = PaymentSelectionState.failed;
+          _isProcessing = false;
+          notifyListeners();
+          return null;
+        },
+      );
 
-    _subscriptionId = int.tryParse(subscription.id);
+      if (sub == null) return;
+      _subscriptionId = int.tryParse(sub.id);
+    }
+
     if (provider == 'loyalty') {
       await _payWithLoyalty(amount: amount, description: description);
     } else {

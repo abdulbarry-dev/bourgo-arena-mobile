@@ -45,6 +45,7 @@ class _BrowseScreenState extends State<BrowseScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() => setState(() {}));
     _loadAll();
   }
 
@@ -156,10 +157,8 @@ class _BrowseScreenState extends State<BrowseScreen>
         duration: const Duration(milliseconds: 300),
         switchInCurve: Curves.easeOutCubic,
         switchOutCurve: Curves.easeInCubic,
-        transitionBuilder: (child, animation) => FadeTransition(
-          opacity: animation,
-          child: child,
-        ),
+        transitionBuilder: (child, animation) =>
+            FadeTransition(opacity: animation, child: child),
         child: KeyedSubtree(
           key: ValueKey(_tabController.index),
           child: [
@@ -258,12 +257,14 @@ class _CoursesTabState extends State<_CoursesTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(child: _buildSearchBar(
-              context: context,
-              controller: _searchController,
-              hintText: 'Search courses...',
-              onChanged: (v) => setState(() => _searchQuery = v),
-            )),
+            SliverToBoxAdapter(
+              child: _buildSearchBar(
+                context: context,
+                controller: _searchController,
+                hintText: 'Search courses...',
+                onChanged: (v) => setState(() => _searchQuery = v),
+              ),
+            ),
             SliverFillRemaining(child: _buildSearchEmpty(context)),
           ],
         ),
@@ -275,12 +276,14 @@ class _CoursesTabState extends State<_CoursesTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(child: _buildSearchBar(
-            context: context,
-            controller: _searchController,
-            hintText: 'Search courses...',
-            onChanged: (v) => setState(() => _searchQuery = v),
-          )),
+          SliverToBoxAdapter(
+            child: _buildSearchBar(
+              context: context,
+              controller: _searchController,
+              hintText: 'Search courses...',
+              onChanged: (v) => setState(() => _searchQuery = v),
+            ),
+          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -379,12 +382,14 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(child: _buildSearchBar(
-              context: context,
-              controller: _searchController,
-              hintText: 'Search activities...',
-              onChanged: (v) => setState(() => _searchQuery = v),
-            )),
+            SliverToBoxAdapter(
+              child: _buildSearchBar(
+                context: context,
+                controller: _searchController,
+                hintText: 'Search activities...',
+                onChanged: (v) => setState(() => _searchQuery = v),
+              ),
+            ),
             SliverFillRemaining(child: _buildSearchEmpty(context)),
           ],
         ),
@@ -396,12 +401,14 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(child: _buildSearchBar(
-            context: context,
-            controller: _searchController,
-            hintText: 'Search activities...',
-            onChanged: (v) => setState(() => _searchQuery = v),
-          )),
+          SliverToBoxAdapter(
+            child: _buildSearchBar(
+              context: context,
+              controller: _searchController,
+              hintText: 'Search activities...',
+              onChanged: (v) => setState(() => _searchQuery = v),
+            ),
+          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -499,12 +506,14 @@ class _EventsTabState extends State<_EventsTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            SliverToBoxAdapter(child: _buildSearchBar(
-              context: context,
-              controller: _searchController,
-              hintText: 'Search events...',
-              onChanged: (v) => setState(() => _searchQuery = v),
-            )),
+            SliverToBoxAdapter(
+              child: _buildSearchBar(
+                context: context,
+                controller: _searchController,
+                hintText: 'Search events...',
+                onChanged: (v) => setState(() => _searchQuery = v),
+              ),
+            ),
             SliverFillRemaining(child: _buildSearchEmpty(context)),
           ],
         ),
@@ -516,12 +525,14 @@ class _EventsTabState extends State<_EventsTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          SliverToBoxAdapter(child: _buildSearchBar(
-            context: context,
-            controller: _searchController,
-            hintText: 'Search events...',
-            onChanged: (v) => setState(() => _searchQuery = v),
-          )),
+          SliverToBoxAdapter(
+            child: _buildSearchBar(
+              context: context,
+              controller: _searchController,
+              hintText: 'Search events...',
+              onChanged: (v) => setState(() => _searchQuery = v),
+            ),
+          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -565,12 +576,17 @@ Widget _buildSearchBar({
               )
             : null,
         filled: true,
-        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.5,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
       ),
     ),
   );

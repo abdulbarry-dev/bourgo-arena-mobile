@@ -178,8 +178,11 @@ class ConfirmActionModal {
                                               );
                                               final shouldClose =
                                                   await onConfirm(context);
-                                              setState(() => isConfirming = false);
-                                              if (shouldClose && context.mounted) {
+                                              setState(
+                                                () => isConfirming = false,
+                                              );
+                                              if (shouldClose &&
+                                                  context.mounted) {
                                                 Navigator.pop(context, true);
                                               }
                                             } else {

@@ -223,7 +223,7 @@ Future<void> initLocator() async {
     () => ApiServiceRepository(locator<ApiClient>()),
   );
   locator.registerLazySingleton<EventRepository>(
-    () => ApiEventRepository(locator<ApiClient>(), locator<UserRepository>()),
+    () => ApiEventRepository(locator<ApiClient>()),
   );
   locator.registerLazySingleton<LoyaltyRepository>(
     () => ApiLoyaltyRepository(locator<ApiClient>()),

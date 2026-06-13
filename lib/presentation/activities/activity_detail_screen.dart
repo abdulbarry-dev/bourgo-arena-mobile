@@ -117,8 +117,9 @@ class ActivityDetailScreen extends StatelessWidget {
                                     .withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: theme.colorScheme.outline
-                                      .withValues(alpha: 0.1),
+                                  color: theme.colorScheme.outline.withValues(
+                                    alpha: 0.1,
+                                  ),
                                 ),
                               ),
                               child: Text(

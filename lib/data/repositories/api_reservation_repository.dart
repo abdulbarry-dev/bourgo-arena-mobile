@@ -131,6 +131,9 @@ class ApiReservationRepository implements ReservationRepository {
         'date': reservation.date,
         'amount': reservation.price,
       };
+      if (reservation.memberId != null) {
+        body['member_id'] = reservation.memberId;
+      }
       if (paymentMethod != null) {
         body['payment_method'] = paymentMethod;
       }
