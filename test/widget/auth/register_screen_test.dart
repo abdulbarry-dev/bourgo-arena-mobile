@@ -229,7 +229,7 @@ void main() {
       ).called(1);
 
       expect(find.text('Email already exists'), findsOneWidget);
-      
+
       await tester.pumpAndSettle();
       await tester.pump(const Duration(seconds: 5));
     });

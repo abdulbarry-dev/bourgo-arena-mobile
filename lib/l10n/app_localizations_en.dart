@@ -2374,4 +2374,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get subscriptionCardEndLabel => 'END';
+
+  @override
+  String get offlineTitle => 'No Connection';
+
+  @override
+  String get offlineSubtitle =>
+      'You are currently offline. Please check your internet connection to continue.';
+
+  @override
+  String get offlineRetryButton => 'Try Again';
 }

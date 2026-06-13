@@ -29,10 +29,55 @@ class _CoursesScreenState extends State<CoursesScreen> {
   String? _error;
   String _selectedFilter = 'All';
 
+  final ScrollController _scrollController = ScrollController();
+  int _displayCount = 5;
+  bool _isLoadingMore = false;
+
   @override
   void initState() {
     super.initState();
     _load();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_isLoadingMore) return;
+
+    // Check if we have more items to show
+    List<Course> filtered = _courses;
+    if (_selectedFilter != 'All') {
+      final lowerFilter = _selectedFilter.toLowerCase();
+      filtered = _courses.where((c) {
+        final text = '${c.name} ${c.description}'.toLowerCase();
+        return text.contains(lowerFilter);
+      }).toList();
+    }
+
+    if (_displayCount >= filtered.length) return;
+
+    setState(() => _isLoadingMore = true);
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    if (mounted) {
+      setState(() {
+        _displayCount += 5;
+        _isLoadingMore = false;
+      });
+    }
   }
 
   Future<void> _load() async {
@@ -167,7 +212,12 @@ class _CoursesScreenState extends State<CoursesScreen> {
     return FilterPill(
       label: label,
       isSelected: _selectedFilter == label,
-      onTap: () => setState(() => _selectedFilter = label),
+      onTap: () {
+        setState(() {
+          _selectedFilter = label;
+          _displayCount = 5;
+        });
+      },
       hapticFeedback: true,
     );
   }
@@ -292,13 +342,34 @@ class _CoursesScreenState extends State<CoursesScreen> {
       );
     }
 
+    final itemCount = _displayCount < filteredCourses.length
+        ? _displayCount + 1
+        : filteredCourses.length;
+
     return RefreshIndicator(
-      onRefresh: _load,
+      onRefresh: () async {
+        setState(() => _displayCount = 5);
+        await _load();
+      },
       child: ListView.builder(
+        controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        itemCount: filteredCourses.length,
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 8,
+          bottom: MediaQuery.paddingOf(context).bottom + 24,
+        ),
+        itemCount: itemCount,
         itemBuilder: (context, index) {
+          if (index == _displayCount &&
+              _displayCount < filteredCourses.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 3)),
+            );
+          }
+
           final course = filteredCourses[index];
           return Padding(
                 padding: const EdgeInsets.only(bottom: 12),

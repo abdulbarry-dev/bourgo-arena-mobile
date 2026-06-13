@@ -253,7 +253,7 @@ void main() {
     check(find.text('bad').evaluate()).isNotEmpty();
     verify(() => mockLoginUseCase('alex@example.com', 'wrong')).called(1);
     check(viewModel.isLoading).isFalse();
-    
+
     // wait for toast to finish
     await tester.pumpAndSettle();
     await tester.pump(const Duration(seconds: 5));

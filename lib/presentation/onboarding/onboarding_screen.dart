@@ -1,4 +1,3 @@
-import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -15,8 +14,6 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final spacing = context.spacing;
-
     return Scaffold(
       body: AuthBackground(
         child: SafeArea(
@@ -25,26 +22,26 @@ class OnboardingScreen extends StatelessWidget {
               return SingleChildScrollView(
                 keyboardDismissBehavior:
                     ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: spacing.screenPadding(context),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 560),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SizedBox(height: spacing.xxxl),
+                          const SizedBox(height: 40),
                           const Center(
                             child: BrandLogo(
-                              size: 160,
+                              size: 100,
                               useVertical: true,
                               isPremium: true,
                               heroTag: 'app_logo',
                             ),
                           ),
-                          SizedBox(height: spacing.xxl),
+                          const SizedBox(height: 48),
                           Text(
                             AppLocalizations.of(context)!.tagline.toUpperCase(),
                             textAlign: TextAlign.center,
@@ -54,26 +51,24 @@ class OnboardingScreen extends StatelessWidget {
                               letterSpacing: 4.0,
                             ),
                           ),
-                          SizedBox(height: spacing.md),
+                          const SizedBox(height: 16),
                           Text(
                             AppLocalizations.of(context)!.onboardingTitle,
                             textAlign: TextAlign.center,
-                            style: theme.textTheme.displayMedium?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              height: 1.1,
+                            style: theme.textTheme.displaySmall?.copyWith(
                               color: theme.colorScheme.onSurface,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
-                          SizedBox(height: spacing.lg),
+                          const SizedBox(height: 16),
                           Text(
                             AppLocalizations.of(context)!.onboardingSubtitle,
                             textAlign: TextAlign.center,
-                            style: theme.textTheme.titleMedium?.copyWith(
+                            style: theme.textTheme.bodyLarge?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
-                              height: 1.5,
                             ),
                           ),
-                          SizedBox(height: spacing.xxl),
+                          const SizedBox(height: 48),
                           Column(
                             children: [
                               SizedBox(
@@ -81,31 +76,43 @@ class OnboardingScreen extends StatelessWidget {
                                 child: ElevatedButton(
                                   onPressed: () => context.push('/register'),
                                   style: ElevatedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: spacing.lg,
+                                    backgroundColor: theme.colorScheme.primary,
+                                    foregroundColor:
+                                        theme.colorScheme.onPrimary,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
                                     ),
                                   ),
                                   child: Text(
                                     AppLocalizations.of(context)!.commonStart,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: spacing.md),
+                              const SizedBox(height: 12),
                               SizedBox(
                                 width: double.infinity,
                                 child: OutlinedButton(
                                   onPressed: () => context.push('/login'),
                                   style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: spacing.lg,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    side: BorderSide(
+                                      color: theme.colorScheme.outline,
                                     ),
                                   ),
                                   child: Text(
                                     AppLocalizations.of(context)!.authLogin,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),
-                              SizedBox(height: spacing.md),
+                              const SizedBox(height: 16),
                               TextButton(
                                 onPressed: () async {
                                   await locator<AuthStateNotifier>()
@@ -124,7 +131,12 @@ class OnboardingScreen extends StatelessWidget {
                               ),
                             ],
                           ),
-                          SizedBox(height: spacing.xl),
+                          const SizedBox(height: 48),
+                          // Brand Footer (Official Logo)
+                          const Center(
+                            child: BrandLogo(size: 32, useVertical: true),
+                          ),
+                          const SizedBox(height: 24),
                         ],
                       ),
                     ),

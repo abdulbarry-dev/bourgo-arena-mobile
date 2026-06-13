@@ -348,6 +348,8 @@ GoRouter createRouter(
       builder: (context, state) {
         final verificationData = authStateNotifier.session.verificationData;
         final user = authStateNotifier.session.user;
+        final extra = state.extra as Map<String, dynamic>?;
+
         return VerifyAdditionalMethodScreen(
           unverifiedMethod: verificationData?.unverifiedMethod ?? 'phone',
           email: verificationData?.email ?? user?.email,
@@ -356,6 +358,7 @@ GoRouter createRouter(
           authRepository: locator<AuthRepository>(),
           getVerificationStatusUseCase: locator<GetVerificationStatusUseCase>(),
           authStateNotifier: authStateNotifier,
+          isFromOnboarding: extra?['from_onboarding'] == true,
         );
       },
     ),

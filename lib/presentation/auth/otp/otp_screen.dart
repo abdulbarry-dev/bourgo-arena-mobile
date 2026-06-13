@@ -152,7 +152,10 @@ class _OtpScreenState extends State<OtpScreen> {
 
             if (authState == AuthState.pendingAdditionalVerification ||
                 authState == AuthState.pendingVerification) {
-              context.go('/verify-additional-method');
+              context.go(
+                '/verify-additional-method',
+                extra: const {'from_onboarding': true},
+              );
               return;
             }
 
@@ -174,6 +177,7 @@ class _OtpScreenState extends State<OtpScreen> {
               'unverified_method': unverifiedMethod,
               'email': email,
               'phone': phone,
+              'from_onboarding': true,
             },
           );
         },

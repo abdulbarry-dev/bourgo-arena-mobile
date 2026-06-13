@@ -184,7 +184,7 @@ void main() {
       await tester.pump();
 
       expect(find.text('Invalid code'), findsOneWidget);
-      
+
       await tester.pumpAndSettle();
       await tester.pump(const Duration(seconds: 5));
     });

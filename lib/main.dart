@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/router.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/offline_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -77,6 +78,9 @@ class _BourgoArenaAppState extends State<BourgoArenaApp> {
           routerConfig: _router,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
+          builder: (context, child) {
+            return OfflineWrapper(child: child!);
+          },
         );
       },
     );

@@ -47,8 +47,8 @@ void main() {
     // Wait for any animations and initializations
     await tester.pumpAndSettle();
 
-    // Verify that the onboarding screen displays the brand logo.
-    expect(find.byType(BrandLogo), findsOneWidget);
+    // Verify that the onboarding screen displays the brand logos (header and footer).
+    expect(find.byType(BrandLogo), findsNWidgets(2));
 
     // Verify that the start button is present.
     // In fr locale, commonStart is "COMMENCER"

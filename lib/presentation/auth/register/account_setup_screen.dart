@@ -206,7 +206,10 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
           GoRouter.of(context).go('/home');
         } else if (currentState == AuthState.pendingAdditionalVerification &&
             onboardingCompleted) {
-          GoRouter.of(context).go('/verify-additional-method');
+          GoRouter.of(context).go(
+            '/verify-additional-method',
+            extra: const {'from_onboarding': true},
+          );
         } else if (currentState == AuthState.pendingVerification) {
           GoRouter.of(context).go('/verification-method');
         } else if (currentState == AuthState.pendingOnboarding ||

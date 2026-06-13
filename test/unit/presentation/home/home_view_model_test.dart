@@ -72,7 +72,7 @@ void main() {
     mockGetEvents = _MockGetEventsUseCase();
     mockGetServices = _MockGetServicesUseCase();
     mockAuthStateNotifier = _MockAuthStateNotifier();
-    
+
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
 

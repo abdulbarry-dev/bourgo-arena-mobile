@@ -802,5 +802,8 @@
   "planCardSubscribeButton": "S'abonner",
   "homeCarouselEmpty": "Rien ici pour l'instant",
   "subscriptionCardStartLabel": "DÉBUT",
-  "subscriptionCardEndLabel": "FIN"
+  "subscriptionCardEndLabel": "FIN",
+  "offlineTitle": "Aucune Connexion",
+  "offlineSubtitle": "Vous êtes actuellement hors ligne. Veuillez vérifier votre connexion Internet pour continuer.",
+  "offlineRetryButton": "Réessayer"
 }

@@ -109,8 +109,10 @@ import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/core/utils/device_token_registrar.dart';
 import 'package:get_it/get_it.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
+import 'package:path_provider/path_provider.dart';
 
 final locator = GetIt.instance;
 
@@ -133,11 +135,30 @@ Future<void> initLocator() async {
     () => DeviceIdentityProvider(),
   );
 
+  // Cache store
+  final cacheDir = await getApplicationDocumentsDirectory();
+  final cacheStore = HiveCacheStore(
+    cacheDir.path,
+    hiveBoxName: 'bourgo_api_cache',
+  );
+
+  final cacheOptions = CacheOptions(
+    store: cacheStore,
+    policy: CachePolicy.request,
+    hitCacheOnErrorExcept: [401, 403],
+    maxStale: const Duration(days: 7),
+    priority: CachePriority.normal,
+    cipher: null,
+    keyBuilder: CacheOptions.defaultCacheKeyBuilder,
+    allowPostMethod: false,
+  );
+
   // Networking
   final apiClient = ApiClient(
     baseUrl: AppConfig.baseUrl,
     sharedPreferences: sharedPrefs,
     deviceIdentityStorage: deviceIdentityStorage,
+    cacheOptions: cacheOptions,
   );
 
   // Initialize the token from storage if it exists

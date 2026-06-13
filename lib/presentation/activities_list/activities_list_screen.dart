@@ -26,6 +26,10 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
   late final ActivitiesViewModel _viewModel;
   String _selectedFilter = 'All';
 
+  final ScrollController _scrollController = ScrollController();
+  int _displayCount = 5;
+  bool _isLoadingMore = false;
+
   @override
   void initState() {
     super.initState();
@@ -35,6 +39,46 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
       authStateNotifier: locator<AuthStateNotifier>(),
     );
     _viewModel.loadData();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _loadMore();
+    }
+  }
+
+  Future<void> _loadMore() async {
+    if (_isLoadingMore) return;
+
+    // Check if we have more items to show
+    List<Activity> filtered = _viewModel.activities;
+    if (_selectedFilter == 'Sports') {
+      filtered = _viewModel.sports;
+    } else if (_selectedFilter == 'Well-being') {
+      filtered = _viewModel.wellbeing;
+    }
+
+    if (_displayCount >= filtered.length) return;
+
+    setState(() => _isLoadingMore = true);
+    // Simulate network delay for clean pagination effect
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    if (mounted) {
+      setState(() {
+        _displayCount += 5;
+        _isLoadingMore = false;
+      });
+    }
   }
 
   @override
@@ -96,7 +140,12 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
     return FilterPill(
       label: label,
       isSelected: _selectedFilter == label,
-      onTap: () => setState(() => _selectedFilter = label),
+      onTap: () {
+        setState(() {
+          _selectedFilter = label;
+          _displayCount = 5;
+        });
+      },
       hapticFeedback: true,
     );
   }
@@ -165,13 +214,34 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
       );
     }
 
+    final itemCount = _displayCount < filteredActivities.length
+        ? _displayCount + 1
+        : filteredActivities.length;
+
     return RefreshIndicator(
-      onRefresh: _viewModel.loadData,
+      onRefresh: () async {
+        setState(() => _displayCount = 5);
+        await _viewModel.loadData();
+      },
       child: ListView.builder(
+        controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-        itemCount: filteredActivities.length,
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 8,
+          bottom: MediaQuery.paddingOf(context).bottom + 24,
+        ),
+        itemCount: itemCount,
         itemBuilder: (context, index) {
+          if (index == _displayCount &&
+              _displayCount < filteredActivities.length) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 3)),
+            );
+          }
+
           final activity = filteredActivities[index];
           return Padding(
                 padding: const EdgeInsets.only(bottom: 16),

@@ -54,7 +54,7 @@ void main() {
     locator.registerFactory<GetCoursesUseCase>(() => mockCourses);
     locator.registerFactory<GetServicesUseCase>(() => mockServices);
     locator.registerFactory<GetEventsUseCase>(() => mockEvents);
-    
+
     when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
     locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
   });

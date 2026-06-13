@@ -118,12 +118,12 @@ void main() {
       final context = tester.element(find.byType(Form));
 
       await viewModel.sendCode(context);
-      
+
       await tester.pump();
 
       check(find.text('error').evaluate()).isNotEmpty();
       check(viewModel.isLoading).isFalse();
-      
+
       await tester.pumpAndSettle();
       await tester.pump(const Duration(seconds: 5));
     });

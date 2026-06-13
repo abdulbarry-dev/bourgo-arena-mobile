@@ -4579,6 +4579,24 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'FIN'**
   String get subscriptionCardEndLabel;
+
+  /// No description provided for @offlineTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune Connexion'**
+  String get offlineTitle;
+
+  /// No description provided for @offlineSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous êtes actuellement hors ligne. Veuillez vérifier votre connexion Internet pour continuer.'**
+  String get offlineSubtitle;
+
+  /// No description provided for @offlineRetryButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get offlineRetryButton;
 }
 
 class _AppLocalizationsDelegate

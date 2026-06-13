@@ -958,46 +958,41 @@ void main() {
     });
 
     group('deleteAccount', () {
-      test(
-        'sends the resolved identifier and clears the session',
-        () async {
-          const identifier = 'alex@example.com';
-          final userJson = testUserJson(email: identifier);
+      test('sends the resolved identifier and clears the session', () async {
+        const identifier = 'alex@example.com';
+        final userJson = testUserJson(email: identifier);
 
-          when(
-            () => apiClient.get('/member/profile', skipAuthError: true),
-          ).thenAnswer((_) async => userJson);
-          when(
-            () => apiClient.post('/auth/delete-account', any()),
-          ).thenAnswer((_) async => {});
+        when(
+          () => apiClient.get('/member/profile', skipAuthError: true),
+        ).thenAnswer((_) async => userJson);
+        when(
+          () => apiClient.post('/auth/delete-account', any()),
+        ).thenAnswer((_) async => {});
 
-          final eventExpectation = expectLater(
-            repository.onAuthStateChanged,
-            emits(
-              predicate<AuthSession>(
-                (value) => value.state == AuthState.unauthenticated,
-              ),
+        final eventExpectation = expectLater(
+          repository.onAuthStateChanged,
+          emits(
+            predicate<AuthSession>(
+              (value) => value.state == AuthState.unauthenticated,
             ),
-          );
+          ),
+        );
 
-          final result = await repository.deleteAccount(password: 'secret123');
+        final result = await repository.deleteAccount(password: 'secret123');
 
-          expect(result, isA<Success<void, Failure>>());
-          verify(
-            () => apiClient.get('/member/profile', skipAuthError: true),
-          ).called(1);
-          verify(
-            () => apiClient.post('/auth/delete-account', {
-              'identifier': identifier,
-              'password': 'secret123',
-            }),
-          ).called(1);
-          verify(
-            () => sessionRepository.clearSession(),
-          ).called(1);
-          await eventExpectation;
-        },
-      );
+        expect(result, isA<Success<void, Failure>>());
+        verify(
+          () => apiClient.get('/member/profile', skipAuthError: true),
+        ).called(1);
+        verify(
+          () => apiClient.post('/auth/delete-account', {
+            'identifier': identifier,
+            'password': 'secret123',
+          }),
+        ).called(1);
+        verify(() => sessionRepository.clearSession()).called(1);
+        await eventExpectation;
+      });
     });
 
     group('getToken', () {

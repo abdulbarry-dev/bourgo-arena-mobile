@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:flutter/material.dart';
+import 'package:bourgo_arena_mobile/presentation/main_layout.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -34,6 +35,9 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
   /// Auth state notifier for session and persistence management
   final AuthStateNotifier authStateNotifier;
 
+  /// Whether this screen was reached during the initial onboarding flow
+  final bool isFromOnboarding;
+
   const VerifyAdditionalMethodScreen({
     super.key,
     required this.unverifiedMethod,
@@ -43,6 +47,7 @@ class VerifyAdditionalMethodScreen extends StatefulWidget {
     required this.authRepository,
     required this.getVerificationStatusUseCase,
     required this.authStateNotifier,
+    this.isFromOnboarding = false,
   });
 
   @override
@@ -144,10 +149,16 @@ class _VerifyAdditionalMethodScreenState
   }
 
   void _skipForNow() {
+    if (widget.isFromOnboarding) {
+      MainLayout.tabController.value = 3;
+    }
     widget.authStateNotifier.skipForSession();
   }
 
   void _skipForever() async {
+    if (widget.isFromOnboarding) {
+      MainLayout.tabController.value = 3;
+    }
     _setLoading(true);
     try {
       // Synchronize with backend if possible

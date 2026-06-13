@@ -2394,4 +2394,14 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get subscriptionCardEndLabel => 'FIN';
+
+  @override
+  String get offlineTitle => 'Aucune Connexion';
+
+  @override
+  String get offlineSubtitle =>
+      'Vous êtes actuellement hors ligne. Veuillez vérifier votre connexion Internet pour continuer.';
+
+  @override
+  String get offlineRetryButton => 'Réessayer';
 }

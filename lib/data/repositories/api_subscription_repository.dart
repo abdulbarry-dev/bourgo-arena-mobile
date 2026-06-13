@@ -68,13 +68,16 @@ class ApiSubscriptionRepository implements SubscriptionRepository {
       final body = <String, dynamic>{'plan_id': planId};
       final Map<String, dynamic> response;
       if (childId != null) {
-        response = await _apiClient.post(
-          '/family/children/$childId/subscriptions',
-          body,
-        ) as Map<String, dynamic>;
+        response =
+            await _apiClient.post(
+                  '/family/children/$childId/subscriptions',
+                  body,
+                )
+                as Map<String, dynamic>;
       } else {
-        response = await _apiClient.post('/subscriptions', body)
-            as Map<String, dynamic>;
+        response =
+            await _apiClient.post('/subscriptions', body)
+                as Map<String, dynamic>;
       }
       final data = response['data'] as Map<String, dynamic>? ?? response;
       return Result.success(
