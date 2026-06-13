@@ -840,7 +840,7 @@ class ApiAuthRepository implements AuthRepository {
     required String newPassword,
   }) {
     return executeApiCall(() async {
-      await _apiClient.put('/member/password', {
+      await _apiClient.put('/user/password', {
         'current_password': currentPassword,
         'new_password': newPassword,
         'new_password_confirmation': newPassword,
@@ -1038,7 +1038,7 @@ class ApiAuthRepository implements AuthRepository {
   Future<Result<bool, Failure>> verifyEmail(String email, String otp) {
     return executeApiCall(() async {
       final response =
-          await _apiClient.post('/member/verify-email', {
+          await _apiClient.post('/user/verify-email', {
                 'email': email,
                 'otp': otp,
               })
@@ -1101,7 +1101,7 @@ class ApiAuthRepository implements AuthRepository {
   Future<Result<bool, Failure>> verifyPhone(String phone, String otp) {
     return executeApiCall(() async {
       final response =
-          await _apiClient.post('/member/verify-phone', {
+          await _apiClient.post('/user/verify-phone', {
                 'phone': phone,
                 'otp': otp,
               })

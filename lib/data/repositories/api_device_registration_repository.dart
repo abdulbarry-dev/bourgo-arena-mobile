@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/entities/device_registration_data.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/device_registration_repository.dart';
+import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 
 class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
   final ApiClient _apiClient;
@@ -18,6 +19,14 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
     Map<String, dynamic>? fingerprint,
     String? integrityToken,
   }) {
+    if (AppConfig.isLocalEnvironment) {
+      return Future.value(Success(
+        DeviceRegistrationData(
+          token: 'local-dummy-token',
+          expiresAt: DateTime.now().add(const Duration(days: 30)),
+        ),
+      ));
+    }
     return executeApiCall(() async {
       final response =
           await _apiClient.post(
@@ -55,6 +64,14 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
 
   @override
   Future<Result<DeviceRefreshData, Failure>> refresh() {
+    if (AppConfig.isLocalEnvironment) {
+      return Future.value(Success(
+        DeviceRefreshData(
+          token: 'local-dummy-token',
+          expiresAt: DateTime.now().add(const Duration(days: 30)),
+        ),
+      ));
+    }
     return executeApiCall(() async {
       final response =
           await _apiClient.post('/device/refresh', {}, fullResponse: true)
@@ -80,6 +97,7 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
 
   @override
   Future<Result<void, Failure>> link(String deviceId) {
+    if (AppConfig.isLocalEnvironment) return Future.value(const Success(null));
     return executeApiCall(() async {
       await _apiClient.post('/device/link', {
         'device_id': deviceId,
@@ -90,6 +108,7 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
 
   @override
   Future<Result<void, Failure>> logout(String deviceId) {
+    if (AppConfig.isLocalEnvironment) return Future.value(const Success(null));
     return executeApiCall(() async {
       await _apiClient.post('/device/logout', {'device_id': deviceId});
       return const Success(null);

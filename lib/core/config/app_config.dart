@@ -34,10 +34,10 @@ class AppConfig {
     defaultValue: '1.0.0',
   );
 
-  /// Internal flag for test environment (true/false).
-  static const bool isTestEnvironment = bool.fromEnvironment(
-    'IS_TEST_ENVIRONMENT',
-    defaultValue: false,
+  /// The current application environment (local, testing, production).
+  static const String appEnv = String.fromEnvironment(
+    'APP_ENV',
+    defaultValue: 'local',
   );
 
   /// Firebase API Key.
@@ -60,6 +60,11 @@ class AppConfig {
 
   static bool? _isTest;
 
+  /// Returns true if the application is running in a local environment.
+  static bool get isLocalEnvironment {
+    return appEnv == 'local';
+  }
+
   /// Returns true if the application is running in a test environment.
   /// Safely handles Flutter Web by avoiding dart:io calls where unsupported.
   static bool get isTest {
@@ -68,15 +73,15 @@ class AppConfig {
     }
 
     if (kIsWeb) {
-      _isTest = isTestEnvironment;
+      _isTest = appEnv == 'testing';
     } else {
       try {
         _isTest =
-            isTestEnvironment ||
+            appEnv == 'testing' ||
             io.Platform.environment.containsKey('FLUTTER_TEST');
       } catch (_) {
         // Fallback if Platform.environment throws unexpectedly
-        _isTest = isTestEnvironment;
+        _isTest = appEnv == 'testing';
       }
     }
 

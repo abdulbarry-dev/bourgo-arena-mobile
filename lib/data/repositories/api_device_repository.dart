@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/data/api/api_client.dart';
 import 'package:bourgo_arena_mobile/data/api/api_error_handler.dart';
 import 'package:bourgo_arena_mobile/domain/core/failure.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/device_repository.dart';
+import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 
 /// Laravel API implementation of [DeviceRepository].
 class ApiDeviceRepository implements DeviceRepository {
@@ -15,6 +16,7 @@ class ApiDeviceRepository implements DeviceRepository {
     String token,
     String? platform,
   ) {
+    if (AppConfig.isLocalEnvironment) return Future.value(const Success(null));
     return executeApiCall(() async {
       final payload = {'token': token};
       if (platform != null && platform.isNotEmpty) {

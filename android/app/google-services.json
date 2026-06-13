@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "892901134215",
+    "project_id": "bourgo-arena",
+    "storage_bucket": "bourgo-arena.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892901134215:android:25b40bf4da062256c40d22",
+        "android_client_info": {
+          "package_name": "com.example.bourgo_arena_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzCH_FZ8BBjZVm__mGwWXjbG-QuQav6YE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
