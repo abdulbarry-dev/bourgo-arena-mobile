@@ -1,7 +1,6 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
@@ -9,7 +8,6 @@ import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
-import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
@@ -154,28 +152,37 @@ class _BrowseScreenState extends State<BrowseScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _CoursesTab(
-            courses: _courses,
-            isLoading: _loadingCourses,
-            error: _coursesError,
-            onRetry: _loadCourses,
-          ),
-          _ActivitiesTab(
-            activities: _activities,
-            isLoading: _loadingActivities,
-            error: _activitiesError,
-            onRetry: _loadActivities,
-          ),
-          _EventsTab(
-            events: _events,
-            isLoading: _loadingEvents,
-            error: _eventsError,
-            onRetry: _loadEvents,
-          ),
-        ],
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeOutCubic,
+        switchOutCurve: Curves.easeInCubic,
+        transitionBuilder: (child, animation) => FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+        child: KeyedSubtree(
+          key: ValueKey(_tabController.index),
+          child: [
+            _CoursesTab(
+              courses: _courses,
+              isLoading: _loadingCourses,
+              error: _coursesError,
+              onRetry: _loadCourses,
+            ),
+            _ActivitiesTab(
+              activities: _activities,
+              isLoading: _loadingActivities,
+              error: _activitiesError,
+              onRetry: _loadActivities,
+            ),
+            _EventsTab(
+              events: _events,
+              isLoading: _loadingEvents,
+              error: _eventsError,
+              onRetry: _loadEvents,
+            ),
+          ][_tabController.index],
+        ),
       ),
     );
   }
@@ -199,41 +206,22 @@ class _CoursesTab extends StatefulWidget {
 }
 
 class _CoursesTabState extends State<_CoursesTab> {
-  String _selectedFilter = '';
-  late List<String> _filterOptions;
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _initFilters();
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
-  @override
-  void didUpdateWidget(_CoursesTab oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.courses != widget.courses) {
-      _initFilters();
-    }
-  }
-
-  void _initFilters() {
-    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
-    final statuses = widget.courses
-        .map((c) => c.status)
-        .whereType<String>()
-        .where((s) => s.isNotEmpty)
-        .toSet()
-        .toList();
-    _filterOptions = [allLabel, ...statuses];
-    if (!_filterOptions.contains(_selectedFilter)) {
-      _selectedFilter = allLabel;
-    }
-  }
-
-  List<Course> _getFiltered() {
-    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
-    if (_selectedFilter == allLabel) return widget.courses;
-    return widget.courses.where((c) => c.status == _selectedFilter).toList();
+  List<Course> _applySearch(List<Course> items) {
+    if (_searchQuery.isEmpty) return items;
+    final q = _searchQuery.toLowerCase();
+    return items.where((c) {
+      return c.name.toLowerCase().contains(q) ||
+          (c.description?.toLowerCase().contains(q) ?? false);
+    }).toList();
   }
 
   @override
@@ -262,8 +250,7 @@ class _CoursesTabState extends State<_CoursesTab> {
       );
     }
 
-    final filtered = _getFiltered();
-    final hasFilter = _filterOptions.length > 1;
+    final filtered = _applySearch(widget.courses);
 
     if (filtered.isEmpty) {
       return RefreshIndicator(
@@ -271,8 +258,13 @@ class _CoursesTabState extends State<_CoursesTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
-            SliverFillRemaining(child: _buildFilterEmpty(context, 'courses')),
+            SliverToBoxAdapter(child: _buildSearchBar(
+              context: context,
+              controller: _searchController,
+              hintText: 'Search courses...',
+              onChanged: (v) => setState(() => _searchQuery = v),
+            )),
+            SliverFillRemaining(child: _buildSearchEmpty(context)),
           ],
         ),
       );
@@ -283,7 +275,12 @@ class _CoursesTabState extends State<_CoursesTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
+          SliverToBoxAdapter(child: _buildSearchBar(
+            context: context,
+            controller: _searchController,
+            hintText: 'Search courses...',
+            onChanged: (v) => setState(() => _searchQuery = v),
+          )),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -309,29 +306,6 @@ class _CoursesTabState extends State<_CoursesTab> {
       ),
     );
   }
-
-  Widget _buildFilterBar() {
-    return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-          child: Row(
-            children: _filterOptions.map((option) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterPill(
-                  label: option,
-                  isSelected: _selectedFilter == option,
-                  onTap: () => setState(() => _selectedFilter = option),
-                  hapticFeedback: true,
-                ),
-              );
-            }).toList(),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 400.ms)
-        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
-  }
 }
 
 class _ActivitiesTab extends StatefulWidget {
@@ -352,39 +326,23 @@ class _ActivitiesTab extends StatefulWidget {
 }
 
 class _ActivitiesTabState extends State<_ActivitiesTab> {
-  String _selectedFilter = '';
-  late List<String> _filterOptions;
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _initFilters();
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
-  @override
-  void didUpdateWidget(_ActivitiesTab oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.activities != widget.activities) {
-      _initFilters();
-    }
-  }
-
-  void _initFilters() {
-    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
-    final categories = widget.activities.map((a) => a.category).toSet().toList()
-      ..sort();
-    _filterOptions = [allLabel, ...categories];
-    if (!_filterOptions.contains(_selectedFilter)) {
-      _selectedFilter = allLabel;
-    }
-  }
-
-  List<Activity> _getFiltered() {
-    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
-    if (_selectedFilter == allLabel) return widget.activities;
-    return widget.activities
-        .where((a) => a.category == _selectedFilter)
-        .toList();
+  List<Activity> _applySearch(List<Activity> items) {
+    if (_searchQuery.isEmpty) return items;
+    final q = _searchQuery.toLowerCase();
+    return items.where((a) {
+      return a.title.toLowerCase().contains(q) ||
+          a.name.toLowerCase().contains(q) ||
+          a.description.toLowerCase().contains(q);
+    }).toList();
   }
 
   @override
@@ -413,8 +371,7 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
       );
     }
 
-    final filtered = _getFiltered();
-    final hasFilter = _filterOptions.length > 1;
+    final filtered = _applySearch(widget.activities);
 
     if (filtered.isEmpty) {
       return RefreshIndicator(
@@ -422,10 +379,13 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
-            SliverFillRemaining(
-              child: _buildFilterEmpty(context, 'activities'),
-            ),
+            SliverToBoxAdapter(child: _buildSearchBar(
+              context: context,
+              controller: _searchController,
+              hintText: 'Search activities...',
+              onChanged: (v) => setState(() => _searchQuery = v),
+            )),
+            SliverFillRemaining(child: _buildSearchEmpty(context)),
           ],
         ),
       );
@@ -436,7 +396,12 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
+          SliverToBoxAdapter(child: _buildSearchBar(
+            context: context,
+            controller: _searchController,
+            hintText: 'Search activities...',
+            onChanged: (v) => setState(() => _searchQuery = v),
+          )),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -445,11 +410,10 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
                 return Padding(
                       padding: const EdgeInsets.only(bottom: 16),
                       child: PressableCard(
-                        onTap: () {
-                          if (ensureAuthenticated(context)) {
-                            context.push('/booking', extra: activity);
-                          }
-                        },
+                        onTap: () => context.push(
+                          '/activities/${activity.id}',
+                          extra: activity,
+                        ),
                         child: ActivityCard(activity: activity),
                       ),
                     )
@@ -462,29 +426,6 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
         ],
       ),
     );
-  }
-
-  Widget _buildFilterBar() {
-    return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 4),
-          child: Row(
-            children: _filterOptions.map((option) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterPill(
-                  label: option,
-                  isSelected: _selectedFilter == option,
-                  onTap: () => setState(() => _selectedFilter = option),
-                  hapticFeedback: true,
-                ),
-              );
-            }).toList(),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 400.ms)
-        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -506,41 +447,22 @@ class _EventsTab extends StatefulWidget {
 }
 
 class _EventsTabState extends State<_EventsTab> {
-  String _selectedFilter = '';
-  late List<String> _filterOptions;
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _initFilters();
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
-  @override
-  void didUpdateWidget(_EventsTab oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.events != widget.events) {
-      _initFilters();
-    }
-  }
-
-  void _initFilters() {
-    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
-    final sportTypes = widget.events
-        .map((e) => e.sportType)
-        .whereType<String>()
-        .where((s) => s.isNotEmpty)
-        .toSet()
-        .toList();
-    _filterOptions = [allLabel, ...sportTypes];
-    if (!_filterOptions.contains(_selectedFilter)) {
-      _selectedFilter = allLabel;
-    }
-  }
-
-  List<Event> _getFiltered() {
-    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
-    if (_selectedFilter == allLabel) return widget.events;
-    return widget.events.where((e) => e.sportType == _selectedFilter).toList();
+  List<Event> _applySearch(List<Event> items) {
+    if (_searchQuery.isEmpty) return items;
+    final q = _searchQuery.toLowerCase();
+    return items.where((e) {
+      return (e.name?.toLowerCase().contains(q) ?? false) ||
+          (e.description?.toLowerCase().contains(q) ?? false);
+    }).toList();
   }
 
   @override
@@ -569,8 +491,7 @@ class _EventsTabState extends State<_EventsTab> {
       );
     }
 
-    final filtered = _getFiltered();
-    final hasFilter = _filterOptions.length > 1;
+    final filtered = _applySearch(widget.events);
 
     if (filtered.isEmpty) {
       return RefreshIndicator(
@@ -578,8 +499,13 @@ class _EventsTabState extends State<_EventsTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
-            SliverFillRemaining(child: _buildFilterEmpty(context, 'events')),
+            SliverToBoxAdapter(child: _buildSearchBar(
+              context: context,
+              controller: _searchController,
+              hintText: 'Search events...',
+              onChanged: (v) => setState(() => _searchQuery = v),
+            )),
+            SliverFillRemaining(child: _buildSearchEmpty(context)),
           ],
         ),
       );
@@ -590,7 +516,12 @@ class _EventsTabState extends State<_EventsTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
+          SliverToBoxAdapter(child: _buildSearchBar(
+            context: context,
+            controller: _searchController,
+            hintText: 'Search events...',
+            onChanged: (v) => setState(() => _searchQuery = v),
+          )),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -606,32 +537,46 @@ class _EventsTabState extends State<_EventsTab> {
       ),
     );
   }
-
-  Widget _buildFilterBar() {
-    return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-          child: Row(
-            children: _filterOptions.map((option) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterPill(
-                  label: option,
-                  isSelected: _selectedFilter == option,
-                  onTap: () => setState(() => _selectedFilter = option),
-                  hapticFeedback: true,
-                ),
-              );
-            }).toList(),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 400.ms)
-        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
-  }
 }
 
-Widget _buildFilterEmpty(BuildContext context, String entityLabel) {
+Widget _buildSearchBar({
+  required BuildContext context,
+  required TextEditingController controller,
+  required String hintText,
+  required ValueChanged<String> onChanged,
+}) {
+  final theme = Theme.of(context);
+
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
+    child: TextField(
+      controller: controller,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: hintText,
+        prefixIcon: const Icon(Symbols.search, size: 20),
+        suffixIcon: controller.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Symbols.close, size: 18),
+                onPressed: () {
+                  controller.clear();
+                  onChanged('');
+                },
+              )
+            : null,
+        filled: true,
+        fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      ),
+    ),
+  );
+}
+
+Widget _buildSearchEmpty(BuildContext context) {
   final theme = Theme.of(context);
   return Center(
     child: Padding(
@@ -640,7 +585,7 @@ Widget _buildFilterEmpty(BuildContext context, String entityLabel) {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Symbols.filter_alt_off,
+            Symbols.search_off,
             size: 48,
             color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
