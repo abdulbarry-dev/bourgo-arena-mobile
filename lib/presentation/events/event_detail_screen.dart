@@ -134,8 +134,13 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
       _isRegistered = true;
       _isCheckedIn = reg.hasCheckedIn;
     } else if (_showFamilyFeatures && member != null) {
-      _isRegistered = false;
-      _isCheckedIn = false;
+      if (member.isPrimary) {
+        _isRegistered = _event!.isRegistered;
+        _isCheckedIn = false;
+      } else {
+        _isRegistered = false;
+        _isCheckedIn = false;
+      }
     }
   }
 
@@ -247,6 +252,21 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         }
       },
       failure: (f) {
+        if (f.message.contains('Already registered')) {
+          setState(() {
+            _isRegistered = true;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.eventsDetailRegisterSuccess,
+              ),
+            ),
+          );
+          _loadEvent();
+          return;
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(f.message),

@@ -532,12 +532,21 @@ class _EventCard extends StatelessWidget {
                       width: double.infinity,
                       height: 40,
                       child: ElevatedButton(
-                        onPressed: isRegistering ? null : onRegister,
+                        onPressed: event.isRegistered
+                            ? null
+                            : (isRegistering ? null : onRegister),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: theme.colorScheme.onPrimary,
+                          backgroundColor: event.isRegistered
+                              ? appColors.statusSuccess.withValues(alpha: 0.1)
+                              : theme.colorScheme.primary,
+                          foregroundColor: event.isRegistered
+                              ? appColors.statusSuccess
+                              : theme.colorScheme.onPrimary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
+                            side: event.isRegistered
+                                ? BorderSide(color: appColors.statusSuccess)
+                                : BorderSide.none,
                           ),
                           elevation: 0,
                           textStyle: TextStyle(
@@ -546,6 +555,16 @@ class _EventCard extends StatelessWidget {
                             letterSpacing: 1,
                             fontFamily: GoogleFonts.lexend().fontFamily,
                           ),
+                          disabledBackgroundColor: event.isRegistered
+                              ? appColors.statusSuccess.withValues(alpha: 0.1)
+                              : theme.colorScheme.primary.withValues(
+                                  alpha: 0.4,
+                                ),
+                          disabledForegroundColor: event.isRegistered
+                              ? appColors.statusSuccess
+                              : theme.colorScheme.onPrimary.withValues(
+                                  alpha: 0.6,
+                                ),
                         ),
                         child: isRegistering
                             ? SizedBox(
@@ -557,9 +576,13 @@ class _EventCard extends StatelessWidget {
                                 ),
                               )
                             : Text(
-                                AppLocalizations.of(
-                                  context,
-                                )!.eventsScreenRegisterButton.toUpperCase(),
+                                event.isRegistered
+                                    ? AppLocalizations.of(context)!
+                                          .eventsDetailRegisteredStatus
+                                          .toUpperCase()
+                                    : AppLocalizations.of(context)!
+                                          .eventsScreenRegisterButton
+                                          .toUpperCase(),
                               ),
                       ),
                     ),

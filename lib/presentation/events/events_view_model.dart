@@ -104,10 +104,64 @@ class EventsViewModel extends ChangeNotifier {
     return result.when(
       success: (reg) {
         _lastRegistrationStatus = reg.status;
+
+        final index = _events.indexWhere((e) => e.id == eventId);
+        if (index != -1) {
+          final oldEvent = _events[index];
+          _events[index] = Event(
+            id: oldEvent.id,
+            name: oldEvent.name,
+            description: oldEvent.description,
+            sportType: oldEvent.sportType,
+            format: oldEvent.format,
+            maxParticipants: oldEvent.maxParticipants,
+            participantsCount: (oldEvent.participantsCount ?? 0) + 1,
+            registrationDeadline: oldEvent.registrationDeadline,
+            startDate: oldEvent.startDate,
+            endDate: oldEvent.endDate,
+            images: oldEvent.images,
+            imageUrl: oldEvent.imageUrl,
+            status: oldEvent.status,
+            requiresCheckIn: oldEvent.requiresCheckIn,
+            isRegistered: true,
+            createdAt: oldEvent.createdAt,
+          );
+        }
+
         notifyListeners();
         return true;
       },
       failure: (failure) {
+        if (failure.message.contains('Already registered')) {
+          _lastRegistrationStatus = 'approved';
+
+          final index = _events.indexWhere((e) => e.id == eventId);
+          if (index != -1) {
+            final oldEvent = _events[index];
+            _events[index] = Event(
+              id: oldEvent.id,
+              name: oldEvent.name,
+              description: oldEvent.description,
+              sportType: oldEvent.sportType,
+              format: oldEvent.format,
+              maxParticipants: oldEvent.maxParticipants,
+              participantsCount: oldEvent.participantsCount,
+              registrationDeadline: oldEvent.registrationDeadline,
+              startDate: oldEvent.startDate,
+              endDate: oldEvent.endDate,
+              images: oldEvent.images,
+              imageUrl: oldEvent.imageUrl,
+              status: oldEvent.status,
+              requiresCheckIn: oldEvent.requiresCheckIn,
+              isRegistered: true,
+              createdAt: oldEvent.createdAt,
+            );
+          }
+
+          notifyListeners();
+          return true;
+        }
+
         developer.log('EventsViewModel register: ${failure.message}');
         _errorMessage = failure.message;
         notifyListeners();
