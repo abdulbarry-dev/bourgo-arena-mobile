@@ -1,6 +1,9 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/domain/entities/payment.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/transaction_history_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/widgets/transaction_tile.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +26,9 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    widget.viewModel.loadTransactions();
+    if (locator<AuthStateNotifier>().isAuthenticated) {
+      widget.viewModel.loadTransactions();
+    }
   }
 
   @override
@@ -35,6 +40,33 @@ class _PaymentHistoryScreenState extends State<PaymentHistoryScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    if (!locator<AuthStateNotifier>().isAuthenticated) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          centerTitle: false,
+          backgroundColor: theme.scaffoldBackgroundColor,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+            onPressed: () => Navigator.pop(context),
+            color: theme.colorScheme.onSurface,
+          ),
+          title: Text(
+            'PAYMENT HISTORY',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontFamily: AppConstants.displayFontFamily,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+              color: theme.colorScheme.onSurface,
+            ),
+          ),
+        ),
+        body: const GuestAuthState(icon: Symbols.payments),
+      );
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -192,10 +224,7 @@ class _ErrorView extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: onRetry,
                     icon: const Icon(Symbols.refresh, size: 18),
-                    label: Text(
-                      AppLocalizations.of(context)!
-                          .commonRetry,
-                    ),
+                    label: Text(AppLocalizations.of(context)!.commonRetry),
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),

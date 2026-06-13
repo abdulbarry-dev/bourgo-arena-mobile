@@ -2,8 +2,10 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -33,6 +35,8 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
   }
 
   Future<void> _load() async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) return;
+
     setState(() {
       _isLoading = true;
       _error = null;
@@ -71,6 +75,10 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
   }
 
   Widget _buildBody(ThemeData theme) {
+    if (!locator<AuthStateNotifier>().isAuthenticated) {
+      return const GuestAuthState(icon: Symbols.emoji_events);
+    }
+
     if (_isLoading) {
       return RefreshIndicator(
         onRefresh: _load,

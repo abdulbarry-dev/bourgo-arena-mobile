@@ -63,11 +63,12 @@ class ProfileViewModel extends BaseViewModel {
       loadProfile();
     } else {
       _fetchTier();
+      _loadCounts();
     }
-    _loadCounts();
   }
 
   Future<void> _loadCounts() async {
+    if (_authStateNotifier.currentUser == null) return;
     final results = await Future.wait([
       _getOngoingReservationsUseCase(),
       _getFullPaymentHistoryUseCase.execute(),
