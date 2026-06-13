@@ -240,7 +240,7 @@ class _EventsScreenState extends State<EventsScreen> {
                         final success = await _viewModel.registerForEvent(
                           event.id,
                         );
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         if (success) {
                           final status = _viewModel.lastRegistrationStatus;
                           final msg = status == 'waitlisted'

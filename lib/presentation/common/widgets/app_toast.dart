@@ -69,13 +69,11 @@ class AppToast {
     _activeState = null;
   }
 
-  static Duration _durationFor(AppToastType type) =>
-      switch (type) {
-        AppToastType.error => const Duration(seconds: 4),
-        AppToastType.warning =>
-          const Duration(milliseconds: 3500),
-        _ => const Duration(seconds: 3),
-      };
+  static Duration _durationFor(AppToastType type) => switch (type) {
+    AppToastType.error => const Duration(seconds: 4),
+    AppToastType.warning => const Duration(milliseconds: 3500),
+    _ => const Duration(seconds: 3),
+  };
 
   static void _hapticFor(AppToastType type) {
     switch (type) {
@@ -89,29 +87,24 @@ class AppToast {
         AppHaptics.selection();
     }
   }
-
 }
 
 Color _colorFor(AppToastType type, ThemeData theme) {
   final c = theme.extension<AppColors>();
   return switch (type) {
-    AppToastType.success =>
-      c?.statusSuccess ?? const Color(0xFF4CAF50),
-    AppToastType.error =>
-      c?.statusError ?? const Color(0xFFEF5350),
-    AppToastType.warning =>
-      c?.statusWarning ?? const Color(0xFFFFD54F),
+    AppToastType.success => c?.statusSuccess ?? const Color(0xFF4CAF50),
+    AppToastType.error => c?.statusError ?? const Color(0xFFEF5350),
+    AppToastType.warning => c?.statusWarning ?? const Color(0xFFFFD54F),
     AppToastType.info => theme.colorScheme.primary,
   };
 }
 
-IconData _iconFor(AppToastType type) =>
-    switch (type) {
-      AppToastType.success => Symbols.check_circle,
-      AppToastType.error => Symbols.error,
-      AppToastType.warning => Symbols.warning,
-      AppToastType.info => Symbols.info,
-    };
+IconData _iconFor(AppToastType type) => switch (type) {
+  AppToastType.success => Symbols.check_circle,
+  AppToastType.error => Symbols.error,
+  AppToastType.warning => Symbols.warning,
+  AppToastType.info => Symbols.info,
+};
 
 // ─────────────────────────────────────────────────────────────────
 // Overlay widget — manages enter/exit animation + drag-to-dismiss
@@ -139,8 +132,7 @@ class _AppToastWidget extends StatefulWidget {
   final VoidCallback? onAction;
 
   @override
-  State<_AppToastWidget> createState() =>
-      _AppToastWidgetState();
+  State<_AppToastWidget> createState() => _AppToastWidgetState();
 }
 
 class _AppToastWidgetState extends State<_AppToastWidget>
@@ -228,54 +220,53 @@ class _AppToastWidgetState extends State<_AppToastWidget>
       child: Semantics(
         liveRegion: true,
         child: AnimatedBuilder(
-        animation: _slideCtrl,
-        builder: (_, child) => Transform.translate(
-          offset: Offset(0, _slideY.value + _dragY),
-          child: Opacity(
-            opacity: _fade.value.clamp(0.0, 1.0),
-            child: Transform.scale(
-              scale: _scale.value,
-              alignment: Alignment.topCenter,
-              child: child,
+          animation: _slideCtrl,
+          builder: (_, child) => Transform.translate(
+            offset: Offset(0, _slideY.value + _dragY),
+            child: Opacity(
+              opacity: _fade.value.clamp(0.0, 1.0),
+              child: Transform.scale(
+                scale: _scale.value,
+                alignment: Alignment.topCenter,
+                child: child,
+              ),
             ),
           ),
-        ),
-        child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onVerticalDragUpdate: (d) {
-            if (_isDismissing || d.delta.dy >= 0) return;
-            setState(() {
-              _dragY = (_dragY + d.delta.dy)
-                  .clamp(-120.0, 0.0);
-            });
-          },
-          onVerticalDragEnd: (d) {
-            if (_isDismissing) return;
-            final v = d.primaryVelocity ?? 0;
-            if (_dragY < -36 || v < -500) {
-              setState(() => _isDismissing = true);
-              widget.onDismissed();
-            } else {
-              setState(() => _dragY = 0);
-            }
-          },
-          child: Material(
-            color: Colors.transparent,
-            child: RepaintBoundary(
-              child: _ToastCard(
-                type: widget.type,
-                message: widget.message,
-                typeColor: typeColor,
-                theme: widget.theme,
-                progressCtrl: _progressCtrl,
-                actionLabel: widget.actionLabel,
-                onAction: widget.onAction,
-                onDismiss: dismiss,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onVerticalDragUpdate: (d) {
+              if (_isDismissing || d.delta.dy >= 0) return;
+              setState(() {
+                _dragY = (_dragY + d.delta.dy).clamp(-120.0, 0.0);
+              });
+            },
+            onVerticalDragEnd: (d) {
+              if (_isDismissing) return;
+              final v = d.primaryVelocity ?? 0;
+              if (_dragY < -36 || v < -500) {
+                setState(() => _isDismissing = true);
+                widget.onDismissed();
+              } else {
+                setState(() => _dragY = 0);
+              }
+            },
+            child: Material(
+              color: Colors.transparent,
+              child: RepaintBoundary(
+                child: _ToastCard(
+                  type: widget.type,
+                  message: widget.message,
+                  typeColor: typeColor,
+                  theme: widget.theme,
+                  progressCtrl: _progressCtrl,
+                  actionLabel: widget.actionLabel,
+                  onAction: widget.onAction,
+                  onDismiss: dismiss,
+                ),
               ),
             ),
           ),
         ),
-      ),
       ),
     );
   }
@@ -316,16 +307,14 @@ class _ToastCard extends StatelessWidget {
     final textColor = isDark
         ? Colors.white.withValues(alpha: 0.92)
         : const Color(0xFF1A1A1A);
-    final bodyStyle =
-        theme.extension<AppTypography>()?.bodyText;
+    final bodyStyle = theme.extension<AppTypography>()?.bodyText;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black
-                .withValues(alpha: isDark ? 0.45 : 0.10),
+            color: Colors.black.withValues(alpha: isDark ? 0.45 : 0.10),
             blurRadius: 28,
             offset: const Offset(0, 10),
           ),
@@ -342,13 +331,9 @@ class _ToastCard extends StatelessWidget {
           filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
           child: Container(
             decoration: BoxDecoration(
-              color: surface.withValues(
-                alpha: isDark ? 0.94 : 0.97,
-              ),
+              color: surface.withValues(alpha: isDark ? 0.94 : 0.97),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: typeColor.withValues(alpha: 0.22),
-              ),
+              border: Border.all(color: typeColor.withValues(alpha: 0.22)),
             ),
             child: Stack(
               clipBehavior: Clip.none,
@@ -360,17 +345,11 @@ class _ToastCard extends StatelessWidget {
                   child: _AccentBar(color: typeColor),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    16, 13, 12, 15,
-                  ),
+                  padding: const EdgeInsets.fromLTRB(16, 13, 12, 15),
                   child: Row(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      _TypeIconBadge(
-                        type: type,
-                        typeColor: typeColor,
-                      ),
+                      _TypeIconBadge(type: type, typeColor: typeColor),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -384,8 +363,7 @@ class _ToastCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      if (actionLabel != null &&
-                          onAction != null)
+                      if (actionLabel != null && onAction != null)
                         _ActionButton(
                           label: actionLabel!,
                           typeColor: typeColor,
@@ -395,10 +373,7 @@ class _ToastCard extends StatelessWidget {
                           },
                         )
                       else
-                        _DismissButton(
-                          typeColor: typeColor,
-                          onTap: onDismiss,
-                        ),
+                        _DismissButton(typeColor: typeColor, onTap: onDismiss),
                     ],
                   ),
                 ),
@@ -430,18 +405,12 @@ class _AccentBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 4,
-      color: color,
-    );
+    return Container(width: 4, color: color);
   }
 }
 
 class _TypeIconBadge extends StatelessWidget {
-  const _TypeIconBadge({
-    required this.type,
-    required this.typeColor,
-  });
+  const _TypeIconBadge({required this.type, required this.typeColor});
   final AppToastType type;
   final Color typeColor;
 
@@ -454,20 +423,13 @@ class _TypeIconBadge extends StatelessWidget {
         color: typeColor.withValues(alpha: 0.13),
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Icon(
-        _iconFor(type),
-        size: 20,
-        color: typeColor,
-      ),
+      child: Icon(_iconFor(type), size: 20, color: typeColor),
     );
   }
 }
 
 class _ProgressDrain extends StatelessWidget {
-  const _ProgressDrain({
-    required this.controller,
-    required this.color,
-  });
+  const _ProgressDrain({required this.controller, required this.color});
   final AnimationController controller;
   final Color color;
 
@@ -475,16 +437,14 @@ class _ProgressDrain extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: controller,
-      builder: (_, __) => SizedBox(
+      builder: (_, _) => SizedBox(
         height: 2,
         child: Align(
           alignment: Alignment.centerLeft,
           child: FractionallySizedBox(
             widthFactor: controller.value,
             child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.60),
-              ),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.60)),
             ),
           ),
         ),
@@ -494,10 +454,7 @@ class _ProgressDrain extends StatelessWidget {
 }
 
 class _DismissButton extends StatelessWidget {
-  const _DismissButton({
-    required this.typeColor,
-    required this.onTap,
-  });
+  const _DismissButton({required this.typeColor, required this.onTap});
   final Color typeColor;
   final VoidCallback onTap;
 
@@ -539,16 +496,11 @@ class _ActionButton extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 6,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: typeColor.withValues(alpha: 0.14),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: typeColor.withValues(alpha: 0.30),
-          ),
+          border: Border.all(color: typeColor.withValues(alpha: 0.30)),
         ),
         child: Text(
           label,

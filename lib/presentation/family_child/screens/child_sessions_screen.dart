@@ -144,7 +144,7 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                         sessionId: session.id,
                         date: dateStr,
                       );
-                      if (mounted) {
+                      if (context.mounted) {
                         if (booking != null) {
                           AppHaptics.success();
                         } else {
