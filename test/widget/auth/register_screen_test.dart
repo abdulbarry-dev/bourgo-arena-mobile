@@ -212,8 +212,8 @@ void main() {
       await tester.ensureVisible(registerButton);
       await tester.tap(registerButton);
 
-      // Process all microtasks and animations
-      await tester.pumpAndSettle();
+      // Pump to show AppToast
+      await tester.pump();
 
       verify(
         () => mockRegisterUseCase(
@@ -229,6 +229,9 @@ void main() {
       ).called(1);
 
       expect(find.text('Email already exists'), findsOneWidget);
+      
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 5));
     });
 
     testWidgets('toggles family account', (tester) async {

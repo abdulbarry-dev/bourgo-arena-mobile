@@ -14,6 +14,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_cas
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -31,17 +32,21 @@ class MockGetServices extends Mock implements GetServicesUseCase {}
 
 class MockGetEvents extends Mock implements GetEventsUseCase {}
 
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
 void main() {
   late MockGetActivities mockActivities;
   late MockGetCourses mockCourses;
   late MockGetServices mockServices;
   late MockGetEvents mockEvents;
+  late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUp(() async {
     mockActivities = MockGetActivities();
     mockCourses = MockGetCourses();
     mockServices = MockGetServices();
     mockEvents = MockGetEvents();
+    mockAuthStateNotifier = MockAuthStateNotifier();
 
     await locator.reset();
     locator.allowReassignment = true;
@@ -49,6 +54,9 @@ void main() {
     locator.registerFactory<GetCoursesUseCase>(() => mockCourses);
     locator.registerFactory<GetServicesUseCase>(() => mockServices);
     locator.registerFactory<GetEventsUseCase>(() => mockEvents);
+    
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
+    locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
   });
 
   setUpAll(() {
@@ -63,11 +71,11 @@ void main() {
     for (int i = 0; i < 20; i++) {
       if (tester.any(finder)) {
         await tester.ensureVisible(finder);
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(milliseconds: 500));
         return;
       }
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -150));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 500));
     }
   }
 
@@ -86,7 +94,7 @@ void main() {
     ).thenAnswer((_) async => Success([testServiceEntity()]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 1));
 
     final l10n = AppLocalizations.of(tester.element(find.byType(HomeScreen)))!;
 

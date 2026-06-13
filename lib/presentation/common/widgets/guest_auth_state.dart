@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
+import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 
 class GuestAuthState extends StatelessWidget {
   final IconData icon;
@@ -52,7 +53,9 @@ class GuestAuthState extends StatelessWidget {
                   ),
                 )
                 .animate(
-                  onPlay: (controller) => controller.repeat(reverse: true),
+                  onPlay: AppConfig.isTest
+                      ? null
+                      : (controller) => controller.repeat(reverse: true),
                 )
                 .scale(
                   begin: const Offset(1, 1),

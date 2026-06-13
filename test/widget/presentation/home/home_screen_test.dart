@@ -8,6 +8,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -25,12 +26,15 @@ class MockGetServicesUseCase extends Mock implements GetServicesUseCase {}
 
 class MockGoRouter extends Mock implements GoRouter {}
 
+class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
 void main() {
   late MockGetActivitiesUseCase mockGetActivitiesUseCase;
   late MockGetCoursesUseCase mockGetCoursesUseCase;
   late MockGetEventsUseCase mockGetEventsUseCase;
   late MockGetServicesUseCase mockGetServicesUseCase;
   late MockGoRouter mockGoRouter;
+  late MockAuthStateNotifier mockAuthStateNotifier;
 
   setUpAll(() {
     HttpOverrides.global = _FakeHttpOverrides();
@@ -46,6 +50,7 @@ void main() {
     mockGetEventsUseCase = MockGetEventsUseCase();
     mockGetServicesUseCase = MockGetServicesUseCase();
     mockGoRouter = MockGoRouter();
+    mockAuthStateNotifier = MockAuthStateNotifier();
 
     locator.allowReassignment = true;
     locator.registerFactory<GetActivitiesUseCase>(
@@ -54,6 +59,9 @@ void main() {
     locator.registerFactory<GetCoursesUseCase>(() => mockGetCoursesUseCase);
     locator.registerFactory<GetEventsUseCase>(() => mockGetEventsUseCase);
     locator.registerFactory<GetServicesUseCase>(() => mockGetServicesUseCase);
+    
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
+    locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
 
     when(
       () => mockGetActivitiesUseCase.call(),
@@ -95,18 +103,18 @@ void main() {
     for (int i = 0; i < 20; i++) {
       if (tester.any(finder)) {
         await tester.ensureVisible(finder);
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(milliseconds: 500));
         return;
       }
       await tester.drag(find.byType(CustomScrollView), const Offset(0, -150));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 500));
     }
   }
 
   group('HomeScreen Widget Tests', () {
     testWidgets('shows section headers after data loads', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
 
       final l10n = AppLocalizations.of(
         tester.element(find.byType(HomeScreen)),

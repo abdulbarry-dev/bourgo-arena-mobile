@@ -247,12 +247,16 @@ void main() {
 
     await viewModel.login(ctx);
 
-    // SnackBar shows asynchronously; settle animations
-    await tester.pumpAndSettle();
+    // Pump once so the AppToast builds
+    await tester.pump();
 
     check(find.text('bad').evaluate()).isNotEmpty();
     verify(() => mockLoginUseCase('alex@example.com', 'wrong')).called(1);
     check(viewModel.isLoading).isFalse();
+    
+    // wait for toast to finish
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 5));
   });
 
   testWidgets('isLoading resets to false on failure result', (tester) async {
@@ -287,6 +291,10 @@ void main() {
     await loginFuture;
 
     check(viewModel.isLoading).isFalse();
+
+    // cleanup toast
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 5));
   });
 
   group('LoginViewModel - State Management', () {

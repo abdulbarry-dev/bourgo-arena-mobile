@@ -145,6 +145,7 @@ void main() {
       await tester.pump(
         const Duration(seconds: 1),
       ); // wait for animations and futures
+      await tester.pumpAndSettle(); // Clear any remaining timers from animations
     });
   });
 }

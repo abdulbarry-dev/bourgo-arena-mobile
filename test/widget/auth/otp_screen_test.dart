@@ -180,10 +180,13 @@ void main() {
 
       await tester.tap(find.byType(ElevatedButton));
 
-      // Process microtasks and SnackBar animation
-      await tester.pumpAndSettle();
+      // Pump to show AppToast
+      await tester.pump();
 
       expect(find.text('Invalid code'), findsOneWidget);
+      
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 5));
     });
 
     testWidgets('resend button works after timer expires', (tester) async {

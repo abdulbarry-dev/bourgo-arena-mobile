@@ -173,9 +173,14 @@ void main() {
         .first;
     final btn2 = el2.widget as ElevatedButton;
     btn2.onPressed?.call();
-    await tester.pumpAndSettle();
+    
+    // Pump to show AppToast
+    await tester.pump();
 
     expect(find.text('bad'), findsOneWidget);
     verify(() => mockLoginUseCase('alex@example.com', 'wrong')).called(1);
+    
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 5));
   });
 }

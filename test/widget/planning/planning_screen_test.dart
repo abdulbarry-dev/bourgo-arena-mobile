@@ -73,8 +73,14 @@ void main() {
   ) async {
     when(() => mockViewModel.errorMessage).thenReturn('Failed to load');
     await tester.pumpWidget(createWidget());
+    
+    // Pump to let the animation start
+    await tester.pump();
 
     check(find.text('ERREUR DE PLANNING').evaluate()).isNotEmpty();
+    
+    // Clear animations
+    await tester.pumpAndSettle();
   });
 
   testWidgets('renders list of courses when data is loaded', (tester) async {

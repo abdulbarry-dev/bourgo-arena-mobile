@@ -14,6 +14,9 @@ import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+
 class _MockGetActivitiesUseCase extends Mock implements GetActivitiesUseCase {}
 
 class _MockGetCoursesUseCase extends Mock implements GetCoursesUseCase {}
@@ -22,11 +25,14 @@ class _MockGetServicesUseCase extends Mock implements GetServicesUseCase {}
 
 class _MockGetEventsUseCase extends Mock implements GetEventsUseCase {}
 
+class _MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
 void main() {
   late _MockGetActivitiesUseCase mockGetActivities;
   late _MockGetCoursesUseCase mockGetCourses;
   late _MockGetServicesUseCase mockGetServices;
   late _MockGetEventsUseCase mockGetEvents;
+  late _MockAuthStateNotifier mockAuthStateNotifier;
   late HomeViewModel viewModel;
 
   final testActivities = [
@@ -60,10 +66,15 @@ void main() {
   final testServices = [const Service(id: 1, name: 'Coaching')];
 
   setUp(() {
+    locator.allowReassignment = true;
     mockGetActivities = _MockGetActivitiesUseCase();
     mockGetCourses = _MockGetCoursesUseCase();
     mockGetEvents = _MockGetEventsUseCase();
     mockGetServices = _MockGetServicesUseCase();
+    mockAuthStateNotifier = _MockAuthStateNotifier();
+    
+    when(() => mockAuthStateNotifier.isAuthenticated).thenReturn(true);
+    locator.registerSingleton<AuthStateNotifier>(mockAuthStateNotifier);
 
     viewModel = HomeViewModel(
       getActivitiesUseCase: mockGetActivities,

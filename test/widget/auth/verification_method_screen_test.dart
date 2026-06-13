@@ -184,9 +184,14 @@ void main() {
 
     await tester.pumpAndSettle();
     await tester.tap(find.textContaining('alex@example.com'));
-    await tester.pumpAndSettle();
+    
+    // Pump to show AppToast
+    await tester.pump();
 
     expect(find.text('OTP'), findsNothing);
     expect(find.textContaining('failed'), findsOneWidget);
+    
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 5));
   });
 }
