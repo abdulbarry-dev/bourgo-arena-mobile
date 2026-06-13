@@ -68,7 +68,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                       if (_viewModel.errorMessage != null) {
                         return SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
-                          padding: EdgeInsets.all(spacing.lg),
+                          padding: EdgeInsets.fromLTRB(
+                            spacing.lg,
+                            spacing.lg,
+                            spacing.lg,
+                            spacing.lg + MediaQuery.paddingOf(context).bottom,
+                          ),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
                               minHeight: constraints.maxHeight - spacing.lg * 2,
@@ -86,7 +91,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                       if (subscriptions.isEmpty) {
                         return SingleChildScrollView(
                           physics: const AlwaysScrollableScrollPhysics(),
-                          padding: EdgeInsets.all(spacing.lg),
+                          padding: EdgeInsets.fromLTRB(
+                            spacing.lg,
+                            spacing.lg,
+                            spacing.lg,
+                            spacing.lg + MediaQuery.paddingOf(context).bottom,
+                          ),
                           child: ConstrainedBox(
                             constraints: BoxConstraints(
                               minHeight: constraints.maxHeight - spacing.lg * 2,
@@ -135,7 +145,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
 
                       return SingleChildScrollView(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        padding: EdgeInsets.all(spacing.lg),
+                        padding: EdgeInsets.fromLTRB(
+                          spacing.lg,
+                          spacing.lg,
+                          spacing.lg,
+                          spacing.lg + MediaQuery.paddingOf(context).bottom,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

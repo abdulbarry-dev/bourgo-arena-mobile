@@ -223,7 +223,12 @@ class _EventsScreenState extends State<EventsScreen> {
       child: ListView.builder(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+        padding: EdgeInsets.only(
+          left: 24,
+          top: 12,
+          right: 24,
+          bottom: 24 + MediaQuery.paddingOf(context).bottom,
+        ),
         itemCount: _viewModel.events.length + (_viewModel.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= _viewModel.events.length) {
@@ -285,7 +290,12 @@ class _EventsScreenState extends State<EventsScreen> {
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+      padding: EdgeInsets.only(
+        left: 24,
+        top: 12,
+        right: 24,
+        bottom: 24 + MediaQuery.paddingOf(context).bottom,
+      ),
       children: [
         _SkeletonEventCard(theme: theme, appColors: appColors),
         const SizedBox(height: 16),

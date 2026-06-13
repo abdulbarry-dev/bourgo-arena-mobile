@@ -19,5 +19,5 @@ class AppConstants {
   // Assets
   static const String assetAppIcon = 'assets/icons/app_icon.png';
   static const String assetBrandmarkVertical =
-      'assets/icons/brandmark-vert.png';
+      'assets/icons/brandmark-vert.webp';
 }

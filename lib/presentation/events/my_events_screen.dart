@@ -84,7 +84,12 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
         onRefresh: _load,
         child: AppShimmer(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 16,
+              bottom: 16 + MediaQuery.paddingOf(context).bottom,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: List.generate(5, (_) {
@@ -106,7 +111,12 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
           builder: (context, constraints) {
             return ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(32),
+              padding: EdgeInsets.only(
+                left: 32,
+                right: 32,
+                top: 32,
+                bottom: 32 + MediaQuery.paddingOf(context).bottom,
+              ),
               children: [
                 SizedBox(
                   height: constraints.maxHeight - 64,
@@ -155,7 +165,12 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
       onRefresh: _load,
       child: ListView.builder(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 16,
+          bottom: 16 + MediaQuery.paddingOf(context).bottom,
+        ),
         itemCount: _participants.length,
         itemBuilder: (context, index) {
           final p = _participants[index];
@@ -290,7 +305,7 @@ class _EventParticipantCard extends StatelessWidget {
                 if (participant.user?.name != null) ...[
                   const SizedBox(height: 2),
                   Text(
-                    'For: ${participant.user!.name}',
+                    'Participant: ${participant.user!.name}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       fontSize: 11,

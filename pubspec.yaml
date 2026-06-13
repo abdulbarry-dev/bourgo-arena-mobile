@@ -42,7 +42,6 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   shared_preferences: ^2.5.5
-  http: ^1.6.0
   get_it: ^9.2.1
   collection: ^1.19.1
   package_info_plus: ^10.1.0
@@ -51,8 +50,6 @@ dependencies:
   cached_network_image: ^3.4.1
   firebase_messaging: ^16.3.0
   firebase_core: ^4.10.0
-  dio_cache_interceptor_hive_store: ^4.0.0
-  dio_cache_interceptor_file_store: ^1.2.3
   flutter_animate: ^4.5.2
   dio_smart_retry: ^7.0.1
   shimmer: ^3.0.0
@@ -60,7 +57,6 @@ dependencies:
   freezed_annotation: ^3.1.0
   webview_flutter: ^4.13.1
   path_provider: ^2.1.5
-  dio_cache_interceptor: ^3.5.1
   url_launcher: ^6.3.2
   image_picker: ^1.1.2
   uuid: ^4.5.1

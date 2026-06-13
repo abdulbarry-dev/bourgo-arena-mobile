@@ -317,7 +317,12 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
 
   Widget _buildSelection(ThemeData theme, AppColors appColors) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.only(
+        left: 24,
+        top: 24,
+        right: 24,
+        bottom: 24 + MediaQuery.paddingOf(context).bottom,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

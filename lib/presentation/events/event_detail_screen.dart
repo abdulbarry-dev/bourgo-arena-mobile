@@ -429,13 +429,23 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.only(
+                    left: 24,
+                    right: 24,
+                    top: 24,
+                    bottom: 100 + MediaQuery.paddingOf(context).bottom,
+                  ),
                   child: _buildContent(theme, appColors),
                 ),
               ),
             ],
           ),
-          Positioned(left: 24, right: 24, bottom: 32, child: _buildCTA(theme)),
+          Positioned(
+            left: 24,
+            right: 24,
+            bottom: 32 + MediaQuery.paddingOf(context).bottom,
+            child: _buildCTA(theme),
+          ),
         ],
       ),
     );
@@ -726,7 +736,6 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 80),
       ],
     );
   }
