@@ -4,6 +4,7 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/events/events_view_model.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -81,7 +82,7 @@ class _EventsScreenState extends State<EventsScreen> {
           ),
           body: Column(
             children: [
-              _buildFilterBar(theme),
+              _buildFilterBar(),
               Expanded(child: _buildBody(theme)),
             ],
           ),
@@ -289,38 +290,30 @@ class _EventsScreenState extends State<EventsScreen> {
     );
   }
 
-  Widget _buildFilterBar(ThemeData theme) {
+  Widget _buildFilterBar() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: Row(
         children: [
-          _buildFilterChip(theme, 'All', null),
+          _buildFilterChip('All', null),
           const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Football', 'football'),
+          _buildFilterChip('Football', 'football'),
           const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Padel', 'padel'),
+          _buildFilterChip('Padel', 'padel'),
           const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Tennis', 'tennis'),
+          _buildFilterChip('Tennis', 'tennis'),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(ThemeData theme, String label, String? value) {
-    final isSelected = _viewModel.selectedSportType == value;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => _viewModel.setSportType(value),
-      selectedColor: theme.colorScheme.primary,
-      backgroundColor: theme.colorScheme.surfaceContainerHighest,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.black : theme.colorScheme.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      side: BorderSide.none,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+  Widget _buildFilterChip(String label, String? value) {
+    return FilterPill(
+      label: label,
+      isSelected: _viewModel.selectedSportType == value,
+      onTap: () => _viewModel.setSportType(value),
+      hapticFeedback: true,
     );
   }
 }

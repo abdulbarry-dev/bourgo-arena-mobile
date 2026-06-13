@@ -1,8 +1,8 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
-import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/service/services_view_model.dart';
 import 'package:flutter/material.dart';
@@ -86,7 +86,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
       body: Column(
         children: [
           _buildSearchBar(theme),
-          _buildFilterChips(theme),
+          _buildFilterChips(),
           Expanded(child: _buildBody(theme)),
         ],
       ),
@@ -142,7 +142,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 
-  Widget _buildFilterChips(ThemeData theme) {
+  Widget _buildFilterChips() {
     final l10n = AppLocalizations.of(context)!;
     final filters = [
       (ServiceFilterType.all, l10n.servicesFilterAll),
@@ -157,13 +157,13 @@ class _ServicesScreenState extends State<ServicesScreen> {
         scrollDirection: Axis.horizontal,
         child: Row(
           children: filters.map((f) {
-            final isSelected = _viewModel.filterType == f.$1;
             return Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: _ServiceFilterChip(
+              child: FilterPill(
                 label: f.$2,
-                isSelected: isSelected,
+                isSelected: _viewModel.filterType == f.$1,
                 onTap: () => _viewModel.setFilterType(f.$1),
+                hapticFeedback: true,
               ),
             );
           }).toList(),
@@ -341,51 +341,6 @@ class _ServicesScreenState extends State<ServicesScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
       children: List.generate(4, (_) => _SkeletonServiceCard(theme: theme)),
-    );
-  }
-}
-
-class _ServiceFilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _ServiceFilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary : appColors.bgElevated,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : appColors.bgBorder,
-            width: 1,
-          ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.0,
-            color: isSelected
-                ? theme.colorScheme.onPrimary
-                : theme.colorScheme.onSurface,
-          ),
-        ),
-      ),
     );
   }
 }

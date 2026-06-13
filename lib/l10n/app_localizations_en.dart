@@ -1690,6 +1690,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get browseFilterAll => 'All';
+
+  @override
   String get browseTabCourses => 'COURSES';
 
   @override
@@ -2358,8 +2361,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get subscriptionManagementPageTitle => 'EXPLORE PLANS';
 
   @override
-  String get subscriptionManagementSearchHint =>
-      'Search plans or services...';
+  String get subscriptionManagementSearchHint => 'Search plans or services...';
 
   @override
   String get planCardSubscribeButton => 'Subscribe';

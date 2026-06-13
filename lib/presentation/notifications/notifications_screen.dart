@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/notification/get_notificatio
 import 'package:bourgo_arena_mobile/domain/usecases/notification/mark_notifications_read_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/entities/notification.dart'
     as entity;
+import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
 import 'package:bourgo_arena_mobile/presentation/notifications/notifications_view_model.dart';
 import 'package:flutter/material.dart' hide Notification;
 import 'package:intl/intl.dart';
@@ -192,18 +193,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   ),
                   child: Row(
                     children: _filterCategories.keys.map((key) {
-                      final isSelected = _selectedFilter == key;
                       return Padding(
                         padding: EdgeInsets.only(right: spacing.xs),
-                        child: _FilterChip(
+                        child: FilterPill(
                           label: _filterLabel(context, key),
-                          isSelected: isSelected,
+                          isSelected: _selectedFilter == key,
                           onTap: () => setState(() {
                             _selectedFilter = key;
                             if (_scrollController.hasClients) {
                               _scrollController.jumpTo(0);
                             }
                           }),
+                          hapticFeedback: true,
                         ),
                       );
                     }).toList(),
@@ -487,51 +488,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _FilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(30),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? theme.colorScheme.primary : appColors.bgElevated,
-          borderRadius: BorderRadius.circular(30),
-          border: Border.all(
-            color: isSelected ? theme.colorScheme.primary : appColors.bgBorder,
-            width: 1,
-          ),
-        ),
-        child: Text(
-          label,
-          style: theme.textTheme.labelSmall?.copyWith(
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.0,
-            color: isSelected
-                ? theme.colorScheme.onPrimary
-                : theme.colorScheme.onSurface,
-          ),
-        ),
       ),
     );
   }

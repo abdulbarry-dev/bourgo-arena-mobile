@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
@@ -180,7 +181,7 @@ class _BrowseScreenState extends State<BrowseScreen>
   }
 }
 
-class _CoursesTab extends StatelessWidget {
+class _CoursesTab extends StatefulWidget {
   final List<Course> courses;
   final bool isLoading;
   final String? error;
@@ -194,8 +195,50 @@ class _CoursesTab extends StatelessWidget {
   });
 
   @override
+  State<_CoursesTab> createState() => _CoursesTabState();
+}
+
+class _CoursesTabState extends State<_CoursesTab> {
+  String _selectedFilter = '';
+  late List<String> _filterOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFilters();
+  }
+
+  @override
+  void didUpdateWidget(_CoursesTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.courses != widget.courses) {
+      _initFilters();
+    }
+  }
+
+  void _initFilters() {
+    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
+    final statuses = widget.courses
+        .map((c) => c.status)
+        .whereType<String>()
+        .where((s) => s.isNotEmpty)
+        .toSet()
+        .toList();
+    _filterOptions = [allLabel, ...statuses];
+    if (!_filterOptions.contains(_selectedFilter)) {
+      _selectedFilter = allLabel;
+    }
+  }
+
+  List<Course> _getFiltered() {
+    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
+    if (_selectedFilter == allLabel) return widget.courses;
+    return widget.courses.where((c) => c.status == _selectedFilter).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (widget.isLoading) {
       return ListView(
         padding: const EdgeInsets.all(24),
         children: List.generate(
@@ -204,45 +247,95 @@ class _CoursesTab extends StatelessWidget {
         ),
       );
     }
-    if (error != null) {
+    if (widget.error != null) {
       return PremiumErrorState(
         title: AppLocalizations.of(context)!.browseErrorTitle,
-        message: error!,
+        message: widget.error!,
         actionLabel: AppLocalizations.of(context)!.browseErrorRetry,
-        onRetry: onRetry,
+        onRetry: widget.onRetry,
       );
     }
-    if (courses.isEmpty) {
+    if (widget.courses.isEmpty) {
       return RefreshIndicator(
-        onRefresh: () async => onRetry(),
+        onRefresh: () async => widget.onRetry(),
         child: ListView(children: const []),
       );
     }
+
+    final filtered = _getFiltered();
+    final hasFilter = _filterOptions.length > 1;
+
+    if (filtered.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () async => widget.onRetry(),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            if (hasFilter)
+              SliverToBoxAdapter(child: _buildFilterBar()),
+            SliverFillRemaining(child: _buildFilterEmpty(context, 'courses')),
+          ],
+        ),
+      );
+    }
+
     return RefreshIndicator(
-      onRefresh: () async => onRetry(),
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        itemCount: courses.length,
-        itemBuilder: (context, index) {
-          final course = courses[index];
-          return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: PressableCard(
-                  onTap: () =>
-                      context.push('/courses/${course.id}', extra: course),
-                  child: CourseCard(course: course),
-                ),
-              )
-              .animate(delay: (index * 50).ms)
-              .fade(duration: 400.ms)
-              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
-        },
+      onRefresh: () async => widget.onRetry(),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          if (hasFilter)
+            SliverToBoxAdapter(child: _buildFilterBar()),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final course = filtered[index];
+                return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: PressableCard(
+                        onTap: () =>
+                            context.push('/courses/${course.id}', extra: course),
+                        child: CourseCard(course: course),
+                      ),
+                    )
+                    .animate(delay: (index * 50).ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
+              }, childCount: filtered.length),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildFilterBar() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+      child: Row(
+        children: _filterOptions.map((option) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterPill(
+              label: option,
+              isSelected: _selectedFilter == option,
+              onTap: () => setState(() => _selectedFilter = option),
+              hapticFeedback: true,
+            ),
+          );
+        }).toList(),
+      ),
+    ).animate().fadeIn(duration: 400.ms).slideY(
+      begin: 0.1,
+      end: 0,
+      curve: Curves.easeOutQuad,
     );
   }
 }
 
-class _ActivitiesTab extends StatelessWidget {
+class _ActivitiesTab extends StatefulWidget {
   final List<Activity> activities;
   final bool isLoading;
   final String? error;
@@ -256,8 +349,49 @@ class _ActivitiesTab extends StatelessWidget {
   });
 
   @override
+  State<_ActivitiesTab> createState() => _ActivitiesTabState();
+}
+
+class _ActivitiesTabState extends State<_ActivitiesTab> {
+  String _selectedFilter = '';
+  late List<String> _filterOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFilters();
+  }
+
+  @override
+  void didUpdateWidget(_ActivitiesTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.activities != widget.activities) {
+      _initFilters();
+    }
+  }
+
+  void _initFilters() {
+    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
+    final categories = widget.activities
+        .map((a) => a.category)
+        .toSet()
+        .toList()
+      ..sort();
+    _filterOptions = [allLabel, ...categories];
+    if (!_filterOptions.contains(_selectedFilter)) {
+      _selectedFilter = allLabel;
+    }
+  }
+
+  List<Activity> _getFiltered() {
+    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
+    if (_selectedFilter == allLabel) return widget.activities;
+    return widget.activities.where((a) => a.category == _selectedFilter).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (widget.isLoading) {
       return ListView(
         padding: const EdgeInsets.all(24),
         children: List.generate(
@@ -266,49 +400,98 @@ class _ActivitiesTab extends StatelessWidget {
         ),
       );
     }
-    if (error != null) {
+    if (widget.error != null) {
       return PremiumErrorState(
         title: AppLocalizations.of(context)!.browseErrorTitle,
-        message: error!,
+        message: widget.error!,
         actionLabel: AppLocalizations.of(context)!.browseErrorRetry,
-        onRetry: onRetry,
+        onRetry: widget.onRetry,
       );
     }
-    if (activities.isEmpty) {
+    if (widget.activities.isEmpty) {
       return RefreshIndicator(
-        onRefresh: () async => onRetry(),
+        onRefresh: () async => widget.onRetry(),
         child: ListView(children: const []),
       );
     }
+
+    final filtered = _getFiltered();
+    final hasFilter = _filterOptions.length > 1;
+
+    if (filtered.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () async => widget.onRetry(),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            if (hasFilter)
+              SliverToBoxAdapter(child: _buildFilterBar()),
+            SliverFillRemaining(child: _buildFilterEmpty(context, 'activities')),
+          ],
+        ),
+      );
+    }
+
     return RefreshIndicator(
-      onRefresh: () async => onRetry(),
-      child: ListView.builder(
+      onRefresh: () async => widget.onRetry(),
+      child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        itemCount: activities.length,
-        itemBuilder: (context, index) {
-          final activity = activities[index];
-          return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: PressableCard(
-                  onTap: () {
-                    if (ensureAuthenticated(context)) {
-                      context.push('/booking', extra: activity);
-                    }
-                  },
-                  child: ActivityCard(activity: activity),
-                ),
-              )
-              .animate(delay: (index * 50).ms)
-              .fade(duration: 400.ms)
-              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
-        },
+        slivers: [
+          if (hasFilter)
+            SliverToBoxAdapter(child: _buildFilterBar()),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                final activity = filtered[index];
+                return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: PressableCard(
+                        onTap: () {
+                          if (ensureAuthenticated(context)) {
+                            context.push('/booking', extra: activity);
+                          }
+                        },
+                        child: ActivityCard(activity: activity),
+                      ),
+                    )
+                    .animate(delay: (index * 50).ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
+              }, childCount: filtered.length),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildFilterBar() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(24, 20, 24, 4),
+      child: Row(
+        children: _filterOptions.map((option) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterPill(
+              label: option,
+              isSelected: _selectedFilter == option,
+              onTap: () => setState(() => _selectedFilter = option),
+              hapticFeedback: true,
+            ),
+          );
+        }).toList(),
+      ),
+    ).animate().fadeIn(duration: 400.ms).slideY(
+      begin: 0.1,
+      end: 0,
+      curve: Curves.easeOutQuad,
     );
   }
 }
 
-class _EventsTab extends StatelessWidget {
+class _EventsTab extends StatefulWidget {
   final List<Event> events;
   final bool isLoading;
   final String? error;
@@ -322,8 +505,50 @@ class _EventsTab extends StatelessWidget {
   });
 
   @override
+  State<_EventsTab> createState() => _EventsTabState();
+}
+
+class _EventsTabState extends State<_EventsTab> {
+  String _selectedFilter = '';
+  late List<String> _filterOptions;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFilters();
+  }
+
+  @override
+  void didUpdateWidget(_EventsTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.events != widget.events) {
+      _initFilters();
+    }
+  }
+
+  void _initFilters() {
+    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
+    final sportTypes = widget.events
+        .map((e) => e.sportType)
+        .whereType<String>()
+        .where((s) => s.isNotEmpty)
+        .toSet()
+        .toList();
+    _filterOptions = [allLabel, ...sportTypes];
+    if (!_filterOptions.contains(_selectedFilter)) {
+      _selectedFilter = allLabel;
+    }
+  }
+
+  List<Event> _getFiltered() {
+    final allLabel = AppLocalizations.of(context)!.browseFilterAll;
+    if (_selectedFilter == allLabel) return widget.events;
+    return widget.events.where((e) => e.sportType == _selectedFilter).toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (widget.isLoading) {
       return ListView(
         padding: const EdgeInsets.all(24),
         children: List.generate(
@@ -332,34 +557,121 @@ class _EventsTab extends StatelessWidget {
         ),
       );
     }
-    if (error != null) {
+    if (widget.error != null) {
       return PremiumErrorState(
         title: AppLocalizations.of(context)!.browseErrorTitle,
-        message: error!,
+        message: widget.error!,
         actionLabel: AppLocalizations.of(context)!.browseErrorRetry,
-        onRetry: onRetry,
+        onRetry: widget.onRetry,
       );
     }
-    if (events.isEmpty) {
+    if (widget.events.isEmpty) {
       return RefreshIndicator(
-        onRefresh: () async => onRetry(),
+        onRefresh: () async => widget.onRetry(),
         child: ListView(children: const []),
       );
     }
+
+    final filtered = _getFiltered();
+    final hasFilter = _filterOptions.length > 1;
+
+    if (filtered.isEmpty) {
+      return RefreshIndicator(
+        onRefresh: () async => widget.onRetry(),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            if (hasFilter)
+              SliverToBoxAdapter(child: _buildFilterBar()),
+            SliverFillRemaining(child: _buildFilterEmpty(context, 'events')),
+          ],
+        ),
+      );
+    }
+
     return RefreshIndicator(
-      onRefresh: () async => onRetry(),
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        itemCount: events.length,
-        itemBuilder: (context, index) {
-          return _EventTile(event: events[index])
-              .animate(delay: (index * 50).ms)
-              .fade(duration: 400.ms)
-              .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
-        },
+      onRefresh: () async => widget.onRetry(),
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          if (hasFilter)
+            SliverToBoxAdapter(child: _buildFilterBar()),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+                return _EventTile(event: filtered[index])
+                    .animate(delay: (index * 50).ms)
+                    .fade(duration: 400.ms)
+                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
+              }, childCount: filtered.length),
+            ),
+          ),
+        ],
       ),
     );
   }
+
+  Widget _buildFilterBar() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+      child: Row(
+        children: _filterOptions.map((option) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterPill(
+              label: option,
+              isSelected: _selectedFilter == option,
+              onTap: () => setState(() => _selectedFilter = option),
+              hapticFeedback: true,
+            ),
+          );
+        }).toList(),
+      ),
+    ).animate().fadeIn(duration: 400.ms).slideY(
+      begin: 0.1,
+      end: 0,
+      curve: Curves.easeOutQuad,
+    );
+  }
+}
+
+Widget _buildFilterEmpty(BuildContext context, String entityLabel) {
+  final theme = Theme.of(context);
+  return Center(
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Symbols.filter_alt_off,
+            size: 48,
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            AppLocalizations.of(context)!.commonNoResults,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontFamily: AppConstants.displayFontFamily,
+              fontWeight: FontWeight.w900,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            AppLocalizations.of(context)!.commonNoResultsSubtitle,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _EventTile extends StatelessWidget {

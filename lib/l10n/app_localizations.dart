@@ -3242,6 +3242,12 @@ abstract class AppLocalizations {
   /// **'{name} (Moi)'**
   String meMemberName(String name);
 
+  /// No description provided for @browseFilterAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout'**
+  String get browseFilterAll;
+
   /// No description provided for @browseTabCourses.
   ///
   /// In fr, this message translates to:

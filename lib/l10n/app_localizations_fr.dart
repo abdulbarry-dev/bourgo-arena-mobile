@@ -1707,6 +1707,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get browseFilterAll => 'Tout';
+
+  @override
   String get browseTabCourses => 'COURS';
 
   @override
@@ -2368,8 +2371,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get accountSetupIncompleteOnboarding =>
-      'Veuillez compléter tous les champs d\'inscription'
-      ' obligatoires avant de continuer.';
+      'Veuillez compléter tous les champs d\'inscription obligatoires avant de continuer.';
 
   @override
   String get subscriptionScreenTitle => 'MON ABONNEMENT';

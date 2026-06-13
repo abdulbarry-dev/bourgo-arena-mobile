@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/family/complete_child_bookin
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import '../../common/widgets/app_toast.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_bookings_view_model.dart';
@@ -81,12 +82,7 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
                       SliverToBoxAdapter(
-                        child: _buildFilterTabs(
-                          context,
-                          theme,
-                          spacing,
-                          appColors,
-                        ),
+                        child: _buildFilterTabs(spacing),
                       ),
                       if (_viewModel.bookings.isEmpty)
                         SliverFillRemaining(
@@ -168,59 +164,22 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
     );
   }
 
-  Widget _buildFilterTabs(
-    BuildContext context,
-    ThemeData theme,
-    AppSpacing spacing,
-    AppColors appColors,
-  ) {
+  Widget _buildFilterTabs(AppSpacing spacing) {
     final filters = ['all', 'upcoming', 'past'];
     return Padding(
           padding: EdgeInsets.fromLTRB(spacing.lg, spacing.lg, spacing.lg, 0),
           child: Row(
             children: filters.map((f) {
-              final isSelected = _viewModel.filter == f;
               return Padding(
                 padding: EdgeInsets.only(right: spacing.sm),
-                child: Semantics(
-                  button: true,
-                  selected: isSelected,
-                  label: f,
-                  child: GestureDetector(
-                    onTap: () {
-                      AppHaptics.selection();
-                      _viewModel.load(childId: widget.childId, filter: f);
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeOutCubic,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: spacing.md,
-                        vertical: spacing.sm,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? theme.colorScheme.primary
-                            : appColors.bgElevated,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: isSelected
-                              ? theme.colorScheme.primary
-                              : appColors.bgBorder,
-                        ),
-                      ),
-                      child: Text(
-                        f.toUpperCase(),
-                        style: theme.textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          color: isSelected
-                              ? theme.colorScheme.onPrimary
-                              : theme.colorScheme.onSurfaceVariant,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                    ),
+                child: FilterPill(
+                  label: f.toUpperCase(),
+                  isSelected: _viewModel.filter == f,
+                  onTap: () => _viewModel.load(
+                    childId: widget.childId,
+                    filter: f,
                   ),
+                  hapticFeedback: true,
                 ),
               );
             }).toList(),

@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_
 import 'package:bourgo_arena_mobile/presentation/activities/viewmodels/activities_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/skeleton_card.dart';
 import 'package:bourgo_arena_mobile/presentation/home/widgets/activity_card.dart';
@@ -67,7 +68,7 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (!_viewModel.isLoading && _viewModel.activities.isNotEmpty)
-              _buildFilterBar(theme),
+              _buildFilterBar(),
             Expanded(child: _buildBody()),
           ],
         ),
@@ -75,36 +76,28 @@ class _ActivitiesListScreenState extends State<ActivitiesListScreen> {
     );
   }
 
-  Widget _buildFilterBar(ThemeData theme) {
+  Widget _buildFilterBar() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       child: Row(
         children: [
-          _buildFilterChip(theme, 'All'),
+          _buildFilterChip('All'),
           const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Sports'),
+          _buildFilterChip('Sports'),
           const SizedBox(width: 8),
-          _buildFilterChip(theme, 'Well-being'),
+          _buildFilterChip('Well-being'),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(ThemeData theme, String label) {
-    final isSelected = _selectedFilter == label;
-    return ChoiceChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: (_) => setState(() => _selectedFilter = label),
-      selectedColor: theme.colorScheme.primary,
-      backgroundColor: theme.colorScheme.surfaceContainerHighest,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.black : theme.colorScheme.onSurfaceVariant,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
-      side: BorderSide.none,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+  Widget _buildFilterChip(String label) {
+    return FilterPill(
+      label: label,
+      isSelected: _selectedFilter == label,
+      onTap: () => setState(() => _selectedFilter = label),
+      hapticFeedback: true,
     );
   }
 

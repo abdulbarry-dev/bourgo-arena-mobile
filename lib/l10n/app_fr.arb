@@ -27,7 +27,6 @@
   "commonSetUp": "CONFIGURER",
   "commonPointsShort": "pts",
   "guestBrowse": "CONTINUER EN TANT QU'INVITÉ",
-  "guestBrowse": "CONTINUER EN TANT QU'INVITÉ",
   
   "navHome": "ACCUEIL",
   "navActivities": "PARCOURIR",
@@ -581,6 +580,7 @@
   "meLabel": "Moi",
   "meMemberName": "{name} (Moi)",
   "@meMemberName": {"placeholders": {"name": {"type": "String"}}},
+  "browseFilterAll": "Tout",
   "browseTabCourses": "COURS",
   "browseTabActivities": "ACTIVITÉS",
   "browseTabEvents": "ÉVÉNEMENTS",

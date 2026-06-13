@@ -580,6 +580,7 @@
   "meLabel": "Me",
   "meMemberName": "{name} (Me)",
   "@meMemberName": {"placeholders": {"name": {"type": "String"}}},
+  "browseFilterAll": "All",
   "browseTabCourses": "COURSES",
   "browseTabActivities": "ACTIVITIES",
   "browseTabEvents": "EVENTS",
