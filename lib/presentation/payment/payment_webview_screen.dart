@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import '../common/widgets/app_toast.dart';
 
 /// Result returned when [PaymentWebViewScreen] closes.
 enum PaymentWebViewResult {
@@ -101,11 +102,10 @@ class _PaymentWebViewScreenState extends State<PaymentWebViewScreen> {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (mounted) {
       final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.paymentErrorCannotOpen),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppToast.show(
+        context,
+        l10n.paymentErrorCannotOpen,
+        type: AppToastType.error,
       );
     }
   }

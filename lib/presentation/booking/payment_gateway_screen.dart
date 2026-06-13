@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/reservation_repository.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/payment_view_model.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -87,11 +88,10 @@ class _PaymentGatewayScreenState extends State<PaymentGatewayScreen>
       _didReturnFromBrowser = true;
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.paymentErrorLaunch),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppToast.show(
+        context,
+        AppLocalizations.of(context)!.paymentErrorLaunch,
+        type: AppToastType.error,
       );
     }
   }

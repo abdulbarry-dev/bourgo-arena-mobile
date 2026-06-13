@@ -792,5 +792,14 @@
   "paymentExternalDesc": "We have opened the payment gateway in your browser. Please complete the transaction there.",
   "paymentOpenAgain": "REOPEN PAYMENT PAGE",
   "paymentDoneConfirm": "I HAVE COMPLETED THE PAYMENT",
-  "paymentCancel": "CANCEL"
+  "paymentCancel": "CANCEL",
+  "accountSetupSessionExpired": "Your session needs to be refreshed. Please log in again.",
+  "accountSetupIncompleteOnboarding": "Please complete all required onboarding fields before continuing.",
+  "subscriptionScreenTitle": "MY SUBSCRIPTION",
+  "subscriptionManagementPageTitle": "EXPLORE PLANS",
+  "subscriptionManagementSearchHint": "Search plans or services...",
+  "planCardSubscribeButton": "Subscribe",
+  "homeCarouselEmpty": "Nothing here yet",
+  "subscriptionCardStartLabel": "START",
+  "subscriptionCardEndLabel": "END"
 }

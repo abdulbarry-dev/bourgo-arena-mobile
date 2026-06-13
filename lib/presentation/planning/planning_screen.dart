@@ -15,6 +15,7 @@ import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.da
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/session_schedule_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
@@ -224,21 +225,20 @@ class _PlanningScreenState extends State<PlanningScreen> {
     if (error == null) {
       setState(() {});
       CelebrationOverlay.show(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(
-              context,
-            )!.courseDetailBookedSession(entry.title, dateStr, entry.startTime),
-          ),
+      AppToast.show(
+        context,
+        AppLocalizations.of(context)!.courseDetailBookedSession(
+          entry.title,
+          dateStr,
+          entry.startTime,
         ),
+        type: AppToastType.success,
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(error),
-          backgroundColor: Theme.of(context).colorScheme.error,
-        ),
+      AppToast.show(
+        context,
+        error,
+        type: AppToastType.error,
       );
     }
   }

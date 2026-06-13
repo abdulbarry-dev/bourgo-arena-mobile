@@ -2361,4 +2361,35 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get paymentCancel => 'ANNULER';
+
+  @override
+  String get accountSetupSessionExpired =>
+      'Votre session doit être actualisée. Veuillez vous reconnecter.';
+
+  @override
+  String get accountSetupIncompleteOnboarding =>
+      'Veuillez compléter tous les champs d\'inscription'
+      ' obligatoires avant de continuer.';
+
+  @override
+  String get subscriptionScreenTitle => 'MON ABONNEMENT';
+
+  @override
+  String get subscriptionManagementPageTitle => 'EXPLORER LES PLANS';
+
+  @override
+  String get subscriptionManagementSearchHint =>
+      'Rechercher des plans ou services...';
+
+  @override
+  String get planCardSubscribeButton => 'S\'abonner';
+
+  @override
+  String get homeCarouselEmpty => 'Rien ici pour l\'instant';
+
+  @override
+  String get subscriptionCardStartLabel => 'DÉBUT';
+
+  @override
+  String get subscriptionCardEndLabel => 'FIN';
 }

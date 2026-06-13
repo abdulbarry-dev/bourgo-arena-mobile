@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
@@ -94,7 +95,10 @@ class _SubscriptionManagementScreenState
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'EXPLORE PLANS'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!
+                .subscriptionManagementPageTitle,
+          ),
           body: _viewModel.isLoading
               ? _buildSkeletonLoading(theme)
               : _viewModel.errorMessage != null
@@ -123,7 +127,8 @@ class _SubscriptionManagementScreenState
           fontFamily: GoogleFonts.dmSans().fontFamily,
         ),
         decoration: InputDecoration(
-          hintText: 'Search plans or services...',
+          hintText: AppLocalizations.of(context)!
+              .subscriptionManagementSearchHint,
           hintStyle: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             fontFamily: GoogleFonts.dmSans().fontFamily,
@@ -312,7 +317,7 @@ class _SubscriptionManagementScreenState
               ),
             ),
             child: Text(
-              'RETRY',
+              AppLocalizations.of(context)!.commonRetry,
               style: TextStyle(
                 fontWeight: FontWeight.w900,
                 letterSpacing: 1.2,

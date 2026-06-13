@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_
 import 'package:bourgo_arena_mobile/domain/repositories/course_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/book_child_session_use_case.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/child_selector_sheet.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
@@ -135,25 +136,22 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
       result.when(
         success: (_) {
           CelebrationOverlay.show(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.courseDetailBookedSession(
-                  session.title,
-                  dateStr,
-                  session.startTime,
-                ),
-              ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.courseDetailBookedSession(
+              session.title,
+              dateStr,
+              session.startTime,
             ),
+            type: AppToastType.success,
           );
           _loadSessions();
         },
         failure: (f) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(f.message),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
+          AppToast.show(
+            context,
+            f.message,
+            type: AppToastType.error,
           );
         },
       );
@@ -168,25 +166,22 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     result.when(
       success: (_) {
         CelebrationOverlay.show(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.courseDetailBookedSession(
-                session.title,
-                dateStr,
-                session.startTime,
-              ),
-            ),
+        AppToast.show(
+          context,
+          AppLocalizations.of(context)!.courseDetailBookedSession(
+            session.title,
+            dateStr,
+            session.startTime,
           ),
+          type: AppToastType.success,
         );
         _loadSessions();
       },
       failure: (f) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(f.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppToast.show(
+          context,
+          f.message,
+          type: AppToastType.error,
         );
         _showSubscriptionGate();
       },

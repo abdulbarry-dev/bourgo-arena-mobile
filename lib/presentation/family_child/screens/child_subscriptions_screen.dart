@@ -388,7 +388,9 @@ class _ErrorState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Symbols.refresh, size: 20),
-              label: const Text('R\u00E9essayer'),
+              label: Text(
+                AppLocalizations.of(context)!.commonRetry,
+              ),
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/viewmodels/settings_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/settings/terms_of_service_screen.dart';
@@ -377,8 +378,10 @@ class SettingsScreen extends StatelessWidget {
       onConfirm: (dialogContext) async {
         final pwd = passwordController.text.trim();
         if (pwd.isEmpty) {
-          ScaffoldMessenger.of(dialogContext).showSnackBar(
-            SnackBar(content: Text(l10n.settingsEnterPasswordFirst)),
+          AppToast.show(
+            dialogContext,
+            l10n.settingsEnterPasswordFirst,
+            type: AppToastType.warning,
           );
           return false;
         }

@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/buy_child_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/child_selector_sheet.dart';
 import 'package:flutter/material.dart';
@@ -187,12 +188,7 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
   }
 
   void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Theme.of(context).colorScheme.error,
-      ),
-    );
+    AppToast.show(context, message, type: AppToastType.error);
   }
 
   Future<void> _showChildOnlyPlanDialog() async {
@@ -246,10 +242,10 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     if (childId == kAddChildSentinel) {
       await context.push('/add-child');
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.planDetailChildAdded),
-        ),
+      AppToast.show(
+        context,
+        AppLocalizations.of(context)!.planDetailChildAdded,
+        type: AppToastType.info,
       );
       return;
     }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer' as developer;
 
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
+import '../../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
@@ -226,9 +227,11 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
         );
       },
       onFailure: (failure) {
-        ScaffoldMessenger.of(
+        AppToast.show(
           context,
-        ).showSnackBar(SnackBar(content: Text(failure.message)));
+          failure.message,
+          type: AppToastType.error,
+        );
       },
     );
   }

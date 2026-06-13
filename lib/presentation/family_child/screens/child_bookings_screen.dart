@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/entities/child_booking.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/complete_child_booking_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
+import '../../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_bookings_view_model.dart';
@@ -236,32 +237,22 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
       bookingId: bookingId,
     );
     if (mounted) {
-      final t = Theme.of(context);
-      final appColors = t.extension<AppColors>()!;
       if (success) {
         AppHaptics.success();
       } else {
         AppHaptics.error();
       }
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? AppLocalizations.of(
-                      context,
-                    )!.familyChildBookingCompletedSuccess
-                  : AppLocalizations.of(
-                      context,
-                    )!.familyChildBookingCompletedFailure,
-            ),
-            backgroundColor: success
-                ? appColors.statusSuccess
-                : t.colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      AppToast.show(
+        context,
+        success
+            ? AppLocalizations.of(
+                context,
+              )!.familyChildBookingCompletedSuccess
+            : AppLocalizations.of(
+                context,
+              )!.familyChildBookingCompletedFailure,
+        type: success ? AppToastType.success : AppToastType.error,
+      );
     }
   }
 

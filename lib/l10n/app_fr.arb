@@ -793,5 +793,14 @@
   "paymentExternalDesc": "Nous avons ouvert la passerelle de paiement dans votre navigateur. Veuillez y effectuer la transaction.",
   "paymentOpenAgain": "ROUVRIR LA PAGE DE PAIEMENT",
   "paymentDoneConfirm": "J'AI EFFECTUÉ LE PAIEMENT",
-  "paymentCancel": "ANNULER"
+  "paymentCancel": "ANNULER",
+  "accountSetupSessionExpired": "Votre session doit être actualisée. Veuillez vous reconnecter.",
+  "accountSetupIncompleteOnboarding": "Veuillez compléter tous les champs d'inscription obligatoires avant de continuer.",
+  "subscriptionScreenTitle": "MON ABONNEMENT",
+  "subscriptionManagementPageTitle": "EXPLORER LES PLANS",
+  "subscriptionManagementSearchHint": "Rechercher des plans ou services...",
+  "planCardSubscribeButton": "S'abonner",
+  "homeCarouselEmpty": "Rien ici pour l'instant",
+  "subscriptionCardStartLabel": "DÉBUT",
+  "subscriptionCardEndLabel": "FIN"
 }

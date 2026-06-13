@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/domain/entities/payment.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/transaction_history_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/widgets/transaction_tile.dart';
@@ -191,7 +192,10 @@ class _ErrorView extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: onRetry,
                     icon: const Icon(Symbols.refresh, size: 18),
-                    label: const Text('Réessayer'),
+                    label: Text(
+                      AppLocalizations.of(context)!
+                          .commonRetry,
+                    ),
                     style: FilledButton.styleFrom(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),

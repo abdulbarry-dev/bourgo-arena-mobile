@@ -3,6 +3,8 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/forgot_password_use_cas
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../common/widgets/app_toast.dart';
+
 /// ViewModel for the Forgot Password screen.
 class ForgotPasswordViewModel extends ChangeNotifier {
   final ForgotPasswordUseCase _forgotPasswordUseCase;
@@ -59,9 +61,11 @@ class ForgotPasswordViewModel extends ChangeNotifier {
         },
       );
     } else {
-      ScaffoldMessenger.of(
+      AppToast.show(
         context,
-      ).showSnackBar(SnackBar(content: Text(failure.message)));
+        failure.message,
+        type: AppToastType.error,
+      );
     }
   }
 

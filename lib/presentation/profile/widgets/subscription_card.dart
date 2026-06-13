@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -147,7 +148,8 @@ class SubscriptionCard extends StatelessWidget {
             children: [
               Expanded(
                 child: DateLabel(
-                  label: 'D\u00C9BUT',
+                  label: AppLocalizations.of(context)!
+                      .subscriptionCardStartLabel,
                   date: subscription.startsAt,
                   theme: theme,
                 ),
@@ -163,7 +165,8 @@ class SubscriptionCard extends StatelessWidget {
               SizedBox(width: spacing.sm),
               Expanded(
                 child: DateLabel(
-                  label: 'FIN',
+                  label: AppLocalizations.of(context)!
+                      .subscriptionCardEndLabel,
                   date: subscription.endsAt,
                   theme: theme,
                 ),

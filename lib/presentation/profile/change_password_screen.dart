@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/change_password_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -48,23 +49,17 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
       if (mounted) {
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.passwordUpdateSuccess,
-              ),
-              backgroundColor: Colors.green,
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.passwordUpdateSuccess,
+            type: AppToastType.success,
           );
           context.pop();
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.errorUpdatingPassword,
-              ),
-              backgroundColor: Colors.red,
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.errorUpdatingPassword,
+            type: AppToastType.error,
           );
         }
       }

@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/auth/verify_otp_use_case.dar
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/otp/otp_view_model.dart';
+import '../../common/widgets/app_toast.dart';
 import 'dart:async';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.dart';
@@ -121,12 +122,15 @@ class _OtpScreenState extends State<OtpScreen> {
   void _onViewModelChanged() {
     if (_viewModel.errorMessage != null) {
       final l10n = AppLocalizations.of(context)!;
-      final message = _viewModel.errorMessage == 'authInvalidVerificationCode'
+      final message =
+          _viewModel.errorMessage == 'authInvalidVerificationCode'
           ? l10n.authInvalidVerificationCode
           : _viewModel.errorMessage!;
-      ScaffoldMessenger.of(
+      AppToast.show(
         context,
-      ).showSnackBar(SnackBar(content: Text(message)));
+        message,
+        type: AppToastType.error,
+      );
     }
   }
 
@@ -222,26 +226,10 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _showInvalidPasteToast() {
-    final theme = Theme.of(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(Symbols.warning, color: theme.colorScheme.onError),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Invalid format. Please paste a 6-digit code.',
-                style: TextStyle(color: theme.colorScheme.onError),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: theme.colorScheme.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(24),
-      ),
+    AppToast.show(
+      context,
+      'Invalid format. Please paste a 6-digit code.',
+      type: AppToastType.error,
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
+import 'app_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -254,14 +255,12 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                             final code = _controllers.map((c) => c.text).join();
                             if (code.length != 6) {
                               if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.otpErrorIncomplete,
-                                  ),
-                                ),
+                              AppToast.show(
+                                context,
+                                AppLocalizations.of(
+                                  context,
+                                )!.otpErrorIncomplete,
+                                type: AppToastType.warning,
                               );
                               return;
                             }
@@ -272,15 +271,12 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                               Navigator.pop(context, true);
                             } else {
                               setState(() => _isVerifying = false);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.otpErrorFailed,
-                                  ),
-                                  backgroundColor: theme.colorScheme.error,
-                                ),
+                              AppToast.show(
+                                context,
+                                AppLocalizations.of(
+                                  context,
+                                )!.otpErrorFailed,
+                                type: AppToastType.error,
                               );
                             }
                           },
