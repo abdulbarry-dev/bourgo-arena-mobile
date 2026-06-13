@@ -1,6 +1,8 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
@@ -55,6 +57,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   }
 
   Future<void> _loadFamilyStatus() async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) return;
     final userRepository = locator<UserRepository>();
     final userResult = await userRepository.getUserProfile();
     if (!mounted) return;
@@ -168,6 +171,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _register() async {
     if (_event == null || _isActionLoading) return;
+    if (!ensureAuthenticated(context)) return;
 
     final theme = Theme.of(context);
     final memberName =
@@ -269,6 +273,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _withdraw() async {
     if (_event == null || _isActionLoading) return;
+    if (!ensureAuthenticated(context)) return;
 
     final memberName =
         _selectedMember?.name ?? AppLocalizations.of(context)!.planDetailMyself;
@@ -322,6 +327,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _checkIn() async {
     if (_event == null || _isActionLoading) return;
+    if (!ensureAuthenticated(context)) return;
     setState(() => _isActionLoading = true);
 
     final childId = _selectedMember?.isPrimary == true

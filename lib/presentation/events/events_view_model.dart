@@ -1,7 +1,9 @@
 import 'dart:developer' as developer;
 
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:flutter/material.dart';
 
 enum EventsLoadState { idle, loading, loaded, error, loadingMore }
@@ -24,7 +26,9 @@ class EventsViewModel extends ChangeNotifier {
     required RegisterForEventUseCase registerForEventUseCase,
   }) : _getEventsUseCase = getEventsUseCase,
        _registerForEventUseCase = registerForEventUseCase {
-    loadEvents();
+    if (locator<AuthStateNotifier>().isAuthenticated) {
+      loadEvents();
+    }
   }
 
   List<Event> get events => _events;
@@ -43,6 +47,12 @@ class EventsViewModel extends ChangeNotifier {
   }
 
   Future<void> loadEvents() async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) {
+      _state = EventsLoadState.loaded;
+      notifyListeners();
+      return;
+    }
+
     _state = EventsLoadState.loading;
     _errorMessage = null;
     _currentPage = 1;
@@ -94,6 +104,8 @@ class EventsViewModel extends ChangeNotifier {
   }
 
   Future<bool> registerForEvent(String eventId) async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) return false;
+
     _registeringEventId = eventId;
     _lastRegistrationStatus = null;
     notifyListeners();

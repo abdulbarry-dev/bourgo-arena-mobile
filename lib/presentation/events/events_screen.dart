@@ -4,7 +4,9 @@ import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/events/events_view_model.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -92,6 +94,10 @@ class _EventsScreenState extends State<EventsScreen> {
   }
 
   Widget _buildBody(ThemeData theme) {
+    if (!locator<AuthStateNotifier>().isAuthenticated) {
+      return const GuestAuthState(icon: Symbols.emoji_events);
+    }
+
     if (_viewModel.isLoading) {
       return RefreshIndicator(
         onRefresh: _viewModel.loadEvents,
