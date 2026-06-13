@@ -7,6 +7,8 @@ import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view
 import 'package:bourgo_arena_mobile/presentation/common/widgets/animated_loyalty_balance.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_webview_screen.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -50,23 +52,46 @@ class _PaymentStepState extends State<PaymentStep> {
   String? _errorMessage;
   String? _pendingReservationId;
   int? _pendingDepositPaymentId;
+  bool _isProcessing = false;
+
+  void _navigateToSuccess() {
+    if (!mounted) return;
+    setState(() {
+      _konnectState = _KonnectPaymentState.idle;
+    });
+    context.push('/booking-success', extra: widget.viewModel.selectedActivity);
+  }
 
   Future<void> _handlePayment() async {
+    if (_isProcessing) return;
+    _isProcessing = true;
+
     setState(() {
       _konnectState = _KonnectPaymentState.processingReservation;
       _errorMessage = null;
     });
 
     final success = await widget.viewModel.makeReservation();
-    if (!mounted) return;
+    if (!mounted) {
+      _isProcessing = false;
+      return;
+    }
 
     if (!success) {
       setState(() {
+        _isProcessing = false;
         _konnectState = _KonnectPaymentState.failed;
         _errorMessage =
             widget.viewModel.errorMessage ??
             AppLocalizations.of(context)!.paymentErrorGeneric;
       });
+      return;
+    }
+
+    final requiresDeposit = widget.viewModel.requiresDeposit;
+    if (!requiresDeposit) {
+      _isProcessing = false;
+      _navigateToSuccess();
       return;
     }
 
@@ -94,7 +119,10 @@ class _PaymentStepState extends State<PaymentStep> {
         confirmLabel: AppLocalizations.of(context)!.actionPayNow,
       );
       if (confirmed != true) {
-        setState(() => _konnectState = _KonnectPaymentState.idle);
+        setState(() {
+          _isProcessing = false;
+          _konnectState = _KonnectPaymentState.idle;
+        });
         return;
       }
       await _handleLoyaltyPayment(reservationId);
@@ -111,6 +139,7 @@ class _PaymentStepState extends State<PaymentStep> {
   Future<void> _handleLoyaltyPayment(String? reservationId) async {
     if (reservationId == null) {
       setState(() {
+        _isProcessing = false;
         _konnectState = _KonnectPaymentState.failed;
         _errorMessage = AppLocalizations.of(context)!.paymentErrorMissingId;
       });
@@ -120,6 +149,7 @@ class _PaymentStepState extends State<PaymentStep> {
     final parsedId = int.tryParse(reservationId);
     if (parsedId == null) {
       setState(() {
+        _isProcessing = false;
         _konnectState = _KonnectPaymentState.failed;
         _errorMessage = AppLocalizations.of(context)!.paymentErrorInvalidId;
       });
@@ -131,14 +161,19 @@ class _PaymentStepState extends State<PaymentStep> {
     final useCase = locator<PayWithLoyaltyUseCase>();
     final result = await useCase(type: 'reservation', id: parsedId);
 
-    if (!mounted) return;
+    if (!mounted) {
+      _isProcessing = false;
+      return;
+    }
 
     result.fold(
       onSuccess: (_) {
-        setState(() => _konnectState = _KonnectPaymentState.success);
+        _isProcessing = false;
+        _navigateToSuccess();
       },
       onFailure: (failure) {
         setState(() {
+          _isProcessing = false;
           _konnectState = _KonnectPaymentState.failed;
           _errorMessage = failure.message;
         });
@@ -146,7 +181,7 @@ class _PaymentStepState extends State<PaymentStep> {
     );
   }
 
-  /// Opens the Konnect gateway in a full-screen in-app WebView.
+  /// Opens the Konnect gateway in a full-screen in-app WebView (or redirects on Web).
   Future<void> _openKonnectGateway({
     required String? reservationId,
     required String? depositUrl,
@@ -154,6 +189,7 @@ class _PaymentStepState extends State<PaymentStep> {
   }) async {
     if (depositUrl == null || reservationId == null) {
       setState(() {
+        _isProcessing = false;
         _konnectState = _KonnectPaymentState.failed;
         _errorMessage = AppLocalizations.of(context)!.paymentErrorNoUrl;
       });
@@ -163,6 +199,20 @@ class _PaymentStepState extends State<PaymentStep> {
     _pendingReservationId = reservationId;
     _pendingDepositPaymentId = depositPaymentId;
 
+    if (kIsWeb) {
+      final uri = Uri.tryParse(depositUrl);
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri, webOnlyWindowName: '_self');
+      } else if (mounted) {
+        setState(() {
+          _isProcessing = false;
+          _konnectState = _KonnectPaymentState.failed;
+          _errorMessage = AppLocalizations.of(context)!.paymentErrorCannotOpen;
+        });
+      }
+      return;
+    }
+
     setState(() => _konnectState = _KonnectPaymentState.openingGateway);
 
     final result = await Navigator.of(context).push<PaymentWebViewResult>(
@@ -171,7 +221,10 @@ class _PaymentStepState extends State<PaymentStep> {
       ),
     );
 
-    if (!mounted) return;
+    if (!mounted) {
+      _isProcessing = false;
+      return;
+    }
 
     switch (result) {
       case PaymentWebViewResult.success:
@@ -180,6 +233,7 @@ class _PaymentStepState extends State<PaymentStep> {
       case PaymentWebViewResult.failure:
         // Gateway explicitly signalled failure.
         setState(() {
+          _isProcessing = false;
           _konnectState = _KonnectPaymentState.failed;
           _errorMessage = AppLocalizations.of(context)!.paymentErrorGeneric;
         });
@@ -188,6 +242,7 @@ class _PaymentStepState extends State<PaymentStep> {
         // User closed the WebView without completing payment — go back
         // to the summary so they can retry. No verification needed.
         setState(() {
+          _isProcessing = false;
           _konnectState = _KonnectPaymentState.idle;
           _errorMessage = null;
         });
@@ -204,14 +259,19 @@ class _PaymentStepState extends State<PaymentStep> {
       _pendingDepositPaymentId?.toString() ?? '',
     );
 
-    if (!mounted) return;
+    if (!mounted) {
+      _isProcessing = false;
+      return;
+    }
 
     verifyResult.fold(
       onSuccess: (status) {
         if (status == 'paid' || status == 'completed') {
-          setState(() => _konnectState = _KonnectPaymentState.success);
+          _isProcessing = false;
+          _navigateToSuccess();
         } else {
           setState(() {
+            _isProcessing = false;
             _konnectState = _KonnectPaymentState.idle;
             _errorMessage = AppLocalizations.of(
               context,
@@ -221,6 +281,7 @@ class _PaymentStepState extends State<PaymentStep> {
       },
       onFailure: (failure) {
         setState(() {
+          _isProcessing = false;
           _konnectState = _KonnectPaymentState.failed;
           _errorMessage = failure.message;
         });
@@ -244,12 +305,7 @@ class _PaymentStepState extends State<PaymentStep> {
           message: AppLocalizations.of(context)!.paymentVerifying,
         );
       case _KonnectPaymentState.success:
-        return _SuccessView(
-          onContinue: () => context.push(
-            '/booking-success',
-            extra: widget.viewModel.selectedActivity,
-          ),
-        );
+        return const SizedBox.shrink();
       case _KonnectPaymentState.failed:
         return _FailedView(
           message:
@@ -290,70 +346,6 @@ class _LoadingView extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Full-screen success state — mirrors the plan payment success screen.
-class _SuccessView extends StatelessWidget {
-  final VoidCallback onContinue;
-
-  const _SuccessView({required this.onContinue});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Icon(
-            Symbols.check_circle,
-            size: 100,
-            color: theme.colorScheme.primary,
-          ),
-          const SizedBox(height: 32),
-          Text(
-            AppLocalizations.of(context)!.paymentSuccessTitle,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontFamily: AppConstants.displayFontFamily,
-              fontWeight: FontWeight.w900,
-              color: theme.colorScheme.onSurface,
-              letterSpacing: 1.5,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            AppLocalizations.of(context)!.paymentSuccessDesc,
-            textAlign: TextAlign.center,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 48),
-          ElevatedButton(
-            onPressed: onContinue,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              minimumSize: const Size(double.infinity, 56),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-            ),
-            child: Text(
-              AppLocalizations.of(context)!.paymentViewBooking,
-              style: const TextStyle(
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.2,
-              ),
             ),
           ),
         ],

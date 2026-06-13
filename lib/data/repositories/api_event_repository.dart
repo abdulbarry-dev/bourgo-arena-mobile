@@ -79,10 +79,17 @@ class ApiEventRepository implements EventRepository {
   }
 
   @override
-  Future<Result<RegistrationResult, Failure>> registerForEvent(String eventId) {
+  Future<Result<RegistrationResult, Failure>> registerForEvent(
+    String eventId, {
+    String? childId,
+  }) {
     return executeApiCall(() async {
+      final body = <String, dynamic>{};
+      if (childId != null) {
+        body['child_id'] = childId;
+      }
       final response =
-          await _apiClient.post('/events/$eventId/register', {})
+          await _apiClient.post('/events/$eventId/register', body)
               as Map<String, dynamic>;
       final status = response['status'] as String? ?? 'pending';
       return Result.success(RegistrationResult(status: status));
@@ -120,17 +127,50 @@ class ApiEventRepository implements EventRepository {
   }
 
   @override
-  Future<Result<void, Failure>> withdrawFromEvent(String eventId) {
+  Future<Result<List<EventParticipant>, Failure>> getAccountRegistrations() {
     return executeApiCall(() async {
-      await _apiClient.post('/events/$eventId/withdraw', {});
+      final response = await _apiClient.get('/user/events');
+      final List<dynamic> data = response is List
+          ? response
+          : ((response as Map<String, dynamic>)['data'] as List<dynamic>? ??
+                []);
+      final entities = data
+          .map(
+            (json) => EventMapper.toParticipantEntity(
+              EventParticipantModel.fromJson(json as Map<String, dynamic>),
+            ),
+          )
+          .toList();
+      return Result.success(entities);
+    });
+  }
+
+  @override
+  Future<Result<void, Failure>> withdrawFromEvent(
+    String eventId, {
+    String? childId,
+  }) {
+    return executeApiCall(() async {
+      final body = <String, dynamic>{};
+      if (childId != null) {
+        body['child_id'] = childId;
+      }
+      await _apiClient.post('/events/$eventId/withdraw', body);
       return Result.success(null);
     });
   }
 
   @override
-  Future<Result<void, Failure>> checkInToEvent(String eventId) {
+  Future<Result<void, Failure>> checkInToEvent(
+    String eventId, {
+    String? childId,
+  }) {
     return executeApiCall(() async {
-      await _apiClient.post('/events/$eventId/check-in', {});
+      final body = <String, dynamic>{};
+      if (childId != null) {
+        body['child_id'] = childId;
+      }
+      await _apiClient.post('/events/$eventId/check-in', body);
       return Result.success(null);
     });
   }

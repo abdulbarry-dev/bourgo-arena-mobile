@@ -41,7 +41,7 @@ class _TickerStripState extends State<TickerStrip>
               _scrollController.jumpTo(currentScroll);
             }
           });
-    final isTest = AppConfig.isTestEnvironment;
+    final isTest = AppConfig.isTest;
     if (!isTest) {
       _animationController.repeat();
     }

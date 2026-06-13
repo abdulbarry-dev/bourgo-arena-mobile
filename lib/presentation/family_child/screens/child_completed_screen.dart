@@ -1,8 +1,8 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
-import 'package:bourgo_arena_mobile/domain/entities/completed_item.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_completed_items_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_schedule_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
@@ -22,32 +22,21 @@ class ChildCompletedScreen extends StatefulWidget {
 
 class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
   late final ChildCompletedViewModel _viewModel;
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     _viewModel = ChildCompletedViewModel(
       getChildCompletedItemsUseCase: locator<GetChildCompletedItemsUseCase>(),
+      getChildScheduleUseCase: locator<GetChildScheduleUseCase>(),
     );
     _viewModel.load(widget.childId);
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    final position = _scrollController.position;
-    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
-    if (position.pixels >= position.maxScrollExtent - 200) {
-      _viewModel.loadMore();
-    }
   }
 
   @override
@@ -69,27 +58,30 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
                   onRefresh: () => _viewModel.load(widget.childId),
                   color: theme.colorScheme.primary,
                   child: _viewModel.items.isEmpty
-                      ? _buildEmptyState(theme, spacing)
+                      ? LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight,
+                                ),
+                                child: Center(
+                                  child: _buildEmptyState(theme, spacing),
+                                ),
+                              ),
+                            );
+                          },
+                        )
                       : ListView.builder(
-                          controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
                           padding: EdgeInsets.all(spacing.lg),
-                          itemCount:
-                              _viewModel.items.length +
-                              (_viewModel.isLoadingMore ? 1 : 0),
+                          itemCount: _viewModel.items.length,
                           itemBuilder: (context, index) {
-                            if (index == _viewModel.items.length) {
-                              return const Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            }
                             final item = _viewModel.items[index];
                             return Padding(
                               padding: EdgeInsets.only(bottom: spacing.md),
-                              child: _CompletedCard(
+                              child: _ActivityCard(
                                 item: item,
                                 index: index,
                                 theme: theme,
@@ -138,66 +130,68 @@ class _ChildCompletedScreenState extends State<ChildCompletedScreen> {
   }
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
-    return Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: spacing.xxl,
-              horizontal: spacing.xl,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 112,
-                  height: 112,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                    ),
-                  ),
-                  child: Icon(
-                    Symbols.check_circle,
-                    size: 56,
-                    color: theme.colorScheme.primary,
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: spacing.xxl,
+        horizontal: spacing.xl,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
                   ),
                 ),
-                SizedBox(height: spacing.xl),
-                Text(
-                  AppLocalizations.of(context)!.familyChildCompletedEmptyTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
+                child: Icon(
+                  Symbols.check_circle,
+                  size: 56,
+                  color: theme.colorScheme.primary,
                 ),
-                SizedBox(height: spacing.md),
-                Text(
-                  AppLocalizations.of(
-                    context,
-                  )!.familyChildCompletedEmptyMessage,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
+              )
+              .animate()
+              .scale(duration: 400.ms, curve: Curves.easeOutBack)
+              .fade(duration: 400.ms),
+          SizedBox(height: spacing.xl),
+          Text(
+                AppLocalizations.of(context)!.familyChildCompletedEmptyTitle,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
                 ),
-              ],
-            ),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 300.ms)
-        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
+              )
+              .animate(delay: 100.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+          SizedBox(height: spacing.md),
+          Text(
+                AppLocalizations.of(context)!.familyChildCompletedEmptyMessage,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              )
+              .animate(delay: 200.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+        ],
+      ),
+    );
   }
 }
 
-class _CompletedCard extends StatelessWidget {
-  final CompletedItem item;
+class _ActivityCard extends StatelessWidget {
+  final ChildActivityItem item;
   final int index;
   final ThemeData theme;
   final AppSpacing spacing;
 
-  const _CompletedCard({
+  const _ActivityCard({
     required this.item,
     required this.index,
     required this.theme,
@@ -207,10 +201,10 @@ class _CompletedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = theme.extension<AppColors>()!;
-    final isActivity = item.type == CompletedItemType.activity;
-    final color = isActivity
-        ? const Color(0xFF8B5CF6)
-        : theme.colorScheme.primary;
+    final isUpcoming = item.status == ChildActivityStatus.upcoming;
+    final statusColor = isUpcoming
+        ? theme.colorScheme.primary
+        : appColors.statusSuccess;
 
     return PressableCard(
           borderRadius: BorderRadius.circular(16),
@@ -228,19 +222,14 @@ class _CompletedCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: appColors.statusSuccess.withValues(alpha: 0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
-                    child: Semantics(
-                      label: AppLocalizations.of(
-                        context,
-                      )!.familyChildCompletedStatus,
-                      child: Icon(
-                        Symbols.check_circle,
-                        color: appColors.statusSuccess,
-                        size: 24,
-                      ),
+                    child: Icon(
+                      isUpcoming ? Symbols.schedule : Symbols.check_circle,
+                      color: statusColor,
+                      size: 24,
                     ),
                   ),
                 ),
@@ -257,23 +246,42 @@ class _CompletedCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: color.withValues(alpha: 0.1),
+                              color: statusColor.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               item.typeLabel.toUpperCase(),
                               style: theme.textTheme.labelSmall?.copyWith(
                                 fontWeight: FontWeight.w900,
-                                color: color,
+                                color: statusColor,
                                 fontSize: 9,
                               ),
                             ),
                           ),
                           const Spacer(),
-                          Text(
-                            item.date,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: spacing.xs,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isUpcoming
+                                  ? theme.colorScheme.primary.withValues(
+                                      alpha: 0.08,
+                                    )
+                                  : appColors.statusSuccess.withValues(
+                                      alpha: 0.08,
+                                    ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              isUpcoming ? 'UPCOMING' : 'COMPLETED',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: statusColor,
+                                fontSize: 9,
+                                letterSpacing: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -289,19 +297,53 @@ class _CompletedCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(
-                            Symbols.check_circle,
+                            Symbols.calendar_today,
                             size: 12,
-                            color: appColors.statusSuccess,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           SizedBox(width: spacing.xxs),
                           Text(
-                            '${AppLocalizations.of(context)!.familyChildCompletedAtPrefix} ${item.completedAt}',
+                            item.date,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
+                          if (item.timeDisplay != null) ...[
+                            SizedBox(width: spacing.sm),
+                            Icon(
+                              Symbols.schedule,
+                              size: 12,
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                            SizedBox(width: spacing.xxs),
+                            Text(
+                              item.timeDisplay!,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
+                      if (!isUpcoming && item.completedAt != null) ...[
+                        SizedBox(height: spacing.xxs),
+                        Row(
+                          children: [
+                            Icon(
+                              Symbols.check_circle,
+                              size: 12,
+                              color: appColors.statusSuccess,
+                            ),
+                            SizedBox(width: spacing.xxs),
+                            Text(
+                              '${AppLocalizations.of(context)!.familyChildCompletedAtPrefix} ${item.completedAt}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),

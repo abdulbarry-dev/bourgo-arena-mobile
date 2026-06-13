@@ -529,6 +529,14 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                     fit: BoxFit.cover,
                     width: 100,
                     height: 100,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: Icon(
+                        Symbols.person,
+                        size: 40,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
                   )
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,

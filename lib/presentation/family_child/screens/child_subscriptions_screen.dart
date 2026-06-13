@@ -2,12 +2,12 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
-import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/buy_child_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_subscriptions_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_subscriptions_view_model.dart';
+import 'package:bourgo_arena_mobile/presentation/profile/widgets/subscription_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +25,6 @@ class ChildSubscriptionsScreen extends StatefulWidget {
 
 class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
   late final ChildSubscriptionsViewModel _viewModel;
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -35,38 +34,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
       buyChildSubscriptionUseCase: locator<BuyChildSubscriptionUseCase>(),
     );
     _viewModel.load(widget.childId);
-    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
     _viewModel.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    final position = _scrollController.position;
-    if (position.maxScrollExtent <= 0 || position.pixels <= 0) return;
-    if (position.pixels >= position.maxScrollExtent - 200) {
-      _viewModel.loadMore();
-    }
-  }
-
-  Color _statusColor(String status, AppColors appColors) {
-    switch (status.toLowerCase()) {
-      case 'active':
-        return appColors.statusSuccess;
-      case 'expired':
-        return const Color(0xFF9CA3AF);
-      case 'cancelled':
-        return appColors.statusError;
-      case 'pending':
-        return appColors.statusWarning;
-      default:
-        return const Color(0xFF9CA3AF);
-    }
   }
 
   @override
@@ -78,6 +51,8 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
     return ListenableBuilder(
       listenable: _viewModel,
       builder: (context, _) {
+        final subscriptions = _viewModel.subscriptions;
+
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: SubScreenAppBar(
@@ -88,77 +63,168 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
               : RefreshIndicator(
                   onRefresh: () => _viewModel.load(widget.childId),
                   color: theme.colorScheme.primary,
-                  child: ListView(
-                    controller: _scrollController,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.all(spacing.lg),
-                    children: [
-                      if (_viewModel.subscriptions.isEmpty)
-                        _buildEmptyState(theme, spacing)
-                      else ...[
-                        ..._viewModel.subscriptions.asMap().entries.map((
-                          entry,
-                        ) {
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: spacing.md),
-                            child:
-                                _SubCard(
-                                      subscription: entry.value,
-                                      statusColor: _statusColor(
-                                        entry.value.status,
-                                        appColors,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (_viewModel.errorMessage != null) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.all(spacing.lg),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight - spacing.lg * 2,
+                            ),
+                            child: Center(
+                              child: _ErrorState(
+                                message: _viewModel.errorMessage!,
+                                onRetry: () => _viewModel.load(widget.childId),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (subscriptions.isEmpty) {
+                        return SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: EdgeInsets.all(spacing.lg),
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minHeight: constraints.maxHeight - spacing.lg * 2,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const SizedBox(),
+                                _buildEmptyState(theme, spacing),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 56,
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      AppHaptics.light();
+                                      context.push('/plans');
+                                    },
+                                    icon: const Icon(Symbols.add, size: 20),
+                                    label: Text(
+                                      AppLocalizations.of(
+                                        context,
+                                      )!.familyChildSubscriptionsBuyNew,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1.2,
                                       ),
-                                      theme: theme,
-                                      spacing: spacing,
-                                      appColors: appColors,
-                                    )
-                                    .animate(
-                                      delay: (entry.key.clamp(0, 8) * 50).ms,
-                                    )
-                                    .fadeIn(duration: 350.ms)
-                                    .slideY(
-                                      begin: 0.08,
-                                      end: 0,
-                                      curve: Curves.easeOutCubic,
                                     ),
-                          );
-                        }),
-                        if (_viewModel.isLoadingMore)
-                          const Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Center(child: CircularProgressIndicator()),
-                          ),
-                      ],
-                      SizedBox(height: spacing.lg),
-                      SizedBox(
-                        width: double.infinity,
-                        height: 56,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            AppHaptics.light();
-                            context.push('/plans');
-                          },
-                          icon: const Icon(Symbols.add, size: 20),
-                          label: Text(
-                            AppLocalizations.of(
-                              context,
-                            )!.familyChildSubscriptionsBuyNew,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 1.2,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          theme.colorScheme.primary,
+                                      foregroundColor:
+                                          theme.colorScheme.onPrimary,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: theme.colorScheme.primary,
-                            foregroundColor: theme.colorScheme.onPrimary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                        );
+                      }
+
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        padding: EdgeInsets.all(spacing.lg),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            for (int i = 0; i < subscriptions.length; i++) ...[
+                              if (i > 0) ...[
+                                SizedBox(height: spacing.xl),
+                                Container(
+                                  height: 1,
+                                  color: appColors.bgBorder.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                ),
+                                SizedBox(height: spacing.xl),
+                              ],
+                              SubscriptionCard(
+                                    subscription: subscriptions[i],
+                                    appColors: appColors,
+                                  )
+                                  .animate()
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                              SizedBox(height: spacing.xl),
+                              PlanDetailsSection(
+                                    subscription: subscriptions[i],
+                                    appColors: appColors,
+                                  )
+                                  .animate(delay: 100.ms)
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                              SizedBox(height: spacing.xl),
+                              ServiceSection(subscription: subscriptions[i])
+                                  .animate(delay: 200.ms)
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                              SizedBox(height: spacing.xl),
+                              PaymentSection(
+                                    subscription: subscriptions[i],
+                                    appColors: appColors,
+                                  )
+                                  .animate(delay: 300.ms)
+                                  .fade(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                            ],
+                            SizedBox(height: spacing.lg),
+                            SizedBox(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  AppHaptics.light();
+                                  context.push('/plans');
+                                },
+                                icon: const Icon(Symbols.add, size: 20),
+                                label: Text(
+                                  AppLocalizations.of(
+                                    context,
+                                  )!.familyChildSubscriptionsBuyNew,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 1.2,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: theme.colorScheme.primary,
+                                  foregroundColor: theme.colorScheme.onPrimary,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: spacing.xl),
-                    ],
+                      );
+                    },
                   ),
                 ),
         );
@@ -218,10 +284,10 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Padding(
-          padding: EdgeInsets.symmetric(vertical: spacing.xxl),
-          child: Column(
-            children: [
-              Container(
+      padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+      child: Column(
+        children: [
+          Container(
                 width: 112,
                 height: 112,
                 decoration: BoxDecoration(
@@ -236,9 +302,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                   size: 56,
                   color: theme.colorScheme.primary,
                 ),
-              ),
-              SizedBox(height: spacing.xl),
-              Text(
+              )
+              .animate()
+              .scale(duration: 400.ms, curve: Curves.easeOutBack)
+              .fade(duration: 400.ms),
+          SizedBox(height: spacing.xl),
+          Text(
                 AppLocalizations.of(
                   context,
                 )!.familyChildSubscriptionsEmptyTitle,
@@ -246,9 +315,12 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                 ),
-              ),
-              SizedBox(height: spacing.sm),
-              Text(
+              )
+              .animate(delay: 100.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+          SizedBox(height: spacing.sm),
+          Text(
                 AppLocalizations.of(
                   context,
                 )!.familyChildSubscriptionsEmptyMessage,
@@ -256,142 +328,75 @@ class _ChildSubscriptionsScreenState extends State<ChildSubscriptionsScreen> {
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
-              ),
-            ],
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 300.ms)
-        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
+              )
+              .animate(delay: 200.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+        ],
+      ),
+    );
   }
 }
 
-class _SubCard extends StatelessWidget {
-  final Subscription subscription;
-  final Color statusColor;
-  final ThemeData theme;
-  final AppSpacing spacing;
-  final AppColors appColors;
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
 
-  const _SubCard({
-    required this.subscription,
-    required this.statusColor,
-    required this.theme,
-    required this.spacing,
-    required this.appColors,
-  });
+  const _ErrorState({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(spacing.lg),
-      decoration: BoxDecoration(
-        color: appColors.bgElevated,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: appColors.bgBorder),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: spacing.sm,
-                  vertical: spacing.xxs,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  subscription.status.toUpperCase(),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.0,
-                  ),
-                ),
+    final theme = Theme.of(context);
+    final spacing = context.spacing;
+
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: spacing.xxl),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(spacing.lg),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.error.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-              if (subscription.plan?.service?.imageUrl != null)
-                Semantics(
-                  label:
-                      subscription.plan?.service?.name ??
-                      subscription.plan?.name ??
-                      '',
-                  image: true,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: Image.network(
-                      subscription.plan!.service!.imageUrl!,
-                      width: 40,
-                      height: 40,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(height: spacing.md),
-          Text(
-            subscription.plan?.name.toUpperCase() ?? '',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          if (subscription.plan?.description != null &&
-              subscription.plan!.description!.isNotEmpty)
-            Padding(
-              padding: EdgeInsets.only(top: spacing.xs),
-              child: Text(
-                subscription.plan!.description!,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
+              child: Icon(
+                Symbols.wifi_off,
+                size: 48,
+                color: theme.colorScheme.error,
               ),
             ),
-          SizedBox(height: spacing.md),
-          Row(
-            children: [
-              Icon(
-                Symbols.schedule,
-                size: 14,
+            SizedBox(height: spacing.lg),
+            Text(
+              'Chargement \u00E9chou\u00E9',
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: theme.colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: spacing.sm),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
-              SizedBox(width: spacing.xxs),
-              Text(
-                '${subscription.daysRemaining ?? 0} ${AppLocalizations.of(context)!.familyChildSubscriptionsDaysRemaining}',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurfaceVariant,
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: spacing.xl),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Symbols.refresh, size: 20),
+              label: const Text('R\u00E9essayer'),
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
-            ],
-          ),
-          SizedBox(height: spacing.sm),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '${AppLocalizations.of(context)!.familyChildSubscriptionsStart} ${subscription.startsAt ?? '—'}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  '${AppLocalizations.of(context)!.familyChildSubscriptionsEnd} ${subscription.endsAt ?? '—'}',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

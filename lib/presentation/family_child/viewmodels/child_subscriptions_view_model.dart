@@ -1,5 +1,4 @@
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
-import 'package:bourgo_arena_mobile/domain/core/paginated_result.dart';
 import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/buy_child_subscription_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_subscriptions_use_case.dart';
@@ -11,10 +10,6 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
 
   List<Subscription> _subscriptions = [];
   bool _isLoading = false;
-  bool _isLoadingMore = false;
-  int _currentPage = 1;
-  String _childId = '';
-  PaginatedResult<Subscription>? _pagination;
 
   ChildSubscriptionsViewModel({
     required GetChildSubscriptionsUseCase getChildSubscriptionsUseCase,
@@ -24,13 +19,10 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
 
   List<Subscription> get subscriptions => _subscriptions;
   bool get isLoading => _isLoading;
-  bool get isLoadingMore => _isLoadingMore;
-  bool get hasMore => _pagination?.hasMore ?? false;
+  bool get hasActiveSubscription => _subscriptions.any((s) => s.isActive);
 
   Future<void> load(String childId) async {
-    _childId = childId;
     _isLoading = true;
-    _currentPage = 1;
     _subscriptions = [];
     notifyListeners();
 
@@ -38,9 +30,7 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
       final result = await _getChildSubscriptionsUseCase(childId: childId);
       result.when(
         success: (paginated) {
-          _subscriptions = paginated.data;
-          _pagination = paginated;
-          _currentPage = paginated.currentPage;
+          _subscriptions = paginated.data.where((s) => s.isActive).toList();
           clearError();
         },
         failure: (failure) {
@@ -55,36 +45,6 @@ class ChildSubscriptionsViewModel extends BaseViewModel {
       developer.log('Error loading child subscriptions: $e');
     } finally {
       _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> loadMore() async {
-    if (_isLoadingMore || !hasMore) return;
-    _isLoadingMore = true;
-    notifyListeners();
-
-    try {
-      final result = await _getChildSubscriptionsUseCase(
-        childId: _childId,
-        page: _currentPage + 1,
-      );
-      result.when(
-        success: (paginated) {
-          _subscriptions.addAll(paginated.data);
-          _pagination = paginated;
-          _currentPage = paginated.currentPage;
-        },
-        failure: (failure) {
-          developer.log(
-            'Failed to load more subscriptions: ${failure.message}',
-          );
-        },
-      );
-    } catch (e) {
-      developer.log('Error loading more subscriptions: $e');
-    } finally {
-      _isLoadingMore = false;
       notifyListeners();
     }
   }

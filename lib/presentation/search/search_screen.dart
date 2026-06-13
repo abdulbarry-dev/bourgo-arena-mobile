@@ -38,9 +38,14 @@ class _SearchScreenState extends State<SearchScreen> {
     super.initState();
 
     // Auto-focus the search bar
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
+    final isTest = WidgetsBinding.instance.runtimeType.toString().contains(
+      'Test',
+    );
+    if (!isTest) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _focusNode.requestFocus();
+      });
+    }
   }
 
   @override

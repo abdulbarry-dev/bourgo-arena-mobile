@@ -190,28 +190,30 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
 
   Widget _buildLoadingState(ThemeData theme, AppSpacing spacing) {
     return AppShimmer(
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
+      child: Padding(
         padding: EdgeInsets.all(spacing.xl),
-        children: List.generate(
-          4,
-          (_) => Padding(
-            padding: EdgeInsets.only(bottom: spacing.lg),
-            child: Row(
-              children: [
-                AppShimmer.block(width: 64, height: 64, borderRadius: 32),
-                SizedBox(width: spacing.lg),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppShimmer.block(width: 140, height: 16),
-                      SizedBox(height: spacing.sm),
-                      AppShimmer.block(width: 80, height: 12),
-                    ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: List.generate(
+            4,
+            (_) => Padding(
+              padding: EdgeInsets.only(bottom: spacing.lg),
+              child: Row(
+                children: [
+                  AppShimmer.block(width: 64, height: 64, borderRadius: 32),
+                  SizedBox(width: spacing.lg),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AppShimmer.block(width: 140, height: 16),
+                        SizedBox(height: spacing.sm),
+                        AppShimmer.block(width: 80, height: 12),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

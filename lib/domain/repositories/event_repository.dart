@@ -10,8 +10,18 @@ abstract interface class EventRepository {
   });
   Future<Result<Event, Failure>> getEventById(String eventId);
   Future<Result<List<BracketRound>, Failure>> getEventBracket(String eventId);
-  Future<Result<RegistrationResult, Failure>> registerForEvent(String eventId);
+  Future<Result<RegistrationResult, Failure>> registerForEvent(
+    String eventId, {
+    String? childId,
+  });
   Future<Result<List<EventParticipant>, Failure>> getMyEvents();
-  Future<Result<void, Failure>> withdrawFromEvent(String eventId);
-  Future<Result<void, Failure>> checkInToEvent(String eventId);
+  Future<Result<List<EventParticipant>, Failure>> getAccountRegistrations();
+  Future<Result<void, Failure>> withdrawFromEvent(
+    String eventId, {
+    String? childId,
+  });
+  Future<Result<void, Failure>> checkInToEvent(
+    String eventId, {
+    String? childId,
+  });
 }

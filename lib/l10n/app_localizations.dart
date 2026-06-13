@@ -4441,6 +4441,84 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Terminé'**
   String get eventsBracketCompleted;
+
+  /// No description provided for @myEventsStatusRegistered.
+  ///
+  /// In fr, this message translates to:
+  /// **'INSCRIT'**
+  String get myEventsStatusRegistered;
+
+  /// No description provided for @myEventsStatusApproved.
+  ///
+  /// In fr, this message translates to:
+  /// **'APPROUVÉ'**
+  String get myEventsStatusApproved;
+
+  /// No description provided for @myEventsStatusPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'EN ATTENTE'**
+  String get myEventsStatusPending;
+
+  /// No description provided for @myEventsStatusWithdrawn.
+  ///
+  /// In fr, this message translates to:
+  /// **'RETIRÉ'**
+  String get myEventsStatusWithdrawn;
+
+  /// No description provided for @myEventsStatusWaitlisted.
+  ///
+  /// In fr, this message translates to:
+  /// **'LISTE D\'ATTENTE'**
+  String get myEventsStatusWaitlisted;
+
+  /// No description provided for @myEventsEventUpcoming.
+  ///
+  /// In fr, this message translates to:
+  /// **'À VENIR'**
+  String get myEventsEventUpcoming;
+
+  /// No description provided for @myEventsEventInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'EN COURS'**
+  String get myEventsEventInProgress;
+
+  /// No description provided for @myEventsEventCompleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'TERMINÉ'**
+  String get myEventsEventCompleted;
+
+  /// No description provided for @paymentExternalTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passerelle sécurisée ouverte'**
+  String get paymentExternalTitle;
+
+  /// No description provided for @paymentExternalDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nous avons ouvert la passerelle de paiement dans votre navigateur. Veuillez y effectuer la transaction.'**
+  String get paymentExternalDesc;
+
+  /// No description provided for @paymentOpenAgain.
+  ///
+  /// In fr, this message translates to:
+  /// **'ROUVRIR LA PAGE DE PAIEMENT'**
+  String get paymentOpenAgain;
+
+  /// No description provided for @paymentDoneConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'J\'AI EFFECTUÉ LE PAIEMENT'**
+  String get paymentDoneConfirm;
+
+  /// No description provided for @paymentCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'ANNULER'**
+  String get paymentCancel;
 }
 
 class _AppLocalizationsDelegate

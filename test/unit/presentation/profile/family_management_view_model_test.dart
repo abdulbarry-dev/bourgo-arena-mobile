@@ -102,7 +102,10 @@ void main() {
     test('requestFamilyAccountOtp success', () async {
       await Future.delayed(Duration.zero);
       when(
-        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+        () => mockRequestFamilyAccountOtpUseCase(
+          method: any(named: 'method'),
+          identifier: any(named: 'identifier'),
+        ),
       ).thenAnswer((_) async => Result.success('OTP sent to email.'));
 
       final result = await viewModel.requestFamilyAccountOtp(
@@ -117,7 +120,10 @@ void main() {
     test('verifyFamilyAccountOtp success', () async {
       await Future.delayed(Duration.zero);
       when(
-        () => mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+        () => mockRequestFamilyAccountOtpUseCase(
+          method: any(named: 'method'),
+          identifier: any(named: 'identifier'),
+        ),
       ).thenAnswer((_) async => Result.success('OTP sent to email.'));
       when(
         () => mockVerifyOtpUseCase(any(), any()),
@@ -181,8 +187,10 @@ void main() {
       'requestFamilyAccountOtp failure sets error message and does not change OTP state',
       () async {
         when(
-          () =>
-              mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+          () => mockRequestFamilyAccountOtpUseCase(
+            method: any(named: 'method'),
+            identifier: any(named: 'identifier'),
+          ),
         ).thenAnswer(
           (_) async => Result.failure(
             AuthFailure(AppErrorCode.invalidCredentials, 'OTP failed'),
@@ -204,8 +212,10 @@ void main() {
       'verifyFamilyAccountOtp failure sets error message and does not proceed',
       () async {
         when(
-          () =>
-              mockRequestFamilyAccountOtpUseCase(method: any(named: 'method')),
+          () => mockRequestFamilyAccountOtpUseCase(
+            method: any(named: 'method'),
+            identifier: any(named: 'identifier'),
+          ),
         ).thenAnswer((_) async => Result.success('OTP sent to phone.'));
         when(() => mockVerifyOtpUseCase(any(), any())).thenAnswer(
           (_) async => Result.failure(

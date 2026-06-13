@@ -214,6 +214,16 @@ GoRouter createRouter(
         return '/verification-method';
 
       case AuthState.pendingAdditionalVerification:
+        final verificationData = authStateNotifier.session.verificationData;
+        if (verificationData?.onboardingCompleted == false) {
+          if (location == '/verification-method' ||
+              location == '/otp' ||
+              location == '/family-onboarding') {
+            return null;
+          }
+          return '/verification-method';
+        }
+
         if (location == '/verify-additional-method' || location == '/otp') {
           return null;
         }

@@ -124,10 +124,12 @@ class ProfileViewModel extends BaseViewModel {
 
   /// Loads the user profile from the auth repository.
   /// This will trigger an update in the global AuthStateNotifier.
-  Future<void> loadProfile() async {
+  Future<void> loadProfile({bool showLoading = true}) async {
     if (!_authStateNotifier.isAuthenticated) return;
 
-    _isLoading = true;
+    if (showLoading) {
+      _isLoading = true;
+    }
     clearError();
     notifyListeners();
 
@@ -146,9 +148,17 @@ class ProfileViewModel extends BaseViewModel {
     } catch (e, stackTrace) {
       developer.log('Error loading profile', error: e, stackTrace: stackTrace);
     } finally {
-      _isLoading = false;
+      if (showLoading) {
+        _isLoading = false;
+      }
       notifyListeners();
     }
+  }
+
+  /// Refreshes only the Profile screen data endpoints.
+  Future<void> reloadProfile() async {
+    await loadProfile(showLoading: false);
+    await _loadCounts();
   }
 
   /// Logs out the user.

@@ -75,6 +75,7 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return MaterialApp(
+      locale: const Locale('en'),
       theme: BourgoTheme.lightTheme,
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -82,7 +83,7 @@ void main() {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [Locale('en'), Locale('fr')],
+      supportedLocales: const [Locale('en'), Locale('fr')],
       home: InheritedGoRouter(
         goRouter: mockGoRouter,
         child: const HomeScreen(),
@@ -90,18 +91,35 @@ void main() {
     );
   }
 
+  Future<void> scrollUntilVisible(WidgetTester tester, Finder finder) async {
+    for (int i = 0; i < 20; i++) {
+      if (tester.any(finder)) {
+        await tester.ensureVisible(finder);
+        await tester.pumpAndSettle();
+        return;
+      }
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -150));
+      await tester.pumpAndSettle();
+    }
+  }
+
   group('HomeScreen Widget Tests', () {
     testWidgets('shows section headers after data loads', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpAndSettle();
 
-      expect(find.text('TOURNAMENTS & EVENTS'), findsOneWidget);
-      expect(find.text('COURSES'), findsOneWidget);
+      final l10n = AppLocalizations.of(
+        tester.element(find.byType(HomeScreen)),
+      )!;
 
-      await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
-      await tester.pump(const Duration(seconds: 1));
+      await scrollUntilVisible(tester, find.text(l10n.homeEventsTitle));
+      expect(find.text(l10n.homeEventsTitle), findsOneWidget);
 
-      expect(find.text('ACTIVITIES'), findsOneWidget);
+      await scrollUntilVisible(tester, find.text(l10n.homeCoursesTitle));
+      expect(find.text(l10n.homeCoursesTitle), findsOneWidget);
+
+      await scrollUntilVisible(tester, find.text(l10n.homeActivitiesTitle));
+      expect(find.text(l10n.homeActivitiesTitle), findsOneWidget);
     });
   });
 }

@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
@@ -11,6 +12,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/booking/cancel_booking_use_c
 import 'package:bourgo_arena_mobile/domain/usecases/booking/get_user_bookings_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/booking/make_reservation_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_reservations_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
@@ -29,6 +31,7 @@ class BookingViewModel extends BaseViewModel {
   final GetContextualPriceUseCase _getContextualPriceUseCase;
   final GetMemberTierUseCase _getMemberTierUseCase;
   final ProjectPointsUseCase _projectPointsUseCase;
+  final GetChildReservationsUseCase _getChildReservationsUseCase;
 
   int _currentStep = 0;
   Activity? _selectedActivity;
@@ -64,6 +67,7 @@ class BookingViewModel extends BaseViewModel {
     required GetContextualPriceUseCase getContextualPriceUseCase,
     required GetMemberTierUseCase getMemberTierUseCase,
     required ProjectPointsUseCase projectPointsUseCase,
+    GetChildReservationsUseCase? getChildReservationsUseCase,
     Activity? initialActivity,
   }) : _getActivitiesUseCase = getActivitiesUseCase,
        _getTimeSlotsUseCase = getTimeSlotsUseCase,
@@ -75,6 +79,9 @@ class BookingViewModel extends BaseViewModel {
        _getContextualPriceUseCase = getContextualPriceUseCase,
        _getMemberTierUseCase = getMemberTierUseCase,
        _projectPointsUseCase = projectPointsUseCase,
+       _getChildReservationsUseCase =
+           getChildReservationsUseCase ??
+           locator<GetChildReservationsUseCase>(),
        _selectedActivity = initialActivity {
     loadUserBookings();
     _initializeFamilyContext();
@@ -159,7 +166,11 @@ class BookingViewModel extends BaseViewModel {
   /// Moves to the next step in the flow.
   void nextStep() {
     if (_currentStep < totalSteps - 1) {
-      _currentStep++;
+      if (_currentStep == 0 && _isFamilyAccount && _selectedActivity != null) {
+        _currentStep = 2;
+      } else {
+        _currentStep++;
+      }
       notifyListeners();
     }
   }
@@ -167,9 +178,24 @@ class BookingViewModel extends BaseViewModel {
   /// Moves to the previous step in the flow.
   void previousStep() {
     if (_currentStep > 0) {
-      _currentStep--;
+      if (_currentStep == 2 && _isFamilyAccount && _selectedActivity != null) {
+        _currentStep = 0;
+      } else {
+        _currentStep--;
+      }
       notifyListeners();
     }
+  }
+
+  /// Whether the user can navigate back to a previous step.
+  bool get canGoBack {
+    if (_isFamilyAccount) {
+      return _currentStep > 0;
+    }
+    if (_selectedActivity != null) {
+      return _currentStep > 1;
+    }
+    return _currentStep > 0;
   }
 
   /// Selects an [activity] and moves to the detail step.
@@ -205,6 +231,7 @@ class BookingViewModel extends BaseViewModel {
     _selectedMember = member;
     _contextualPrice = null;
     _loadContextualPrice();
+    loadUserBookings();
     // If selecting member is the first step, allow moving forward.
     notifyListeners();
   }
@@ -221,16 +248,30 @@ class BookingViewModel extends BaseViewModel {
     clearError();
     notifyListeners();
 
-    final result = await _getUserBookingsUseCase();
-    result.when(
-      success: (bookings) {
-        _userBookings = bookings;
-      },
-      failure: (failure) {
-        setErrorMessage('bookings_loading_failed');
-        developer.log('Error loading bookings: ${failure.message}');
-      },
-    );
+    final member = _selectedMember;
+    if (member != null && !member.isPrimary) {
+      final result = await _getChildReservationsUseCase(childId: member.id);
+      result.when(
+        success: (paginated) {
+          _userBookings = paginated.data;
+        },
+        failure: (failure) {
+          setErrorMessage('bookings_loading_failed');
+          developer.log('Error loading child bookings: ${failure.message}');
+        },
+      );
+    } else {
+      final result = await _getUserBookingsUseCase();
+      result.when(
+        success: (bookings) {
+          _userBookings = bookings;
+        },
+        failure: (failure) {
+          setErrorMessage('bookings_loading_failed');
+          developer.log('Error loading bookings: ${failure.message}');
+        },
+      );
+    }
 
     _isLoading = false;
     notifyListeners();
@@ -422,15 +463,18 @@ class BookingViewModel extends BaseViewModel {
       );
 
       if (_selectedActivity != null) {
-        _currentStep = _isFamilyAccount ? 2 : 1;
+        _currentStep = _isFamilyAccount ? 0 : 1;
       } else {
-        _currentStep = _isFamilyAccount ? 0 : 0;
+        _currentStep = 0;
         _loadActivities();
       }
     } catch (_) {
       _isFamilyAccount = false;
       _loadActivities();
     } finally {
+      if (_selectedMember != null) {
+        await loadUserBookings();
+      }
       notifyListeners();
     }
   }

@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/time_slot.dart';
+import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/booking_flow_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
@@ -66,12 +67,17 @@ void main() {
     when(() => mockViewModel.selectedActivity).thenReturn(null);
     when(() => mockViewModel.selectedDate).thenReturn(DateTime(2024, 1, 1));
     when(() => mockViewModel.selectedSlot).thenReturn(null);
-    when(() => mockViewModel.priceToPay).thenReturn(0);
+    when(() => mockViewModel.priceToPay).thenReturn(0.0);
     when(() => mockViewModel.isPricingLoading).thenReturn(false);
     when(() => mockViewModel.projectedPoints).thenReturn(0);
     when(
       () => mockViewModel.paymentMethod,
     ).thenReturn(AppConstants.paymentMethodCardId);
+    when(() => mockViewModel.reservedSlotIds).thenReturn(<String>{});
+    when(() => mockViewModel.requiresDeposit).thenReturn(false);
+    when(() => mockViewModel.depositAmount).thenReturn(0.0);
+    when(() => mockViewModel.selectedMember).thenReturn(null);
+    when(() => mockViewModel.familyMembers).thenReturn(const <FamilyMember>[]);
 
     when(() => mockViewModel.addListener(any())).thenAnswer((invocation) {
       listener = invocation.positionalArguments[0] as VoidCallback;
@@ -205,6 +211,7 @@ void main() {
 
       // Wait for navigation
       await tester.pumpAndSettle();
+
       verify(
         () => mockGoRouter.push('/booking-success', extra: testActivity),
       ).called(1);

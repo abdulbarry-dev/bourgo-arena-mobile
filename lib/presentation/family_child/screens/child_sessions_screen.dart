@@ -207,7 +207,21 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                   onRefresh: () => _viewModel.load(widget.childId),
                   color: theme.colorScheme.primary,
                   child: _viewModel.sessions.isEmpty
-                      ? _buildEmptyState(theme, spacing)
+                      ? LayoutBuilder(
+                          builder: (context, constraints) {
+                            return SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  minHeight: constraints.maxHeight,
+                                ),
+                                child: Center(
+                                  child: _buildEmptyState(theme, spacing),
+                                ),
+                              ),
+                            );
+                          },
+                        )
                       : ListView.builder(
                           controller: _scrollController,
                           physics: const AlwaysScrollableScrollPhysics(),
@@ -289,43 +303,47 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
   }
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
-    return Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: spacing.xxl),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  width: 112,
-                  height: 112,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                    ),
-                  ),
-                  child: Icon(
-                    Symbols.sports_kabaddi,
-                    size: 56,
-                    color: theme.colorScheme.primary,
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: spacing.xxl,
+        horizontal: spacing.xl,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
                   ),
                 ),
-                SizedBox(height: spacing.xl),
-                Text(
-                  AppLocalizations.of(context)!.familyChildSessionsEmptyTitle,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w900,
-                  ),
+                child: Icon(
+                  Symbols.sports_kabaddi,
+                  size: 56,
+                  color: theme.colorScheme.primary,
                 ),
-              ],
-            ),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 300.ms)
-        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
+              )
+              .animate()
+              .scale(duration: 400.ms, curve: Curves.easeOutBack)
+              .fade(duration: 400.ms),
+          SizedBox(height: spacing.xl),
+          Text(
+                AppLocalizations.of(context)!.familyChildSessionsEmptyTitle,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
+              )
+              .animate(delay: 100.ms)
+              .fade(duration: 400.ms)
+              .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+        ],
+      ),
+    );
   }
 }
 

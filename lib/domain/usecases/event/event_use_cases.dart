@@ -34,22 +34,24 @@ class RegisterForEventUseCase {
   final EventRepository _repository;
   const RegisterForEventUseCase(this._repository);
 
-  Future<Result<RegistrationResult, Failure>> call(String eventId) =>
-      _repository.registerForEvent(eventId);
+  Future<Result<RegistrationResult, Failure>> call(
+    String eventId, {
+    String? childId,
+  }) => _repository.registerForEvent(eventId, childId: childId);
 }
 
 class WithdrawFromEventUseCase {
   final EventRepository _repository;
   const WithdrawFromEventUseCase(this._repository);
 
-  Future<Result<void, Failure>> call(String eventId) =>
-      _repository.withdrawFromEvent(eventId);
+  Future<Result<void, Failure>> call(String eventId, {String? childId}) =>
+      _repository.withdrawFromEvent(eventId, childId: childId);
 }
 
 class CheckInToEventUseCase {
   final EventRepository _repository;
   const CheckInToEventUseCase(this._repository);
 
-  Future<Result<void, Failure>> call(String eventId) =>
-      _repository.checkInToEvent(eventId);
+  Future<Result<void, Failure>> call(String eventId, {String? childId}) =>
+      _repository.checkInToEvent(eventId, childId: childId);
 }

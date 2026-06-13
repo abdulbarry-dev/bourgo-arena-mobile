@@ -59,6 +59,18 @@ void main() {
     HttpOverrides.global = null;
   });
 
+  Future<void> scrollUntilVisible(WidgetTester tester, Finder finder) async {
+    for (int i = 0; i < 20; i++) {
+      if (tester.any(finder)) {
+        await tester.ensureVisible(finder);
+        await tester.pumpAndSettle();
+        return;
+      }
+      await tester.drag(find.byType(CustomScrollView), const Offset(0, -150));
+      await tester.pumpAndSettle();
+    }
+  }
+
   testWidgets('shows section headers after data loads', (tester) async {
     when(
       () => mockActivities(),
@@ -74,19 +86,18 @@ void main() {
     ).thenAnswer((_) async => Success([testServiceEntity()]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
-    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
 
-    expect(find.text('TOURNAMENTS & EVENTS'), findsOneWidget);
+    final l10n = AppLocalizations.of(tester.element(find.byType(HomeScreen)))!;
 
-    await tester.drag(find.byType(CustomScrollView), const Offset(0, -300));
-    await tester.pump(const Duration(seconds: 1));
+    await scrollUntilVisible(tester, find.text(l10n.homeEventsTitle));
+    expect(find.text(l10n.homeEventsTitle), findsOneWidget);
 
-    expect(find.text('COURSES'), findsOneWidget);
+    await scrollUntilVisible(tester, find.text(l10n.homeCoursesTitle));
+    expect(find.text(l10n.homeCoursesTitle), findsOneWidget);
 
-    await tester.drag(find.byType(CustomScrollView), const Offset(0, -500));
-    await tester.pump(const Duration(seconds: 1));
-
-    expect(find.text('ACTIVITIES'), findsOneWidget);
+    await scrollUntilVisible(tester, find.text(l10n.homeActivitiesTitle));
+    expect(find.text(l10n.homeActivitiesTitle), findsOneWidget);
   });
 
   testWidgets('shows empty state messages when no data', (tester) async {
@@ -102,7 +113,7 @@ void main() {
     ).thenAnswer((_) async => const Success(<Service>[]));
 
     await tester.pumpWidget(_buildApp(const HomeScreen()));
-    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
 
     expect(find.textContaining('No'), findsWidgets);
   });
@@ -135,7 +146,7 @@ void main() {
 
 Widget _buildApp(Widget home) {
   return MaterialApp(
-    locale: AppLocalizations.supportedLocales.first,
+    locale: const Locale('en'),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
     theme: BourgoTheme.darkTheme,

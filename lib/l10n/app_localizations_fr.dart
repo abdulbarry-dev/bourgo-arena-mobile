@@ -2321,4 +2321,44 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get eventsBracketCompleted => 'Terminé';
+
+  @override
+  String get myEventsStatusRegistered => 'INSCRIT';
+
+  @override
+  String get myEventsStatusApproved => 'APPROUVÉ';
+
+  @override
+  String get myEventsStatusPending => 'EN ATTENTE';
+
+  @override
+  String get myEventsStatusWithdrawn => 'RETIRÉ';
+
+  @override
+  String get myEventsStatusWaitlisted => 'LISTE D\'ATTENTE';
+
+  @override
+  String get myEventsEventUpcoming => 'À VENIR';
+
+  @override
+  String get myEventsEventInProgress => 'EN COURS';
+
+  @override
+  String get myEventsEventCompleted => 'TERMINÉ';
+
+  @override
+  String get paymentExternalTitle => 'Passerelle sécurisée ouverte';
+
+  @override
+  String get paymentExternalDesc =>
+      'Nous avons ouvert la passerelle de paiement dans votre navigateur. Veuillez y effectuer la transaction.';
+
+  @override
+  String get paymentOpenAgain => 'ROUVRIR LA PAGE DE PAIEMENT';
+
+  @override
+  String get paymentDoneConfirm => 'J\'AI EFFECTUÉ LE PAIEMENT';
+
+  @override
+  String get paymentCancel => 'ANNULER';
 }

@@ -780,5 +780,18 @@
   "eventsBracketNotAvailable": "Arbre non disponible",
   "eventsBracketFinal": "Finale",
   "eventsBracketQuarterFinals": "Quarts de finale",
-  "eventsBracketCompleted": "Terminé"
+  "eventsBracketCompleted": "Terminé",
+  "myEventsStatusRegistered": "INSCRIT",
+  "myEventsStatusApproved": "APPROUVÉ",
+  "myEventsStatusPending": "EN ATTENTE",
+  "myEventsStatusWithdrawn": "RETIRÉ",
+  "myEventsStatusWaitlisted": "LISTE D'ATTENTE",
+  "myEventsEventUpcoming": "À VENIR",
+  "myEventsEventInProgress": "EN COURS",
+  "myEventsEventCompleted": "TERMINÉ",
+  "paymentExternalTitle": "Passerelle sécurisée ouverte",
+  "paymentExternalDesc": "Nous avons ouvert la passerelle de paiement dans votre navigateur. Veuillez y effectuer la transaction.",
+  "paymentOpenAgain": "ROUVRIR LA PAGE DE PAIEMENT",
+  "paymentDoneConfirm": "J'AI EFFECTUÉ LE PAIEMENT",
+  "paymentCancel": "ANNULER"
 }

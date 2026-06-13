@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/child_avatar.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_profile_view_model.dart';
@@ -52,7 +53,7 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: SubScreenAppBar(title: profile?.name.toUpperCase() ?? ''),
           body: _viewModel.isLoading && profile == null
-              ? const Center(child: CircularProgressIndicator())
+              ? _buildLoadingState(theme, spacing, appColors)
               : RefreshIndicator(
                   onRefresh: () => _viewModel.load(widget.childId),
                   color: theme.colorScheme.primary,
@@ -365,6 +366,68 @@ class _ChildProfileScreenState extends State<ChildProfileScreen> {
               icon: const Icon(Symbols.refresh, size: 20),
               label: Text(
                 AppLocalizations.of(context)!.familyChildProfileRetryButton,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(
+    ThemeData theme,
+    AppSpacing spacing,
+    AppColors appColors,
+  ) {
+    return AppShimmer(
+      child: Padding(
+        padding: EdgeInsets.all(spacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(spacing.xl),
+              decoration: BoxDecoration(
+                color: appColors.bgElevated,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: appColors.bgBorder),
+              ),
+              child: Column(
+                children: [
+                  AppShimmer.circle(size: 96),
+                  SizedBox(height: spacing.md),
+                  AppShimmer.block(width: 160, height: 24, borderRadius: 8),
+                  SizedBox(height: spacing.sm),
+                  AppShimmer.block(width: 120, height: 16, borderRadius: 6),
+                  SizedBox(height: spacing.md),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AppShimmer.block(
+                        width: 100,
+                        height: 28,
+                        borderRadius: 14,
+                      ),
+                      SizedBox(width: spacing.sm),
+                      AppShimmer.block(width: 80, height: 28, borderRadius: 14),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: spacing.xl),
+            Column(
+              children: List.generate(
+                5,
+                (_) => Padding(
+                  padding: EdgeInsets.only(bottom: spacing.md),
+                  child: AppShimmer.block(
+                    width: double.infinity,
+                    height: 56,
+                    borderRadius: 16,
+                  ),
+                ),
               ),
             ),
           ],

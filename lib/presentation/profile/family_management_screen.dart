@@ -244,16 +244,18 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
             return RefreshIndicator(
               onRefresh: _viewModel.reloadProfile,
               child: AppShimmer(
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
                   padding: EdgeInsets.all(spacing.xl),
-                  children: [
-                    AppShimmer.block(height: 88, borderRadius: 24),
-                    SizedBox(height: spacing.xl),
-                    AppShimmer.block(width: 180, height: 20),
-                    SizedBox(height: spacing.lg),
-                    AppShimmer.block(height: 56, borderRadius: 16),
-                  ],
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppShimmer.block(height: 88, borderRadius: 24),
+                      SizedBox(height: spacing.xl),
+                      AppShimmer.block(width: 180, height: 20),
+                      SizedBox(height: spacing.lg),
+                      AppShimmer.block(height: 56, borderRadius: 16),
+                    ],
+                  ),
                 ),
               ),
             );

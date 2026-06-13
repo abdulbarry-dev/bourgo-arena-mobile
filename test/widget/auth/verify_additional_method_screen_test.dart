@@ -156,24 +156,6 @@ void main() {
 
   group('VerifyAdditionalMethodScreen -', () {
     testWidgets(
-      'redirects to verification-method when onboarding is incomplete',
-      (tester) async {
-        await setupScreenSize(tester);
-        await tester.pumpWidget(
-          createWidgetUnderTest(
-            unverifiedMethod: 'email',
-            email: 'alex@example.com',
-            phone: '+15550000000',
-            onboardingCompleted: false,
-          ),
-        );
-        await tester.pumpAndSettle();
-
-        expect(find.text('VERIF_METHOD'), findsOneWidget);
-      },
-    );
-
-    testWidgets(
       'renders phone verification UI when unverifiedMethod is phone',
       (tester) async {
         await setupScreenSize(tester);

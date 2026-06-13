@@ -779,5 +779,18 @@
   "eventsBracketNotAvailable": "Bracket not available",
   "eventsBracketFinal": "Final",
   "eventsBracketQuarterFinals": "Quarter-Finals",
-  "eventsBracketCompleted": "Completed"
+  "eventsBracketCompleted": "Completed",
+  "myEventsStatusRegistered": "REGISTERED",
+  "myEventsStatusApproved": "APPROVED",
+  "myEventsStatusPending": "PENDING",
+  "myEventsStatusWithdrawn": "WITHDRAWN",
+  "myEventsStatusWaitlisted": "WAITLISTED",
+  "myEventsEventUpcoming": "UPCOMING",
+  "myEventsEventInProgress": "IN PROGRESS",
+  "myEventsEventCompleted": "COMPLETED",
+  "paymentExternalTitle": "Secure Gateway Opened",
+  "paymentExternalDesc": "We have opened the payment gateway in your browser. Please complete the transaction there.",
+  "paymentOpenAgain": "REOPEN PAYMENT PAGE",
+  "paymentDoneConfirm": "I HAVE COMPLETED THE PAYMENT",
+  "paymentCancel": "CANCEL"
 }

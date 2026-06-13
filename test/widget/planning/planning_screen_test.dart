@@ -46,6 +46,7 @@ void main() {
 
   Widget createWidget() {
     return MaterialApp(
+      locale: const Locale('fr'),
       theme: BourgoTheme.lightTheme,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,

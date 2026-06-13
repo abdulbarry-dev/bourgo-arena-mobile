@@ -1,3 +1,4 @@
+import 'package:bourgo_arena_mobile/core/config/app_config.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -80,8 +81,10 @@ class EmptyState extends StatelessWidget {
                             ),
                           )
                           .animate(
-                            onPlay: (controller) =>
-                                controller.repeat(reverse: true),
+                            onPlay: AppConfig.isTest
+                                ? null
+                                : (controller) =>
+                                      controller.repeat(reverse: true),
                           )
                           .slideY(
                             begin: 0,

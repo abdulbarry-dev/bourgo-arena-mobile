@@ -1,11 +1,11 @@
-import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/get_my_events_use_case.dart';
-import 'package:bourgo_arena_mobile/presentation/common/widgets/app_card.dart';
+import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -63,24 +63,8 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.pop(context),
-          color: theme.colorScheme.onSurface,
-        ),
-        title: Text(
-          AppLocalizations.of(context)!.myEventsScreenTitle,
-          style: theme.textTheme.titleSmall?.copyWith(
-            fontFamily: AppConstants.displayFontFamily,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-          ),
-        ),
+      appBar: SubScreenAppBar(
+        title: AppLocalizations.of(context)!.myEventsScreenTitle,
       ),
       body: _buildBody(theme),
     );
@@ -91,15 +75,17 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
       return RefreshIndicator(
         onRefresh: _load,
         child: AppShimmer(
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            children: List.generate(5, (_) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: AppShimmer.block(width: double.infinity, height: 88),
-              );
-            }),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: List.generate(5, (_) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: AppShimmer.block(width: double.infinity, height: 88),
+                );
+              }),
+            ),
           ),
         ),
       );
@@ -149,32 +135,10 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
     if (_participants.isEmpty) {
       return RefreshIndicator(
         onRefresh: _load,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: constraints.maxHeight,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Symbols.emoji_events,
-                        size: 64,
-                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        AppLocalizations.of(context)!.myEventsScreenNoEvents,
-                        style: theme.textTheme.titleMedium,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          },
+        child: EmptyState(
+          title: AppLocalizations.of(context)!.myEventsScreenNoEvents,
+          message: '',
+          icon: Symbols.emoji_events,
         ),
       );
     }
@@ -197,6 +161,63 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
   }
 }
 
+enum _EventTimeStatus { upcoming, inProgress, completed }
+
+_EventTimeStatus _resolveEventTimeStatus(Event event) {
+  try {
+    final now = DateTime.now();
+    if (event.startDate != null) {
+      final start = DateTime.parse(event.startDate!);
+      if (now.isBefore(start)) return _EventTimeStatus.upcoming;
+    }
+    if (event.endDate != null) {
+      final end = DateTime.parse(event.endDate!);
+      if (now.isAfter(end)) return _EventTimeStatus.completed;
+    }
+    if (event.startDate != null && event.endDate != null) {
+      final start = DateTime.parse(event.startDate!);
+      final end = DateTime.parse(event.endDate!);
+      if (!now.isBefore(start) && !now.isAfter(end)) {
+        return _EventTimeStatus.inProgress;
+      }
+    }
+    if (event.startDate != null) return _EventTimeStatus.inProgress;
+    return _EventTimeStatus.upcoming;
+  } catch (_) {
+    return _EventTimeStatus.upcoming;
+  }
+}
+
+(Color, String) _participantStatusStyle(String? status, ThemeData theme) {
+  final appColors = theme.extension<AppColors>()!;
+  switch ((status ?? '').toLowerCase()) {
+    case 'approved':
+      return (appColors.statusSuccess, 'APPROVED');
+    case 'registered':
+      return (appColors.statusSuccess, 'REGISTERED');
+    case 'pending':
+      return (appColors.statusWarning, 'PENDING');
+    case 'waitlisted':
+      return (appColors.statusWarning, 'WAITLISTED');
+    case 'withdrawn':
+      return (theme.colorScheme.error, 'WITHDRAWN');
+    default:
+      return (theme.colorScheme.onSurfaceVariant, (status ?? '').toUpperCase());
+  }
+}
+
+(Color, String) _eventStatusStyle(_EventTimeStatus status, ThemeData theme) {
+  final appColors = theme.extension<AppColors>()!;
+  switch (status) {
+    case _EventTimeStatus.upcoming:
+      return (theme.colorScheme.primary, 'UPCOMING');
+    case _EventTimeStatus.inProgress:
+      return (const Color(0xFFF59E0B), 'IN PROGRESS');
+    case _EventTimeStatus.completed:
+      return (appColors.statusSuccess, 'COMPLETED');
+  }
+}
+
 class _EventParticipantCard extends StatelessWidget {
   final EventParticipant participant;
 
@@ -205,30 +226,49 @@ class _EventParticipantCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
-    final typography = context.typography;
     final event = participant.event;
     if (event == null) return const SizedBox.shrink();
 
     final name = event.name ?? '';
-    final status = event.status ?? '';
     final imageUrl = event.imageUrl;
+    final eventTimeStatus = _resolveEventTimeStatus(event);
+    final (eventColor, eventLabel) = _eventStatusStyle(eventTimeStatus, theme);
+    final (pColor, pLabel) = _participantStatusStyle(participant.status, theme);
+    final hasImage = imageUrl != null && imageUrl.isNotEmpty;
 
-    return AppCard.compact(
+    return _AppCardCompact(
       onTap: () => context.push('/events/${event.id}', extra: event),
       child: Row(
         children: [
-          if (imageUrl != null)
-            ClipRRect(
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              child: PremiumNetworkImage(
-                imageUrl: imageUrl,
-                width: 56,
-                height: 56,
-                fit: BoxFit.cover,
+              color: theme.colorScheme.surfaceContainerHighest.withValues(
+                alpha: 0.3,
+              ),
+              border: Border.all(
+                color: theme.colorScheme.outline.withValues(alpha: 0.08),
               ),
             ),
-          if (imageUrl != null) const SizedBox(width: 12),
+            child: hasImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(11),
+                    child: PremiumNetworkImage(
+                      imageUrl: imageUrl,
+                      width: 56,
+                      height: 56,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Icon(
+                    Symbols.emoji_events,
+                    size: 24,
+                    color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                  ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,36 +279,88 @@ class _EventParticipantCard extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  status.toUpperCase(),
-                  style: typography.overline?.copyWith(
-                    color: status == 'open'
-                        ? appColors.statusSuccess
-                        : theme.colorScheme.onSurfaceVariant,
-                  ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: eventColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        eventLabel,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: eventColor,
+                          fontSize: 9,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: pColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        pLabel,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: pColor,
+                          fontSize: 9,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: participant.status == 'withdrawn'
-                  ? theme.colorScheme.error.withValues(alpha: 0.1)
-                  : theme.colorScheme.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              (participant.status ?? '').toUpperCase(),
-              style: typography.overline?.copyWith(
-                color: participant.status == 'withdrawn'
-                    ? theme.colorScheme.error
-                    : theme.colorScheme.primary,
-              ),
-            ),
+          Icon(
+            Symbols.chevron_right,
+            size: 20,
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _AppCardCompact extends StatelessWidget {
+  final Widget child;
+  final VoidCallback? onTap;
+
+  const _AppCardCompact({required this.child, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = Theme.of(context).extension<AppColors>()!;
+
+    return Material(
+      color: appColors.bgElevated,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: appColors.bgBorder),
+          ),
+          child: child,
+        ),
       ),
     );
   }

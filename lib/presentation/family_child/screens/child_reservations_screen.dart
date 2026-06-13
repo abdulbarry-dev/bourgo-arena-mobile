@@ -89,6 +89,7 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                       ),
                       if (_viewModel.reservations.isEmpty)
                         SliverFillRemaining(
+                          hasScrollBody: false,
                           child: _buildEmptyState(theme, spacing),
                         )
                       else ...[
@@ -228,15 +229,15 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: spacing.xxl,
-              horizontal: spacing.xl,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: spacing.xxl,
+          horizontal: spacing.xl,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
                   width: 112,
                   height: 112,
                   decoration: BoxDecoration(
@@ -247,13 +248,16 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                     ),
                   ),
                   child: Icon(
-                    Symbols.list_alt,
+                    Symbols.event_busy,
                     size: 56,
                     color: theme.colorScheme.primary,
                   ),
-                ),
-                SizedBox(height: spacing.xl),
-                Text(
+                )
+                .animate()
+                .scale(duration: 400.ms, curve: Curves.easeOutBack)
+                .fade(duration: 400.ms),
+            SizedBox(height: spacing.xl),
+            Text(
                   AppLocalizations.of(
                     context,
                   )!.familyChildReservationsEmptyTitle,
@@ -261,9 +265,12 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
                   ),
-                ),
-                SizedBox(height: spacing.md),
-                Text(
+                )
+                .animate(delay: 100.ms)
+                .fade(duration: 400.ms)
+                .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+            SizedBox(height: spacing.md),
+            Text(
                   AppLocalizations.of(
                     context,
                   )!.familyChildReservationsEmptyMessage,
@@ -271,14 +278,14 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
-                ),
-              ],
-            ),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 300.ms)
-        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
+                )
+                .animate(delay: 200.ms)
+                .fade(duration: 400.ms)
+                .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+          ],
+        ),
+      ),
+    );
   }
 }
 

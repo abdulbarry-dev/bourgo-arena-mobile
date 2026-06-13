@@ -124,51 +124,56 @@ class _ProfileScreenState extends State<ProfileScreen>
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              _buildAppBar(context, user),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: spacing.horizontalPadding(context),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SizedBox(height: spacing.lg),
-                      _StatsDashboard(
-                        user: user,
-                        ongoingReservationsCount:
-                            _viewModel.ongoingReservationsCount,
-                        successfulPaymentsCount:
-                            _viewModel.successfulPaymentsCount,
-                        myEventsCount: _viewModel.myEventsCount,
-                        animation: _animationController,
-                      ),
-                      SizedBox(height: spacing.xl),
-                      _buildSectionHeader(context, l10n.profileSettings),
-                      SizedBox(height: spacing.md),
-                      _ProfileMenu(
-                        animation: _animationController,
-                        onTapAbonnement: () => context.push('/subscription'),
-                        onTapNotifications: () =>
-                            context.push('/notifications'),
-                        onTapSettings: () => context.push('/settings'),
-                      ),
-                      SizedBox(height: spacing.xxl),
-                      _LogoutButton(
-                        onLogout: () async {
-                          await _viewModel.logout();
-                          if (context.mounted) {
-                            context.go('/login');
-                          }
-                        },
-                      ),
-                      SizedBox(height: spacing.xxxl),
-                    ],
+          body: RefreshIndicator(
+            onRefresh: _viewModel.reloadProfile,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
+              slivers: [
+                _buildAppBar(context, user),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: spacing.horizontalPadding(context),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: spacing.lg),
+                        _StatsDashboard(
+                          user: user,
+                          ongoingReservationsCount:
+                              _viewModel.ongoingReservationsCount,
+                          successfulPaymentsCount:
+                              _viewModel.successfulPaymentsCount,
+                          myEventsCount: _viewModel.myEventsCount,
+                          animation: _animationController,
+                        ),
+                        SizedBox(height: spacing.xl),
+                        _buildSectionHeader(context, l10n.profileSettings),
+                        SizedBox(height: spacing.md),
+                        _ProfileMenu(
+                          animation: _animationController,
+                          onTapAbonnement: () => context.push('/subscription'),
+                          onTapNotifications: () =>
+                              context.push('/notifications'),
+                          onTapSettings: () => context.push('/settings'),
+                        ),
+                        SizedBox(height: spacing.xxl),
+                        _LogoutButton(
+                          onLogout: () async {
+                            await _viewModel.logout();
+                            if (context.mounted) {
+                              context.go('/login');
+                            }
+                          },
+                        ),
+                        SizedBox(height: spacing.xxxl),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

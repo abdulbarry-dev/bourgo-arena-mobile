@@ -72,38 +72,60 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
               : RefreshIndicator(
                   onRefresh: () async => _load(),
                   color: theme.colorScheme.primary,
-                  child: SingleChildScrollView(
+                  child: CustomScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    padding: EdgeInsets.all(spacing.lg),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildDateRangePicker(theme, spacing, appColors)
-                            .animate()
-                            .fadeIn(duration: 400.ms)
-                            .slideY(
-                              begin: 0.1,
-                              end: 0,
-                              curve: Curves.easeOutQuad,
-                            ),
-                        SizedBox(height: spacing.xl),
-                        if (_viewModel.items.isEmpty)
-                          _buildEmptyState(theme, spacing)
-                        else
-                          ..._viewModel.items.asMap().entries.map((entry) {
-                            return Padding(
-                              padding: EdgeInsets.only(bottom: spacing.md),
-                              child: _ScheduleItemCard(
-                                item: entry.value,
-                                index: entry.key,
-                                theme: theme,
-                                spacing: spacing,
-                                appColors: appColors,
-                              ),
-                            );
-                          }),
-                      ],
-                    ),
+                    slivers: [
+                      SliverPadding(
+                        padding: EdgeInsets.only(
+                          top: spacing.lg,
+                          left: spacing.lg,
+                          right: spacing.lg,
+                          bottom: spacing.xl,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child:
+                              _buildDateRangePicker(theme, spacing, appColors)
+                                  .animate()
+                                  .fadeIn(duration: 400.ms)
+                                  .slideY(
+                                    begin: 0.1,
+                                    end: 0,
+                                    curve: Curves.easeOutQuad,
+                                  ),
+                        ),
+                      ),
+                      if (_viewModel.items.isEmpty)
+                        SliverFillRemaining(
+                          hasScrollBody: false,
+                          child: _buildEmptyState(theme, spacing),
+                        )
+                      else
+                        SliverPadding(
+                          padding: EdgeInsets.only(
+                            left: spacing.lg,
+                            right: spacing.lg,
+                            bottom: spacing.lg,
+                          ),
+                          sliver: SliverList(
+                            delegate: SliverChildBuilderDelegate((
+                              context,
+                              index,
+                            ) {
+                              final item = _viewModel.items[index];
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: spacing.md),
+                                child: _ScheduleItemCard(
+                                  item: item,
+                                  index: index,
+                                  theme: theme,
+                                  spacing: spacing,
+                                  appColors: appColors,
+                                ),
+                              );
+                            }, childCount: _viewModel.items.length),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
         );
@@ -245,11 +267,15 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
 
   Widget _buildEmptyState(ThemeData theme, AppSpacing spacing) {
     return Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(vertical: spacing.xxl),
-            child: Column(
-              children: [
-                Container(
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: spacing.xxl,
+          horizontal: spacing.xl,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
                   width: 112,
                   height: 112,
                   decoration: BoxDecoration(
@@ -264,30 +290,36 @@ class _ChildScheduleScreenState extends State<ChildScheduleScreen> {
                     size: 56,
                     color: theme.colorScheme.primary,
                   ),
-                ),
-                SizedBox(height: spacing.xl),
-                Text(
+                )
+                .animate()
+                .scale(duration: 400.ms, curve: Curves.easeOutBack)
+                .fade(duration: 400.ms),
+            SizedBox(height: spacing.xl),
+            Text(
                   AppLocalizations.of(context)!.familyChildScheduleEmptyTitle,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w900,
                   ),
-                ),
-                SizedBox(height: spacing.sm),
-                Text(
+                )
+                .animate(delay: 100.ms)
+                .fade(duration: 400.ms)
+                .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+            SizedBox(height: spacing.md),
+            Text(
                   AppLocalizations.of(context)!.familyChildScheduleEmptyMessage,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
-                ),
-              ],
-            ),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 300.ms)
-        .slideY(begin: 0.08, end: 0, curve: Curves.easeOutQuad);
+                )
+                .animate(delay: 200.ms)
+                .fade(duration: 400.ms)
+                .slideY(begin: 0.15, end: 0, curve: Curves.easeOutQuad),
+          ],
+        ),
+      ),
+    );
   }
 }
 

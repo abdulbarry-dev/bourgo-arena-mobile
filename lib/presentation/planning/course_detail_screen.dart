@@ -5,6 +5,9 @@ import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/course_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/book_child_session_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/child_selector_sheet.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
@@ -34,6 +37,8 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   String? _bookingSessionId;
   int _currentImageIndex = 0;
   bool _accessDenied = false;
+  bool _showFamilyFeatures = false;
+  String? _selectedChildId;
 
   Course? get _course => widget.course;
 
@@ -41,7 +46,25 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   void initState() {
     super.initState();
     _courseRepository = locator<CourseRepository>();
+    _loadFamilyStatus();
     _loadSessions();
+  }
+
+  Future<void> _loadFamilyStatus() async {
+    final userRepository = locator<UserRepository>();
+    final result = await userRepository.getUserProfile();
+    if (!mounted) return;
+    result.when(
+      success: (user) {
+        final prefs = user.preferences ?? {};
+        final familyEnabled = prefs['app']?['family_enabled'] as bool? ?? false;
+        setState(() {
+          _showFamilyFeatures =
+              familyEnabled || user.isParentAccount || user.children.isNotEmpty;
+        });
+      },
+      failure: (_) {},
+    );
   }
 
   Future<void> _loadSessions() async {
@@ -73,6 +96,16 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
   Future<void> _handleBookSession(CourseSession session) async {
     if (_bookingSessionId != null) return;
 
+    if (_showFamilyFeatures) {
+      final childId = await showChildSelectorSheet(context);
+      if (!mounted) return;
+      if (childId == kAddChildSentinel) {
+        await context.push('/add-child');
+        return;
+      }
+      _selectedChildId = childId;
+    }
+
     final targetWeekday = session.dayOfWeek == 0
         ? DateTime.sunday
         : session.dayOfWeek;
@@ -89,6 +122,44 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
     if (!confirmed || !mounted) return;
 
     setState(() => _bookingSessionId = session.id);
+
+    if (_selectedChildId != null) {
+      final childUseCase = locator<BookChildSessionUseCase>();
+      final result = await childUseCase(
+        childId: _selectedChildId!,
+        sessionId: session.id,
+        date: dateStr,
+      );
+      if (!mounted) return;
+      setState(() => _bookingSessionId = null);
+      result.when(
+        success: (_) {
+          CelebrationOverlay.show(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context)!.courseDetailBookedSession(
+                  session.title,
+                  dateStr,
+                  session.startTime,
+                ),
+              ),
+            ),
+          );
+          _loadSessions();
+        },
+        failure: (f) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(f.message),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        },
+      );
+      return;
+    }
+
     final useCase = locator<BookCourseSessionUseCase>();
     final result = await useCase(widget.courseId, session.id, dateStr);
     if (!mounted) return;

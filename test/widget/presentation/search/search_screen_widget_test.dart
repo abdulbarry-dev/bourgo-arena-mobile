@@ -63,6 +63,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(TextField), findsOneWidget);
+
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
     });
 
     testWidgets('shows results after search is performed', (tester) async {
@@ -74,6 +77,9 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Yoga Basics'), findsOneWidget);
+
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
     });
 
     testWidgets('typing in search field calls search on ViewModel', (
@@ -85,9 +91,12 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextField), 'yoga');
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       verify(() => mockViewModel.search('yoga')).called(1);
+
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
     });
   });
 }

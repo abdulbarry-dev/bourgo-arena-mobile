@@ -2,10 +2,15 @@ import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_plans_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_subscriptions_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/core/failure.dart';
+import 'package:bourgo_arena_mobile/core/utils/result.dart';
 
 class PlansViewModel extends BaseViewModel {
   final GetPlansUseCase _getPlansUseCase;
   final GetActiveSubscriptionsUseCase _getActiveSubscriptionsUseCase;
+  final GetChildSubscriptionsUseCase? _getChildSubscriptionsUseCase;
+  final String? childId;
 
   bool _isLoading = false;
   List<Plan> _plans = [];
@@ -14,8 +19,11 @@ class PlansViewModel extends BaseViewModel {
   PlansViewModel({
     required GetPlansUseCase getPlansUseCase,
     required GetActiveSubscriptionsUseCase getActiveSubscriptionsUseCase,
+    GetChildSubscriptionsUseCase? getChildSubscriptionsUseCase,
+    this.childId,
   }) : _getPlansUseCase = getPlansUseCase,
-       _getActiveSubscriptionsUseCase = getActiveSubscriptionsUseCase {
+       _getActiveSubscriptionsUseCase = getActiveSubscriptionsUseCase,
+       _getChildSubscriptionsUseCase = getChildSubscriptionsUseCase {
     loadPlans();
   }
 
@@ -41,10 +49,26 @@ class PlansViewModel extends BaseViewModel {
     notifyListeners();
 
     try {
-      final results = await Future.wait([
-        _getPlansUseCase(),
-        _getActiveSubscriptionsUseCase.execute(),
-      ]);
+      final Future<Result<dynamic, Failure>> subsFuture;
+      final cid = childId;
+      final getChildSubs = _getChildSubscriptionsUseCase;
+      if (cid != null && getChildSubs != null) {
+        subsFuture = getChildSubs(childId: cid).then(
+          (res) => res.fold(
+            onSuccess: (paginated) => Result.success(paginated.data),
+            onFailure: (f) => FailureResult(f),
+          ),
+        );
+      } else {
+        subsFuture = _getActiveSubscriptionsUseCase.execute().then(
+          (res) => res.fold(
+            onSuccess: (list) => Result.success(list),
+            onFailure: (f) => FailureResult(f),
+          ),
+        );
+      }
+
+      final results = await Future.wait([_getPlansUseCase(), subsFuture]);
 
       final plansResult = results[0];
       final subsResult = results[1];

@@ -81,8 +81,7 @@ class _BookingFlowScreenState extends State<BookingFlowScreen> {
               icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
               color: theme.colorScheme.onSurface,
               onPressed: () {
-                if (_viewModel.currentStep > 0 &&
-                    widget.initialActivity == null) {
+                if (_viewModel.canGoBack) {
                   _viewModel.previousStep();
                 } else {
                   Navigator.of(context).pop();

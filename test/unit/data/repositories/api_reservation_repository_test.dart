@@ -118,7 +118,11 @@ void main() {
       test('returns Success on 200 with mapped reservation', () async {
         final reservation = testReservationEntity();
         when(
-          () => apiClient.post('/reservations', any()),
+          () => apiClient.post(
+            '/reservations',
+            any(),
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenAnswer((_) async => testReservationJson());
 
         final result = await repository.makeReservation(reservation);
@@ -131,13 +135,18 @@ void main() {
             'activity_id': reservation.activityId,
             'activity_slot_id': reservation.activitySlotId,
             'date': reservation.date,
-          }),
+            'amount': reservation.price,
+          }, fullResponse: true),
         ).called(1);
       });
 
       test('returns Failure(AuthFailure) on 401', () async {
         when(
-          () => apiClient.post('/reservations', any()),
+          () => apiClient.post(
+            '/reservations',
+            any(),
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenThrow(const AuthException('API Error: 401 unauthorized'));
 
         final result = await repository.makeReservation(
@@ -153,7 +162,11 @@ void main() {
 
       test('returns Failure(NetworkFailure) on network error', () async {
         when(
-          () => apiClient.post('/reservations', any()),
+          () => apiClient.post(
+            '/reservations',
+            any(),
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenThrow(const NetworkException('offline'));
 
         final result = await repository.makeReservation(
@@ -169,7 +182,11 @@ void main() {
 
       test('returns Failure(ServerFailure) on 500 error', () async {
         when(
-          () => apiClient.post('/reservations', any()),
+          () => apiClient.post(
+            '/reservations',
+            any(),
+            fullResponse: any(named: 'fullResponse'),
+          ),
         ).thenThrow(const ServerException('API Error: 500 server error'));
 
         final result = await repository.makeReservation(

@@ -2302,4 +2302,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventsBracketCompleted => 'Completed';
+
+  @override
+  String get myEventsStatusRegistered => 'REGISTERED';
+
+  @override
+  String get myEventsStatusApproved => 'APPROVED';
+
+  @override
+  String get myEventsStatusPending => 'PENDING';
+
+  @override
+  String get myEventsStatusWithdrawn => 'WITHDRAWN';
+
+  @override
+  String get myEventsStatusWaitlisted => 'WAITLISTED';
+
+  @override
+  String get myEventsEventUpcoming => 'UPCOMING';
+
+  @override
+  String get myEventsEventInProgress => 'IN PROGRESS';
+
+  @override
+  String get myEventsEventCompleted => 'COMPLETED';
+
+  @override
+  String get paymentExternalTitle => 'Secure Gateway Opened';
+
+  @override
+  String get paymentExternalDesc =>
+      'We have opened the payment gateway in your browser. Please complete the transaction there.';
+
+  @override
+  String get paymentOpenAgain => 'REOPEN PAYMENT PAGE';
+
+  @override
+  String get paymentDoneConfirm => 'I HAVE COMPLETED THE PAYMENT';
+
+  @override
+  String get paymentCancel => 'CANCEL';
 }

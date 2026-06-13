@@ -14,6 +14,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/loyalty/get_member_tier_use_
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/project_points_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/pricing/get_contextual_price_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_reservations_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/booking/viewmodels/booking_view_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -42,6 +43,9 @@ class MockGetContextualPriceUseCase extends Mock
 class MockGetMemberTierUseCase extends Mock implements GetMemberTierUseCase {}
 
 class MockProjectPointsUseCase extends Mock implements ProjectPointsUseCase {}
+
+class MockGetChildReservationsUseCase extends Mock
+    implements GetChildReservationsUseCase {}
 
 void main() {
   setUpAll(() {
@@ -72,6 +76,7 @@ void main() {
   late MockGetContextualPriceUseCase mockGetContextualPriceUseCase;
   late MockGetMemberTierUseCase mockGetMemberTierUseCase;
   late MockProjectPointsUseCase mockProjectPointsUseCase;
+  late MockGetChildReservationsUseCase mockGetChildReservationsUseCase;
 
   final tActivities = [
     const Activity(
@@ -117,6 +122,7 @@ void main() {
     mockGetContextualPriceUseCase = MockGetContextualPriceUseCase();
     mockGetMemberTierUseCase = MockGetMemberTierUseCase();
     mockProjectPointsUseCase = MockProjectPointsUseCase();
+    mockGetChildReservationsUseCase = MockGetChildReservationsUseCase();
 
     when(
       () => mockGetActivitiesUseCase(),
@@ -157,6 +163,7 @@ void main() {
       getContextualPriceUseCase: mockGetContextualPriceUseCase,
       getMemberTierUseCase: mockGetMemberTierUseCase,
       projectPointsUseCase: mockProjectPointsUseCase,
+      getChildReservationsUseCase: mockGetChildReservationsUseCase,
       initialActivity: initialActivity,
     );
   }

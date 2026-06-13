@@ -5,9 +5,22 @@ import 'package:shimmer/shimmer.dart';
 ///
 /// Replaces all inline [Shimmer.fromColors] patterns across the app.
 class AppShimmer extends StatelessWidget {
+  /// The widget hierarchy inside the shimmer effect.
   final Widget child;
 
-  const AppShimmer({super.key, required this.child});
+  /// Custom scroll physics for the internal [SingleChildScrollView].
+  ///
+  /// Defaults to [AlwaysScrollableScrollPhysics] to ensure that pull-to-refresh
+  /// containers (e.g. [RefreshIndicator]) can scroll and trigger reload logic
+  /// even when the shimmer height is smaller than the screen.
+  final ScrollPhysics? physics;
+
+  /// Creates a standard [AppShimmer].
+  const AppShimmer({
+    super.key,
+    required this.child,
+    this.physics = const AlwaysScrollableScrollPhysics(),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +31,7 @@ class AppShimmer extends StatelessWidget {
       highlightColor: theme.colorScheme.surfaceContainerHighest.withValues(
         alpha: 0.4,
       ),
-      child: SingleChildScrollView(child: child),
+      child: SingleChildScrollView(physics: physics, child: child),
     );
   }
 

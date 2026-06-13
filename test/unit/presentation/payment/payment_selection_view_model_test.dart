@@ -5,6 +5,7 @@ import 'package:bourgo_arena_mobile/domain/entities/subscription.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/user/get_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_selection_view_model.dart';
 import 'package:checks/checks.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -23,6 +24,8 @@ class MockSubscribeToPlanUseCase extends Mock
 class MockPayWithLoyaltyUseCase extends Mock implements PayWithLoyaltyUseCase {}
 
 class MockAuthStateNotifier extends Mock implements AuthStateNotifier {}
+
+class MockGetUserProfileUseCase extends Mock implements GetUserProfileUseCase {}
 
 Subscription testSubscription({String id = '43', String status = 'pending'}) {
   return Subscription(
@@ -50,9 +53,15 @@ void main() {
     mockSubscribe = MockSubscribeToPlanUseCase();
     mockLoyalty = MockPayWithLoyaltyUseCase();
     final mockAuthNotifier = MockAuthStateNotifier();
+    final mockGetUserProfileUseCase = MockGetUserProfileUseCase();
 
     when(() => mockAuthNotifier.session).thenReturn(
       const AuthSession(user: null, state: AuthState.unauthenticated),
+    );
+    when(() => mockGetUserProfileUseCase()).thenAnswer(
+      (_) async => Result.failure(
+        ServerFailure(AppErrorCode.serverError, 'no profile mock'),
+      ),
     );
 
     locator.allowReassignment = true;
@@ -61,6 +70,17 @@ void main() {
     } else {
       locator.unregister<AuthStateNotifier>();
       locator.registerSingleton<AuthStateNotifier>(mockAuthNotifier);
+    }
+
+    if (!locator.isRegistered<GetUserProfileUseCase>()) {
+      locator.registerSingleton<GetUserProfileUseCase>(
+        mockGetUserProfileUseCase,
+      );
+    } else {
+      locator.unregister<GetUserProfileUseCase>();
+      locator.registerSingleton<GetUserProfileUseCase>(
+        mockGetUserProfileUseCase,
+      );
     }
 
     viewModel = PaymentSelectionViewModel(

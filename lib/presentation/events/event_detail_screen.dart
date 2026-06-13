@@ -2,8 +2,13 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
+import 'package:bourgo_arena_mobile/domain/entities/family_member.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
+import 'package:bourgo_arena_mobile/domain/repositories/event_repository.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/child_selector_sheet.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -30,10 +35,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   bool _isRegistered = false;
   bool _isCheckedIn = false;
   int _currentImageIndex = 0;
+  bool _showFamilyFeatures = false;
+  List<FamilyMember> _familyMembers = [];
+  FamilyMember? _selectedMember;
+  List<EventParticipant> _allRegistrations = [];
 
   @override
   void initState() {
     super.initState();
+    _loadFamilyStatus();
     if (widget.event != null) {
       _event = widget.event;
       _isRegistered = widget.event!.isRegistered;
@@ -43,9 +53,96 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  Future<void> _loadFamilyStatus() async {
+    final userRepository = locator<UserRepository>();
+    final userResult = await userRepository.getUserProfile();
+    if (!mounted) return;
+
+    bool familyEnabled = false;
+    userResult.when(
+      success: (user) {
+        final prefs = user.preferences ?? {};
+        final familyEnabledVal =
+            prefs['app']?['family_enabled'] as bool? ?? false;
+        familyEnabled =
+            familyEnabledVal ||
+            user.isParentAccount ||
+            user.children.isNotEmpty;
+      },
+      failure: (_) {},
+    );
+
+    if (familyEnabled) {
+      final membersResult = await locator<GetFamilyMembersUseCase>()();
+      final regsResult = await locator<EventRepository>()
+          .getAccountRegistrations();
+      if (!mounted) return;
+
+      List<FamilyMember> members = [];
+      membersResult.when(success: (m) => members = m, failure: (_) {});
+
+      List<EventParticipant> regs = [];
+      regsResult.when(success: (r) => regs = r, failure: (_) {});
+
+      setState(() {
+        _showFamilyFeatures = true;
+        _familyMembers = members;
+        _allRegistrations = regs;
+        if (members.isNotEmpty) {
+          _selectedMember = members.firstWhere(
+            (m) => m.isPrimary,
+            orElse: () => members.first,
+          );
+        }
+        _updateSelectedMemberStatus();
+      });
+    } else {
+      final regsResult = await locator<EventRepository>()
+          .getAccountRegistrations();
+      if (!mounted) return;
+      regsResult.when(
+        success: (r) {
+          setState(() {
+            _allRegistrations = r;
+            _updateSelectedMemberStatus();
+          });
+        },
+        failure: (_) {},
+      );
+    }
+  }
+
+  void _updateSelectedMemberStatus() {
+    if (_event == null) return;
+    final member = _selectedMember;
+
+    if (!_showFamilyFeatures || member == null) {
+      _isRegistered = _event!.isRegistered;
+      _isCheckedIn = false;
+    }
+
+    final matchId = member?.id ?? '';
+    final reg = _allRegistrations.firstWhere(
+      (r) =>
+          r.eventId == _event!.id &&
+          ((member == null && r.user != null) ||
+              (member != null && r.user?.id.toString() == matchId.toString())),
+      orElse: () => const EventParticipant(id: -1, eventId: ''),
+    );
+
+    if (reg.id != -1) {
+      _isRegistered = true;
+      _isCheckedIn = reg.hasCheckedIn;
+    } else if (_showFamilyFeatures && member != null) {
+      _isRegistered = false;
+      _isCheckedIn = false;
+    }
+  }
+
   void _onEventLoaded(Event event) {
     _event = event;
     _isRegistered = event.isRegistered;
+    _updateSelectedMemberStatus();
   }
 
   Future<void> _loadEvent() async {
@@ -65,11 +162,15 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
   Future<void> _register() async {
     if (_event == null || _isActionLoading) return;
+
     final theme = Theme.of(context);
+    final memberName =
+        _selectedMember?.name ?? AppLocalizations.of(context)!.planDetailMyself;
     final confirmed = await ConfirmActionModal.show(
       context: context,
       icon: Symbols.emoji_events,
-      title: AppLocalizations.of(context)!.eventsDetailRegisterTitle,
+      title:
+          '${AppLocalizations.of(context)!.eventsDetailRegisterTitle} for $memberName',
       content: Padding(
         padding: const EdgeInsets.only(top: 4),
         child: Column(
@@ -100,12 +201,32 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     );
     if (confirmed != true) return;
     setState(() => _isActionLoading = true);
-    final result = await locator<RegisterForEventUseCase>()(_event!.id);
+
+    final childId = _selectedMember?.isPrimary == true
+        ? null
+        : _selectedMember?.id;
+    final result = await locator<RegisterForEventUseCase>()(
+      _event!.id,
+      childId: childId,
+    );
     if (!mounted) return;
     setState(() => _isActionLoading = false);
     result.when(
-      success: (reg) {
-        setState(() => _isRegistered = true);
+      success: (reg) async {
+        final regsResult = await locator<EventRepository>()
+            .getAccountRegistrations();
+        if (!mounted) return;
+
+        regsResult.when(
+          success: (r) {
+            setState(() {
+              _allRegistrations = r;
+              _updateSelectedMemberStatus();
+            });
+          },
+          failure: (_) {},
+        );
+
         if (reg.isWaitlisted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -139,23 +260,44 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Future<void> _withdraw() async {
     if (_event == null || _isActionLoading) return;
 
+    final memberName =
+        _selectedMember?.name ?? AppLocalizations.of(context)!.planDetailMyself;
     final confirmed = await ConfirmActionModal.show(
       context: context,
       icon: Symbols.cancel,
       title: AppLocalizations.of(context)!.eventsDetailWithdrawTitle,
       message:
-          '${AppLocalizations.of(context)!.eventsDetailWithdrawPromptPrefix} ${_event!.name ?? AppLocalizations.of(context)!.eventsDetailThisEvent} ?',
+          '${AppLocalizations.of(context)!.eventsDetailWithdrawPromptPrefix} $memberName from ${_event!.name ?? AppLocalizations.of(context)!.eventsDetailThisEvent} ?',
       isDestructive: true,
     );
 
     if (confirmed != true) return;
     setState(() => _isActionLoading = true);
-    final result = await locator<WithdrawFromEventUseCase>()(_event!.id);
+
+    final childId = _selectedMember?.isPrimary == true
+        ? null
+        : _selectedMember?.id;
+    final result = await locator<WithdrawFromEventUseCase>()(
+      _event!.id,
+      childId: childId,
+    );
     if (!mounted) return;
     setState(() => _isActionLoading = false);
     result.when(
-      success: (_) {
-        setState(() => _isRegistered = false);
+      success: (_) async {
+        final regsResult = await locator<EventRepository>()
+            .getAccountRegistrations();
+        if (!mounted) return;
+
+        regsResult.when(
+          success: (r) {
+            setState(() {
+              _allRegistrations = r;
+              _updateSelectedMemberStatus();
+            });
+          },
+          failure: (_) {},
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -178,12 +320,31 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
   Future<void> _checkIn() async {
     if (_event == null || _isActionLoading) return;
     setState(() => _isActionLoading = true);
-    final result = await locator<CheckInToEventUseCase>()(_event!.id);
+
+    final childId = _selectedMember?.isPrimary == true
+        ? null
+        : _selectedMember?.id;
+    final result = await locator<CheckInToEventUseCase>()(
+      _event!.id,
+      childId: childId,
+    );
     if (!mounted) return;
     setState(() => _isActionLoading = false);
     result.when(
-      success: (_) {
-        setState(() => _isCheckedIn = true);
+      success: (_) async {
+        final regsResult = await locator<EventRepository>()
+            .getAccountRegistrations();
+        if (!mounted) return;
+
+        regsResult.when(
+          success: (r) {
+            setState(() {
+              _allRegistrations = r;
+              _updateSelectedMemberStatus();
+            });
+          },
+          failure: (_) {},
+        );
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -407,6 +568,89 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
     }
   }
 
+  Widget _buildForWhom(ThemeData theme, AppColors appColors) {
+    final memberName =
+        _selectedMember?.name ?? AppLocalizations.of(context)!.planDetailMyself;
+    final isPrimary = _selectedMember?.isPrimary ?? true;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: appColors.bgElevated,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: appColors.bgBorder),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () async {
+          final childId = await showChildSelectorSheet(context);
+          if (!mounted) return;
+          if (childId == kAddChildSentinel) {
+            await context.push('/add-child');
+            return;
+          }
+          final member = _familyMembers.firstWhere(
+            (m) =>
+                (childId == null && m.isPrimary) ||
+                (childId != null && m.id == childId),
+            orElse: () => _familyMembers.first,
+          );
+          setState(() {
+            _selectedMember = member;
+            _updateSelectedMemberStatus();
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: theme.colorScheme.primary.withValues(
+                  alpha: 0.1,
+                ),
+                child: Icon(
+                  isPrimary ? Symbols.person : Symbols.child_care,
+                  size: 20,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLocalizations.of(
+                        context,
+                      )!.planDetailSubscribeFor.toUpperCase(),
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      memberName,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Symbols.chevron_right,
+                color: theme.colorScheme.onSurfaceVariant,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent(ThemeData theme, AppColors appColors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -450,6 +694,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         const SizedBox(height: 20),
         _participantsProgress(theme),
         const SizedBox(height: 20),
+        if (_showFamilyFeatures && _familyMembers.isNotEmpty) ...[
+          _buildForWhom(theme, appColors),
+          const SizedBox(height: 20),
+        ],
         if (_event!.description != null && _event!.description!.isNotEmpty)
           Text(
             _event!.description!,

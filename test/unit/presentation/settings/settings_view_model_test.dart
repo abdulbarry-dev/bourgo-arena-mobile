@@ -170,6 +170,11 @@ void main() {
     when(
       () => mockUserRepository.updatePreferences(any()),
     ).thenAnswer((_) async => Result.success(null));
+    when(() => mockUserRepository.getUserProfile()).thenAnswer(
+      (_) async => Result.failure(
+        ServerFailure(AppErrorCode.serverError, 'no user profile stubbed'),
+      ),
+    );
 
     viewModel = SettingsViewModel(
       mockGetTheme,

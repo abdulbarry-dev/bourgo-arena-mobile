@@ -25,7 +25,7 @@ class PremiumNetworkImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (AppConfig.isTestEnvironment) {
+    if (AppConfig.isTest) {
       return Container(
         width: width ?? double.infinity,
         height: height ?? double.infinity,
