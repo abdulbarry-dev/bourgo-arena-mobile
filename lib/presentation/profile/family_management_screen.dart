@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/entities/verification_status.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/otp_verification_dialog.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/family_management_view_model.dart';
@@ -72,8 +73,10 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
 
       final options = _buildOtpMethodOptions(status);
       if (options.isEmpty && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.profileNoVerifiedOtpMethod)),
+        AppToast.show(
+          context,
+          l10n.profileNoVerifiedOtpMethod,
+          type: AppToastType.warning,
         );
         return;
       }
@@ -124,26 +127,20 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
 
                       if (!success) {
                         Navigator.pop(context); // Close the OTP dialog
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              _viewModel.errorMessage ??
-                                  l10n.commonErrorOccurred,
-                            ),
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.error,
-                          ),
+                        AppToast.show(
+                          context,
+                          _viewModel.errorMessage ?? l10n.commonErrorOccurred,
+                          type: AppToastType.error,
                         );
                       }
                     }
                   : () {
                       // If somehow an unverified option is shown, give feedback.
                       Navigator.pop(dialogContext);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.profileNoVerifiedOtpMethod),
-                        ),
+                      AppToast.show(
+                        context,
+                        l10n.profileNoVerifiedOtpMethod,
+                        type: AppToastType.warning,
                       );
                     },
             );
@@ -183,7 +180,6 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
 
   void _showOtpDialog() async {
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
 
     final result = await showDialog<bool>(
       context: context,
@@ -197,14 +193,10 @@ class _FamilyManagementScreenState extends State<FamilyManagementScreen> {
 
     if (result == true && mounted) {
       AppHaptics.success();
-      final messenger = ScaffoldMessenger.of(context);
-      final successMessage = l10n.profileFamilyEnabled;
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(successMessage),
-          backgroundColor: theme.extension<AppColors>()!.statusSuccess,
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppToast.show(
+        context,
+        l10n.profileFamilyEnabled,
+        type: AppToastType.success,
       );
       context.push('/manage-children');
     }

@@ -4519,6 +4519,60 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'ANNULER'**
   String get paymentCancel;
+
+  /// No description provided for @accountSetupSessionExpired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre session doit être actualisée. Veuillez vous reconnecter.'**
+  String get accountSetupSessionExpired;
+
+  /// No description provided for @accountSetupIncompleteOnboarding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez compléter tous les champs d\'inscription obligatoires avant de continuer.'**
+  String get accountSetupIncompleteOnboarding;
+
+  /// No description provided for @subscriptionScreenTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'MON ABONNEMENT'**
+  String get subscriptionScreenTitle;
+
+  /// No description provided for @subscriptionManagementPageTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'EXPLORER LES PLANS'**
+  String get subscriptionManagementPageTitle;
+
+  /// No description provided for @subscriptionManagementSearchHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher des plans ou services...'**
+  String get subscriptionManagementSearchHint;
+
+  /// No description provided for @planCardSubscribeButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'S\'abonner'**
+  String get planCardSubscribeButton;
+
+  /// No description provided for @homeCarouselEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien ici pour l\'instant'**
+  String get homeCarouselEmpty;
+
+  /// No description provided for @subscriptionCardStartLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'DÉBUT'**
+  String get subscriptionCardStartLabel;
+
+  /// No description provided for @subscriptionCardEndLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'FIN'**
+  String get subscriptionCardEndLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,7 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_background.da
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_dropdown.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_header.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import '../../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/family_member_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -106,9 +107,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _onViewModelChanged() {
     if (_viewModel.errorMessage != null) {
-      ScaffoldMessenger.of(
+      AppToast.show(
         context,
-      ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
+        _viewModel.errorMessage!,
+        type: AppToastType.error,
+      );
     }
   }
 

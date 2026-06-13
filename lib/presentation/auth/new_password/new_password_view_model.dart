@@ -4,6 +4,8 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../common/widgets/app_toast.dart';
+
 /// ViewModel for the New Password screen.
 class NewPasswordViewModel extends ChangeNotifier {
   final String identifier;
@@ -50,18 +52,20 @@ class NewPasswordViewModel extends ChangeNotifier {
   }
 
   void _handleSuccess(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.passwordUpdateSuccess),
-      ),
+    AppToast.show(
+      context,
+      AppLocalizations.of(context)!.passwordUpdateSuccess,
+      type: AppToastType.success,
     );
     context.go('/login');
   }
 
   void _handleFailure(BuildContext context, Failure failure) {
-    ScaffoldMessenger.of(
+    AppToast.show(
       context,
-    ).showSnackBar(SnackBar(content: Text(failure.message)));
+      failure.message,
+      type: AppToastType.error,
+    );
   }
 
   @override

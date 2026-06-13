@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bourgo_arena_mobile/domain/entities/plan.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_network_image.dart';
 
 class PlanCard extends StatelessWidget {
@@ -80,7 +81,10 @@ class PlanCard extends StatelessWidget {
                           height: 20,
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const Text('Subscribe'),
+                      : Text(
+                          AppLocalizations.of(context)!
+                              .planCardSubscribeButton,
+                        ),
                 ),
               ],
             ),

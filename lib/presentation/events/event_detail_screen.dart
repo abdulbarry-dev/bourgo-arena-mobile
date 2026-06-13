@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/user_repository.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/event_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_family_members_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/child_selector_sheet.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
@@ -233,21 +234,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         );
 
         if (reg.isWaitlisted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.eventsDetailWaitlistSuccess,
-              ),
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.eventsDetailWaitlistSuccess,
+            type: AppToastType.info,
           );
         } else {
           CelebrationOverlay.show(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.eventsDetailRegisterSuccess,
-              ),
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.eventsDetailRegisterSuccess,
+            type: AppToastType.success,
           );
         }
       },
@@ -256,22 +253,19 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           setState(() {
             _isRegistered = true;
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.eventsDetailRegisterSuccess,
-              ),
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.eventsDetailRegisterSuccess,
+            type: AppToastType.success,
           );
           _loadEvent();
           return;
         }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(f.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppToast.show(
+          context,
+          f.message,
+          type: AppToastType.error,
         );
       },
     );
@@ -318,20 +312,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           },
           failure: (_) {},
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.eventsDetailWithdrawSuccess,
-            ),
-          ),
+        AppToast.show(
+          context,
+          AppLocalizations.of(context)!.eventsDetailWithdrawSuccess,
+          type: AppToastType.success,
         );
       },
       failure: (f) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(f.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppToast.show(
+          context,
+          f.message,
+          type: AppToastType.error,
         );
       },
     );
@@ -365,20 +356,17 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           },
           failure: (_) {},
         );
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              AppLocalizations.of(context)!.eventsDetailCheckInSuccess,
-            ),
-          ),
+        AppToast.show(
+          context,
+          AppLocalizations.of(context)!.eventsDetailCheckInSuccess,
+          type: AppToastType.success,
         );
       },
       failure: (f) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(f.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppToast.show(
+          context,
+          f.message,
+          type: AppToastType.error,
         );
       },
     );

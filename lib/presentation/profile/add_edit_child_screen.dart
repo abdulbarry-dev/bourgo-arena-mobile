@@ -7,6 +7,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/family/add_child_use_case.da
 import 'package:bourgo_arena_mobile/domain/usecases/family/update_child_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/widgets/auth_text_field.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/add_edit_child_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -63,6 +64,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
   }
 
   void _showAvatarOptions() {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -90,7 +92,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                   ),
                 ),
                 Text(
-                  "PHOTO DE PROFIL",
+                  l10n.editProfilePhotoTitle,
                   style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w900,
                     letterSpacing: 1.2,
@@ -113,7 +115,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                         ),
                       ),
                       title: Text(
-                        "PRENDRE UNE PHOTO",
+                        l10n.editProfileTakePhoto,
                         style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -151,7 +153,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                         ),
                       ),
                       title: Text(
-                        "CHOISIR UNE PHOTO",
+                        l10n.editProfileChoosePhoto,
                         style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -191,7 +193,7 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
                           ),
                         ),
                         title: Text(
-                          "SUPPRIMER LA PHOTO",
+                          l10n.editProfileDeletePhoto,
                           style: Theme.of(ctx).textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(ctx).colorScheme.error,
@@ -243,27 +245,19 @@ class _AddEditChildScreenState extends State<AddEditChildScreen> {
   Future<void> _onSubmit() async {
     AppHaptics.light();
     final l10n = AppLocalizations.of(context)!;
-    final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
 
     final success = await _viewModel.submitChild();
     if (!mounted) return;
 
     if (success) {
       AppHaptics.success();
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(
-              _viewModel.isEditing
-                  ? l10n.profileChildUpdated
-                  : l10n.profileChildAdded,
-            ),
-            backgroundColor: appColors.statusSuccess,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      AppToast.show(
+        context,
+        _viewModel.isEditing
+            ? l10n.profileChildUpdated
+            : l10n.profileChildAdded,
+        type: AppToastType.success,
+      );
       context.pop(true);
     } else {
       // Move focus to the first invalid text field so the user can fix it

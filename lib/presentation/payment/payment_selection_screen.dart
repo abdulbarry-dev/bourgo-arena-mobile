@@ -11,6 +11,7 @@ import 'package:bourgo_arena_mobile/domain/repositories/payment_repository.dart'
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/subscribe_to_plan_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/loyalty/pay_with_loyalty_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/animated_loyalty_balance.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/confirm_action_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/payment/payment_webview_screen.dart';
@@ -95,11 +96,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
       if (uri != null && await canLaunchUrl(uri)) {
         await launchUrl(uri, webOnlyWindowName: '_self');
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.paymentErrorCannotOpen),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppToast.show(
+          context,
+          AppLocalizations.of(context)!.paymentErrorCannotOpen,
+          type: AppToastType.error,
         );
       }
       return;
@@ -115,11 +115,10 @@ class _PaymentSelectionScreenState extends State<PaymentSelectionScreen> {
     if (result == PaymentWebViewResult.failure) {
       _viewModel.reset();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(AppLocalizations.of(context)!.paymentFailedRetry),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
+        AppToast.show(
+          context,
+          AppLocalizations.of(context)!.paymentFailedRetry,
+          type: AppToastType.error,
         );
       }
       return;

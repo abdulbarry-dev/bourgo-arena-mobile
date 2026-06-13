@@ -6,6 +6,8 @@ import 'package:bourgo_arena_mobile/presentation/auth/widgets/onboarding_setup_m
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../common/widgets/app_toast.dart';
+
 /// ViewModel for the Login screen.
 class LoginViewModel extends ChangeNotifier {
   final LoginUseCase _loginUseCase;
@@ -67,9 +69,11 @@ class LoginViewModel extends ChangeNotifier {
       result.fold(
         onFailure: (failure) {
           if (context.mounted) {
-            ScaffoldMessenger.of(
+            AppToast.show(
               context,
-            ).showSnackBar(SnackBar(content: Text(failure.message)));
+              failure.message,
+              type: AppToastType.error,
+            );
           }
         },
         onSuccess: (session) async {

@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/book_child_session_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_child_available_sessions_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
+import '../../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/sub_screen_app_bar.dart';
 import 'package:bourgo_arena_mobile/presentation/family_child/viewmodels/child_sessions_view_model.dart';
@@ -134,11 +135,10 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                     onPressed: () async {
                       AppHaptics.light();
                       Navigator.pop(dialogContext);
-                      final theme = Theme.of(this.context);
-                      final appColors = theme.extension<AppColors>()!;
-                      final messenger = ScaffoldMessenger.of(this.context);
                       final dateStr =
-                          '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+                          '${selectedDate.year}-'
+                          '${selectedDate.month.toString().padLeft(2, '0')}-'
+                          '${selectedDate.day.toString().padLeft(2, '0')}';
                       final booking = await _viewModel.bookSession(
                         childId: widget.childId,
                         sessionId: session.id,
@@ -150,26 +150,20 @@ class _ChildSessionsScreenState extends State<ChildSessionsScreen> {
                         } else {
                           AppHaptics.error();
                         }
-                        messenger
-                          ..hideCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                booking != null
-                                    ? AppLocalizations.of(
-                                        context,
-                                      )!.familyChildSessionsBookSuccess
-                                    : _viewModel.errorMessage ??
-                                          AppLocalizations.of(
-                                            context,
-                                          )!.familyChildSessionsBookFailure,
-                              ),
-                              backgroundColor: booking != null
-                                  ? appColors.statusSuccess
-                                  : theme.colorScheme.error,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                        AppToast.show(
+                          context,
+                          booking != null
+                              ? AppLocalizations.of(
+                                  context,
+                                )!.familyChildSessionsBookSuccess
+                              : _viewModel.errorMessage ??
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.familyChildSessionsBookFailure,
+                          type: booking != null
+                              ? AppToastType.success
+                              : AppToastType.error,
+                        );
                         if (booking != null) _viewModel.load(widget.childId);
                       }
                     },

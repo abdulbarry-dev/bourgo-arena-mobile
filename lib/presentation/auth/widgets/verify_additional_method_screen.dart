@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/auth_repository.dart';
+import '../../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/get_verification_status_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/send_otp_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
@@ -94,9 +95,11 @@ class _VerifyAdditionalMethodScreenState
           });
         },
         failure: (failure) {
-          ScaffoldMessenger.of(
+          AppToast.show(
             context,
-          ).showSnackBar(SnackBar(content: Text(failure.message)));
+            failure.message,
+            type: AppToastType.error,
+          );
         },
       );
     }
@@ -127,9 +130,11 @@ class _VerifyAdditionalMethodScreenState
             );
           },
           failure: (failure) {
-            ScaffoldMessenger.of(
+            AppToast.show(
               context,
-            ).showSnackBar(SnackBar(content: Text(failure.message)));
+              failure.message,
+              type: AppToastType.error,
+            );
           },
         );
       }
@@ -137,9 +142,11 @@ class _VerifyAdditionalMethodScreenState
       _setLoading(false);
       if (mounted) {
         final l10n = AppLocalizations.of(context)!;
-        ScaffoldMessenger.of(
+        AppToast.show(
           context,
-        ).showSnackBar(SnackBar(content: Text(l10n.commonMissingContactInfo)));
+          l10n.commonMissingContactInfo,
+          type: AppToastType.warning,
+        );
       }
     }
   }

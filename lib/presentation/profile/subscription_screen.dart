@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/domain/usecases/family/get_children_use_case.dart';
+import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/widgets/subscription_card.dart';
 
@@ -42,7 +43,10 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          appBar: SubScreenAppBar(title: 'MON ABONNEMENT'),
+          appBar: SubScreenAppBar(
+            title: AppLocalizations.of(context)!
+                .subscriptionScreenTitle,
+          ),
           body: _viewModel.isLoading && subscriptions.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : RefreshIndicator(
@@ -257,7 +261,9 @@ class _ErrorState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Symbols.refresh, size: 20),
-              label: const Text('Réessayer'),
+              label: Text(
+                AppLocalizations.of(context)!.commonRetry,
+              ),
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

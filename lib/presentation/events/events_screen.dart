@@ -1,4 +1,5 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
@@ -249,17 +250,16 @@ class _EventsScreenState extends State<EventsScreen> {
                               : AppLocalizations.of(
                                   context,
                                 )!.eventsScreenRegisterSuccess;
-                          ScaffoldMessenger.of(
+                          AppToast.show(
                             context,
-                          ).showSnackBar(SnackBar(content: Text(msg)));
+                            msg,
+                            type: AppToastType.success,
+                          );
                         } else if (_viewModel.errorMessage != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(_viewModel.errorMessage!),
-                              backgroundColor: Theme.of(
-                                context,
-                              ).colorScheme.error,
-                            ),
+                          AppToast.show(
+                            context,
+                            _viewModel.errorMessage!,
+                            type: AppToastType.error,
                           );
                         }
                       },

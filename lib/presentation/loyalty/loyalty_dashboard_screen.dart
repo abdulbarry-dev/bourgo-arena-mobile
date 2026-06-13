@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/core/utils/format.dart';
 import 'package:bourgo_arena_mobile/domain/entities/loyalty_balance.dart';
 import 'package:bourgo_arena_mobile/domain/entities/member_tier.dart';
@@ -76,20 +77,13 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
     if (_viewModel.refreshError != null && mounted) {
       final error = _viewModel.refreshError;
       _viewModel.clearRefreshError();
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text(error!),
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Theme.of(context).colorScheme.error,
-            action: SnackBarAction(
-              label: AppLocalizations.of(context)!.loyaltyRetryButton,
-              textColor: Theme.of(context).colorScheme.onError,
-              onPressed: () => _viewModel.loadBalance(),
-            ),
-          ),
-        );
+      AppToast.show(
+        context,
+        error!,
+        type: AppToastType.error,
+        actionLabel: AppLocalizations.of(context)!.loyaltyRetryButton,
+        onAction: () => _viewModel.loadBalance(),
+      );
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:bourgo_arena_mobile/domain/usecases/family/remove_child_use_case
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_modal.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/app_shimmer.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/child_avatar.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/profile/viewmodels/manage_children_view_model.dart';
@@ -43,7 +44,6 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
   void _showDeleteConfirmation(String childId, String childName) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final appColors = theme.extension<AppColors>()!;
 
     showDialog(
       context: context,
@@ -72,30 +72,20 @@ class _ManageChildrenScreenState extends State<ManageChildrenScreen> {
               if (success) {
                 if (context.mounted) {
                   AppHaptics.success();
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text(l10n.profileChildRemoved),
-                        backgroundColor: appColors.statusSuccess,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
+                  AppToast.show(
+                    context,
+                    l10n.profileChildRemoved,
+                    type: AppToastType.success,
+                  );
                 }
               } else {
                 if (context.mounted) {
                   AppHaptics.error();
-                  ScaffoldMessenger.of(context)
-                    ..hideCurrentSnackBar()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          _viewModel.errorMessage ?? l10n.commonErrorOccurred,
-                        ),
-                        backgroundColor: theme.colorScheme.error,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
+                  AppToast.show(
+                    context,
+                    _viewModel.errorMessage ?? l10n.commonErrorOccurred,
+                    type: AppToastType.error,
+                  );
                 }
               }
             },

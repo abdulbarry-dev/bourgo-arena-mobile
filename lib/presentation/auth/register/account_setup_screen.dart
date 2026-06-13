@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
+import '../../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/domain/entities/auth_state.dart';
 import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/domain/entities/user.dart';
@@ -212,25 +213,21 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
             !onboardingCompleted) {
           GoRouter.of(context).go('/account-setup', extra: _data);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Your session needs to be refreshed. Please log in again.',
-              ),
-              behavior: SnackBarBehavior.floating,
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!
+                .accountSetupSessionExpired,
+            type: AppToastType.info,
           );
           GoRouter.of(context).go('/login');
         }
       },
       onFailure: (failure) {
         AppHaptics.error();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(failure.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppToast.show(
+          context,
+          failure.message,
+          type: AppToastType.error,
         );
       },
     );
@@ -273,13 +270,11 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
 
   void _showValidationError() {
     AppHaptics.error();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Please complete all required onboarding fields before continuing.',
-        ),
-        behavior: SnackBarBehavior.floating,
-      ),
+    AppToast.show(
+      context,
+      AppLocalizations.of(context)!
+          .accountSetupIncompleteOnboarding,
+      type: AppToastType.warning,
     );
   }
 
@@ -358,13 +353,11 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                                 InkWell(
                                   onTap: () {
                                     AppHaptics.light();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          l10n.commonImagePickerPlaceholder,
-                                        ),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
+                                    AppToast.show(
+                                      context,
+                                      l10n
+                                          .commonImagePickerPlaceholder,
+                                      type: AppToastType.info,
                                     );
                                   },
                                   borderRadius: BorderRadius.circular(60),

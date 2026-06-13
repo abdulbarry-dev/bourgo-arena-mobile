@@ -1,5 +1,6 @@
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/user/update_user_profile_use_case.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
@@ -286,15 +287,12 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     if (!mounted) return;
     final success = await _viewModel.uploadAvatar(picked.path);
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success
-              ? AppLocalizations.of(context)!.editProfilePhotoUpdated
-              : AppLocalizations.of(context)!.editProfilePhotoFailed,
-        ),
-        backgroundColor: success ? Colors.green : Colors.red,
-      ),
+    AppToast.show(
+      context,
+      success
+          ? AppLocalizations.of(context)!.editProfilePhotoUpdated
+          : AppLocalizations.of(context)!.editProfilePhotoFailed,
+      type: success ? AppToastType.success : AppToastType.error,
     );
   }
 
@@ -330,15 +328,13 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     if (!mounted) return;
     final success = await _viewModel.deleteAvatar();
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success
-              ? AppLocalizations.of(context)!.editProfilePhotoDeleted
-              : AppLocalizations.of(context)!.editProfilePhotoDeleteFailed,
-        ),
-        backgroundColor: success ? Colors.green : Colors.red,
-      ),
+    AppToast.show(
+      context,
+      success
+          ? AppLocalizations.of(context)!.editProfilePhotoDeleted
+          : AppLocalizations.of(context)!
+              .editProfilePhotoDeleteFailed,
+      type: success ? AppToastType.success : AppToastType.error,
     );
   }
 
@@ -364,13 +360,11 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     Navigator.of(context, rootNavigator: true).pop();
 
     if (!sent) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            '${AppLocalizations.of(context)!.editProfileOtpSendFailed} $identifier',
-          ),
-          backgroundColor: Colors.red,
-        ),
+      AppToast.show(
+        context,
+        '${AppLocalizations.of(context)!.editProfileOtpSendFailed}'
+        ' $identifier',
+        type: AppToastType.error,
       );
       return false;
     }
@@ -405,22 +399,18 @@ class _EditProfileScreenState extends State<EditProfileScreen>
         gender: user.gender,
       );
       if (saved && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "$type ${AppLocalizations.of(context)!.editProfileVerifiedUpdated}",
-            ),
-            backgroundColor: Colors.green,
-          ),
+        AppToast.show(
+          context,
+          "$type "
+          "${AppLocalizations.of(context)!.editProfileVerifiedUpdated}",
+          type: AppToastType.success,
         );
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "${AppLocalizations.of(context)!.editProfileUpdateFailed} $type.",
-            ),
-            backgroundColor: Colors.red,
-          ),
+        AppToast.show(
+          context,
+          "${AppLocalizations.of(context)!.editProfileUpdateFailed}"
+          " $type.",
+          type: AppToastType.error,
         );
       }
     }
@@ -442,19 +432,17 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
       if (mounted) {
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.profileUpdateSuccess),
-              backgroundColor: Colors.green,
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.profileUpdateSuccess,
+            type: AppToastType.success,
           );
           context.pop();
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(AppLocalizations.of(context)!.errorUpdatingProfile),
-              backgroundColor: Colors.red,
-            ),
+          AppToast.show(
+            context,
+            AppLocalizations.of(context)!.errorUpdatingProfile,
+            type: AppToastType.error,
           );
         }
       }
@@ -1089,10 +1077,10 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
                             final code = _controllers.map((c) => c.text).join();
                             if (code.length != 6) {
                               if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Please enter all 6 digits"),
-                                ),
+                              AppToast.show(
+                                context,
+                                "Please enter all 6 digits",
+                                type: AppToastType.warning,
                               );
                               return;
                             }
@@ -1103,11 +1091,10 @@ class _OtpVerificationDialogState extends State<_OtpVerificationDialog> {
                               Navigator.pop(context, true);
                             } else {
                               setState(() => _isVerifying = false);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Verification failed"),
-                                  backgroundColor: theme.colorScheme.error,
-                                ),
+                              AppToast.show(
+                                context,
+                                "Verification failed",
+                                type: AppToastType.error,
                               );
                             }
                           },
