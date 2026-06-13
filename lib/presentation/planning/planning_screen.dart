@@ -14,6 +14,7 @@ import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/planning_view_model.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/session_schedule_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/empty_state.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/premium_error_state.dart';
 import '../common/widgets/app_toast.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/celebration_overlay.dart';
@@ -150,14 +151,11 @@ class _PlanningScreenState extends State<PlanningScreen> {
     if (!_viewModel.isAuthenticated) {
       return SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Container(
+        child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.7,
-          padding: const EdgeInsets.symmetric(horizontal: 32),
-          child: PremiumErrorState(
-            title: AppLocalizations.of(context)!.planningSignInTitle,
-            message: AppLocalizations.of(context)!.planningSignInMessage,
-            actionLabel: AppLocalizations.of(context)!.signInButton,
-            onRetry: () => context.push('/login'),
+          child: GuestAuthState(
+            icon: Symbols.calendar_month,
+            subtitle: AppLocalizations.of(context)!.planningSignInMessage,
           ),
         ),
       );
@@ -227,19 +225,13 @@ class _PlanningScreenState extends State<PlanningScreen> {
       CelebrationOverlay.show(context);
       AppToast.show(
         context,
-        AppLocalizations.of(context)!.courseDetailBookedSession(
-          entry.title,
-          dateStr,
-          entry.startTime,
-        ),
+        AppLocalizations.of(
+          context,
+        )!.courseDetailBookedSession(entry.title, dateStr, entry.startTime),
         type: AppToastType.success,
       );
     } else {
-      AppToast.show(
-        context,
-        error,
-        type: AppToastType.error,
-      );
+      AppToast.show(context, error, type: AppToastType.error);
     }
   }
 
