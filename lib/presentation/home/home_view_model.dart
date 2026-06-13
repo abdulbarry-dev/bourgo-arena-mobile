@@ -1,12 +1,14 @@
+import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
+import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
-import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/domain/entities/event.dart';
+import 'package:bourgo_arena_mobile/domain/entities/service.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/activity/get_activities_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
-import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/event/event_use_cases.dart';
-import 'package:bourgo_arena_mobile/core/base/base_view_model.dart';
+import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 
 class HomeViewModel extends BaseViewModel {
   final GetActivitiesUseCase _getActivitiesUseCase;
@@ -59,6 +61,12 @@ class HomeViewModel extends BaseViewModel {
 
   Future<void> loadHomeData() async {
     if (_isDisposed) return;
+    if (!locator<AuthStateNotifier>().isAuthenticated) {
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
     _isLoading = true;
     notifyListeners();
 
@@ -76,6 +84,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> _loadEvents() async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) return;
     _eventsLoading = true;
     _eventsError = null;
     notifyListeners();
@@ -94,6 +103,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> _loadCourses() async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) return;
     _coursesLoading = true;
     _coursesError = null;
     notifyListeners();
@@ -112,6 +122,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> _loadActivities() async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) return;
     _activitiesLoading = true;
     _activitiesError = null;
     notifyListeners();
@@ -130,6 +141,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> _loadServices() async {
+    if (!locator<AuthStateNotifier>().isAuthenticated) return;
     _servicesLoading = true;
     _servicesError = null;
     notifyListeners();

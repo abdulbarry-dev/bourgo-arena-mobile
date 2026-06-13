@@ -185,14 +185,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   onRetry: () => _viewModel.loadHomeData(),
                   itemBuilder: (context, index) => _ActivityCard(
                     activity: _viewModel.activities[index],
-                    onTap: () {
-                      if (ensureAuthenticated(context)) {
-                        context.push(
-                          '/booking',
-                          extra: _viewModel.activities[index],
-                        );
-                      }
-                    },
+                    onTap: () => context.push(
+                      '/activities/${_viewModel.activities[index].id}',
+                      extra: _viewModel.activities[index],
+                    ),
                   ),
                 ),
 

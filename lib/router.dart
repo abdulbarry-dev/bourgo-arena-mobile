@@ -3,6 +3,7 @@ import 'package:bourgo_arena_mobile/domain/entities/child_profile.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/session_repository.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/auth/request_family_account_otp_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/activities/activity_detail_screen.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/domain/entities/activity.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/forgot_password/forgot_password_screen.dart';
@@ -554,6 +555,13 @@ GoRouter createRouter(
     GoRoute(
       path: '/activities',
       builder: (context, state) => const ActivitiesListScreen(),
+    ),
+    GoRoute(
+      path: '/activities/:id',
+      builder: (context, state) {
+        final activity = state.extra as Activity;
+        return ActivityDetailScreen(activity: activity);
+      },
     ),
     GoRoute(
       path: '/services',
