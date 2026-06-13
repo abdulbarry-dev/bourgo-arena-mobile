@@ -1,6 +1,9 @@
 import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:bourgo_arena_mobile/core/utils/haptic_utils.dart';
+import 'dart:ui';
 
 class ConfirmActionModal {
   static Future<bool?> show({
@@ -33,153 +36,199 @@ class ConfirmActionModal {
                 ? theme.colorScheme.error
                 : theme.colorScheme.primary;
 
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: appColors.bgElevated,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
-                  ),
-                  border: Border.all(color: accentColor.withValues(alpha: 0.1)),
+            return BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.only(bottom: 32),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface.withValues(
-                          alpha: 0.1,
-                        ),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: appColors.bgElevated,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(32),
                     ),
-                    Container(
-                      width: 72,
-                      height: 72,
-                      decoration: BoxDecoration(
-                        color: accentColor.withValues(alpha: 0.08),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(icon, color: accentColor, size: 32),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      title.toUpperCase(),
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                        color: theme.colorScheme.onSurface,
-                        fontFamily: AppConstants.displayFontFamily,
-                        letterSpacing: -0.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    if (message != null) ...[
-                      const SizedBox(height: 12),
-                      Text(
-                        message,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant.withValues(
-                            alpha: 0.7,
-                          ),
-                          height: 1.5,
-                        ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: theme.colorScheme.shadow.withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, -5),
                       ),
                     ],
-                    if (content != null) ...[
-                      const SizedBox(height: 12),
-                      content,
-                    ],
-                    const SizedBox(height: 32),
-                    Row(
+                    border: Border.all(
+                      color: accentColor.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: isConfirming
-                                ? null
-                                : () => Navigator.pop(context, false),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              side: BorderSide(
-                                color: theme.colorScheme.onSurface.withValues(
-                                  alpha: 0.1,
-                                ),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
+                        Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 32),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.1,
                             ),
-                            child: Text(
-                              effectiveCancelLabel,
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1,
-                              ),
-                            ),
+                            borderRadius: BorderRadius.circular(2),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: isConfirming
-                                ? null
-                                : () async {
-                                    if (onConfirm != null) {
-                                      setState(() => isConfirming = true);
-                                      final shouldClose = await onConfirm(
-                                        context,
-                                      );
-                                      setState(() => isConfirming = false);
-                                      if (shouldClose) {
-                                        Navigator.pop(context, true);
-                                      }
-                                    } else {
-                                      Navigator.pop(context, true);
-                                    }
-                                  },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: accentColor,
-                              foregroundColor: isDestructive
-                                  ? theme.colorScheme.onError
-                                  : theme.colorScheme.onPrimary,
-                              elevation: 0,
-                              padding: const EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
+                        Container(
+                              width: 72,
+                              height: 72,
+                              decoration: BoxDecoration(
+                                color: accentColor.withValues(alpha: 0.08),
+                                shape: BoxShape.circle,
                               ),
-                            ),
-                            child: isConfirming
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: isDestructive
-                                          ? theme.colorScheme.onError
-                                          : theme.colorScheme.onPrimary,
+                              child: Icon(icon, color: accentColor, size: 32),
+                            )
+                            .animate()
+                            .scale(
+                              begin: const Offset(0.8, 0.8),
+                              duration: 300.ms,
+                              curve: Curves.easeOutBack,
+                            )
+                            .fade(),
+
+                        const SizedBox(height: 20),
+
+                        Text(
+                              title.toUpperCase(),
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: theme.colorScheme.onSurface,
+                                fontFamily: AppConstants.displayFontFamily,
+                                letterSpacing: -0.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            )
+                            .animate()
+                            .fade(delay: 100.ms, duration: 300.ms)
+                            .slideY(begin: 0.1),
+
+                        if (message != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                                message,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant
+                                      .withValues(alpha: 0.7),
+                                  height: 1.5,
+                                ),
+                              )
+                              .animate()
+                              .fade(delay: 150.ms, duration: 300.ms)
+                              .slideY(begin: 0.1),
+                        ],
+
+                        if (content != null) ...[
+                          const SizedBox(height: 12),
+                          content
+                              .animate()
+                              .fade(delay: 200.ms, duration: 300.ms)
+                              .slideY(begin: 0.1),
+                        ],
+
+                        const SizedBox(height: 32),
+                        Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: isConfirming
+                                        ? null
+                                        : () {
+                                            AppHaptics.light();
+                                            Navigator.pop(context, false);
+                                          },
+                                    style: OutlinedButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 18,
+                                      ),
+                                      side: BorderSide(
+                                        color: theme.colorScheme.onSurface
+                                            .withValues(alpha: 0.1),
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
                                     ),
-                                  )
-                                : Text(
-                                    effectiveConfirmLabel,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: 1,
+                                    child: Text(
+                                      effectiveCancelLabel,
+                                      style: TextStyle(
+                                        color: theme.colorScheme.onSurface,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
+                                      ),
                                     ),
                                   ),
-                          ),
-                        ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: isConfirming
+                                        ? null
+                                        : () async {
+                                            AppHaptics.selection();
+                                            if (onConfirm != null) {
+                                              setState(
+                                                () => isConfirming = true,
+                                              );
+                                              final shouldClose =
+                                                  await onConfirm(context);
+                                              setState(() => isConfirming = false);
+                                              if (shouldClose && context.mounted) {
+                                                Navigator.pop(context, true);
+                                              }
+                                            } else {
+                                              Navigator.pop(context, true);
+                                            }
+                                          },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: accentColor,
+                                      foregroundColor: isDestructive
+                                          ? theme.colorScheme.onError
+                                          : theme.colorScheme.onPrimary,
+                                      elevation: 0,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 18,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    child: isConfirming
+                                        ? SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: isDestructive
+                                                  ? theme.colorScheme.onError
+                                                  : theme.colorScheme.onPrimary,
+                                            ),
+                                          )
+                                        : Text(
+                                            effectiveConfirmLabel,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w900,
+                                              letterSpacing: 1,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ],
+                            )
+                            .animate()
+                            .fade(delay: 250.ms, duration: 300.ms)
+                            .slideY(begin: 0.1),
+
+                        const SizedBox(height: 8),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ),
               ),
             );

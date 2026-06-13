@@ -148,8 +148,9 @@ class SubscriptionCard extends StatelessWidget {
             children: [
               Expanded(
                 child: DateLabel(
-                  label: AppLocalizations.of(context)!
-                      .subscriptionCardStartLabel,
+                  label: AppLocalizations.of(
+                    context,
+                  )!.subscriptionCardStartLabel,
                   date: subscription.startsAt,
                   theme: theme,
                 ),
@@ -165,8 +166,7 @@ class SubscriptionCard extends StatelessWidget {
               SizedBox(width: spacing.sm),
               Expanded(
                 child: DateLabel(
-                  label: AppLocalizations.of(context)!
-                      .subscriptionCardEndLabel,
+                  label: AppLocalizations.of(context)!.subscriptionCardEndLabel,
                   date: subscription.endsAt,
                   theme: theme,
                 ),

@@ -203,8 +203,8 @@ class _CoursesTabState extends State<_CoursesTab> {
   late List<String> _filterOptions;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _initFilters();
   }
 
@@ -271,8 +271,7 @@ class _CoursesTabState extends State<_CoursesTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            if (hasFilter)
-              SliverToBoxAdapter(child: _buildFilterBar()),
+            if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
             SliverFillRemaining(child: _buildFilterEmpty(context, 'courses')),
           ],
         ),
@@ -284,8 +283,7 @@ class _CoursesTabState extends State<_CoursesTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (hasFilter)
-            SliverToBoxAdapter(child: _buildFilterBar()),
+          if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -294,8 +292,10 @@ class _CoursesTabState extends State<_CoursesTab> {
                 return Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: PressableCard(
-                        onTap: () =>
-                            context.push('/courses/${course.id}', extra: course),
+                        onTap: () => context.push(
+                          '/courses/${course.id}',
+                          extra: course,
+                        ),
                         child: CourseCard(course: course),
                       ),
                     )
@@ -312,26 +312,25 @@ class _CoursesTabState extends State<_CoursesTab> {
 
   Widget _buildFilterBar() {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-      child: Row(
-        children: _filterOptions.map((option) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterPill(
-              label: option,
-              isSelected: _selectedFilter == option,
-              onTap: () => setState(() => _selectedFilter = option),
-              hapticFeedback: true,
-            ),
-          );
-        }).toList(),
-      ),
-    ).animate().fadeIn(duration: 400.ms).slideY(
-      begin: 0.1,
-      end: 0,
-      curve: Curves.easeOutQuad,
-    );
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+          child: Row(
+            children: _filterOptions.map((option) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterPill(
+                  label: option,
+                  isSelected: _selectedFilter == option,
+                  onTap: () => setState(() => _selectedFilter = option),
+                  hapticFeedback: true,
+                ),
+              );
+            }).toList(),
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -357,8 +356,8 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
   late List<String> _filterOptions;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _initFilters();
   }
 
@@ -372,10 +371,7 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
 
   void _initFilters() {
     final allLabel = AppLocalizations.of(context)!.browseFilterAll;
-    final categories = widget.activities
-        .map((a) => a.category)
-        .toSet()
-        .toList()
+    final categories = widget.activities.map((a) => a.category).toSet().toList()
       ..sort();
     _filterOptions = [allLabel, ...categories];
     if (!_filterOptions.contains(_selectedFilter)) {
@@ -386,7 +382,9 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
   List<Activity> _getFiltered() {
     final allLabel = AppLocalizations.of(context)!.browseFilterAll;
     if (_selectedFilter == allLabel) return widget.activities;
-    return widget.activities.where((a) => a.category == _selectedFilter).toList();
+    return widget.activities
+        .where((a) => a.category == _selectedFilter)
+        .toList();
   }
 
   @override
@@ -424,9 +422,10 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            if (hasFilter)
-              SliverToBoxAdapter(child: _buildFilterBar()),
-            SliverFillRemaining(child: _buildFilterEmpty(context, 'activities')),
+            if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
+            SliverFillRemaining(
+              child: _buildFilterEmpty(context, 'activities'),
+            ),
           ],
         ),
       );
@@ -437,8 +436,7 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (hasFilter)
-            SliverToBoxAdapter(child: _buildFilterBar()),
+          if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -468,26 +466,25 @@ class _ActivitiesTabState extends State<_ActivitiesTab> {
 
   Widget _buildFilterBar() {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 4),
-      child: Row(
-        children: _filterOptions.map((option) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterPill(
-              label: option,
-              isSelected: _selectedFilter == option,
-              onTap: () => setState(() => _selectedFilter = option),
-              hapticFeedback: true,
-            ),
-          );
-        }).toList(),
-      ),
-    ).animate().fadeIn(duration: 400.ms).slideY(
-      begin: 0.1,
-      end: 0,
-      curve: Curves.easeOutQuad,
-    );
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 4),
+          child: Row(
+            children: _filterOptions.map((option) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterPill(
+                  label: option,
+                  isSelected: _selectedFilter == option,
+                  onTap: () => setState(() => _selectedFilter = option),
+                  hapticFeedback: true,
+                ),
+              );
+            }).toList(),
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 }
 
@@ -513,8 +510,8 @@ class _EventsTabState extends State<_EventsTab> {
   late List<String> _filterOptions;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _initFilters();
   }
 
@@ -581,8 +578,7 @@ class _EventsTabState extends State<_EventsTab> {
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           slivers: [
-            if (hasFilter)
-              SliverToBoxAdapter(child: _buildFilterBar()),
+            if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
             SliverFillRemaining(child: _buildFilterEmpty(context, 'events')),
           ],
         ),
@@ -594,8 +590,7 @@ class _EventsTabState extends State<_EventsTab> {
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          if (hasFilter)
-            SliverToBoxAdapter(child: _buildFilterBar()),
+          if (hasFilter) SliverToBoxAdapter(child: _buildFilterBar()),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             sliver: SliverList(
@@ -614,26 +609,25 @@ class _EventsTabState extends State<_EventsTab> {
 
   Widget _buildFilterBar() {
     return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
-      child: Row(
-        children: _filterOptions.map((option) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterPill(
-              label: option,
-              isSelected: _selectedFilter == option,
-              onTap: () => setState(() => _selectedFilter = option),
-              hapticFeedback: true,
-            ),
-          );
-        }).toList(),
-      ),
-    ).animate().fadeIn(duration: 400.ms).slideY(
-      begin: 0.1,
-      end: 0,
-      curve: Curves.easeOutQuad,
-    );
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 4),
+          child: Row(
+            children: _filterOptions.map((option) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterPill(
+                  label: option,
+                  isSelected: _selectedFilter == option,
+                  onTap: () => setState(() => _selectedFilter = option),
+                  hapticFeedback: true,
+                ),
+              );
+            }).toList(),
+          ),
+        )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad);
   }
 }
 

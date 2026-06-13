@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
+import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/l10n/app_localizations.dart';
 
 class PlanningAuthState extends StatelessWidget {
@@ -52,9 +53,7 @@ class PlanningAuthState extends StatelessWidget {
             ),
             SizedBox(height: spacing.xxl),
             FilledButton.icon(
-              onPressed: () {
-                context.push('/login');
-              },
+              onPressed: () => ensureAuthenticated(context),
               icon: const Icon(Symbols.login),
               label: Text(AppLocalizations.of(context)!.signInRegisterButton),
               style: FilledButton.styleFrom(

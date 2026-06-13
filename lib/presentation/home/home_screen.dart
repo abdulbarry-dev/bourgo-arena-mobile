@@ -1101,9 +1101,7 @@ class _ErrorRow extends StatelessWidget {
               TextButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Symbols.refresh, size: 16),
-                label: Text(
-                  AppLocalizations.of(context)!.commonRetry,
-                ),
+                label: Text(AppLocalizations.of(context)!.commonRetry),
                 style: TextButton.styleFrom(
                   foregroundColor: accentColor,
                   textStyle: const TextStyle(
@@ -1138,8 +1136,7 @@ class _EmptyRow extends StatelessWidget {
     return SizedBox(
       height: 200,
       child: EmptyState(
-        title: AppLocalizations.of(context)!
-            .homeCarouselEmpty,
+        title: AppLocalizations.of(context)!.homeCarouselEmpty,
         message: message,
         icon: icon,
       ),

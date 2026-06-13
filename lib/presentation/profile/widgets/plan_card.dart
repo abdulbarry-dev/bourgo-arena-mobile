@@ -82,8 +82,7 @@ class PlanCard extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Text(
-                          AppLocalizations.of(context)!
-                              .planCardSubscribeButton,
+                          AppLocalizations.of(context)!.planCardSubscribeButton,
                         ),
                 ),
               ],

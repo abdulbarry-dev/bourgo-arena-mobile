@@ -273,9 +273,7 @@ class _OtpVerificationDialogState extends State<OtpVerificationDialog> {
                               setState(() => _isVerifying = false);
                               AppToast.show(
                                 context,
-                                AppLocalizations.of(
-                                  context,
-                                )!.otpErrorFailed,
+                                AppLocalizations.of(context)!.otpErrorFailed,
                                 type: AppToastType.error,
                               );
                             }

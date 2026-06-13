@@ -69,11 +69,7 @@ class LoginViewModel extends ChangeNotifier {
       result.fold(
         onFailure: (failure) {
           if (context.mounted) {
-            AppToast.show(
-              context,
-              failure.message,
-              type: AppToastType.error,
-            );
+            AppToast.show(context, failure.message, type: AppToastType.error);
           }
         },
         onSuccess: (session) async {

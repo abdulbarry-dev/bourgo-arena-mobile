@@ -95,11 +95,7 @@ class _VerifyAdditionalMethodScreenState
           });
         },
         failure: (failure) {
-          AppToast.show(
-            context,
-            failure.message,
-            type: AppToastType.error,
-          );
+          AppToast.show(context, failure.message, type: AppToastType.error);
         },
       );
     }
@@ -130,11 +126,7 @@ class _VerifyAdditionalMethodScreenState
             );
           },
           failure: (failure) {
-            AppToast.show(
-              context,
-              failure.message,
-              type: AppToastType.error,
-            );
+            AppToast.show(context, failure.message, type: AppToastType.error);
           },
         );
       }

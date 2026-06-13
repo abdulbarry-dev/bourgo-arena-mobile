@@ -44,8 +44,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: SubScreenAppBar(
-            title: AppLocalizations.of(context)!
-                .subscriptionScreenTitle,
+            title: AppLocalizations.of(context)!.subscriptionScreenTitle,
           ),
           body: _viewModel.isLoading && subscriptions.isEmpty
               ? const Center(child: CircularProgressIndicator())
@@ -261,9 +260,7 @@ class _ErrorState extends StatelessWidget {
             FilledButton.icon(
               onPressed: onRetry,
               icon: const Icon(Symbols.refresh, size: 20),
-              label: Text(
-                AppLocalizations.of(context)!.commonRetry,
-              ),
+              label: Text(AppLocalizations.of(context)!.commonRetry),
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),

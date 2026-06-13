@@ -227,11 +227,7 @@ class _VerificationMethodScreenState extends State<VerificationMethodScreen> {
         );
       },
       onFailure: (failure) {
-        AppToast.show(
-          context,
-          failure.message,
-          type: AppToastType.error,
-        );
+        AppToast.show(context, failure.message, type: AppToastType.error);
       },
     );
   }

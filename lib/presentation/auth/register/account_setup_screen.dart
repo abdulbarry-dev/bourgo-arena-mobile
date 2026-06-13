@@ -215,8 +215,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
         } else {
           AppToast.show(
             context,
-            AppLocalizations.of(context)!
-                .accountSetupSessionExpired,
+            AppLocalizations.of(context)!.accountSetupSessionExpired,
             type: AppToastType.info,
           );
           GoRouter.of(context).go('/login');
@@ -224,11 +223,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
       },
       onFailure: (failure) {
         AppHaptics.error();
-        AppToast.show(
-          context,
-          failure.message,
-          type: AppToastType.error,
-        );
+        AppToast.show(context, failure.message, type: AppToastType.error);
       },
     );
 
@@ -272,8 +267,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
     AppHaptics.error();
     AppToast.show(
       context,
-      AppLocalizations.of(context)!
-          .accountSetupIncompleteOnboarding,
+      AppLocalizations.of(context)!.accountSetupIncompleteOnboarding,
       type: AppToastType.warning,
     );
   }
@@ -355,8 +349,7 @@ class _AccountSetupScreenState extends State<AccountSetupScreen> {
                                     AppHaptics.light();
                                     AppToast.show(
                                       context,
-                                      l10n
-                                          .commonImagePickerPlaceholder,
+                                      l10n.commonImagePickerPlaceholder,
                                       type: AppToastType.info,
                                     );
                                   },

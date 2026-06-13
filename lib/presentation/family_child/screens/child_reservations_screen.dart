@@ -80,9 +80,7 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
-                      SliverToBoxAdapter(
-                        child: _buildFilterTabs(spacing),
-                      ),
+                      SliverToBoxAdapter(child: _buildFilterTabs(spacing)),
                       if (_viewModel.reservations.isEmpty)
                         SliverFillRemaining(
                           hasScrollBody: false,
@@ -171,10 +169,8 @@ class _ChildReservationsScreenState extends State<ChildReservationsScreen> {
                 child: FilterPill(
                   label: f.toUpperCase(),
                   isSelected: _viewModel.filter == f,
-                  onTap: () => _viewModel.load(
-                    childId: widget.childId,
-                    filter: f,
-                  ),
+                  onTap: () =>
+                      _viewModel.load(childId: widget.childId, filter: f),
                   hapticFeedback: true,
                 ),
               );

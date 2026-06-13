@@ -122,15 +122,10 @@ class _OtpScreenState extends State<OtpScreen> {
   void _onViewModelChanged() {
     if (_viewModel.errorMessage != null) {
       final l10n = AppLocalizations.of(context)!;
-      final message =
-          _viewModel.errorMessage == 'authInvalidVerificationCode'
+      final message = _viewModel.errorMessage == 'authInvalidVerificationCode'
           ? l10n.authInvalidVerificationCode
           : _viewModel.errorMessage!;
-      AppToast.show(
-        context,
-        message,
-        type: AppToastType.error,
-      );
+      AppToast.show(context, message, type: AppToastType.error);
     }
   }
 

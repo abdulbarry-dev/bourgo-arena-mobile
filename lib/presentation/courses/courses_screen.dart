@@ -4,7 +4,9 @@ import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/get_courses_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/subscription/get_active_subscriptions_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/service/get_services_use_case.dart';
+import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/filter_pill.dart';
+import 'package:bourgo_arena_mobile/presentation/common/widgets/guest_auth_state.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/pressable_card.dart';
 import 'package:bourgo_arena_mobile/presentation/common/widgets/skeleton_card.dart';
 import 'package:bourgo_arena_mobile/presentation/planning/widgets/course_card.dart';
@@ -41,6 +43,12 @@ class _CoursesScreenState extends State<CoursesScreen> {
       _error = null;
       _hasSubscriptionGap = false;
     });
+
+    if (!locator<AuthStateNotifier>().isAuthenticated) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+
     final result = await locator<GetCoursesUseCase>()();
     if (!mounted) return;
     result.when(
@@ -222,6 +230,10 @@ class _CoursesScreenState extends State<CoursesScreen> {
   }
 
   Widget _buildBody() {
+    if (!locator<AuthStateNotifier>().isAuthenticated) {
+      return const GuestAuthState(icon: Symbols.school);
+    }
+
     if (_isLoading) {
       return RefreshIndicator(
         onRefresh: _load,

@@ -2,6 +2,7 @@ import 'package:bourgo_arena_mobile/core/constants/app_constants.dart';
 import 'package:bourgo_arena_mobile/core/di/locator.dart';
 import 'package:bourgo_arena_mobile/core/theme/bourgo_theme.dart';
 import 'package:bourgo_arena_mobile/presentation/auth/auth_state_notifier.dart';
+import 'package:bourgo_arena_mobile/core/utils/auth_utils.dart';
 import 'package:bourgo_arena_mobile/domain/entities/course.dart';
 import 'package:bourgo_arena_mobile/domain/usecases/course/enroll_in_course_use_case.dart';
 import 'package:bourgo_arena_mobile/domain/repositories/course_repository.dart';
@@ -148,11 +149,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           _loadSessions();
         },
         failure: (f) {
-          AppToast.show(
-            context,
-            f.message,
-            type: AppToastType.error,
-          );
+          AppToast.show(context, f.message, type: AppToastType.error);
         },
       );
       return;
@@ -178,11 +175,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
         _loadSessions();
       },
       failure: (f) {
-        AppToast.show(
-          context,
-          f.message,
-          type: AppToastType.error,
-        );
+        AppToast.show(context, f.message, type: AppToastType.error);
         _showSubscriptionGate();
       },
     );
@@ -641,9 +634,13 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
           ),
           const SizedBox(height: 16),
           ElevatedButton(
-            onPressed: () => isAuthenticated
-                ? context.push('/plans')
-                : context.push('/login'),
+            onPressed: () {
+              if (!isAuthenticated) {
+                ensureAuthenticated(context);
+                return;
+              }
+              context.push('/plans');
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,

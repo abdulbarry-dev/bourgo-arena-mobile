@@ -176,9 +176,14 @@ GoRouter createRouter(
         location == '/search' ||
         location == '/services' ||
         location.startsWith('/services/') ||
+        location == '/courses' ||
         location.startsWith('/courses/') ||
+        location == '/activities' ||
         location.startsWith('/activities/') ||
-        location.startsWith('/events/');
+        location == '/events' ||
+        location.startsWith('/events/') ||
+        location == '/my-events' ||
+        location == '/transactions';
 
     // Routes that are part of the verification/onboarding flow
     final bool isSetupRoute =
@@ -640,6 +645,5 @@ GoRouter createRouter(
         return EventDetailScreen(eventId: eventId, event: event);
       },
     ),
-    // NFC screen removed — route intentionally deleted.
   ],
 );

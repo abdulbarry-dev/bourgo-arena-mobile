@@ -332,8 +332,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
       context,
       success
           ? AppLocalizations.of(context)!.editProfilePhotoDeleted
-          : AppLocalizations.of(context)!
-              .editProfilePhotoDeleteFailed,
+          : AppLocalizations.of(context)!.editProfilePhotoDeleteFailed,
       type: success ? AppToastType.success : AppToastType.error,
     );
   }

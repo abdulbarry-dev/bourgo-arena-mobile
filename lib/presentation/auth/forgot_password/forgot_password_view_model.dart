@@ -61,11 +61,7 @@ class ForgotPasswordViewModel extends ChangeNotifier {
         },
       );
     } else {
-      AppToast.show(
-        context,
-        failure.message,
-        type: AppToastType.error,
-      );
+      AppToast.show(context, failure.message, type: AppToastType.error);
     }
   }
 

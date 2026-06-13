@@ -262,11 +262,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
           return;
         }
 
-        AppToast.show(
-          context,
-          f.message,
-          type: AppToastType.error,
-        );
+        AppToast.show(context, f.message, type: AppToastType.error);
       },
     );
   }
@@ -319,11 +315,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         );
       },
       failure: (f) {
-        AppToast.show(
-          context,
-          f.message,
-          type: AppToastType.error,
-        );
+        AppToast.show(context, f.message, type: AppToastType.error);
       },
     );
   }
@@ -363,11 +355,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         );
       },
       failure: (f) {
-        AppToast.show(
-          context,
-          f.message,
-          type: AppToastType.error,
-        );
+        AppToast.show(context, f.message, type: AppToastType.error);
       },
     );
   }

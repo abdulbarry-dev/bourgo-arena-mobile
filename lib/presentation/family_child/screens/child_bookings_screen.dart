@@ -81,9 +81,7 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
                     slivers: [
-                      SliverToBoxAdapter(
-                        child: _buildFilterTabs(spacing),
-                      ),
+                      SliverToBoxAdapter(child: _buildFilterTabs(spacing)),
                       if (_viewModel.bookings.isEmpty)
                         SliverFillRemaining(
                           hasScrollBody: false,
@@ -175,10 +173,8 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
                 child: FilterPill(
                   label: f.toUpperCase(),
                   isSelected: _viewModel.filter == f,
-                  onTap: () => _viewModel.load(
-                    childId: widget.childId,
-                    filter: f,
-                  ),
+                  onTap: () =>
+                      _viewModel.load(childId: widget.childId, filter: f),
                   hapticFeedback: true,
                 ),
               );
@@ -204,12 +200,8 @@ class _ChildBookingsScreenState extends State<ChildBookingsScreen> {
       AppToast.show(
         context,
         success
-            ? AppLocalizations.of(
-                context,
-              )!.familyChildBookingCompletedSuccess
-            : AppLocalizations.of(
-                context,
-              )!.familyChildBookingCompletedFailure,
+            ? AppLocalizations.of(context)!.familyChildBookingCompletedSuccess
+            : AppLocalizations.of(context)!.familyChildBookingCompletedFailure,
         type: success ? AppToastType.success : AppToastType.error,
       );
     }

@@ -61,11 +61,7 @@ class NewPasswordViewModel extends ChangeNotifier {
   }
 
   void _handleFailure(BuildContext context, Failure failure) {
-    AppToast.show(
-      context,
-      failure.message,
-      type: AppToastType.error,
-    );
+    AppToast.show(context, failure.message, type: AppToastType.error);
   }
 
   @override

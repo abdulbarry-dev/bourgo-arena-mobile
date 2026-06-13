@@ -20,12 +20,14 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
     String? integrityToken,
   }) {
     if (AppConfig.isLocalEnvironment) {
-      return Future.value(Success(
-        DeviceRegistrationData(
-          token: 'local-dummy-token',
-          expiresAt: DateTime.now().add(const Duration(days: 30)),
+      return Future.value(
+        Success(
+          DeviceRegistrationData(
+            token: 'local-dummy-token',
+            expiresAt: DateTime.now().add(const Duration(days: 30)),
+          ),
         ),
-      ));
+      );
     }
     return executeApiCall(() async {
       final response =
@@ -65,12 +67,14 @@ class ApiDeviceRegistrationRepository implements DeviceRegistrationRepository {
   @override
   Future<Result<DeviceRefreshData, Failure>> refresh() {
     if (AppConfig.isLocalEnvironment) {
-      return Future.value(Success(
-        DeviceRefreshData(
-          token: 'local-dummy-token',
-          expiresAt: DateTime.now().add(const Duration(days: 30)),
+      return Future.value(
+        Success(
+          DeviceRefreshData(
+            token: 'local-dummy-token',
+            expiresAt: DateTime.now().add(const Duration(days: 30)),
+          ),
         ),
-      ));
+      );
     }
     return executeApiCall(() async {
       final response =

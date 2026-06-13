@@ -96,8 +96,9 @@ class _SubscriptionManagementScreenState
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
           appBar: SubScreenAppBar(
-            title: AppLocalizations.of(context)!
-                .subscriptionManagementPageTitle,
+            title: AppLocalizations.of(
+              context,
+            )!.subscriptionManagementPageTitle,
           ),
           body: _viewModel.isLoading
               ? _buildSkeletonLoading(theme)
@@ -127,8 +128,9 @@ class _SubscriptionManagementScreenState
           fontFamily: GoogleFonts.dmSans().fontFamily,
         ),
         decoration: InputDecoration(
-          hintText: AppLocalizations.of(context)!
-              .subscriptionManagementSearchHint,
+          hintText: AppLocalizations.of(
+            context,
+          )!.subscriptionManagementSearchHint,
           hintStyle: TextStyle(
             color: theme.colorScheme.onSurfaceVariant,
             fontFamily: GoogleFonts.dmSans().fontFamily,

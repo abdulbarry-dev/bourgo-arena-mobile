@@ -4,7 +4,7 @@
   "tagline": "Le QG du Sport à Djerba",
   "onboardingTitle": "REPOUSSEZ VOS LIMITES",
   "onboardingSubtitle": "Découvrez le centre de performance sportive ultime au cœur de Djerba.",
-  
+
   "commonRetry": "RÉESSAYER",
   "commonLoadingError": "Erreur de chargement",
   "commonNoResults": "AUCUN RÉSULTAT",
@@ -27,12 +27,12 @@
   "commonSetUp": "CONFIGURER",
   "commonPointsShort": "pts",
   "guestBrowse": "CONTINUER EN TANT QU'INVITÉ",
-  
+
   "navHome": "ACCUEIL",
   "navActivities": "PARCOURIR",
   "navPlanning": "PLANNING",
   "navProfile": "COMPTE",
-  
+
   "homeHeroPart1": "REJOIGNEZ",
   "homeHeroPart2": "L'ARÈNE",
   "homeTicker": "RÉSERVEZ VOTRE SESSION • FOOTBALL • PADEL • FITNESS • ",
@@ -42,7 +42,7 @@
   "homeActivitiesEmptySubtitle": "Revenez plus tard pour découvrir de nouveaux sports.",
   "homeSeeAll": "VOIR TOUT",
   "homeTodayTitle": "AUJOURD'HUI",
-  
+
   "activitiesExplorer": "DÉCOUVRIR LE SPORT",
   "activitiesMyReservations": "MES RÉSERVATIONS",
   "activitiesNoReservations": "Aucune réservation trouvée.",
@@ -54,7 +54,7 @@
   "activitiesStatusConfirmed": "CONFIRMÉ",
   "activitiesStatusPending": "EN ATTENTE",
   "activitiesStatusCancelled": "ANNULÉ",
-  
+
   "authLogin": "SE CONNECTER",
   "authRegister": "S'INSCRIRE",
   "authForgotPassword": "Mot de passe oublié ?",
@@ -94,7 +94,7 @@
   "authSendCode": "ENVOYER LE CODE",
   "authVerify": "VÉRIFIER",
   "authReset": "RÉINITIALISER",
-  
+
   "profilePoints": "POINTS BOURGO",
   "profileCheckins": "VISITES",
   "profileMySubscription": "Mon Adhésion",
@@ -135,12 +135,12 @@
   "profileNoCheckinsSubtitle": "Vos passages apparaîtront ici une fois que vous entrerez dans l'arène.",
   "profileNoHistory": "Aucune réservation passée.",
   "profileNoHistorySubtitle": "Vos activités et sessions passées apparaîtront ici une fois terminées.",
-  
+
   "planningTitle": "PLANNING DES COURS",
   "planningFilterTitle": "FILTRER PAR CATÉGORIE",
   "planningNoCourses": "Aucun cours prévu pour ce jour.",
   "planningNoCoursesSubtitle": "Essayez de sélectionner un autre jour de la semaine ou une catégorie différente pour trouver des sessions disponibles.",
-  
+
   "bookingTitle": "RÉSERVATION",
   "bookingSuccess": "RÉSERVATION RÉUSSIE !",
   "bookingConfirmed": "RÉSERVATION CONFIRMÉE !",
@@ -169,7 +169,7 @@
   "bookingSportDefault": "Sport",
   "bookingLocationValue": "Bourgo Arena, Djerba",
   "bookingTodayAt": "Aujourd'hui à 18:30",
-  
+
   "commonMon": "LUN",
   "commonTue": "MAR",
   "commonWed": "MER",
@@ -177,17 +177,17 @@
   "commonFri": "VEN",
   "commonSat": "SAM",
   "commonSun": "DIM",
-  
+
   "notificationsTitle": "NOTIFICATIONS",
   "notificationsMarkAllRead": "TOUT LIRE",
   "notificationsEmpty": "Aucune notification pour le moment.",
   "notificationsEmptySubtitle": "Nous vous préviendrons ici lorsque vous aurez une nouvelle réservation ou une offre spéciale.",
-  
+
   "planningCategoryAll": "Tous",
   "planningCategoryFitness": "Fitness",
   "planningCategoryAcademy": "Academy",
   "planningCategoryWellness": "Wellness",
-  
+
   "bookingStepSport": "SPORT",
   "bookingStepDetails": "DÉTAILS",
   "bookingStepTime": "HORAIRE",
